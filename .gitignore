@@ -1,0 +1,4 @@
+node_modules/
+
+# 에이전트 작업 계획 스크래치 — 로컬 개발용 DB 비밀번호가 포함되어 있어 원격에 올리지 않음
+docs/superpowers/

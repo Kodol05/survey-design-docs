@@ -1,0 +1,13 @@
+{
+  "name": "mermaid-lint",
+  "private": true,
+  "type": "module",
+  "description": "문서의 Mermaid 코드블록을 실제 파서로 검증합니다",
+  "scripts": {
+    "lint": "node mermaid-lint.mjs ../docs"
+  },
+  "dependencies": {
+    "jsdom": "^26.0.0",
+    "mermaid": "^11.17.0"
+  }
+}
