@@ -520,4 +520,4 @@ flowchart LR
 
 ---
 
-상세 설계는 `00_설계_작업본.md`와 `01_기능_UX_설계.md`에 있습니다.
+상세 설계는 `00-design-notes.md`와 `01-features-ux.md`에 있습니다.
