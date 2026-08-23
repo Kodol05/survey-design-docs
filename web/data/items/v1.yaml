@@ -3,60 +3,168 @@
 # 이 파일이 검사의 실체다. 고칠 때 프로그램은 건드리지 않는다.
 # seed 전에 형식 검사를 통과해야 한다 (src/lib/items/validate.ts).
 #
-# sourceRef 규칙 — 어디서 온 문항인지 반드시 적는다 (00 §5 저작권 대응).
-#   IPIP 프록시는 "어떤 내용이 이 척도와 상관이 높은가"를 알려주는 참고자료일 뿐,
-#   문항을 그대로 옮기는 것이 아니다. 한국어로 새로 쓴다.
+# ── 작성 규칙 ─────────────────────────────────────────────────────────
 #
-# 성향 문항은 직장 맥락으로 쓴다 (08). 다만 기질 축은 상황과 무관하게
-# 나타나는 것을 재므로 전부 직장 상황으로 바꾸지 않는다.
+# 1. 하위척도는 한국판 TCI-RS 공식 명칭을 쓴다 (00 §2.9.3).
+#    양극 명칭이 역채점 방향을 그대로 알려준다.
+#    예) `탐색적 흥분 / 관습적 안정성` → 관습적 안정성 쪽 진술이 역방향 문항.
 #
-# ⚠️ 아래는 포맷 확인용 예시 8개다. 본 문항 114개는 Task 4에서 쓴다.
+# 2. sourceRef 에 어디서 온 문항인지 반드시 적는다 (00 §5 저작권 대응).
+#    IPIP 프록시는 "어떤 내용이 이 척도와 상관이 높은가"를 알려주는 참고자료다.
+#    문항을 옮기는 것이 아니라 방향만 보고 한국어로 새로 쓴다.
+#
+# 3. 맥락화 — 직장 상황으로 묻는 문항이 일반형보다 직무성과를 잘 예측한다(08).
+#    다만 **기질 축은 절반쯤만 맥락화한다.** 기질은 원래 상황과 무관하게
+#    나타나는 것을 재는 축이라, 전부 직장 상황으로 바꾸면 다른 것을 재게 된다.
+#    성격 축(자율성·연대감·자기초월)은 대부분 맥락화한다.
+#
+# 4. 역방향 비율 25~45%. 짝(antonymOf)은 서로를 가리키고 방향이 반대여야 한다.
+#    이 짝이 응답 품질 지표 두 축 중 하나(반대 문항 일치도)의 전부다.
+#
+# ── 진행 상황 ─────────────────────────────────────────────────────────
+#   자극추구   15 / 15  ✅
+#   위험회피    0 / 15
+#   사회적민감성 0 / 15
+#   인내력      0 / 15
+#   자율성      0 / 15
+#   연대감      0 / 15
+#   자기초월    0 / 15
+#   직무능력    3 / 9   (협력만)
 
 version: 1
 title: 7차원 성향 설문 v1
 
 items:
-  # ── 성향 ──────────────────────────────────────────────
+  # ══ 자극추구 (NS) ══════════════════════════════════════════════════
+  # IPIP 프록시: Variety-seeking(.72) · Recklessness(.60) ·
+  #              Extravagance(.60) · Rebelliousness(.60)  — 00 §2.1
+
+  # ── 탐색적 흥분 / 관습적 안정성 ──
   - kind: trait
     code: NS1-01
     scale: 자극추구
-    subscale: 자극추구성 흥분
+    subscale: 탐색적 흥분
     content: 처음 맡는 거래처를 배정받으면 부담보다 흥미가 앞선다.
-    sourceRef: IPIP Variety-seeking 구성개념 참고 (00 §2.1)
+    sourceRef: 한국판 TCI-RS 탐색적 흥분 facet 정의 · IPIP Variety-seeking 참고(.72)
     antonymOf: NS1-02
 
   - kind: trait
     code: NS1-02
     scale: 자극추구
-    subscale: 자극추구성 흥분
+    subscale: 탐색적 흥분
     content: 늘 하던 방식대로 하는 일이 마음이 편하다.
     reverse: true
-    sourceRef: IPIP Variety-seeking 구성개념 참고 (역방향)
+    sourceRef: 한국판 TCI-RS 관습적 안정성(양극 반대편) · NS1-01의 반대 방향
     antonymOf: NS1-01
 
   - kind: trait
-    code: HA3-01
-    scale: 위험회피
-    subscale: 낯선사람 수줍음
-    content: 처음 보는 사람이 많은 자리에서는 말수가 줄어든다.
-    sourceRef: IPIP Social discomfort 구성개념 참고 (원본 상관 .81)
+    code: NS1-03
+    scale: 자극추구
+    subscale: 탐색적 흥분
+    content: 안 가본 동네나 새로 생긴 곳을 굳이 찾아가 보는 편이다.
+    sourceRef: 한국판 TCI-RS 탐색적 흥분 facet 정의 · IPIP Variety-seeking 참고
 
   - kind: trait
-    code: PS3-01
-    scale: 인내력
-    subscale: 성취에 대한 야망
-    content: 목표를 정하면 어지간해서는 중간에 놓지 않는다.
-    sourceRef: IPIP Achievement-striving 구성개념 참고 (원본 상관 .68)
+    code: NS1-04
+    scale: 자극추구
+    subscale: 탐색적 흥분
+    content: 회의에서 아무도 꺼내지 않은 방식을 먼저 말해보는 편이다.
+    sourceRef: 한국판 TCI-RS 탐색적 흥분 facet 정의 · 직장 맥락
+
+  # ── 충동성 / 심사숙고 ──
+  - kind: trait
+    code: NS2-01
+    scale: 자극추구
+    subscale: 충동성
+    content: 괜찮아 보이는 일은 자세히 따져보기 전에 일단 시작한다.
+    sourceRef: 한국판 TCI-RS 충동성 facet 정의 · IPIP Recklessness 참고(.60)
+    antonymOf: NS2-02
 
   - kind: trait
-    code: SD5-01
-    scale: 자율성
-    subscale: 자기일치
-    content: 하기 싫은 일이라도 해야 할 때는 미루지 않는다.
-    sourceRef: IPIP Impulse control 구성개념 참고 (원본 상관 .72)
+    code: NS2-02
+    scale: 자극추구
+    subscale: 충동성
+    content: 일을 정하기 전에 따져볼 것은 다 따져보고 넘어간다.
+    reverse: true
+    sourceRef: 한국판 TCI-RS 심사숙고(양극 반대편) · NS2-01의 반대 방향
+    antonymOf: NS2-01
 
-  # ── 직무능력 ──────────────────────────────────────────
+  - kind: trait
+    code: NS2-03
+    scale: 자극추구
+    subscale: 충동성
+    content: 하고 싶은 말이 떠오르면 담아두기가 어렵다.
+    sourceRef: 한국판 TCI-RS 충동성 facet 정의 · IPIP Recklessness 참고
+
+  - kind: trait
+    code: NS2-04
+    scale: 자극추구
+    subscale: 충동성
+    content: 언짢은 일이 있어도 한 박자 두고 반응하는 편이다.
+    reverse: true
+    sourceRef: 한국판 TCI-RS 심사숙고(양극 반대편)
+
+  # ── 무절제 / 절제 ──
+  - kind: trait
+    code: NS3-01
+    scale: 자극추구
+    subscale: 무절제
+    content: 갖고 싶은 것이 생기면 형편을 따지기 전에 사는 편이다.
+    sourceRef: 한국판 TCI-RS 무절제 facet 정의 · IPIP Extravagance 참고(.60)
+    antonymOf: NS3-02
+
+  - kind: trait
+    code: NS3-02
+    scale: 자극추구
+    subscale: 무절제
+    content: 쓸 돈은 미리 정해두고 그 안에서 쓴다.
+    reverse: true
+    sourceRef: 한국판 TCI-RS 절제(양극 반대편) · NS3-01의 반대 방향
+    antonymOf: NS3-01
+
+  - kind: trait
+    code: NS3-03
+    scale: 자극추구
+    subscale: 무절제
+    content: 재미있는 자리가 생기면 다음 날 일정을 생각하지 않고 끝까지 간다.
+    sourceRef: 한국판 TCI-RS 무절제 facet 정의 · IPIP Extravagance 참고
+
+  - kind: trait
+    code: NS3-04
+    scale: 자극추구
+    subscale: 무절제
+    content: 한번 흥이 오르면 적당한 선에서 멈추기가 어렵다.
+    sourceRef: 한국판 TCI-RS 무절제 facet 정의
+
+  # ── 자유분방 / 질서정연 ──
+  - kind: trait
+    code: NS4-01
+    scale: 자극추구
+    subscale: 자유분방
+    content: 정해진 절차가 번거로우면 건너뛰고 싶어진다.
+    sourceRef: 한국판 TCI-RS 자유분방 facet 정의 · IPIP Rebelliousness 참고(.60)
+    antonymOf: NS4-02
+
+  - kind: trait
+    code: NS4-02
+    scale: 자극추구
+    subscale: 자유분방
+    content: 정해진 규정은 번거로워도 그대로 따르는 편이다.
+    reverse: true
+    sourceRef: 한국판 TCI-RS 질서정연(양극 반대편) · NS4-01의 반대 방향
+    antonymOf: NS4-01
+
+  - kind: trait
+    code: NS4-03
+    scale: 자극추구
+    subscale: 자유분방
+    content: 미리 계획을 세우기보다 그때그때 정하는 편이 편하다.
+    sourceRef: 한국판 TCI-RS 자유분방 facet 정의
+
+  # ══ 직무능력 ═══════════════════════════════════════════════════════
   # 능력당 직접형 1 + 간접형 2 (07). 성향 문항 사이에 섞어 배치한다.
+  # 직접형만 두면 거의 다 높게 답해서 사람마다 구분이 되지 않는다.
+
   - kind: ability
     code: AB-COOP-01
     axis: 협력
