@@ -1,12 +1,8 @@
-import { Card } from "@/components/ui/Card";
+import { redirect } from "next/navigation";
+import { currentUser } from "@/lib/auth/session";
 
-export default function Home() {
-  return (
-    <main className="reading-column py-16">
-      <h1 className="text-screen-title mb-6">7차원 성향 설문</h1>
-      <Card>
-        <p className="text-ink-secondary">준비 중입니다.</p>
-      </Card>
-    </main>
-  );
+export default async function Home() {
+  const me = await currentUser();
+  if (!me) redirect("/login");
+  redirect(me.role === "ADMIN" ? "/admin" : "/me");
 }
