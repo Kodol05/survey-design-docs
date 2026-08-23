@@ -50,19 +50,6 @@ export default async function MePage() {
         }))}
       />
 
-      <dl className="text-axis mx-auto mt-12 grid max-w-3xl grid-cols-[5rem_1fr] gap-x-6 gap-y-1 border-t border-[--border] pt-6">
-        <dt className="text-ink font-medium">눈금이란?</dt>
-        <dd className="text-ink-secondary">
-          0에서 100까지이고, 모든 문항에 &ldquo;보통&rdquo;으로 답하면 50이 나옵니다.
-        </dd>
-        <dd className="text-ink-secondary col-start-2">
-          40 아래면 왼쪽 특성, 60 위면 오른쪽 특성이 두드러지는 편으로 봅니다.
-        </dd>
-        <dd className="text-ink-secondary col-start-2">
-          어느 쪽이 좋은 것은 아니고, 딱 잘리는 기준도 아니라 참고로만 보시면 됩니다.
-        </dd>
-      </dl>
-
       <section className="mt-20 grid gap-12 lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)] lg:items-center">
         <div>
           <h2 className="text-section-title mb-3">한눈에 보기</h2>
