@@ -1,0 +1,24 @@
+
+> survey-web@0.1.0 dev
+> next dev
+
+▲ Next.js 16.3.2 (Turbopack)
+- Local:         http://localhost:3000
+- Network:       http://192.168.219.100:3000
+- Environments: .env
+✓ Ready in 550ms
+✓ Running next.config.ts took 52ms
+
+ GET /signup 200 in 1750ms (next.js: 1541ms, application-code: 209ms)
+ GET /survey 200 in 443ms (next.js: 326ms, application-code: 117ms)
+ POST /signup 200 in 676ms (next.js: 11ms, application-code: 665ms)
+  └─ ƒ signup(undefined, {}) in 202ms src/lib/auth/actions.ts
+ GET /survey 200 in 176ms (next.js: 5ms, application-code: 171ms)
+✓ Compiled in 57ms
+ GET /survey 200 in 85ms (next.js: 14ms, application-code: 71ms)
+ GET /survey 200 in 83ms (next.js: 12ms, application-code: 71ms)
+ GET /survey 200 in 78ms (next.js: 12ms, application-code: 66ms)
+ GET /survey 200 in 110ms (next.js: 5ms, application-code: 105ms)
+ GET /survey 200 in 113ms (next.js: 5ms, application-code: 108ms)
+✓ Compiled in 34ms
+ GET /survey 200 in 76ms (next.js: 12ms, application-code: 64ms)

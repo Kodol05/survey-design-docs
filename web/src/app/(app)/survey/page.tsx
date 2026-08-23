@@ -28,9 +28,9 @@ export default async function SurveyPage(props: {
   const pct = Math.round(((section - 1) / SECTION_COUNT) * 100);
 
   return (
-    <main className="reading-column py-8">
+    <main className="mx-auto w-full max-w-4xl px-6">
       {/* 진행률 — 바 + "묶음 N / 7". 퍼센트 숫자와 타이머는 두지 않는다 (01 §2.5) */}
-      <div className="sticky top-0 z-10 -mx-4 bg-page/95 px-4 pt-2 pb-4 backdrop-blur">
+      <div className="sticky top-0 z-10 -mx-6 bg-page/95 px-6 pt-4 pb-4 backdrop-blur">
         <div className="mb-2 flex items-baseline justify-between">
           <h1 className="text-section-title">7차원 성향 설문</h1>
           <span className="text-axis text-ink-secondary tabular">
@@ -38,7 +38,7 @@ export default async function SurveyPage(props: {
           </span>
         </div>
         <div
-          className="h-1.5 w-full overflow-hidden rounded-full"
+          className="h-2 w-full overflow-hidden rounded-full"
           style={{ background: "var(--grid)" }}
           role="progressbar"
           aria-valuenow={section}
@@ -46,11 +46,14 @@ export default async function SurveyPage(props: {
           aria-valuemax={SECTION_COUNT}
           aria-label={`전체 ${SECTION_COUNT}묶음 중 ${section}번째`}
         >
-          <div className="h-full" style={{ width: `${pct}%`, background: "var(--series-1)" }} />
+          <div
+            className="h-full transition-[width] duration-300"
+            style={{ width: `${pct}%`, background: "var(--series-1)" }}
+          />
         </div>
       </div>
 
-      <p className="text-ink-secondary my-8">
+      <p className="text-ink-secondary my-10 text-center">
         정답이 없습니다. 오래 고민하지 마시고 평소 모습에 가까운 쪽을 골라 주세요.
       </p>
 
