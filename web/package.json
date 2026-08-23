@@ -12,7 +12,9 @@
     "db:migrate": "prisma migrate dev",
     "db:studio": "prisma studio",
     "test": "vitest run",
-    "test:watch": "vitest"
+    "test:watch": "vitest",
+    "db:seed": "tsx scripts/seed.mts",
+    "items": "tsx scripts/items-report.mts"
   },
   "dependencies": {
     "@prisma/adapter-pg": "^7.9.1",
