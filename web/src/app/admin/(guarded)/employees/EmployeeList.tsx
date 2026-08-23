@@ -44,10 +44,10 @@ export function EmployeeList({ rows, open }: { rows: Row[]; open: boolean }) {
             <th className="w-44 pb-2 text-left font-medium">이름</th>
             <th className="w-28 pb-2 text-left font-medium">번호</th>
             <th className="w-20 pb-2 text-left font-medium">상태</th>
-            <th className="min-w-[22rem] pb-2 text-left font-medium">
+            <th className="w-px pb-2 text-left font-medium whitespace-nowrap">
               {open ? <TraitStripHeader /> : "성향"}
             </th>
-            <th className="w-16 pb-2 text-left font-medium">품질</th>
+            <th className="pb-2 pl-8 text-left font-medium">품질</th>
           </tr>
         </thead>
         <tbody>
@@ -77,14 +77,14 @@ export function EmployeeList({ rows, open }: { rows: Row[]; open: boolean }) {
                   <td className="text-axis text-ink-secondary py-3">
                     {r.status ? STATUS[r.status as keyof typeof STATUS] : "미응시"}
                   </td>
-                  <td className="py-3 pr-6">
+                  <td className="py-3 whitespace-nowrap">
                     {open ? (
                       <TraitStrip traits={r.traits} />
                     ) : (
                       <span className="text-axis text-ink-muted">공개 전</span>
                     )}
                   </td>
-                  <td className="text-axis py-3" style={{ color: flag?.color }}>
+                  <td className="text-axis py-3 pl-8" style={{ color: flag?.color }}>
                     {flag?.label ?? ""}
                   </td>
                 </tr>

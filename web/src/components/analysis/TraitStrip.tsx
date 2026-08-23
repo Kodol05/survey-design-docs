@@ -2,44 +2,39 @@ import { colorAt } from "../charts/scale";
 import { TRAIT_SCALES } from "@/lib/items/types";
 
 /**
- * 7축 히트 표 — 구성원 목록에서 한 사람을 한 줄로 훑는 용도.
+ * 7축 한 줄 표시 — 구성원 목록에서 한 사람을 훑는 용도.
  *
- * **색과 숫자를 같이 둔다.** 색만 두면 정확한 값을 못 읽고, 숫자만 두면
- * 50명을 훑을 수 없다. 색은 모양을 먼저 보여주고 숫자는 값을 확정해 준다.
+ * **숫자를 왼쪽에, 색 네모를 그 오른쪽에** 둔다. 칸 전체를 색으로 칠하면
+ * 줄마다 색 덩어리가 이어져 화면이 시끄럽다. 작은 네모로 떼어 두면 숫자가
+ * 먼저 읽히고 색은 옆에서 거들기만 한다.
  *
- * 색은 성향 눈금과 같다 — 왼쪽(낮음) 청회색, 오른쪽(높음) 테라코타.
+ * 색은 성향 눈금과 같다 — 청회색이 낮음, 테라코타가 높음.
  */
 
-/** 칸 배경에 얹을 글자색. 진한 칸에는 흰 글자를 쓴다. */
-function readableInk(hex: string): string {
-  const n = parseInt(hex.slice(1), 16);
-  const [r, g, b] = [(n >> 16) & 255, (n >> 8) & 255, n & 255].map((v) => {
-    const c = v / 255;
-    return c <= 0.03928 ? c / 12.92 : ((c + 0.055) / 1.055) ** 2.4;
-  });
-  const lum = 0.2126 * r + 0.7152 * g + 0.0722 * b;
-  return lum > 0.45 ? "var(--ink)" : "#ffffff";
-}
+const CELL = "w-[3.25rem]";
 
 export function TraitStrip({ traits }: { traits: Record<string, number> | null }) {
   if (!traits)
     return <span className="text-ink-muted text-axis">아직 결과가 없습니다</span>;
 
   return (
-    <div className="flex gap-px" role="img" aria-label={describe(traits)}>
+    <div className="flex gap-3" role="img" aria-label={describe(traits)}>
       {TRAIT_SCALES.map((s) => {
         const v = traits[s];
         const has = typeof v === "number";
-        const bg = has ? colorAt(v) : "var(--grid)";
         return (
-          <div
+          <span
             key={s}
             title={has ? `${s} ${Math.round(v)}` : s}
-            className="tabular flex h-8 flex-1 items-center justify-center text-[0.8125rem] font-medium first:rounded-l-sm last:rounded-r-sm"
-            style={{ background: bg, color: has ? readableInk(bg) : "var(--ink-muted)" }}
+            className={`${CELL} flex items-center justify-end gap-1.5`}
           >
-            {has ? Math.round(v) : "—"}
-          </div>
+            <span className="tabular text-table">{has ? Math.round(v) : "—"}</span>
+            <span
+              aria-hidden
+              className="size-3 shrink-0 rounded-[3px]"
+              style={{ background: has ? colorAt(v) : "var(--grid)" }}
+            />
+          </span>
         );
       })}
     </div>
@@ -62,14 +57,14 @@ function describe(traits: Record<string, number>) {
   ).join(", ");
 }
 
-/** 목록 머리에 한 번 두는 축 이름 줄 */
+/** 목록 머리에 한 번 두는 축 이름 줄. 아래 칸과 자리를 맞춘다. */
 export function TraitStripHeader() {
   return (
-    <div className="flex gap-px">
+    <div className="flex gap-3">
       {TRAIT_SCALES.map((s) => (
         <span
           key={s}
-          className="text-ink-muted flex-1 text-center"
+          className={`${CELL} text-ink-muted pr-[1.125rem] text-right`}
           style={{ fontSize: 13 }}
           title={s}
         >
