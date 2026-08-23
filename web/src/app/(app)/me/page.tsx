@@ -57,13 +57,13 @@ export default async function MePage() {
         }))}
       />
 
-      <section className="mx-auto mt-20 max-w-3xl border-t border-[--border] pt-10">
+      <section className="mt-24 border-t border-[--border] pt-10">
         <h2 className="text-section-title mb-6">묶어서 보면</h2>
         <CubeReading
           temperament={temperamentCube(axes)}
           character={characterCube(axes)}
         />
-        <p className="text-axis text-ink-muted mt-8">
+        <p className="text-axis text-ink-muted mt-8 max-w-3xl">
           일곱 축을 따로 보는 것과 묶어서 보는 것은 다릅니다. 위는 세 축이 겹쳤을 때
           어떤 모습이 되는지를 적은 것이고, 사람을 어떤 종류로 나누는 것이 아닙니다.
         </p>

@@ -39,17 +39,17 @@ function Row({ row }: { row: ProfileRow }) {
   const x = Math.max(0, Math.min(100, row.percent));
   const poles = POLES[row.scale];
   return (
-    <div className="py-7">
+    <div className="py-8">
       <p className="mb-3 text-center">
-        <span className="text-lg font-medium">{row.scale}</span>
+        <span className="text-xl font-medium">{row.scale}</span>
         <span className="text-ink-muted text-table ml-2">{BAND_LABEL[row.band]}</span>
       </p>
 
-      <div className="flex items-start gap-4">
-        <span className="text-axis text-ink-muted w-10 shrink-0 pt-2 text-right">낮음</span>
+      <div className="flex items-start gap-6">
+        <span className="text-ink-muted w-14 shrink-0 pt-1.5 text-right text-table">낮음</span>
 
         <div className="relative flex-1 pb-7">
-          <div className="h-3 w-full rounded-full" style={{ background: GRADIENT }} />
+          <div className="h-4 w-full rounded-full" style={{ background: GRADIENT }} />
 
           {/* 값이 있는 자리에 점, 그 바로 아래에 숫자 */}
           <div
@@ -57,25 +57,25 @@ function Row({ row }: { row: ProfileRow }) {
             style={{ left: `${x}%` }}
           >
             <span
-              className="block size-5 rounded-full ring-[3px]"
+              className="block size-6 rounded-full ring-4"
               style={{
                 background: "var(--ink)",
                 ["--tw-ring-color" as string]: "var(--page)",
                 marginTop: -4,
               }}
             />
-            <span className="tabular text-table mt-1 font-semibold">
+            <span className="tabular mt-1.5 font-semibold">
               {Math.round(row.percent)}
             </span>
           </div>
         </div>
 
-        <span className="text-axis text-ink-muted w-10 shrink-0 pt-2">높음</span>
+        <span className="text-ink-muted w-14 shrink-0 pt-1.5 text-table">높음</span>
       </div>
 
       {/* 낮을 때·높을 때가 어떤 모습인지. 해당하는 쪽을 진하게 둔다. */}
       {poles && (
-        <div className="text-axis mt-1 flex gap-6 px-14">
+        <div className="text-table mt-2 flex gap-8 px-20">
           <p className={`flex-1 ${row.band === "lower" ? "text-ink" : "text-ink-muted"}`}>
             {poles.low}
           </p>
@@ -96,9 +96,9 @@ export function TraitProfile({ rows }: { rows: ProfileRow[] }) {
     names.map((n) => byScale.get(n)).filter((r): r is ProfileRow => Boolean(r));
 
   return (
-    <div className="mx-auto max-w-3xl">
+    <div>
       <section>
-        <h3 className="text-ink-secondary mb-2 border-b border-[--border] pb-2 font-medium">
+        <h3 className="text-section-title text-ink-secondary mb-4 border-b border-[--border] pb-3">
           기질 <span className="text-ink-muted text-table font-normal">— 타고난 부분</span>
         </h3>
         {group(TEMPERAMENT).map((r) => (
@@ -107,7 +107,7 @@ export function TraitProfile({ rows }: { rows: ProfileRow[] }) {
       </section>
 
       <section className="mt-14">
-        <h3 className="text-ink-secondary mb-2 border-b border-[--border] pb-2 font-medium">
+        <h3 className="text-section-title text-ink-secondary mb-4 border-b border-[--border] pb-3">
           성격{" "}
           <span className="text-ink-muted text-table font-normal">— 살면서 형성된 부분</span>
         </h3>
