@@ -21,3 +21,13 @@ const rev = items.filter((i) => i.reverse).length;
 const pairs = items.filter((i) => i.antonymOf).length / 2;
 console.log(`\n역방향 ${rev}/${items.length} = ${((rev / items.length) * 100).toFixed(0)}%  (목표 25~45%)`);
 console.log(`반대 문항 짝 ${pairs}쌍\n`);
+
+// 전체 문항이 다 찼을 때만 통과하는 엄격 검사
+import { validateItemFile } from "../src/lib/items/validate";
+const strict = validateItemFile(f, { strictCount: true });
+if (strict.length) {
+  console.log(`엄격 검사 실패 ${strict.length}건`);
+  for (const p of strict) console.log(`  [${p.code}] ${p.message}`);
+  process.exit(1);
+}
+console.log("엄격 검사 통과 — seed 가능\n");

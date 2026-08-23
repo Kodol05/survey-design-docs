@@ -23,13 +23,13 @@
 #
 # ── 진행 상황 ─────────────────────────────────────────────────────────
 #   자극추구   15 / 15  ✅
-#   위험회피    0 / 15
-#   사회적민감성 0 / 15
-#   인내력      0 / 15
-#   자율성      0 / 15
-#   연대감      0 / 15
-#   자기초월    0 / 15
-#   직무능력    3 / 9   (협력만)
+#   위험회피   15 / 15  ✅
+#   사회적민감성 15 / 15  ✅
+#   인내력     15 / 15  ✅
+#   자율성     15 / 15  ✅
+#   연대감     15 / 15  ✅
+#   자기초월   15 / 15  ✅
+#   직무능력    9 / 9   ✅
 
 version: 1
 title: 7차원 성향 설문 v1
@@ -161,6 +161,778 @@ items:
     content: 미리 계획을 세우기보다 그때그때 정하는 편이 편하다.
     sourceRef: 한국판 TCI-RS 자유분방 facet 정의
 
+  # ══ 위험회피 (HA) ══════════════════════════════════════════════════
+  # IPIP 프록시: Neuroticism(.74) · Harmavoidance(.61) ·
+  #              Social discomfort(.81) · Low self-efficacy(.53)  — 00 §2.1
+  # 관련도 표에서 협력 −.25, 자율적 실행 −.36 으로 나온 축이다 (07).
+
+  # ── 예기불안 ──
+  - kind: trait
+    code: HA1-01
+    scale: 위험회피
+    subscale: 예기불안
+    content: 일을 맡으면 잘못될 수 있는 경우부터 먼저 떠올린다.
+    sourceRef: 한국판 TCI-RS 예기불안 facet 정의 · IPIP Neuroticism 참고(.74)
+    antonymOf: HA1-02
+
+  - kind: trait
+    code: HA1-02
+    scale: 위험회피
+    subscale: 예기불안
+    content: 일을 맡으면 일단 되는 쪽으로 생각하고 시작한다.
+    reverse: true
+    sourceRef: 한국판 TCI-RS 예기불안 반대 방향 · HA1-01의 짝
+    antonymOf: HA1-01
+
+  - kind: trait
+    code: HA1-03
+    scale: 위험회피
+    subscale: 예기불안
+    content: 별일 없을 것을 알면서도 마음이 놓이지 않을 때가 있다.
+    sourceRef: 한국판 TCI-RS 예기불안 facet 정의 · IPIP Neuroticism 참고
+
+  - kind: trait
+    code: HA1-04
+    scale: 위험회피
+    subscale: 예기불안
+    content: 발표나 보고를 앞두면 며칠 전부터 신경이 쓰인다.
+    sourceRef: 한국판 TCI-RS 예기불안 facet 정의 · 직장 맥락
+
+  # ── 불확실성에 대한 두려움 ──
+  - kind: trait
+    code: HA2-01
+    scale: 위험회피
+    subscale: 불확실성에 대한 두려움
+    content: 어떻게 될지 모르는 상태가 길어지면 견디기 힘들다.
+    sourceRef: 한국판 TCI-RS 불확실성에 대한 두려움 facet 정의 · IPIP Harmavoidance 참고(.61)
+    antonymOf: HA2-02
+
+  - kind: trait
+    code: HA2-02
+    scale: 위험회피
+    subscale: 불확실성에 대한 두려움
+    content: 결과가 정해지지 않은 일도 크게 불편하지 않다.
+    reverse: true
+    sourceRef: 한국판 TCI-RS 불확실성에 대한 두려움 반대 방향 · HA2-01의 짝
+    antonymOf: HA2-01
+
+  - kind: trait
+    code: HA2-03
+    scale: 위험회피
+    subscale: 불확실성에 대한 두려움
+    content: 처음 해보는 방식보다 결과가 확인된 방식을 고른다.
+    sourceRef: 한국판 TCI-RS 불확실성에 대한 두려움 facet 정의
+
+  - kind: trait
+    code: HA2-04
+    scale: 위험회피
+    subscale: 불확실성에 대한 두려움
+    content: 낯선 자리에 가기 전에 미리 알아보고 가야 마음이 놓인다.
+    sourceRef: 한국판 TCI-RS 불확실성에 대한 두려움 facet 정의 · IPIP Harmavoidance 참고
+
+  # ── 낯선 사람에 대한 수줍음 ──
+  # 원본과의 상관이 .81로 7축 하위척도 중 가장 높다. 구성개념이 명확한 편.
+  - kind: trait
+    code: HA3-01
+    scale: 위험회피
+    subscale: 낯선 사람에 대한 수줍음
+    content: 처음 보는 사람이 많은 자리에서는 말수가 줄어든다.
+    sourceRef: 한국판 TCI-RS 낯선 사람에 대한 수줍음 facet 정의 · IPIP Social discomfort 참고(.81)
+    antonymOf: HA3-02
+
+  - kind: trait
+    code: HA3-02
+    scale: 위험회피
+    subscale: 낯선 사람에 대한 수줍음
+    content: 처음 만난 사람과도 어렵지 않게 말을 트는 편이다.
+    reverse: true
+    sourceRef: 한국판 TCI-RS 낯선 사람에 대한 수줍음 반대 방향 · HA3-01의 짝
+    antonymOf: HA3-01
+
+  - kind: trait
+    code: HA3-03
+    scale: 위험회피
+    subscale: 낯선 사람에 대한 수줍음
+    content: 잘 모르는 부서 사람에게 먼저 말을 거는 것이 부담스럽다.
+    sourceRef: 한국판 TCI-RS 낯선 사람에 대한 수줍음 facet 정의 · 직장 맥락
+
+  - kind: trait
+    code: HA3-04
+    scale: 위험회피
+    subscale: 낯선 사람에 대한 수줍음
+    content: 여러 사람 앞에서 이야기할 때 긴장이 잘 가라앉지 않는다.
+    sourceRef: 한국판 TCI-RS 낯선 사람에 대한 수줍음 facet 정의
+
+  # ── 쉽게 지침 ──
+  - kind: trait
+    code: HA4-01
+    scale: 위험회피
+    subscale: 쉽게 지침
+    content: 바쁜 시기가 지나고 나면 한동안 회복이 되지 않는다.
+    sourceRef: 한국판 TCI-RS 쉽게 지침 facet 정의 · IPIP Low self-efficacy 참고(.53)
+    antonymOf: HA4-02
+
+  - kind: trait
+    code: HA4-02
+    scale: 위험회피
+    subscale: 쉽게 지침
+    content: 일이 몰려도 하루 쉬면 대체로 회복된다.
+    reverse: true
+    sourceRef: 한국판 TCI-RS 쉽게 지침 반대 방향 · HA4-01의 짝
+    antonymOf: HA4-01
+
+  - kind: trait
+    code: HA4-03
+    scale: 위험회피
+    subscale: 쉽게 지침
+    content: 남들보다 쉽게 피곤해지는 편이다.
+    sourceRef: 한국판 TCI-RS 쉽게 지침 facet 정의 · IPIP Low self-efficacy 참고
+
+  # ══ 사회적 민감성 (RD) ═════════════════════════════════════════════
+  # IPIP 프록시: Sentimentality(.67) · Friendliness(.79) ·
+  #              Self-disclosure(.78) · Dependence(.56)  — 00 §2.1
+  # 관련도 표에서 협력과 −.34. 이름과 결과가 어긋나는 축이다 (07).
+
+  # ── 정서적 감수성 ──
+  - kind: trait
+    code: RD1-01
+    scale: 사회적민감성
+    subscale: 정서적 감수성
+    content: 다른 사람의 표정이나 말투가 달라지면 금방 알아챈다.
+    sourceRef: 한국판 TCI-RS 정서적 감수성 facet 정의 · IPIP Sentimentality 참고(.67)
+    antonymOf: RD1-02
+
+  - kind: trait
+    code: RD1-02
+    scale: 사회적민감성
+    subscale: 정서적 감수성
+    content: 남이 기분이 상했는지는 말해주기 전에는 잘 모른다.
+    reverse: true
+    sourceRef: 한국판 TCI-RS 정서적 감수성 반대 방향 · RD1-01의 짝
+    antonymOf: RD1-01
+
+  - kind: trait
+    code: RD1-03
+    scale: 사회적민감성
+    subscale: 정서적 감수성
+    content: 슬픈 이야기를 들으면 한동안 마음에 남는다.
+    sourceRef: 한국판 TCI-RS 정서적 감수성 facet 정의
+
+  - kind: trait
+    code: RD1-04
+    scale: 사회적민감성
+    subscale: 정서적 감수성
+    content: 회의 분위기가 가라앉으면 금세 알아차린다.
+    sourceRef: 한국판 TCI-RS 정서적 감수성 facet 정의 · 직장 맥락
+
+  # ── 정서적 개방성 ──
+  - kind: trait
+    code: RD2-01
+    scale: 사회적민감성
+    subscale: 정서적 개방성
+    content: 동료가 힘들어 보이면 먼저 말을 건네는 편이다.
+    sourceRef: 한국판 TCI-RS 정서적 개방성 facet 정의 · IPIP Friendliness 참고(.79)
+    antonymOf: RD2-02
+
+  - kind: trait
+    code: RD2-02
+    scale: 사회적민감성
+    subscale: 정서적 개방성
+    content: 동료의 개인적인 사정에는 되도록 끼어들지 않는다.
+    reverse: true
+    sourceRef: 한국판 TCI-RS 정서적 개방성 반대 방향 · RD2-01의 짝
+    antonymOf: RD2-01
+
+  - kind: trait
+    code: RD2-03
+    scale: 사회적민감성
+    subscale: 정서적 개방성
+    content: 처음 만난 사람에게도 따뜻하게 대하는 편이다.
+    sourceRef: 한국판 TCI-RS 정서적 개방성 facet 정의 · IPIP Friendliness 참고
+
+  - kind: trait
+    code: RD2-04
+    scale: 사회적민감성
+    subscale: 정서적 개방성
+    content: 고맙거나 미안한 마음은 말로 표현하는 편이다.
+    sourceRef: 한국판 TCI-RS 정서적 개방성 facet 정의
+
+  # ── 친밀감 / 거리두기 ──
+  - kind: trait
+    code: RD3-01
+    scale: 사회적민감성
+    subscale: 친밀감
+    content: 회사에도 속 얘기를 나눌 수 있는 사람이 있으면 좋겠다.
+    sourceRef: 한국판 TCI-RS 친밀감 facet 정의 · IPIP Self-disclosure 참고(.78)
+    antonymOf: RD3-02
+
+  - kind: trait
+    code: RD3-02
+    scale: 사회적민감성
+    subscale: 친밀감
+    content: 회사 사람과는 일 얘기만 하는 편이 편하다.
+    reverse: true
+    sourceRef: 한국판 TCI-RS 거리두기(양극 반대편) · RD3-01의 짝
+    antonymOf: RD3-01
+
+  - kind: trait
+    code: RD3-03
+    scale: 사회적민감성
+    subscale: 친밀감
+    content: 가까운 사람에게는 내 고민을 털어놓는 편이다.
+    sourceRef: 한국판 TCI-RS 친밀감 facet 정의 · IPIP Self-disclosure 참고
+
+  - kind: trait
+    code: RD3-04
+    scale: 사회적민감성
+    subscale: 친밀감
+    content: 오래 알고 지낸 사람들과의 관계를 중요하게 여긴다.
+    sourceRef: 한국판 TCI-RS 친밀감 facet 정의
+
+  # ── 의존 / 독립 ──
+  - kind: trait
+    code: RD4-01
+    scale: 사회적민감성
+    subscale: 의존
+    content: 정하기 전에 다른 사람 의견을 들어야 마음이 놓인다.
+    sourceRef: 한국판 TCI-RS 의존 facet 정의 · IPIP Dependence 참고(.56)
+    antonymOf: RD4-02
+
+  - kind: trait
+    code: RD4-02
+    scale: 사회적민감성
+    subscale: 의존
+    content: 내가 맡은 일은 남 의견을 굳이 묻지 않고 정하는 편이다.
+    reverse: true
+    sourceRef: 한국판 TCI-RS 독립(양극 반대편) · RD4-01의 짝
+    antonymOf: RD4-01
+
+  - kind: trait
+    code: RD4-03
+    scale: 사회적민감성
+    subscale: 의존
+    content: 누군가 알아주고 인정해주면 힘이 많이 난다.
+    sourceRef: 한국판 TCI-RS 의존 facet 정의
+
+  # ══ 인내력 (PS) ════════════════════════════════════════════════════
+  # IPIP 프록시: Initiative(.64) · Competence(.56) ·
+  #              Achievement-striving(.68) · Hard-working(.65)  — 00 §2.1
+  # 관련도 표에서 협력 +.28 — 협력에서 가장 큰 값이 나온 축이다 (07).
+
+  # ── 근면 ──
+  - kind: trait
+    code: PS1-01
+    scale: 인내력
+    subscale: 근면
+    content: 해야 할 일이 있으면 미루지 않고 시작한다.
+    sourceRef: 한국판 TCI-RS 근면 facet 정의 · IPIP Initiative 참고(.64)
+    antonymOf: PS1-02
+
+  - kind: trait
+    code: PS1-02
+    scale: 인내력
+    subscale: 근면
+    content: 급하지 않은 일은 마감이 가까워져야 손을 댄다.
+    reverse: true
+    sourceRef: 한국판 TCI-RS 근면 반대 방향 · PS1-01의 짝
+    antonymOf: PS1-01
+
+  - kind: trait
+    code: PS1-03
+    scale: 인내력
+    subscale: 근면
+    content: 맡은 일은 시키지 않아도 마무리까지 챙긴다.
+    sourceRef: 한국판 TCI-RS 근면 facet 정의 · 직장 맥락
+
+  - kind: trait
+    code: PS1-04
+    scale: 인내력
+    subscale: 근면
+    content: 쉬는 날에도 해둘 일이 있으면 해두는 편이다.
+    sourceRef: 한국판 TCI-RS 근면 facet 정의
+
+  # ── 끈기 ──
+  - kind: trait
+    code: PS2-01
+    scale: 인내력
+    subscale: 끈기
+    content: 잘 안 풀리는 일도 방법을 바꿔가며 계속 붙잡는다.
+    sourceRef: 한국판 TCI-RS 끈기 facet 정의 · IPIP Competence 참고(.56)
+    antonymOf: PS2-02
+
+  - kind: trait
+    code: PS2-02
+    scale: 인내력
+    subscale: 끈기
+    content: 몇 번 해봐서 안 되면 다른 일로 넘어가는 편이다.
+    reverse: true
+    sourceRef: 한국판 TCI-RS 끈기 반대 방향 · PS2-01의 짝
+    antonymOf: PS2-01
+
+  - kind: trait
+    code: PS2-03
+    scale: 인내력
+    subscale: 끈기
+    content: 오래 걸리는 일도 끝까지 해내는 편이다.
+    sourceRef: 한국판 TCI-RS 끈기 facet 정의
+
+  - kind: trait
+    code: PS2-04
+    scale: 인내력
+    subscale: 끈기
+    content: 지루한 일이라도 정해진 만큼은 해낸다.
+    sourceRef: 한국판 TCI-RS 끈기 facet 정의
+
+  # ── 성취에 대한 야망 ──
+  - kind: trait
+    code: PS3-01
+    scale: 인내력
+    subscale: 성취에 대한 야망
+    content: 목표를 정하면 어지간해서는 중간에 놓지 않는다.
+    sourceRef: 한국판 TCI-RS 성취에 대한 야망 facet 정의 · IPIP Achievement-striving 참고(.68)
+
+  - kind: trait
+    code: PS3-02
+    scale: 인내력
+    subscale: 성취에 대한 야망
+    content: 남들보다 더 잘하고 싶다는 마음이 일할 때 큰 힘이 된다.
+    sourceRef: 한국판 TCI-RS 성취에 대한 야망 facet 정의 · 직장 맥락
+    antonymOf: PS3-03
+
+  - kind: trait
+    code: PS3-03
+    scale: 인내력
+    subscale: 성취에 대한 야망
+    content: 남들 하는 만큼만 하면 됐다고 생각하는 편이다.
+    reverse: true
+    sourceRef: 한국판 TCI-RS 성취에 대한 야망 반대 방향 · PS3-02의 짝
+    antonymOf: PS3-02
+
+  - kind: trait
+    code: PS3-04
+    scale: 인내력
+    subscale: 성취에 대한 야망
+    content: 어려운 목표일수록 해보고 싶어진다.
+    sourceRef: 한국판 TCI-RS 성취에 대한 야망 facet 정의
+
+  # ── 완벽주의 ──
+  - kind: trait
+    code: PS4-01
+    scale: 인내력
+    subscale: 완벽주의
+    content: 넘기기 전에 한 번 더 확인하는 편이다.
+    sourceRef: 한국판 TCI-RS 완벽주의 facet 정의 · IPIP Hard-working 참고(.65) · 직장 맥락
+    antonymOf: PS4-03
+
+  - kind: trait
+    code: PS4-02
+    scale: 인내력
+    subscale: 완벽주의
+    content: 어중간하게 끝내는 것을 견디기 어렵다.
+    sourceRef: 한국판 TCI-RS 완벽주의 facet 정의
+
+  - kind: trait
+    code: PS4-03
+    scale: 인내력
+    subscale: 완벽주의
+    content: 웬만큼 됐다 싶으면 더 붙잡지 않고 넘긴다.
+    reverse: true
+    sourceRef: 한국판 TCI-RS 완벽주의 반대 방향 · PS4-01의 짝
+    antonymOf: PS4-01
+
+  # ══ 자율성 (SD) ════════════════════════════════════════════════════
+  # 여기부터는 성격 축이다 — 살면서 형성된 부분이라 대부분 맥락화한다.
+  # IPIP 프록시: Satisfaction(.59) · Optimism(.69) · Resourcefulness(.73) ·
+  #              Self-acceptance(.47) · Impulse control(.72)  — 00 §2.1
+  # 관련도 표에서 자율적 실행 +.48 — 표 전체에서 가장 큰 값이다 (07).
+  # 하위척도 5개라 축당 3문항씩 배분한다.
+
+  # ── 책임감 / 책임전가 ──
+  - kind: trait
+    code: SD1-01
+    scale: 자율성
+    subscale: 책임감
+    content: 일이 잘못되면 내가 무엇을 놓쳤는지부터 본다.
+    sourceRef: 한국판 TCI-RS 책임감 facet 정의 · IPIP Satisfaction 참고(.59)
+    antonymOf: SD1-02
+
+  - kind: trait
+    code: SD1-02
+    scale: 자율성
+    subscale: 책임감
+    content: 일이 틀어지면 상황이나 여건 탓이 크다고 느낀다.
+    reverse: true
+    sourceRef: 한국판 TCI-RS 책임전가(양극 반대편) · SD1-01의 짝
+    antonymOf: SD1-01
+
+  - kind: trait
+    code: SD1-03
+    scale: 자율성
+    subscale: 책임감
+    content: 내 선택으로 생긴 결과는 내가 감당해야 한다고 생각한다.
+    sourceRef: 한국판 TCI-RS 책임감 facet 정의
+
+  # ── 목적의식 ──
+  - kind: trait
+    code: SD2-01
+    scale: 자율성
+    subscale: 목적의식
+    content: 지금 하는 일이 어디로 가는 일인지 스스로 알고 있다.
+    sourceRef: 한국판 TCI-RS 목적의식 facet 정의 · IPIP Optimism 참고(.69) · 직장 맥락
+    antonymOf: SD2-03
+
+  - kind: trait
+    code: SD2-02
+    scale: 자율성
+    subscale: 목적의식
+    content: 내가 무엇을 하고 싶은지 비교적 뚜렷한 편이다.
+    sourceRef: 한국판 TCI-RS 목적의식 facet 정의
+
+  - kind: trait
+    code: SD2-03
+    scale: 자율성
+    subscale: 목적의식
+    content: 그날그날 주어진 일을 할 뿐 방향까지는 잘 모르겠다.
+    reverse: true
+    sourceRef: 한국판 TCI-RS 목적의식 반대 방향 · SD2-01의 짝
+    antonymOf: SD2-01
+
+  # ── 유능감 / 무능감 ──
+  - kind: trait
+    code: SD3-01
+    scale: 자율성
+    subscale: 유능감
+    content: 처음 보는 문제도 어떻게든 방법을 찾아내는 편이다.
+    sourceRef: 한국판 TCI-RS 유능감 facet 정의 · IPIP Resourcefulness 참고(.73)
+    antonymOf: SD3-02
+
+  - kind: trait
+    code: SD3-02
+    scale: 자율성
+    subscale: 유능감
+    content: 어려운 일이 오면 내가 해낼 수 있을지 자신이 없다.
+    reverse: true
+    sourceRef: 한국판 TCI-RS 무능감(양극 반대편) · SD3-01의 짝
+    antonymOf: SD3-01
+
+  - kind: trait
+    code: SD3-03
+    scale: 자율성
+    subscale: 유능감
+    content: 혼자 처리해야 하는 상황에서도 크게 막히지 않는다.
+    sourceRef: 한국판 TCI-RS 유능감 facet 정의 · 직장 맥락
+
+  # ── 자기수용 / 자기불만 ──
+  # 원본과의 상관이 .47로 28개 하위척도 중 가장 낮다. 구성개념이 흐린 자리라
+  # 문항을 쓸 때 더 조심해야 한다 (00 §2.1).
+  - kind: trait
+    code: SD4-01
+    scale: 자율성
+    subscale: 자기수용
+    content: 내 부족한 점도 나의 일부로 받아들이는 편이다.
+    sourceRef: 한국판 TCI-RS 자기수용 facet 정의 · IPIP Self-acceptance 참고(.47)
+    antonymOf: SD4-02
+
+  - kind: trait
+    code: SD4-02
+    scale: 자율성
+    subscale: 자기수용
+    content: 내 모습에서 마음에 들지 않는 부분이 자주 걸린다.
+    reverse: true
+    sourceRef: 한국판 TCI-RS 자기불만(양극 반대편) · SD4-01의 짝
+    antonymOf: SD4-01
+
+  - kind: trait
+    code: SD4-03
+    scale: 자율성
+    subscale: 자기수용
+    content: 남과 비교해서 나를 낮춰 보지는 않는다.
+    sourceRef: 한국판 TCI-RS 자기수용 facet 정의
+
+  # ── 자기일치 ──
+  - kind: trait
+    code: SD5-01
+    scale: 자율성
+    subscale: 자기일치
+    content: 하기 싫은 일이라도 해야 할 때는 미루지 않는다.
+    sourceRef: 한국판 TCI-RS 자기일치 facet 정의 · IPIP Impulse control 참고(.72)
+
+  - kind: trait
+    code: SD5-02
+    scale: 자율성
+    subscale: 자기일치
+    content: 당장 편한 쪽보다 나중에 나은 쪽을 고르는 편이다.
+    sourceRef: 한국판 TCI-RS 자기일치 facet 정의 · 직장 맥락
+    antonymOf: SD5-03
+
+  - kind: trait
+    code: SD5-03
+    scale: 자율성
+    subscale: 자기일치
+    content: 지금 하고 싶은 것을 참기가 어려울 때가 많다.
+    reverse: true
+    sourceRef: 한국판 TCI-RS 자기일치 반대 방향 · SD5-02의 짝
+    antonymOf: SD5-02
+
+  # ══ 연대감 (CO) ════════════════════════════════════════════════════
+  # IPIP 프록시: Tolerance(.67) · Empathy(.64) · Trust(.59) ·
+  #              Compassion(.68) · Morality(.54)  — 00 §2.1
+  # ⚠️ 이름이 "연대감"인데 관련도 표에서 협력과는 "없음"으로 나왔다 (07).
+  #    이름과 결과가 어긋나는 자리라 문항을 특히 정확히 써야 한다.
+
+  # ── 타인수용 ──
+  - kind: trait
+    code: CO1-01
+    scale: 연대감
+    subscale: 타인수용
+    content: 나와 방식이 다른 사람과도 무리 없이 일한다.
+    sourceRef: 한국판 TCI-RS 타인수용 facet 정의 · IPIP Tolerance 참고(.67) · 직장 맥락
+    antonymOf: CO1-02
+
+  - kind: trait
+    code: CO1-02
+    scale: 연대감
+    subscale: 타인수용
+    content: 일하는 방식이 나와 많이 다르면 같이 하기 불편하다.
+    reverse: true
+    sourceRef: 한국판 TCI-RS 타인수용 반대 방향 · CO1-01의 짝
+    antonymOf: CO1-01
+
+  - kind: trait
+    code: CO1-03
+    scale: 연대감
+    subscale: 타인수용
+    content: 사람마다 저마다 사정이 있다고 생각하는 편이다.
+    sourceRef: 한국판 TCI-RS 타인수용 facet 정의
+
+  # ── 공감 / 둔감 ──
+  - kind: trait
+    code: CO2-01
+    scale: 연대감
+    subscale: 공감
+    content: 동료가 어려운 상황이면 그 사람 입장에서 생각해본다.
+    sourceRef: 한국판 TCI-RS 공감 facet 정의 · IPIP Empathy 참고(.64) · 직장 맥락
+
+  - kind: trait
+    code: CO2-02
+    scale: 연대감
+    subscale: 공감
+    content: 남의 이야기를 들으면 그 마음이 어느 정도 느껴진다.
+    sourceRef: 한국판 TCI-RS 공감 facet 정의
+    antonymOf: CO2-03
+
+  - kind: trait
+    code: CO2-03
+    scale: 연대감
+    subscale: 공감
+    content: 남의 감정까지 헤아리는 것은 잘 안 되는 편이다.
+    reverse: true
+    sourceRef: 한국판 TCI-RS 둔감(양극 반대편) · CO2-02의 짝
+    antonymOf: CO2-02
+
+  # ── 이타성 / 이기성 ──
+  - kind: trait
+    code: CO3-01
+    scale: 연대감
+    subscale: 이타성
+    content: 내 일이 아니어도 도움이 되면 손을 보태는 편이다.
+    sourceRef: 한국판 TCI-RS 이타성 facet 정의 · IPIP Trust 참고(.59) · 직장 맥락
+    antonymOf: CO3-02
+
+  - kind: trait
+    code: CO3-02
+    scale: 연대감
+    subscale: 이타성
+    content: 내 몫만 잘하면 됐다고 생각하는 편이다.
+    reverse: true
+    sourceRef: 한국판 TCI-RS 이기성(양극 반대편) · CO3-01의 짝
+    antonymOf: CO3-01
+
+  - kind: trait
+    code: CO3-03
+    scale: 연대감
+    subscale: 이타성
+    content: 도움을 받으면 갚아야 마음이 편하다.
+    sourceRef: 한국판 TCI-RS 이타성 facet 정의
+
+  # ── 관대함 / 복수심 ──
+  - kind: trait
+    code: CO4-01
+    scale: 연대감
+    subscale: 관대함
+    content: 실수한 사람에게 한 번은 기회를 주는 편이다.
+    sourceRef: 한국판 TCI-RS 관대함 facet 정의 · IPIP Compassion 참고(.68) · 직장 맥락
+    antonymOf: CO4-02
+
+  - kind: trait
+    code: CO4-02
+    scale: 연대감
+    subscale: 관대함
+    content: 나에게 한 번 서운하게 한 사람은 오래 기억에 남는다.
+    reverse: true
+    sourceRef: 한국판 TCI-RS 복수심(양극 반대편) · CO4-01의 짝
+    antonymOf: CO4-01
+
+  - kind: trait
+    code: CO4-03
+    scale: 연대감
+    subscale: 관대함
+    content: 지난 일을 계속 마음에 담아두지는 않는다.
+    sourceRef: 한국판 TCI-RS 관대함 facet 정의
+
+  # ── 공평 / 편파 ──
+  - kind: trait
+    code: CO5-01
+    scale: 연대감
+    subscale: 공평
+    content: 친한 사람이라고 해서 봐주지는 않는 편이다.
+    sourceRef: 한국판 TCI-RS 공평 facet 정의 · IPIP Morality 참고(.54) · 직장 맥락
+    antonymOf: CO5-03
+
+  - kind: trait
+    code: CO5-02
+    scale: 연대감
+    subscale: 공평
+    content: 규칙은 누구에게나 똑같이 적용해야 한다고 생각한다.
+    sourceRef: 한국판 TCI-RS 공평 facet 정의 · 직장 맥락
+
+  - kind: trait
+    code: CO5-03
+    scale: 연대감
+    subscale: 공평
+    content: 아는 사람 일이면 아무래도 마음이 기운다.
+    reverse: true
+    sourceRef: 한국판 TCI-RS 편파(양극 반대편) · CO5-01의 짝
+    antonymOf: CO5-01
+
+  # ══ 자기초월 (ST) ══════════════════════════════════════════════════
+  # 하위척도 3개(00 §2.9.4 안 B′)라 축당 5문항씩 배분한다.
+  # ST1 IPIP Imagination 참고(.65) · ST2 Romanticism 참고(.58)
+  # ST3는 IPIP에 대응 항목이 없어 한국판 facet 정의로만 쓴다 (00 §2.9.4).
+  #
+  # ⚠️ 이 축은 맥락화가 3/15로 낮다. 초월 경험 자체가 업무 상황과 무관한
+  #    개념이라 억지로 직장으로 옮기면 다른 것을 재게 된다.
+  # ⚠️ ST3는 종교를 묻지 않는다. TCI의 구성개념은 특정 신앙이 아니라
+  #    "설명되지 않는 것을 받아들이는 태도"다. 사내 검사라 더 조심해서 썼다.
+
+  # ── 창조적 자기망각 / 자의식 ──
+  - kind: trait
+    code: ST1-01
+    scale: 자기초월
+    subscale: 창조적 자기망각
+    content: 어떤 일에 몰두하면 시간 가는 줄 모른다.
+    sourceRef: 한국판 TCI-RS 창조적 자기망각 facet 정의 · IPIP Imagination 참고(.65)
+    antonymOf: ST1-02
+
+  - kind: trait
+    code: ST1-02
+    scale: 자기초월
+    subscale: 창조적 자기망각
+    content: 무슨 일을 하든 시간이 얼마나 지났는지 의식하는 편이다.
+    reverse: true
+    sourceRef: 한국판 TCI-RS 자의식(양극 반대편) · ST1-01의 짝
+    antonymOf: ST1-01
+
+  - kind: trait
+    code: ST1-03
+    scale: 자기초월
+    subscale: 창조적 자기망각
+    content: 머릿속으로 이런저런 장면을 그려보는 것을 즐긴다.
+    sourceRef: 한국판 TCI-RS 창조적 자기망각 facet 정의 · IPIP Imagination 참고
+
+  - kind: trait
+    code: ST1-04
+    scale: 자기초월
+    subscale: 창조적 자기망각
+    content: 한 가지에 빠져 있으면 주변 소리가 잘 들리지 않는다.
+    sourceRef: 한국판 TCI-RS 창조적 자기망각 facet 정의 · 직장 맥락
+
+  - kind: trait
+    code: ST1-05
+    scale: 자기초월
+    subscale: 창조적 자기망각
+    content: 무언가에 푹 빠져 있을 때가 가장 즐겁다.
+    sourceRef: 한국판 TCI-RS 창조적 자기망각 facet 정의
+
+  # ── 우주만물과의 일체감 ──
+  - kind: trait
+    code: ST2-01
+    scale: 자기초월
+    subscale: 우주만물과의 일체감
+    content: 자연 속에 있으면 나라는 경계가 옅어지는 느낌이 든다.
+    sourceRef: 한국판 TCI-RS 우주만물과의 일체감 facet 정의 · IPIP Romanticism 참고(.58)
+
+  - kind: trait
+    code: ST2-02
+    scale: 자기초월
+    subscale: 우주만물과의 일체감
+    content: 세상 모든 것이 어떤 식으로든 이어져 있다고 느낀다.
+    sourceRef: 한국판 TCI-RS 우주만물과의 일체감 facet 정의
+    antonymOf: ST2-03
+
+  - kind: trait
+    code: ST2-03
+    scale: 자기초월
+    subscale: 우주만물과의 일체감
+    content: 사람이든 사물이든 결국 각각 따로 있는 것이라고 본다.
+    reverse: true
+    sourceRef: 한국판 TCI-RS 우주만물과의 일체감 반대 방향 · ST2-02의 짝
+    antonymOf: ST2-02
+
+  - kind: trait
+    code: ST2-04
+    scale: 자기초월
+    subscale: 우주만물과의 일체감
+    content: 나보다 큰 무언가의 일부라고 느낄 때가 있다.
+    sourceRef: 한국판 TCI-RS 우주만물과의 일체감 facet 정의
+
+  - kind: trait
+    code: ST2-05
+    scale: 자기초월
+    subscale: 우주만물과의 일체감
+    content: 음악이나 풍경에 마음이 크게 움직일 때가 있다.
+    sourceRef: 한국판 TCI-RS 우주만물과의 일체감 facet 정의 · IPIP Romanticism 참고
+
+  # ── 영성 수용 / 합리적 유물론 ──
+  - kind: trait
+    code: ST3-01
+    scale: 자기초월
+    subscale: 영성 수용
+    content: 지금은 설명되지 않는 일도 있을 수 있다고 생각한다.
+    sourceRef: 한국판 TCI-RS 영성 수용 facet 정의 (IPIP 대응 항목 없음, 00 §2.9.4)
+    antonymOf: ST3-02
+
+  - kind: trait
+    code: ST3-02
+    scale: 자기초월
+    subscale: 영성 수용
+    content: 근거로 설명되지 않는 것은 받아들이지 않는 편이다.
+    reverse: true
+    sourceRef: 한국판 TCI-RS 합리적 유물론(양극 반대편) · ST3-01의 짝
+    antonymOf: ST3-01
+
+  - kind: trait
+    code: ST3-03
+    scale: 자기초월
+    subscale: 영성 수용
+    content: 우연처럼 보이는 일에도 어떤 뜻이 있다고 느낄 때가 있다.
+    sourceRef: 한국판 TCI-RS 영성 수용 facet 정의
+
+  - kind: trait
+    code: ST3-04
+    scale: 자기초월
+    subscale: 영성 수용
+    content: 눈에 보이는 것이 전부는 아니라고 생각한다.
+    sourceRef: 한국판 TCI-RS 영성 수용 facet 정의
+
+  - kind: trait
+    code: ST3-05
+    scale: 자기초월
+    subscale: 영성 수용
+    content: 세상일은 결국 원인과 결과로 설명된다고 본다.
+    reverse: true
+    sourceRef: 한국판 TCI-RS 합리적 유물론(양극 반대편)
+
   # ══ 직무능력 ═══════════════════════════════════════════════════════
   # 능력당 직접형 1 + 간접형 2 (07). 성향 문항 사이에 섞어 배치한다.
   # 직접형만 두면 거의 다 높게 답해서 사람마다 구분이 되지 않는다.
@@ -184,4 +956,50 @@ items:
     axis: 협력
     direct: false
     content: 내 담당이 아니어도 옆에서 막히면 한 번은 들여다본다.
+    sourceRef: 07-job-ability.md 간접형
+
+  # ── 조직생활 ──
+  # 정의: 오래 다닌다 + 주변 사람들과 잘 어울린다 (07, 09).
+  # "회사 방식에 따라온다" 쪽이 아니라 **대인 융화** 쪽으로 쓴다.
+  - kind: ability
+    code: AB-ORG-01
+    axis: 조직생활
+    direct: true
+    content: 회사 사람들과 두루 잘 지내는 편이다.
+    sourceRef: 07-job-ability.md 직접형
+
+  - kind: ability
+    code: AB-ORG-02
+    axis: 조직생활
+    direct: false
+    content: 점심이나 쉬는 시간에 이야기를 나누는 동료가 여럿 있다.
+    sourceRef: 07-job-ability.md 간접형 — 대인 융화
+
+  - kind: ability
+    code: AB-ORG-03
+    axis: 조직생활
+    direct: false
+    content: 힘든 일이 있어도 그만두는 것까지 생각하지는 않는다.
+    sourceRef: 07-job-ability.md 간접형 — 오래 다닌다. 근속 기록과 대조할 수 있는 축
+
+  # ── 자율적 실행 ──
+  - kind: ability
+    code: AB-AUTO-01
+    axis: 자율적실행
+    direct: true
+    content: 지시가 없어도 스스로 일을 진행하는 편이다.
+    sourceRef: 07-job-ability.md 직접형
+
+  - kind: ability
+    code: AB-AUTO-02
+    axis: 자율적실행
+    direct: false
+    content: 어떻게 할지 애매하면 일단 내 판단으로 해보고 나중에 확인받는다.
+    sourceRef: 07-job-ability.md 간접형
+
+  - kind: ability
+    code: AB-AUTO-03
+    axis: 자율적실행
+    direct: false
+    content: 맡은 일의 다음 단계를 누가 말해주지 않아도 챙긴다.
     sourceRef: 07-job-ability.md 간접형
