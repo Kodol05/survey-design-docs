@@ -1,8 +1,8 @@
 /**
  * 성향 프로필 — TCI 결과지 형식
  *
- * 축마다 상자를 따로 두지 않는다. **하나의 눈금 위에 일곱 축을 얹어**
- * 어느 축이 튀는지 세로로 훑어보게 한다. 상자를 나누면 축끼리 비교가 안 된다.
+ * 축 이름을 위 가운데 두고, 아래에 낮음↔높음 눈금을 깔고, 값이 있는 자리에
+ * 점과 숫자를 찍는다. 상자를 두르지 않는다.
  *
  * 기질과 성격을 나눠 보여준다. 08의 첫 문장이 "타고난 기질과 살면서 형성된
  * 성격을 나눠 재고"이므로 화면에서도 갈라져 있어야 한다.
@@ -10,8 +10,6 @@
  * 눈금은 **범위 대비 %**다. 전 문항 최저가 0, 중립이 50, 최고가 100이다.
  * 백분위가 아니다 — 사내 상대위치는 개인 화면에 표시하지 않는다 (00 D-09).
  */
-
-import { BAND } from "@/lib/scoring/score";
 
 export type ProfileRow = {
   scale: string;
@@ -25,44 +23,52 @@ export const CHARACTER = ["자율성", "연대감", "자기초월"];
 
 const BAND_LABEL = { lower: "낮은 편", middle: "보통", upper: "높은 편" } as const;
 
+/**
+ * 왼쪽으로 갈수록 보라가 진해지고 오른쪽으로 갈수록 주황이 진해진다.
+ * 가운데는 바탕에 가까워서 "어느 쪽도 아님"으로 읽힌다.
+ *
+ * 빨강↔초록을 쓰지 않는다. 낮음이 틀린 것도 높음이 맞는 것도 아닌데
+ * 빨강·초록은 오답·정답으로 읽힌다.
+ */
+const GRADIENT =
+  "linear-gradient(90deg, #8b7ad6 0%, #b6abe3 20%, #ded9ec 38%, #eceae4 50%, #f3decb 62%, #eec091 80%, #e5904e 100%)";
+
 function Row({ row }: { row: ProfileRow }) {
   const x = Math.max(0, Math.min(100, row.percent));
   return (
-    <div className="grid grid-cols-[9rem_1fr_7rem] items-center gap-6 py-4">
-      <span className="font-medium">{row.scale}</span>
+    <div className="py-6">
+      <p className="mb-3 text-center">
+        <span className="text-lg font-medium">{row.scale}</span>
+        <span className="text-ink-muted text-table ml-2">{BAND_LABEL[row.band]}</span>
+      </p>
 
-      <div className="relative h-10">
-        {/* 눈금 배경 — 구간 경계를 옅게 깔아 어디가 보통인지 보이게 한다 (D-26) */}
-        <div className="absolute inset-y-[0.9rem] left-0 right-0 flex overflow-hidden rounded-full">
-          <div style={{ width: `${BAND.lower}%`, background: "var(--grid)" }} />
+      <div className="flex items-start gap-4">
+        <span className="text-axis text-ink-muted w-10 shrink-0 pt-2 text-right">낮음</span>
+
+        <div className="relative flex-1 pb-7">
+          <div className="h-3 w-full rounded-full" style={{ background: GRADIENT }} />
+
+          {/* 값이 있는 자리에 점, 그 바로 아래에 숫자 */}
           <div
-            style={{
-              width: `${BAND.upper - BAND.lower}%`,
-              background: "var(--diverge-mid)",
-            }}
-          />
-          <div style={{ width: `${100 - BAND.upper}%`, background: "var(--grid)" }} />
+            className="absolute top-0 flex -translate-x-1/2 flex-col items-center"
+            style={{ left: `${x}%` }}
+          >
+            <span
+              className="block size-5 rounded-full ring-[3px]"
+              style={{
+                background: "var(--ink)",
+                ["--tw-ring-color" as string]: "var(--page)",
+                marginTop: -4,
+              }}
+            />
+            <span className="tabular text-table mt-1 font-semibold">
+              {Math.round(row.percent)}
+            </span>
+          </div>
         </div>
 
-        {/* 값 표시 */}
-        <div
-          className="absolute top-1/2 -translate-x-1/2 -translate-y-1/2"
-          style={{ left: `${x}%` }}
-        >
-          <span
-            className="block size-6 rounded-full ring-4"
-            style={{
-              background: "var(--series-1)",
-              ["--tw-ring-color" as string]: "var(--surface)",
-            }}
-          />
-        </div>
+        <span className="text-axis text-ink-muted w-10 shrink-0 pt-2">높음</span>
       </div>
-
-      <span className="tabular text-right">
-        <span className="text-lg font-medium">{Math.round(row.percent)}</span>
-        <span className="text-ink-muted text-axis ml-2">{BAND_LABEL[row.band]}</span>
-      </span>
     </div>
   );
 }
@@ -73,38 +79,24 @@ export function TraitProfile({ rows }: { rows: ProfileRow[] }) {
     names.map((n) => byScale.get(n)).filter((r): r is ProfileRow => Boolean(r));
 
   return (
-    <div>
-      {/* 눈금 머리 — 한 번만 둔다. 축마다 반복하면 화면이 시끄러워진다 */}
-      <div className="grid grid-cols-[9rem_1fr_7rem] items-end gap-6 border-b border-[--border] pb-2">
-        <span className="text-axis text-ink-muted">성향 축</span>
-        <div className="text-axis text-ink-muted relative flex justify-between">
-          <span>낮음</span>
-          <span>보통</span>
-          <span>높음</span>
-        </div>
-        <span className="text-axis text-ink-muted text-right">점수</span>
-      </div>
-
+    <div className="mx-auto max-w-3xl">
       <section>
-        <h3 className="text-ink-secondary mt-10 mb-2 font-medium">
+        <h3 className="text-ink-secondary mb-2 border-b border-[--border] pb-2 font-medium">
           기질 <span className="text-ink-muted text-table font-normal">— 타고난 부분</span>
         </h3>
-        <div className="divide-y divide-[--border]">
-          {group(TEMPERAMENT).map((r) => (
-            <Row key={r.scale} row={r} />
-          ))}
-        </div>
+        {group(TEMPERAMENT).map((r) => (
+          <Row key={r.scale} row={r} />
+        ))}
       </section>
 
-      <section>
-        <h3 className="text-ink-secondary mt-12 mb-2 font-medium">
-          성격 <span className="text-ink-muted text-table font-normal">— 살면서 형성된 부분</span>
+      <section className="mt-14">
+        <h3 className="text-ink-secondary mb-2 border-b border-[--border] pb-2 font-medium">
+          성격{" "}
+          <span className="text-ink-muted text-table font-normal">— 살면서 형성된 부분</span>
         </h3>
-        <div className="divide-y divide-[--border]">
-          {group(CHARACTER).map((r) => (
-            <Row key={r.scale} row={r} />
-          ))}
-        </div>
+        {group(CHARACTER).map((r) => (
+          <Row key={r.scale} row={r} />
+        ))}
       </section>
     </div>
   );

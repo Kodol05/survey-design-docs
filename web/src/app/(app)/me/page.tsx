@@ -50,9 +50,9 @@ export default async function MePage() {
         }))}
       />
 
-      <p className="text-axis text-ink-muted mt-8 max-w-[44rem]">
+      <p className="text-axis text-ink-muted mx-auto mt-10 max-w-3xl">
         눈금은 0에서 100까지입니다. 모든 문항에 &ldquo;보통&rdquo;으로 답하면 정확히 50이
-        나오고, 가운데 밝은 구간이 보통입니다.
+        나옵니다. 왼쪽이 낮은 쪽, 오른쪽이 높은 쪽이고 어느 쪽이 좋은 것은 아닙니다.
       </p>
 
       <section className="mt-20 grid gap-12 lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)] lg:items-center">

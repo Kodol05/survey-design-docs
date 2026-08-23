@@ -67,3 +67,11 @@
  GET /me 200 in 70ms (next.js: 11ms, application-code: 59ms)
 ✓ Compiled in 35ms
 ✓ Compiled in 37ms
+ GET /me 200 in 11ms (next.js: 5ms, application-code: 5ms)
+ GET /me 200 in 51ms (next.js: 4ms, application-code: 47ms)
+ GET /me 200 in 34ms (next.js: 5ms, application-code: 29ms)
+ GET /survey?section=7 200 in 63ms (next.js: 12ms, application-code: 51ms)
+ GET /me 200 in 52ms (next.js: 5ms, application-code: 47ms)
+ GET /me 200 in 57ms (next.js: 4ms, application-code: 52ms)
+ GET /me 200 in 68ms (next.js: 18ms, application-code: 50ms)
+ GET /me 200 in 74ms (next.js: 11ms, application-code: 63ms)
