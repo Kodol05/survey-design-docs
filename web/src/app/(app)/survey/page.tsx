@@ -28,7 +28,7 @@ export default async function SurveyPage(props: {
   const pct = Math.round(((section - 1) / SECTION_COUNT) * 100);
 
   return (
-    <main className="mx-auto w-full max-w-4xl px-6">
+    <main className="mx-auto w-full max-w-[80rem] px-6">
       {/* 진행률 — 바 + "묶음 N / 7". 퍼센트 숫자와 타이머는 두지 않는다 (01 §2.5) */}
       <div className="sticky top-0 z-10 -mx-6 bg-page/95 px-6 pt-4 pb-4 backdrop-blur">
         <div className="mb-2 flex items-baseline justify-between">
@@ -53,7 +53,7 @@ export default async function SurveyPage(props: {
         </div>
       </div>
 
-      <p className="text-ink-secondary my-10 text-center">
+      <p className="text-ink-secondary my-12 text-center text-lg">
         정답이 없습니다. 오래 고민하지 마시고 평소 모습에 가까운 쪽을 골라 주세요.
       </p>
 

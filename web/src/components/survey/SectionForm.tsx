@@ -107,19 +107,22 @@ export function SectionForm({
             ref={(el) => {
               nodes.current[item.id] = el;
             }}
-            className="scroll-mt-32 border-b border-[--border] py-12 last:border-0"
+            className="scroll-mt-32 border-b border-[--border] py-16 last:border-0"
           >
+            {/* 글자만 읽기 폭으로 제한한다. 한 줄 40~50자를 넘기면 다음 줄
+                첫 글자를 찾느라 눈이 헤맨다 (01 §2.3). 아래 척도 줄은 글이
+                아니므로 이 제한을 받지 않는다. */}
             <p
-              className={`mb-8 text-center transition-opacity ${
+              className={`mx-auto mb-10 max-w-[44rem] text-center transition-opacity ${
                 done || current ? "opacity-100" : "opacity-45"
               }`}
               style={{
-                fontSize: "clamp(1.125rem, 1rem + 0.7vw, 1.6rem)",
-                lineHeight: 1.5,
+                fontSize: "clamp(1.25rem, 1rem + 1vw, 2.1rem)",
+                lineHeight: 1.45,
                 fontWeight: current ? 600 : 500,
               }}
             >
-              <span className="text-ink-muted tabular mr-3 text-[0.7em] font-normal">
+              <span className="text-ink-muted tabular mr-3 text-[0.6em] font-normal">
                 {idx + 1}
               </span>
               {item.content}
@@ -144,7 +147,7 @@ export function SectionForm({
         <p className="text-axis text-ink-muted tabular">
           {answered} / {items.length}
         </p>
-        <Button onClick={next} disabled={pending} className="min-w-56 text-lg">
+        <Button onClick={next} disabled={pending} className="h-14 min-w-64 text-lg">
           {pending ? "저장 중…" : isLast ? "제출하고 결과 보기" : "다음 묶음"}
         </Button>
       </div>

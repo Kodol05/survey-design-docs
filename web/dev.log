@@ -22,3 +22,37 @@
  GET /survey 200 in 113ms (next.js: 5ms, application-code: 108ms)
 ✓ Compiled in 34ms
  GET /survey 200 in 76ms (next.js: 12ms, application-code: 64ms)
+✓ Compiled in 35ms
+ GET /survey 200 in 87ms (next.js: 12ms, application-code: 75ms)
+ GET /survey 200 in 115ms (next.js: 5ms, application-code: 111ms)
+ GET /survey 200 in 110ms (next.js: 5ms, application-code: 105ms)
+ POST /survey 200 in 79ms (next.js: 4ms, application-code: 75ms)
+  └─ ƒ saveSectionAction("cmt5gtvzc0002x0w6dksdxej8", 1, [{"changedCount":0,"elapsedMs":5264,"itemId":"cmt5eqgwt0001eow61iicx3ee","...":"1 item not stringified"},{"changedCount":0,"elapsedMs":6371,"itemId":"cmt5eqgwt0002eow6n7dqx199","...":"1 item not stringified"},{"changedCount":0,"elapsedMs":7216,"itemId":"cmt5eqgwt0003eow6n5x4ih97","...":"1 item not stringified"},"... 12 items not stringified"]) in 66ms src/lib/survey/actions.ts
+ GET /survey?section=2 200 in 97ms (next.js: 5ms, application-code: 93ms)
+ GET /survey?section=2 200 in 118ms (next.js: 4ms, application-code: 113ms)
+ GET /survey?section=2 200 in 116ms (next.js: 5ms, application-code: 111ms)
+ POST /survey?section=2 200 in 59ms (next.js: 4ms, application-code: 54ms)
+  └─ ƒ saveSectionAction("cmt5gtvzc0002x0w6dksdxej8", 2, [{"changedCount":0,"elapsedMs":98080,"itemId":"cmt5eqgwu000heow6hawmd58n","...":"1 item not stringified"},{"changedCount":0,"elapsedMs":90589,"itemId":"cmt5eqgwu000ieow6yjte0119","...":"1 item not stringified"},{"changedCount":0,"elapsedMs":92448,"itemId":"cmt5eqgwu000jeow6wwplxy5e","...":"1 item not stringified"},"... 12 items not stringified"]) in 46ms src/lib/survey/actions.ts
+ GET /survey?section=3 200 in 112ms (next.js: 5ms, application-code: 107ms)
+ GET /survey?section=3 200 in 96ms (next.js: 15ms, application-code: 81ms)
+ POST /survey?section=3 200 in 53ms (next.js: 4ms, application-code: 49ms)
+  └─ ƒ saveSectionAction("cmt5gtvzc0002x0w6dksdxej8", 3, [{"changedCount":1,"elapsedMs":1290,"itemId":"cmt5eqgwu000xeow655pur1u3","...":"1 item not stringified"},{"changedCount":0,"elapsedMs":2224,"itemId":"cmt5eqgwu000yeow65gegj27o","...":"1 item not stringified"},{"changedCount":0,"elapsedMs":2922,"itemId":"cmt5eqgwu000zeow65frhkuap","...":"1 item not stringified"},"... 12 items not stringified"]) in 42ms src/lib/survey/actions.ts
+ GET /survey?section=4 200 in 123ms (next.js: 6ms, application-code: 117ms)
+ POST /survey?section=4 200 in 59ms (next.js: 4ms, application-code: 54ms)
+  └─ ƒ saveSectionAction("cmt5gtvzc0002x0w6dksdxej8", 4, [{"changedCount":0,"elapsedMs":983,"itemId":"cmt5eqgwu001deow65xicj7ty","...":"1 item not stringified"},{"changedCount":0,"elapsedMs":2156,"itemId":"cmt5eqgwu001eeow6a5preu6s","...":"1 item not stringified"},{"changedCount":0,"elapsedMs":2855,"itemId":"cmt5eqgwu001feow6zjwlkaf0","...":"1 item not stringified"},"... 13 items not stringified"]) in 47ms src/lib/survey/actions.ts
+ GET /survey?section=5 200 in 129ms (next.js: 5ms, application-code: 125ms)
+ POST /survey?section=5 200 in 55ms (next.js: 5ms, application-code: 50ms)
+  └─ ƒ saveSectionAction("cmt5gtvzc0002x0w6dksdxej8", 5, [{"changedCount":0,"elapsedMs":1029,"itemId":"cmt5eqgwu001ueow63atspo7b","...":"1 item not stringified"},{"changedCount":0,"elapsedMs":1652,"itemId":"cmt5eqgwu001veow671e21fwd","...":"1 item not stringified"},{"changedCount":0,"elapsedMs":2289,"itemId":"cmt5eqgwu001weow6h2dblqx0","...":"1 item not stringified"},"... 12 items not stringified"]) in 43ms src/lib/survey/actions.ts
+ GET /survey?section=6 200 in 137ms (next.js: 6ms, application-code: 132ms)
+ POST /survey?section=6 200 in 53ms (next.js: 4ms, application-code: 49ms)
+  └─ ƒ saveSectionAction("cmt5gtvzc0002x0w6dksdxej8", 6, [{"changedCount":0,"elapsedMs":727,"itemId":"cmt5eqgwu002aeow6hy71d3u6","...":"1 item not stringified"},{"changedCount":0,"elapsedMs":1483,"itemId":"cmt5eqgwu002beow6bbnc5tmc","...":"1 item not stringified"},{"changedCount":0,"elapsedMs":2238,"itemId":"cmt5eqgwu002ceow602v3zo2a","...":"1 item not stringified"},"... 13 items not stringified"]) in 42ms src/lib/survey/actions.ts
+ GET /survey?section=7 200 in 140ms (next.js: 5ms, application-code: 136ms)
+ POST /survey?section=7 200 in 60ms (next.js: 4ms, application-code: 56ms)
+  └─ ƒ saveSectionAction("cmt5gtvzc0002x0w6dksdxej8", 7, [{"changedCount":0,"elapsedMs":969,"itemId":"cmt5eqgwu002reow67tathw1a","...":"1 item not stringified"},{"changedCount":0,"elapsedMs":1739,"itemId":"cmt5eqgwu002seow66j1o30vf","...":"1 item not stringified"},{"changedCount":0,"elapsedMs":2438,"itemId":"cmt5eqgwu002teow6hby4vme4","...":"1 item not stringified"},"... 12 items not stringified"]) in 48ms src/lib/survey/actions.ts
+ GET /me 200 in 593ms (next.js: 537ms, application-code: 56ms)
+ POST /survey?section=7 200 in 665ms (next.js: 4ms, application-code: 661ms)
+  └─ ƒ submitAction("cmt5gtvzc0002x0w6dksdxej8") in 48ms src/lib/survey/actions.ts
+ GET /me 200 in 19ms (next.js: 13ms, application-code: 7ms)
+ GET /me 200 in 38ms (next.js: 4ms, application-code: 33ms)
+✓ Compiled in 70ms
+ GET /me 200 in 71ms (next.js: 15ms, application-code: 56ms)

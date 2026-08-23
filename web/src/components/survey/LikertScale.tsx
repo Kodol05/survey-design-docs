@@ -21,7 +21,7 @@ export const LABELS = [
 ] as const;
 
 /** 양 끝이 크고 가운데가 작다. 눈으로 척도의 방향과 세기가 읽힌다. */
-const SIZE = [64, 52, 42, 34, 42, 52, 64] as const;
+const SIZE = [88, 72, 58, 46, 58, 72, 88] as const;
 
 /**
  * 왼쪽 보라 ↔ 오른쪽 청록. 가운데는 중립 회색.
@@ -59,8 +59,8 @@ export function LikertScale({
       <legend className="sr-only">7단계 중 하나를 고르세요</legend>
 
       {/* 넓은 폭 — 양 끝 라벨을 크게 두고 가운데에 원 일곱 개 */}
-      <div className="hidden items-center gap-4 sm:flex">
-        <span className="w-20 shrink-0 text-right text-table font-medium text-ink-secondary">
+      <div className="hidden items-center gap-6 sm:flex">
+        <span className="w-24 shrink-0 text-right font-medium text-ink-secondary">
           전혀
           <br />
           아니다
@@ -76,7 +76,7 @@ export function LikertScale({
               <label
                 key={v}
                 className="group flex cursor-pointer flex-col items-center gap-2"
-                style={{ minWidth: 72 }}
+                style={{ minWidth: 96 }}
               >
                 <input
                   type="radio"
@@ -94,9 +94,9 @@ export function LikertScale({
                     width: size,
                     height: size,
                     // 안 고른 것은 테두리만, 고른 것은 꽉 채운다
-                    border: `2.5px solid ${color}`,
+                    border: `3px solid ${color}`,
                     background: on ? color : "transparent",
-                    boxShadow: on ? `0 0 0 5px ${color}26` : undefined,
+                    boxShadow: on ? `0 0 0 7px ${color}22` : undefined,
                   }}
                 >
                   {on && (
@@ -112,7 +112,7 @@ export function LikertScale({
                   )}
                 </span>
                 <span
-                  className={`text-axis text-center leading-tight whitespace-nowrap ${
+                  className={`text-table text-center leading-tight whitespace-nowrap ${
                     on ? "font-semibold text-ink" : "text-ink-muted"
                   }`}
                 >
@@ -123,7 +123,7 @@ export function LikertScale({
           })}
         </div>
 
-        <span className="w-20 shrink-0 text-table font-medium text-ink-secondary">
+        <span className="w-24 shrink-0 font-medium text-ink-secondary">
           매우
           <br />
           그렇다
