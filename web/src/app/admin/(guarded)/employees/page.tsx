@@ -1,24 +1,13 @@
 import Link from "next/link";
 import { EmptyState } from "@/components/ui/Card";
-import { TraitStrip, TraitStripHeader } from "@/components/analysis/TraitStrip";
+import { EmployeeList, type Row } from "./EmployeeList";
 import { prisma } from "@/lib/db";
 import { requireAdmin } from "@/lib/auth/guard";
 import { isResultsOpen } from "@/lib/admin/phase";
-import { formatPhone } from "@/lib/auth/phone";
 import { TRAIT_SCALES } from "@/lib/items/types";
-import type { StoredTraits } from "@/lib/survey/result";
+import type { StoredAbilities, StoredTraits } from "@/lib/survey/result";
 
 export const metadata = { title: "구성원 — 관리자" };
-
-const FLAG = {
-  review: { label: "검토", color: "var(--status-warn)" },
-  poor: { label: "미달", color: "var(--status-critical)" },
-} as const;
-
-const STATUS = {
-  COMPLETED: "완료",
-  IN_PROGRESS: "진행 중",
-} as const;
 
 export default async function EmployeesPage(props: {
   searchParams: Promise<{ sort?: string; q?: string }>;
@@ -39,18 +28,10 @@ export default async function EmployeesPage(props: {
     },
   });
 
-  type Row = {
-    id: string;
-    name: string;
-    phone: string | null;
-    status: string | null;
-    flag: string;
-    traits: Record<string, number> | null;
-  };
-
   let rows: Row[] = employees.map((e) => {
     const s = e.testSessions[0];
     const stored = (s?.result?.scoresJson ?? null) as StoredTraits | null;
+    const ability = (s?.result?.abilityScoresJson ?? null) as StoredAbilities | null;
     return {
       id: e.id,
       name: e.name,
@@ -59,6 +40,9 @@ export default async function EmployeesPage(props: {
       flag: s?.qualityFlag?.flag ?? "ok",
       traits: stored
         ? Object.fromEntries(Object.entries(stored).map(([k, v]) => [k, v.percent]))
+        : null,
+      abilities: ability
+        ? Object.fromEntries(Object.entries(ability).map(([k, v]) => [k, v.percent]))
         : null,
     };
   });
@@ -127,61 +111,14 @@ export default async function EmployeesPage(props: {
       {rows.length === 0 ? (
         <EmptyState message={keyword ? "찾는 사람이 없습니다." : "아직 가입한 사람이 없습니다."} />
       ) : (
-        <div className="overflow-x-auto">
-          <table className="w-full">
-            <thead>
-              <tr className="text-axis text-ink-muted border-b border-[--border]">
-                <th className="w-40 pb-2 text-left font-medium">이름</th>
-                <th className="w-28 pb-2 text-left font-medium">번호</th>
-                <th className="w-20 pb-2 text-left font-medium">상태</th>
-                <th className="min-w-[18rem] pb-2 text-left font-medium">
-                  {open ? <TraitStripHeader /> : "성향"}
-                </th>
-                <th className="w-16 pb-2 text-left font-medium">품질</th>
-              </tr>
-            </thead>
-            <tbody>
-              {rows.map((r) => {
-                const flag = FLAG[r.flag as keyof typeof FLAG];
-                return (
-                  <tr
-                    key={r.id}
-                    className="border-b border-[--border] last:border-0 hover:bg-[--wash]"
-                  >
-                    <td className="py-3">
-                      <Link href={`/admin/employees/${r.id}`} className="font-medium">
-                        {r.name}
-                      </Link>
-                    </td>
-                    <td className="text-axis tabular text-ink-secondary py-3">
-                      {r.phone ? formatPhone(r.phone) : "—"}
-                    </td>
-                    <td className="text-axis text-ink-secondary py-3">
-                      {r.status ? STATUS[r.status as keyof typeof STATUS] : "미응시"}
-                    </td>
-                    <td className="py-3 pr-6">
-                      {open ? (
-                        <TraitStrip traits={r.traits} />
-                      ) : (
-                        <span className="text-axis text-ink-muted">공개 전</span>
-                      )}
-                    </td>
-                    <td className="text-axis py-3" style={{ color: flag?.color }}>
-                      {flag?.label ?? ""}
-                    </td>
-                  </tr>
-                );
-              })}
-            </tbody>
-          </table>
-        </div>
+        <EmployeeList rows={rows} open={open} />
       )}
 
-      <p className="text-axis text-ink-muted mt-6 max-w-[44rem]">
-        색 띠는 일곱 축을 왼쪽부터 늘어놓은 것입니다.{" "}
+      <p className="text-table text-ink-muted mt-6 max-w-[46rem]">
+        일곱 칸은 성향 축을 왼쪽부터 늘어놓은 것입니다.{" "}
         <span style={{ color: "#44618d" }}>■</span> 낮음{" "}
-        <span style={{ color: "#b3623f" }}>■</span> 높음. 칸에 마우스를 올리면 정확한
-        값이 나옵니다. 숫자 일곱 개를 늘어놓으면 훑어볼 수가 없어서 색으로 둡니다.
+        <span style={{ color: "#b3623f" }}>■</span> 높음. 색으로 모양을 먼저 보고 숫자로
+        값을 확인하시면 됩니다. <strong>줄을 누르면 그 자리에서 그래프가 펼쳐집니다.</strong>
       </p>
     </>
   );
