@@ -1525,3 +1525,73 @@ https://nextjs.org/docs/messages/module-not-found
 
 ✓ Compiled in 113ms
  GET /me 200 in 93ms (next.js: 18ms, application-code: 74ms)
+[browser] ./src/app/(app)/me/page.tsx:5:1
+Error: Module not found: Can't resolve '@/components/charts/TraitOverview'
+   3 | import { PairReadings } from "@/components/charts/PairReadings";
+   4 | import { TraitRadar } from "@/components/charts/TraitRadar";
+>  5 | import {
+     | ^^^^^^^
+>  6 |   CHARACTER,
+     | ^^^^^^^^^^^^
+>  7 |   TEMPERAMENT,
+     | ^^^^^^^^^^^^^^
+>  8 |   TraitOverview,
+     | ^^^^^^^^^^^^^^^^
+>  9 | } from "@/components/charts/TraitOverview";
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  10 | import { EmptyState } from "@/components/ui/Card";
+  11 | import { requireUser } from "@/lib/auth/guard";
+  12 | import { readPairs, type AxisInput } from "@/lib/interpretation/pairs";
+
+Import map: aliased to relative './src/components/charts/TraitOverview' inside of [project]/
+
+https://nextjs.org/docs/messages/module-not-found 
+[browser] ./src/app/(app)/me/page.tsx:5:1
+Error: Module not found: Can't resolve '@/components/charts/TraitOverview'
+   3 | import { PairReadings } from "@/components/charts/PairReadings";
+   4 | import { TraitRadar } from "@/components/charts/TraitRadar";
+>  5 | import {
+     | ^^^^^^^
+>  6 |   CHARACTER,
+     | ^^^^^^^^^^^^
+>  7 |   TEMPERAMENT,
+     | ^^^^^^^^^^^^^^
+>  8 |   TraitOverview,
+     | ^^^^^^^^^^^^^^^^
+>  9 | } from "@/components/charts/TraitOverview";
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  10 | import { EmptyState } from "@/components/ui/Card";
+  11 | import { requireUser } from "@/lib/auth/guard";
+  12 | import { readPairs, type AxisInput } from "@/lib/interpretation/pairs";
+
+Import map: aliased to relative './src/components/charts/TraitOverview' inside of [project]/
+
+https://nextjs.org/docs/messages/module-not-found 
+[browser] ./src/app/(app)/me/page.tsx:5:1
+Error: Module not found: Can't resolve '@/components/charts/TraitOverview'
+   3 | import { PairReadings } from "@/components/charts/PairReadings";
+   4 | import { TraitRadar } from "@/components/charts/TraitRadar";
+>  5 | import {
+     | ^^^^^^^
+>  6 |   CHARACTER,
+     | ^^^^^^^^^^^^
+>  7 |   TEMPERAMENT,
+     | ^^^^^^^^^^^^^^
+>  8 |   TraitOverview,
+     | ^^^^^^^^^^^^^^^^
+>  9 | } from "@/components/charts/TraitOverview";
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  10 | import { EmptyState } from "@/components/ui/Card";
+  11 | import { requireUser } from "@/lib/auth/guard";
+  12 | import { readPairs, type AxisInput } from "@/lib/interpretation/pairs";
+
+Import map: aliased to relative './src/components/charts/TraitOverview' inside of [project]/
+
+https://nextjs.org/docs/messages/module-not-found 
+ GET /me 200 in 197ms (next.js: 5ms, application-code: 193ms)
+✓ Compiled in 55ms
+ GET /me 200 in 83ms (next.js: 10ms, application-code: 72ms)
+✓ Compiled in 280ms
+ GET /me 200 in 84ms (next.js: 12ms, application-code: 72ms)
+✓ Compiled in 36ms
+ GET /me 200 in 86ms (next.js: 9ms, application-code: 77ms)

@@ -18,21 +18,60 @@ import {
  */
 export type RadarPoint = { scale: string; percent: number; average?: number };
 
+/** 축 이름 아래에 값을 같이 적는다. 별도 라벨을 띄우면 선과 겹친다. */
+type TickProps = {
+  payload?: { value?: string };
+  x?: number | string;
+  y?: number | string;
+  textAnchor?: string;
+  values?: Map<string, number>;
+};
+
+function Tick({ payload, x, y, textAnchor, values }: TickProps) {
+  const name = payload?.value ?? "";
+  const v = values?.get(name);
+  return (
+    <text x={x} y={y} textAnchor={textAnchor as never} dominantBaseline="central">
+      <tspan x={x} dy={v === undefined ? 0 : -6} fill="var(--ink-secondary)" fontSize={13}>
+        {name}
+      </tspan>
+      {v !== undefined && (
+        <tspan
+          x={x}
+          dy={17}
+          fill="var(--ink)"
+          fontSize={14}
+          fontWeight={600}
+          style={{ fontVariantNumeric: "tabular-nums" }}
+        >
+          {Math.round(v)}
+        </tspan>
+      )}
+    </text>
+  );
+}
+
 export function TraitRadar({
   data,
   showAverage,
+  showValues,
 }: {
   data: RadarPoint[];
   showAverage?: boolean;
+  showValues?: boolean;
 }) {
+  const values = showValues
+    ? new Map(data.map((d) => [d.scale, d.percent]))
+    : undefined;
+
   return (
-    <div className="w-full" style={{ aspectRatio: "1 / 0.85" }}>
+    <div className="w-full" style={{ aspectRatio: "1 / 0.9" }}>
       <ResponsiveContainer>
-        <RadarChart data={data} outerRadius="70%">
+        <RadarChart data={data} outerRadius="66%">
           <PolarGrid stroke="var(--grid)" />
           <PolarAngleAxis
             dataKey="scale"
-            tick={{ fill: "var(--ink-secondary)", fontSize: 13 }}
+            tick={(props: TickProps) => <Tick {...props} values={values} />}
           />
           <PolarRadiusAxis domain={[0, 100]} tick={false} axisLine={false} />
           {showAverage && (
