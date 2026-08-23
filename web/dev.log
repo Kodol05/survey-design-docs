@@ -84,3 +84,661 @@
  GET /me 200 in 123ms (next.js: 4ms, application-code: 119ms)
  GET /me 200 in 67ms (next.js: 11ms, application-code: 56ms)
  GET /me 200 in 61ms (next.js: 9ms, application-code: 52ms)
+ GET /me 200 in 121ms (next.js: 5ms, application-code: 116ms)
+ GET /me 200 in 111ms (next.js: 4ms, application-code: 107ms)
+⨯ ./src/app/(app)/me/page.tsx:2:1
+Error: Module not found: Can't resolve '@/components/charts/CubeReading'
+  [90m1 |[0m [36mimport[0m [33mLink[0m [36mfrom[0m [32m"next/link"[0m;
+[31m[1m>[0m [90m2 |[0m [36mimport[0m { [33mCubeReading[0m } [36mfrom[0m [32m"@/components/charts/CubeReading"[0m;
+  [90m  |[0m [31m[1m^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^[0m
+  [90m3 |[0m [36mimport[0m { [33mTraitProfile[0m } [36mfrom[0m [32m"@/components/charts/TraitProfile"[0m;
+  [90m4 |[0m [36mimport[0m { [33mTraitRadar[0m } [36mfrom[0m [32m"@/components/charts/TraitRadar"[0m;
+  [90m5 |[0m [36mimport[0m { [33mEmptyState[0m } [36mfrom[0m [32m"@/components/ui/Card"[0m;
+
+Import map: aliased to relative './src/components/charts/CubeReading' inside of [project]/
+
+
+https://nextjs.org/docs/messages/module-not-found
+
+
+⨯ ./src/app/(app)/me/page.tsx:2:1
+Error: Module not found: Can't resolve '@/components/charts/CubeReading'
+  [90m1 |[0m [36mimport[0m [33mLink[0m [36mfrom[0m [32m"next/link"[0m;
+[31m[1m>[0m [90m2 |[0m [36mimport[0m { [33mCubeReading[0m } [36mfrom[0m [32m"@/components/charts/CubeReading"[0m;
+  [90m  |[0m [31m[1m^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^[0m
+  [90m3 |[0m [36mimport[0m { [33mTraitProfile[0m } [36mfrom[0m [32m"@/components/charts/TraitProfile"[0m;
+  [90m4 |[0m [36mimport[0m { [33mTraitRadar[0m } [36mfrom[0m [32m"@/components/charts/TraitRadar"[0m;
+  [90m5 |[0m [36mimport[0m { [33mEmptyState[0m } [36mfrom[0m [32m"@/components/ui/Card"[0m;
+
+Import map: aliased to relative './src/components/charts/CubeReading' inside of [project]/
+
+
+https://nextjs.org/docs/messages/module-not-found
+
+
+⨯ ./src/app/(app)/me/page.tsx:7:1
+Error: Module not found: Can't resolve '@/lib/interpretation/cube'
+  [90m 5 |[0m [36mimport[0m { [33mEmptyState[0m } [36mfrom[0m [32m"@/components/ui/Card"[0m;
+  [90m 6 |[0m [36mimport[0m { requireUser } [36mfrom[0m [32m"@/lib/auth/guard"[0m;
+[31m[1m>[0m [90m 7 |[0m [36mimport[0m { characterCube, temperamentCube, [36mtype[0m [33mAxisInput[0m } [36mfrom[0m [32m"@/lib/interpretation/cube"[0m;
+  [90m   |[0m [31m[1m^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^[0m
+  [90m 8 |[0m [36mimport[0m { latestResult, orderedTraits } [36mfrom[0m [32m"@/lib/survey/result"[0m;
+  [90m 9 |[0m
+  [90m10 |[0m [36mexport[0m [36mconst[0m metadata = { title: [32m"내 결과 — 7차원 성향 설문"[0m };
+
+Import map: aliased to relative './src/lib/interpretation/cube' inside of [project]/
+
+
+https://nextjs.org/docs/messages/module-not-found
+
+
+⨯ ./src/app/(app)/me/page.tsx:7:1
+Error: Module not found: Can't resolve '@/lib/interpretation/cube'
+  [90m 5 |[0m [36mimport[0m { [33mEmptyState[0m } [36mfrom[0m [32m"@/components/ui/Card"[0m;
+  [90m 6 |[0m [36mimport[0m { requireUser } [36mfrom[0m [32m"@/lib/auth/guard"[0m;
+[31m[1m>[0m [90m 7 |[0m [36mimport[0m { characterCube, temperamentCube, [36mtype[0m [33mAxisInput[0m } [36mfrom[0m [32m"@/lib/interpretation/cube"[0m;
+  [90m   |[0m [31m[1m^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^[0m
+  [90m 8 |[0m [36mimport[0m { latestResult, orderedTraits } [36mfrom[0m [32m"@/lib/survey/result"[0m;
+  [90m 9 |[0m
+  [90m10 |[0m [36mexport[0m [36mconst[0m metadata = { title: [32m"내 결과 — 7차원 성향 설문"[0m };
+
+Import map: aliased to relative './src/lib/interpretation/cube' inside of [project]/
+
+
+https://nextjs.org/docs/messages/module-not-found
+
+
+⨯ ./src/app/(app)/me/page.tsx:7:1
+Error: Module not found: Can't resolve '@/lib/interpretation/cube'
+  [90m 5 |[0m [36mimport[0m { [33mEmptyState[0m } [36mfrom[0m [32m"@/components/ui/Card"[0m;
+  [90m 6 |[0m [36mimport[0m { requireUser } [36mfrom[0m [32m"@/lib/auth/guard"[0m;
+[31m[1m>[0m [90m 7 |[0m [36mimport[0m { characterCube, temperamentCube, [36mtype[0m [33mAxisInput[0m } [36mfrom[0m [32m"@/lib/interpretation/cube"[0m;
+  [90m   |[0m [31m[1m^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^[0m
+  [90m 8 |[0m [36mimport[0m { latestResult, orderedTraits } [36mfrom[0m [32m"@/lib/survey/result"[0m;
+  [90m 9 |[0m
+  [90m10 |[0m [36mexport[0m [36mconst[0m metadata = { title: [32m"내 결과 — 7차원 성향 설문"[0m };
+
+Import map: aliased to relative './src/lib/interpretation/cube' inside of [project]/
+
+
+https://nextjs.org/docs/messages/module-not-found
+
+
+⨯ ./src/app/(app)/me/page.tsx:2:1
+Error: Module not found: Can't resolve '@/components/charts/CubeReading'
+  [90m1 |[0m [36mimport[0m [33mLink[0m [36mfrom[0m [32m"next/link"[0m;
+[31m[1m>[0m [90m2 |[0m [36mimport[0m { [33mCubeReading[0m } [36mfrom[0m [32m"@/components/charts/CubeReading"[0m;
+  [90m  |[0m [31m[1m^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^[0m
+  [90m3 |[0m [36mimport[0m { [33mTraitProfile[0m } [36mfrom[0m [32m"@/components/charts/TraitProfile"[0m;
+  [90m4 |[0m [36mimport[0m { [33mTraitRadar[0m } [36mfrom[0m [32m"@/components/charts/TraitRadar"[0m;
+  [90m5 |[0m [36mimport[0m { [33mEmptyState[0m } [36mfrom[0m [32m"@/components/ui/Card"[0m;
+
+Import map: aliased to relative './src/components/charts/CubeReading' inside of [project]/
+
+
+https://nextjs.org/docs/messages/module-not-found
+
+
+⨯ ./src/app/(app)/me/page.tsx:2:1
+Error: Module not found: Can't resolve '@/components/charts/CubeReading'
+  [90m1 |[0m [36mimport[0m [33mLink[0m [36mfrom[0m [32m"next/link"[0m;
+[31m[1m>[0m [90m2 |[0m [36mimport[0m { [33mCubeReading[0m } [36mfrom[0m [32m"@/components/charts/CubeReading"[0m;
+  [90m  |[0m [31m[1m^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^[0m
+  [90m3 |[0m [36mimport[0m { [33mTraitProfile[0m } [36mfrom[0m [32m"@/components/charts/TraitProfile"[0m;
+  [90m4 |[0m [36mimport[0m { [33mTraitRadar[0m } [36mfrom[0m [32m"@/components/charts/TraitRadar"[0m;
+  [90m5 |[0m [36mimport[0m { [33mEmptyState[0m } [36mfrom[0m [32m"@/components/ui/Card"[0m;
+
+Import map: aliased to relative './src/components/charts/CubeReading' inside of [project]/
+
+
+https://nextjs.org/docs/messages/module-not-found
+
+
+⨯ ./src/app/(app)/me/page.tsx:7:1
+Error: Module not found: Can't resolve '@/lib/interpretation/cube'
+  [90m 5 |[0m [36mimport[0m { [33mEmptyState[0m } [36mfrom[0m [32m"@/components/ui/Card"[0m;
+  [90m 6 |[0m [36mimport[0m { requireUser } [36mfrom[0m [32m"@/lib/auth/guard"[0m;
+[31m[1m>[0m [90m 7 |[0m [36mimport[0m { characterCube, temperamentCube, [36mtype[0m [33mAxisInput[0m } [36mfrom[0m [32m"@/lib/interpretation/cube"[0m;
+  [90m   |[0m [31m[1m^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^[0m
+  [90m 8 |[0m [36mimport[0m { latestResult, orderedTraits } [36mfrom[0m [32m"@/lib/survey/result"[0m;
+  [90m 9 |[0m
+  [90m10 |[0m [36mexport[0m [36mconst[0m metadata = { title: [32m"내 결과 — 7차원 성향 설문"[0m };
+
+Import map: aliased to relative './src/lib/interpretation/cube' inside of [project]/
+
+
+https://nextjs.org/docs/messages/module-not-found
+
+
+⨯ ./src/app/(app)/me/page.tsx:7:1
+Error: Module not found: Can't resolve '@/lib/interpretation/cube'
+  [90m 5 |[0m [36mimport[0m { [33mEmptyState[0m } [36mfrom[0m [32m"@/components/ui/Card"[0m;
+  [90m 6 |[0m [36mimport[0m { requireUser } [36mfrom[0m [32m"@/lib/auth/guard"[0m;
+[31m[1m>[0m [90m 7 |[0m [36mimport[0m { characterCube, temperamentCube, [36mtype[0m [33mAxisInput[0m } [36mfrom[0m [32m"@/lib/interpretation/cube"[0m;
+  [90m   |[0m [31m[1m^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^[0m
+  [90m 8 |[0m [36mimport[0m { latestResult, orderedTraits } [36mfrom[0m [32m"@/lib/survey/result"[0m;
+  [90m 9 |[0m
+  [90m10 |[0m [36mexport[0m [36mconst[0m metadata = { title: [32m"내 결과 — 7차원 성향 설문"[0m };
+
+Import map: aliased to relative './src/lib/interpretation/cube' inside of [project]/
+
+
+https://nextjs.org/docs/messages/module-not-found
+
+
+⨯ ./src/app/(app)/me/page.tsx:7:1
+Error: Module not found: Can't resolve '@/lib/interpretation/cube'
+  [90m 5 |[0m [36mimport[0m { [33mEmptyState[0m } [36mfrom[0m [32m"@/components/ui/Card"[0m;
+  [90m 6 |[0m [36mimport[0m { requireUser } [36mfrom[0m [32m"@/lib/auth/guard"[0m;
+[31m[1m>[0m [90m 7 |[0m [36mimport[0m { characterCube, temperamentCube, [36mtype[0m [33mAxisInput[0m } [36mfrom[0m [32m"@/lib/interpretation/cube"[0m;
+  [90m   |[0m [31m[1m^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^[0m
+  [90m 8 |[0m [36mimport[0m { latestResult, orderedTraits } [36mfrom[0m [32m"@/lib/survey/result"[0m;
+  [90m 9 |[0m
+  [90m10 |[0m [36mexport[0m [36mconst[0m metadata = { title: [32m"내 결과 — 7차원 성향 설문"[0m };
+
+Import map: aliased to relative './src/lib/interpretation/cube' inside of [project]/
+
+
+https://nextjs.org/docs/messages/module-not-found
+
+
+⨯ ./src/app/(app)/me/page.tsx:2:1
+Error: Module not found: Can't resolve '@/components/charts/CubeReading'
+  [90m1 |[0m [36mimport[0m [33mLink[0m [36mfrom[0m [32m"next/link"[0m;
+[31m[1m>[0m [90m2 |[0m [36mimport[0m { [33mCubeReading[0m } [36mfrom[0m [32m"@/components/charts/CubeReading"[0m;
+  [90m  |[0m [31m[1m^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^[0m
+  [90m3 |[0m [36mimport[0m { [33mTraitProfile[0m } [36mfrom[0m [32m"@/components/charts/TraitProfile"[0m;
+  [90m4 |[0m [36mimport[0m { [33mTraitRadar[0m } [36mfrom[0m [32m"@/components/charts/TraitRadar"[0m;
+  [90m5 |[0m [36mimport[0m { [33mEmptyState[0m } [36mfrom[0m [32m"@/components/ui/Card"[0m;
+
+Import map: aliased to relative './src/components/charts/CubeReading' inside of [project]/
+
+
+https://nextjs.org/docs/messages/module-not-found
+
+
+⨯ ./src/app/(app)/me/page.tsx:2:1
+Error: Module not found: Can't resolve '@/components/charts/CubeReading'
+  [90m1 |[0m [36mimport[0m [33mLink[0m [36mfrom[0m [32m"next/link"[0m;
+[31m[1m>[0m [90m2 |[0m [36mimport[0m { [33mCubeReading[0m } [36mfrom[0m [32m"@/components/charts/CubeReading"[0m;
+  [90m  |[0m [31m[1m^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^[0m
+  [90m3 |[0m [36mimport[0m { [33mTraitProfile[0m } [36mfrom[0m [32m"@/components/charts/TraitProfile"[0m;
+  [90m4 |[0m [36mimport[0m { [33mTraitRadar[0m } [36mfrom[0m [32m"@/components/charts/TraitRadar"[0m;
+  [90m5 |[0m [36mimport[0m { [33mEmptyState[0m } [36mfrom[0m [32m"@/components/ui/Card"[0m;
+
+Import map: aliased to relative './src/components/charts/CubeReading' inside of [project]/
+
+
+https://nextjs.org/docs/messages/module-not-found
+
+
+⨯ ./src/app/(app)/me/page.tsx:7:1
+Error: Module not found: Can't resolve '@/lib/interpretation/cube'
+  [90m 5 |[0m [36mimport[0m { [33mEmptyState[0m } [36mfrom[0m [32m"@/components/ui/Card"[0m;
+  [90m 6 |[0m [36mimport[0m { requireUser } [36mfrom[0m [32m"@/lib/auth/guard"[0m;
+[31m[1m>[0m [90m 7 |[0m [36mimport[0m { characterCube, temperamentCube, [36mtype[0m [33mAxisInput[0m } [36mfrom[0m [32m"@/lib/interpretation/cube"[0m;
+  [90m   |[0m [31m[1m^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^[0m
+  [90m 8 |[0m [36mimport[0m { latestResult, orderedTraits } [36mfrom[0m [32m"@/lib/survey/result"[0m;
+  [90m 9 |[0m
+  [90m10 |[0m [36mexport[0m [36mconst[0m metadata = { title: [32m"내 결과 — 7차원 성향 설문"[0m };
+
+Import map: aliased to relative './src/lib/interpretation/cube' inside of [project]/
+
+
+https://nextjs.org/docs/messages/module-not-found
+
+
+⨯ ./src/app/(app)/me/page.tsx:7:1
+Error: Module not found: Can't resolve '@/lib/interpretation/cube'
+  [90m 5 |[0m [36mimport[0m { [33mEmptyState[0m } [36mfrom[0m [32m"@/components/ui/Card"[0m;
+  [90m 6 |[0m [36mimport[0m { requireUser } [36mfrom[0m [32m"@/lib/auth/guard"[0m;
+[31m[1m>[0m [90m 7 |[0m [36mimport[0m { characterCube, temperamentCube, [36mtype[0m [33mAxisInput[0m } [36mfrom[0m [32m"@/lib/interpretation/cube"[0m;
+  [90m   |[0m [31m[1m^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^[0m
+  [90m 8 |[0m [36mimport[0m { latestResult, orderedTraits } [36mfrom[0m [32m"@/lib/survey/result"[0m;
+  [90m 9 |[0m
+  [90m10 |[0m [36mexport[0m [36mconst[0m metadata = { title: [32m"내 결과 — 7차원 성향 설문"[0m };
+
+Import map: aliased to relative './src/lib/interpretation/cube' inside of [project]/
+
+
+https://nextjs.org/docs/messages/module-not-found
+
+
+⨯ ./src/app/(app)/me/page.tsx:7:1
+Error: Module not found: Can't resolve '@/lib/interpretation/cube'
+  [90m 5 |[0m [36mimport[0m { [33mEmptyState[0m } [36mfrom[0m [32m"@/components/ui/Card"[0m;
+  [90m 6 |[0m [36mimport[0m { requireUser } [36mfrom[0m [32m"@/lib/auth/guard"[0m;
+[31m[1m>[0m [90m 7 |[0m [36mimport[0m { characterCube, temperamentCube, [36mtype[0m [33mAxisInput[0m } [36mfrom[0m [32m"@/lib/interpretation/cube"[0m;
+  [90m   |[0m [31m[1m^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^[0m
+  [90m 8 |[0m [36mimport[0m { latestResult, orderedTraits } [36mfrom[0m [32m"@/lib/survey/result"[0m;
+  [90m 9 |[0m
+  [90m10 |[0m [36mexport[0m [36mconst[0m metadata = { title: [32m"내 결과 — 7차원 성향 설문"[0m };
+
+Import map: aliased to relative './src/lib/interpretation/cube' inside of [project]/
+
+
+https://nextjs.org/docs/messages/module-not-found
+
+
+⨯ ./src/app/(app)/me/page.tsx:2:1
+Error: Module not found: Can't resolve '@/components/charts/CubeReading'
+  [90m1 |[0m [36mimport[0m [33mLink[0m [36mfrom[0m [32m"next/link"[0m;
+[31m[1m>[0m [90m2 |[0m [36mimport[0m { [33mCubeReading[0m } [36mfrom[0m [32m"@/components/charts/CubeReading"[0m;
+  [90m  |[0m [31m[1m^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^[0m
+  [90m3 |[0m [36mimport[0m { [33mTraitProfile[0m } [36mfrom[0m [32m"@/components/charts/TraitProfile"[0m;
+  [90m4 |[0m [36mimport[0m { [33mTraitRadar[0m } [36mfrom[0m [32m"@/components/charts/TraitRadar"[0m;
+  [90m5 |[0m [36mimport[0m { [33mEmptyState[0m } [36mfrom[0m [32m"@/components/ui/Card"[0m;
+
+Import map: aliased to relative './src/components/charts/CubeReading' inside of [project]/
+
+
+https://nextjs.org/docs/messages/module-not-found
+
+
+⨯ ./src/app/(app)/me/page.tsx:2:1
+Error: Module not found: Can't resolve '@/components/charts/CubeReading'
+  [90m1 |[0m [36mimport[0m [33mLink[0m [36mfrom[0m [32m"next/link"[0m;
+[31m[1m>[0m [90m2 |[0m [36mimport[0m { [33mCubeReading[0m } [36mfrom[0m [32m"@/components/charts/CubeReading"[0m;
+  [90m  |[0m [31m[1m^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^[0m
+  [90m3 |[0m [36mimport[0m { [33mTraitProfile[0m } [36mfrom[0m [32m"@/components/charts/TraitProfile"[0m;
+  [90m4 |[0m [36mimport[0m { [33mTraitRadar[0m } [36mfrom[0m [32m"@/components/charts/TraitRadar"[0m;
+  [90m5 |[0m [36mimport[0m { [33mEmptyState[0m } [36mfrom[0m [32m"@/components/ui/Card"[0m;
+
+Import map: aliased to relative './src/components/charts/CubeReading' inside of [project]/
+
+
+https://nextjs.org/docs/messages/module-not-found
+
+
+⨯ ./src/app/(app)/me/page.tsx:7:1
+Error: Module not found: Can't resolve '@/lib/interpretation/cube'
+  [90m 5 |[0m [36mimport[0m { [33mEmptyState[0m } [36mfrom[0m [32m"@/components/ui/Card"[0m;
+  [90m 6 |[0m [36mimport[0m { requireUser } [36mfrom[0m [32m"@/lib/auth/guard"[0m;
+[31m[1m>[0m [90m 7 |[0m [36mimport[0m { characterCube, temperamentCube, [36mtype[0m [33mAxisInput[0m } [36mfrom[0m [32m"@/lib/interpretation/cube"[0m;
+  [90m   |[0m [31m[1m^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^[0m
+  [90m 8 |[0m [36mimport[0m { latestResult, orderedTraits } [36mfrom[0m [32m"@/lib/survey/result"[0m;
+  [90m 9 |[0m
+  [90m10 |[0m [36mexport[0m [36mconst[0m metadata = { title: [32m"내 결과 — 7차원 성향 설문"[0m };
+
+Import map: aliased to relative './src/lib/interpretation/cube' inside of [project]/
+
+
+https://nextjs.org/docs/messages/module-not-found
+
+
+⨯ ./src/app/(app)/me/page.tsx:7:1
+Error: Module not found: Can't resolve '@/lib/interpretation/cube'
+  [90m 5 |[0m [36mimport[0m { [33mEmptyState[0m } [36mfrom[0m [32m"@/components/ui/Card"[0m;
+  [90m 6 |[0m [36mimport[0m { requireUser } [36mfrom[0m [32m"@/lib/auth/guard"[0m;
+[31m[1m>[0m [90m 7 |[0m [36mimport[0m { characterCube, temperamentCube, [36mtype[0m [33mAxisInput[0m } [36mfrom[0m [32m"@/lib/interpretation/cube"[0m;
+  [90m   |[0m [31m[1m^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^[0m
+  [90m 8 |[0m [36mimport[0m { latestResult, orderedTraits } [36mfrom[0m [32m"@/lib/survey/result"[0m;
+  [90m 9 |[0m
+  [90m10 |[0m [36mexport[0m [36mconst[0m metadata = { title: [32m"내 결과 — 7차원 성향 설문"[0m };
+
+Import map: aliased to relative './src/lib/interpretation/cube' inside of [project]/
+
+
+https://nextjs.org/docs/messages/module-not-found
+
+
+⨯ ./src/app/(app)/me/page.tsx:7:1
+Error: Module not found: Can't resolve '@/lib/interpretation/cube'
+  [90m 5 |[0m [36mimport[0m { [33mEmptyState[0m } [36mfrom[0m [32m"@/components/ui/Card"[0m;
+  [90m 6 |[0m [36mimport[0m { requireUser } [36mfrom[0m [32m"@/lib/auth/guard"[0m;
+[31m[1m>[0m [90m 7 |[0m [36mimport[0m { characterCube, temperamentCube, [36mtype[0m [33mAxisInput[0m } [36mfrom[0m [32m"@/lib/interpretation/cube"[0m;
+  [90m   |[0m [31m[1m^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^[0m
+  [90m 8 |[0m [36mimport[0m { latestResult, orderedTraits } [36mfrom[0m [32m"@/lib/survey/result"[0m;
+  [90m 9 |[0m
+  [90m10 |[0m [36mexport[0m [36mconst[0m metadata = { title: [32m"내 결과 — 7차원 성향 설문"[0m };
+
+Import map: aliased to relative './src/lib/interpretation/cube' inside of [project]/
+
+
+https://nextjs.org/docs/messages/module-not-found
+
+
+✓ Compiled in 42ms
+⨯ ./src/app/(app)/me/page.tsx:2:1
+Error: Module not found: Can't resolve '@/components/charts/CubeReading'
+  [90m1 |[0m [36mimport[0m [33mLink[0m [36mfrom[0m [32m"next/link"[0m;
+[31m[1m>[0m [90m2 |[0m [36mimport[0m { [33mCubeReading[0m } [36mfrom[0m [32m"@/components/charts/CubeReading"[0m;
+  [90m  |[0m [31m[1m^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^[0m
+  [90m3 |[0m [36mimport[0m { [33mTraitProfile[0m } [36mfrom[0m [32m"@/components/charts/TraitProfile"[0m;
+  [90m4 |[0m [36mimport[0m { [33mTraitRadar[0m } [36mfrom[0m [32m"@/components/charts/TraitRadar"[0m;
+  [90m5 |[0m [36mimport[0m { [33mEmptyState[0m } [36mfrom[0m [32m"@/components/ui/Card"[0m;
+
+Import map: aliased to relative './src/components/charts/CubeReading' inside of [project]/
+
+
+https://nextjs.org/docs/messages/module-not-found
+
+
+⨯ ./src/app/(app)/me/page.tsx:2:1
+Error: Module not found: Can't resolve '@/components/charts/CubeReading'
+  [90m1 |[0m [36mimport[0m [33mLink[0m [36mfrom[0m [32m"next/link"[0m;
+[31m[1m>[0m [90m2 |[0m [36mimport[0m { [33mCubeReading[0m } [36mfrom[0m [32m"@/components/charts/CubeReading"[0m;
+  [90m  |[0m [31m[1m^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^[0m
+  [90m3 |[0m [36mimport[0m { [33mTraitProfile[0m } [36mfrom[0m [32m"@/components/charts/TraitProfile"[0m;
+  [90m4 |[0m [36mimport[0m { [33mTraitRadar[0m } [36mfrom[0m [32m"@/components/charts/TraitRadar"[0m;
+  [90m5 |[0m [36mimport[0m { [33mEmptyState[0m } [36mfrom[0m [32m"@/components/ui/Card"[0m;
+
+Import map: aliased to relative './src/components/charts/CubeReading' inside of [project]/
+
+
+https://nextjs.org/docs/messages/module-not-found
+
+
+⨯ ./src/app/(app)/me/page.tsx:3:1
+Error: Module not found: Can't resolve '@/components/charts/TraitProfile'
+  [90m1 |[0m [36mimport[0m [33mLink[0m [36mfrom[0m [32m"next/link"[0m;
+  [90m2 |[0m [36mimport[0m { [33mCubeReading[0m } [36mfrom[0m [32m"@/components/charts/CubeReading"[0m;
+[31m[1m>[0m [90m3 |[0m [36mimport[0m { [33mTraitProfile[0m } [36mfrom[0m [32m"@/components/charts/TraitProfile"[0m;
+  [90m  |[0m [31m[1m^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^[0m
+  [90m4 |[0m [36mimport[0m { [33mTraitRadar[0m } [36mfrom[0m [32m"@/components/charts/TraitRadar"[0m;
+  [90m5 |[0m [36mimport[0m { [33mEmptyState[0m } [36mfrom[0m [32m"@/components/ui/Card"[0m;
+  [90m6 |[0m [36mimport[0m { requireUser } [36mfrom[0m [32m"@/lib/auth/guard"[0m;
+
+Import map: aliased to relative './src/components/charts/TraitProfile' inside of [project]/
+
+
+https://nextjs.org/docs/messages/module-not-found
+
+
+⨯ ./src/app/(app)/me/page.tsx:3:1
+Error: Module not found: Can't resolve '@/components/charts/TraitProfile'
+  [90m1 |[0m [36mimport[0m [33mLink[0m [36mfrom[0m [32m"next/link"[0m;
+  [90m2 |[0m [36mimport[0m { [33mCubeReading[0m } [36mfrom[0m [32m"@/components/charts/CubeReading"[0m;
+[31m[1m>[0m [90m3 |[0m [36mimport[0m { [33mTraitProfile[0m } [36mfrom[0m [32m"@/components/charts/TraitProfile"[0m;
+  [90m  |[0m [31m[1m^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^[0m
+  [90m4 |[0m [36mimport[0m { [33mTraitRadar[0m } [36mfrom[0m [32m"@/components/charts/TraitRadar"[0m;
+  [90m5 |[0m [36mimport[0m { [33mEmptyState[0m } [36mfrom[0m [32m"@/components/ui/Card"[0m;
+  [90m6 |[0m [36mimport[0m { requireUser } [36mfrom[0m [32m"@/lib/auth/guard"[0m;
+
+Import map: aliased to relative './src/components/charts/TraitProfile' inside of [project]/
+
+
+https://nextjs.org/docs/messages/module-not-found
+
+
+⨯ ./src/app/(app)/me/page.tsx:7:1
+Error: Module not found: Can't resolve '@/lib/interpretation/cube'
+  [90m 5 |[0m [36mimport[0m { [33mEmptyState[0m } [36mfrom[0m [32m"@/components/ui/Card"[0m;
+  [90m 6 |[0m [36mimport[0m { requireUser } [36mfrom[0m [32m"@/lib/auth/guard"[0m;
+[31m[1m>[0m [90m 7 |[0m [36mimport[0m { characterCube, temperamentCube, [36mtype[0m [33mAxisInput[0m } [36mfrom[0m [32m"@/lib/interpretation/cube"[0m;
+  [90m   |[0m [31m[1m^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^[0m
+  [90m 8 |[0m [36mimport[0m { latestResult, orderedTraits } [36mfrom[0m [32m"@/lib/survey/result"[0m;
+  [90m 9 |[0m
+  [90m10 |[0m [36mexport[0m [36mconst[0m metadata = { title: [32m"내 결과 — 7차원 성향 설문"[0m };
+
+Import map: aliased to relative './src/lib/interpretation/cube' inside of [project]/
+
+
+https://nextjs.org/docs/messages/module-not-found
+
+
+⨯ ./src/app/(app)/me/page.tsx:7:1
+Error: Module not found: Can't resolve '@/lib/interpretation/cube'
+  [90m 5 |[0m [36mimport[0m { [33mEmptyState[0m } [36mfrom[0m [32m"@/components/ui/Card"[0m;
+  [90m 6 |[0m [36mimport[0m { requireUser } [36mfrom[0m [32m"@/lib/auth/guard"[0m;
+[31m[1m>[0m [90m 7 |[0m [36mimport[0m { characterCube, temperamentCube, [36mtype[0m [33mAxisInput[0m } [36mfrom[0m [32m"@/lib/interpretation/cube"[0m;
+  [90m   |[0m [31m[1m^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^[0m
+  [90m 8 |[0m [36mimport[0m { latestResult, orderedTraits } [36mfrom[0m [32m"@/lib/survey/result"[0m;
+  [90m 9 |[0m
+  [90m10 |[0m [36mexport[0m [36mconst[0m metadata = { title: [32m"내 결과 — 7차원 성향 설문"[0m };
+
+Import map: aliased to relative './src/lib/interpretation/cube' inside of [project]/
+
+
+https://nextjs.org/docs/messages/module-not-found
+
+
+⨯ ./src/app/(app)/me/page.tsx:7:1
+Error: Module not found: Can't resolve '@/lib/interpretation/cube'
+  [90m 5 |[0m [36mimport[0m { [33mEmptyState[0m } [36mfrom[0m [32m"@/components/ui/Card"[0m;
+  [90m 6 |[0m [36mimport[0m { requireUser } [36mfrom[0m [32m"@/lib/auth/guard"[0m;
+[31m[1m>[0m [90m 7 |[0m [36mimport[0m { characterCube, temperamentCube, [36mtype[0m [33mAxisInput[0m } [36mfrom[0m [32m"@/lib/interpretation/cube"[0m;
+  [90m   |[0m [31m[1m^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^[0m
+  [90m 8 |[0m [36mimport[0m { latestResult, orderedTraits } [36mfrom[0m [32m"@/lib/survey/result"[0m;
+  [90m 9 |[0m
+  [90m10 |[0m [36mexport[0m [36mconst[0m metadata = { title: [32m"내 결과 — 7차원 성향 설문"[0m };
+
+Import map: aliased to relative './src/lib/interpretation/cube' inside of [project]/
+
+
+https://nextjs.org/docs/messages/module-not-found
+
+
+⨯ ./src/app/(app)/me/page.tsx:2:1
+Error: Module not found: Can't resolve '@/components/charts/CubeReading'
+  [90m1 |[0m [36mimport[0m [33mLink[0m [36mfrom[0m [32m"next/link"[0m;
+[31m[1m>[0m [90m2 |[0m [36mimport[0m { [33mCubeReading[0m } [36mfrom[0m [32m"@/components/charts/CubeReading"[0m;
+  [90m  |[0m [31m[1m^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^[0m
+  [90m3 |[0m [36mimport[0m { [33mTraitProfile[0m } [36mfrom[0m [32m"@/components/charts/TraitProfile"[0m;
+  [90m4 |[0m [36mimport[0m { [33mTraitRadar[0m } [36mfrom[0m [32m"@/components/charts/TraitRadar"[0m;
+  [90m5 |[0m [36mimport[0m { [33mEmptyState[0m } [36mfrom[0m [32m"@/components/ui/Card"[0m;
+
+Import map: aliased to relative './src/components/charts/CubeReading' inside of [project]/
+
+
+https://nextjs.org/docs/messages/module-not-found
+
+
+⨯ ./src/app/(app)/me/page.tsx:2:1
+Error: Module not found: Can't resolve '@/components/charts/CubeReading'
+  [90m1 |[0m [36mimport[0m [33mLink[0m [36mfrom[0m [32m"next/link"[0m;
+[31m[1m>[0m [90m2 |[0m [36mimport[0m { [33mCubeReading[0m } [36mfrom[0m [32m"@/components/charts/CubeReading"[0m;
+  [90m  |[0m [31m[1m^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^[0m
+  [90m3 |[0m [36mimport[0m { [33mTraitProfile[0m } [36mfrom[0m [32m"@/components/charts/TraitProfile"[0m;
+  [90m4 |[0m [36mimport[0m { [33mTraitRadar[0m } [36mfrom[0m [32m"@/components/charts/TraitRadar"[0m;
+  [90m5 |[0m [36mimport[0m { [33mEmptyState[0m } [36mfrom[0m [32m"@/components/ui/Card"[0m;
+
+Import map: aliased to relative './src/components/charts/CubeReading' inside of [project]/
+
+
+https://nextjs.org/docs/messages/module-not-found
+
+
+⨯ ./src/app/(app)/me/page.tsx:3:1
+Error: Module not found: Can't resolve '@/components/charts/TraitProfile'
+  [90m1 |[0m [36mimport[0m [33mLink[0m [36mfrom[0m [32m"next/link"[0m;
+  [90m2 |[0m [36mimport[0m { [33mCubeReading[0m } [36mfrom[0m [32m"@/components/charts/CubeReading"[0m;
+[31m[1m>[0m [90m3 |[0m [36mimport[0m { [33mTraitProfile[0m } [36mfrom[0m [32m"@/components/charts/TraitProfile"[0m;
+  [90m  |[0m [31m[1m^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^[0m
+  [90m4 |[0m [36mimport[0m { [33mTraitRadar[0m } [36mfrom[0m [32m"@/components/charts/TraitRadar"[0m;
+  [90m5 |[0m [36mimport[0m { [33mEmptyState[0m } [36mfrom[0m [32m"@/components/ui/Card"[0m;
+  [90m6 |[0m [36mimport[0m { requireUser } [36mfrom[0m [32m"@/lib/auth/guard"[0m;
+
+Import map: aliased to relative './src/components/charts/TraitProfile' inside of [project]/
+
+
+https://nextjs.org/docs/messages/module-not-found
+
+
+⨯ ./src/app/(app)/me/page.tsx:3:1
+Error: Module not found: Can't resolve '@/components/charts/TraitProfile'
+  [90m1 |[0m [36mimport[0m [33mLink[0m [36mfrom[0m [32m"next/link"[0m;
+  [90m2 |[0m [36mimport[0m { [33mCubeReading[0m } [36mfrom[0m [32m"@/components/charts/CubeReading"[0m;
+[31m[1m>[0m [90m3 |[0m [36mimport[0m { [33mTraitProfile[0m } [36mfrom[0m [32m"@/components/charts/TraitProfile"[0m;
+  [90m  |[0m [31m[1m^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^[0m
+  [90m4 |[0m [36mimport[0m { [33mTraitRadar[0m } [36mfrom[0m [32m"@/components/charts/TraitRadar"[0m;
+  [90m5 |[0m [36mimport[0m { [33mEmptyState[0m } [36mfrom[0m [32m"@/components/ui/Card"[0m;
+  [90m6 |[0m [36mimport[0m { requireUser } [36mfrom[0m [32m"@/lib/auth/guard"[0m;
+
+Import map: aliased to relative './src/components/charts/TraitProfile' inside of [project]/
+
+
+https://nextjs.org/docs/messages/module-not-found
+
+
+⨯ ./src/app/(app)/me/page.tsx:7:1
+Error: Module not found: Can't resolve '@/lib/interpretation/cube'
+  [90m 5 |[0m [36mimport[0m { [33mEmptyState[0m } [36mfrom[0m [32m"@/components/ui/Card"[0m;
+  [90m 6 |[0m [36mimport[0m { requireUser } [36mfrom[0m [32m"@/lib/auth/guard"[0m;
+[31m[1m>[0m [90m 7 |[0m [36mimport[0m { characterCube, temperamentCube, [36mtype[0m [33mAxisInput[0m } [36mfrom[0m [32m"@/lib/interpretation/cube"[0m;
+  [90m   |[0m [31m[1m^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^[0m
+  [90m 8 |[0m [36mimport[0m { latestResult, orderedTraits } [36mfrom[0m [32m"@/lib/survey/result"[0m;
+  [90m 9 |[0m
+  [90m10 |[0m [36mexport[0m [36mconst[0m metadata = { title: [32m"내 결과 — 7차원 성향 설문"[0m };
+
+Import map: aliased to relative './src/lib/interpretation/cube' inside of [project]/
+
+
+https://nextjs.org/docs/messages/module-not-found
+
+
+⨯ ./src/app/(app)/me/page.tsx:7:1
+Error: Module not found: Can't resolve '@/lib/interpretation/cube'
+  [90m 5 |[0m [36mimport[0m { [33mEmptyState[0m } [36mfrom[0m [32m"@/components/ui/Card"[0m;
+  [90m 6 |[0m [36mimport[0m { requireUser } [36mfrom[0m [32m"@/lib/auth/guard"[0m;
+[31m[1m>[0m [90m 7 |[0m [36mimport[0m { characterCube, temperamentCube, [36mtype[0m [33mAxisInput[0m } [36mfrom[0m [32m"@/lib/interpretation/cube"[0m;
+  [90m   |[0m [31m[1m^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^[0m
+  [90m 8 |[0m [36mimport[0m { latestResult, orderedTraits } [36mfrom[0m [32m"@/lib/survey/result"[0m;
+  [90m 9 |[0m
+  [90m10 |[0m [36mexport[0m [36mconst[0m metadata = { title: [32m"내 결과 — 7차원 성향 설문"[0m };
+
+Import map: aliased to relative './src/lib/interpretation/cube' inside of [project]/
+
+
+https://nextjs.org/docs/messages/module-not-found
+
+
+⨯ ./src/app/(app)/me/page.tsx:7:1
+Error: Module not found: Can't resolve '@/lib/interpretation/cube'
+  [90m 5 |[0m [36mimport[0m { [33mEmptyState[0m } [36mfrom[0m [32m"@/components/ui/Card"[0m;
+  [90m 6 |[0m [36mimport[0m { requireUser } [36mfrom[0m [32m"@/lib/auth/guard"[0m;
+[31m[1m>[0m [90m 7 |[0m [36mimport[0m { characterCube, temperamentCube, [36mtype[0m [33mAxisInput[0m } [36mfrom[0m [32m"@/lib/interpretation/cube"[0m;
+  [90m   |[0m [31m[1m^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^[0m
+  [90m 8 |[0m [36mimport[0m { latestResult, orderedTraits } [36mfrom[0m [32m"@/lib/survey/result"[0m;
+  [90m 9 |[0m
+  [90m10 |[0m [36mexport[0m [36mconst[0m metadata = { title: [32m"내 결과 — 7차원 성향 설문"[0m };
+
+Import map: aliased to relative './src/lib/interpretation/cube' inside of [project]/
+
+
+https://nextjs.org/docs/messages/module-not-found
+
+
+⨯ ./src/app/(app)/me/page.tsx:2:1
+Error: Module not found: Can't resolve '@/components/charts/CubeReading'
+  [90m1 |[0m [36mimport[0m [33mLink[0m [36mfrom[0m [32m"next/link"[0m;
+[31m[1m>[0m [90m2 |[0m [36mimport[0m { [33mCubeReading[0m } [36mfrom[0m [32m"@/components/charts/CubeReading"[0m;
+  [90m  |[0m [31m[1m^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^[0m
+  [90m3 |[0m [36mimport[0m { [33mTraitProfile[0m } [36mfrom[0m [32m"@/components/charts/TraitProfile"[0m;
+  [90m4 |[0m [36mimport[0m { [33mTraitRadar[0m } [36mfrom[0m [32m"@/components/charts/TraitRadar"[0m;
+  [90m5 |[0m [36mimport[0m { [33mEmptyState[0m } [36mfrom[0m [32m"@/components/ui/Card"[0m;
+
+Import map: aliased to relative './src/components/charts/CubeReading' inside of [project]/
+
+
+https://nextjs.org/docs/messages/module-not-found
+
+
+⨯ ./src/app/(app)/me/page.tsx:2:1
+Error: Module not found: Can't resolve '@/components/charts/CubeReading'
+  [90m1 |[0m [36mimport[0m [33mLink[0m [36mfrom[0m [32m"next/link"[0m;
+[31m[1m>[0m [90m2 |[0m [36mimport[0m { [33mCubeReading[0m } [36mfrom[0m [32m"@/components/charts/CubeReading"[0m;
+  [90m  |[0m [31m[1m^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^[0m
+  [90m3 |[0m [36mimport[0m { [33mTraitProfile[0m } [36mfrom[0m [32m"@/components/charts/TraitProfile"[0m;
+  [90m4 |[0m [36mimport[0m { [33mTraitRadar[0m } [36mfrom[0m [32m"@/components/charts/TraitRadar"[0m;
+  [90m5 |[0m [36mimport[0m { [33mEmptyState[0m } [36mfrom[0m [32m"@/components/ui/Card"[0m;
+
+Import map: aliased to relative './src/components/charts/CubeReading' inside of [project]/
+
+
+https://nextjs.org/docs/messages/module-not-found
+
+
+⨯ ./src/app/(app)/me/page.tsx:3:1
+Error: Module not found: Can't resolve '@/components/charts/TraitProfile'
+  [90m1 |[0m [36mimport[0m [33mLink[0m [36mfrom[0m [32m"next/link"[0m;
+  [90m2 |[0m [36mimport[0m { [33mCubeReading[0m } [36mfrom[0m [32m"@/components/charts/CubeReading"[0m;
+[31m[1m>[0m [90m3 |[0m [36mimport[0m { [33mTraitProfile[0m } [36mfrom[0m [32m"@/components/charts/TraitProfile"[0m;
+  [90m  |[0m [31m[1m^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^[0m
+  [90m4 |[0m [36mimport[0m { [33mTraitRadar[0m } [36mfrom[0m [32m"@/components/charts/TraitRadar"[0m;
+  [90m5 |[0m [36mimport[0m { [33mEmptyState[0m } [36mfrom[0m [32m"@/components/ui/Card"[0m;
+  [90m6 |[0m [36mimport[0m { requireUser } [36mfrom[0m [32m"@/lib/auth/guard"[0m;
+
+Import map: aliased to relative './src/components/charts/TraitProfile' inside of [project]/
+
+
+https://nextjs.org/docs/messages/module-not-found
+
+
+⨯ ./src/app/(app)/me/page.tsx:3:1
+Error: Module not found: Can't resolve '@/components/charts/TraitProfile'
+  [90m1 |[0m [36mimport[0m [33mLink[0m [36mfrom[0m [32m"next/link"[0m;
+  [90m2 |[0m [36mimport[0m { [33mCubeReading[0m } [36mfrom[0m [32m"@/components/charts/CubeReading"[0m;
+[31m[1m>[0m [90m3 |[0m [36mimport[0m { [33mTraitProfile[0m } [36mfrom[0m [32m"@/components/charts/TraitProfile"[0m;
+  [90m  |[0m [31m[1m^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^[0m
+  [90m4 |[0m [36mimport[0m { [33mTraitRadar[0m } [36mfrom[0m [32m"@/components/charts/TraitRadar"[0m;
+  [90m5 |[0m [36mimport[0m { [33mEmptyState[0m } [36mfrom[0m [32m"@/components/ui/Card"[0m;
+  [90m6 |[0m [36mimport[0m { requireUser } [36mfrom[0m [32m"@/lib/auth/guard"[0m;
+
+Import map: aliased to relative './src/components/charts/TraitProfile' inside of [project]/
+
+
+https://nextjs.org/docs/messages/module-not-found
+
+
+⨯ ./src/app/(app)/me/page.tsx:7:1
+Error: Module not found: Can't resolve '@/lib/interpretation/cube'
+  [90m 5 |[0m [36mimport[0m { [33mEmptyState[0m } [36mfrom[0m [32m"@/components/ui/Card"[0m;
+  [90m 6 |[0m [36mimport[0m { requireUser } [36mfrom[0m [32m"@/lib/auth/guard"[0m;
+[31m[1m>[0m [90m 7 |[0m [36mimport[0m { characterCube, temperamentCube, [36mtype[0m [33mAxisInput[0m } [36mfrom[0m [32m"@/lib/interpretation/cube"[0m;
+  [90m   |[0m [31m[1m^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^[0m
+  [90m 8 |[0m [36mimport[0m { latestResult, orderedTraits } [36mfrom[0m [32m"@/lib/survey/result"[0m;
+  [90m 9 |[0m
+  [90m10 |[0m [36mexport[0m [36mconst[0m metadata = { title: [32m"내 결과 — 7차원 성향 설문"[0m };
+
+Import map: aliased to relative './src/lib/interpretation/cube' inside of [project]/
+
+
+https://nextjs.org/docs/messages/module-not-found
+
+
+⨯ ./src/app/(app)/me/page.tsx:7:1
+Error: Module not found: Can't resolve '@/lib/interpretation/cube'
+  [90m 5 |[0m [36mimport[0m { [33mEmptyState[0m } [36mfrom[0m [32m"@/components/ui/Card"[0m;
+  [90m 6 |[0m [36mimport[0m { requireUser } [36mfrom[0m [32m"@/lib/auth/guard"[0m;
+[31m[1m>[0m [90m 7 |[0m [36mimport[0m { characterCube, temperamentCube, [36mtype[0m [33mAxisInput[0m } [36mfrom[0m [32m"@/lib/interpretation/cube"[0m;
+  [90m   |[0m [31m[1m^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^[0m
+  [90m 8 |[0m [36mimport[0m { latestResult, orderedTraits } [36mfrom[0m [32m"@/lib/survey/result"[0m;
+  [90m 9 |[0m
+  [90m10 |[0m [36mexport[0m [36mconst[0m metadata = { title: [32m"내 결과 — 7차원 성향 설문"[0m };
+
+Import map: aliased to relative './src/lib/interpretation/cube' inside of [project]/
+
+
+https://nextjs.org/docs/messages/module-not-found
+
+
+⨯ ./src/app/(app)/me/page.tsx:7:1
+Error: Module not found: Can't resolve '@/lib/interpretation/cube'
+  [90m 5 |[0m [36mimport[0m { [33mEmptyState[0m } [36mfrom[0m [32m"@/components/ui/Card"[0m;
+  [90m 6 |[0m [36mimport[0m { requireUser } [36mfrom[0m [32m"@/lib/auth/guard"[0m;
+[31m[1m>[0m [90m 7 |[0m [36mimport[0m { characterCube, temperamentCube, [36mtype[0m [33mAxisInput[0m } [36mfrom[0m [32m"@/lib/interpretation/cube"[0m;
+  [90m   |[0m [31m[1m^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^[0m
+  [90m 8 |[0m [36mimport[0m { latestResult, orderedTraits } [36mfrom[0m [32m"@/lib/survey/result"[0m;
+  [90m 9 |[0m
+  [90m10 |[0m [36mexport[0m [36mconst[0m metadata = { title: [32m"내 결과 — 7차원 성향 설문"[0m };
+
+Import map: aliased to relative './src/lib/interpretation/cube' inside of [project]/
+
+
+https://nextjs.org/docs/messages/module-not-found
+
+
+✓ Compiled in 81ms
+ GET /me 404 in 313ms (next.js: 246ms, application-code: 66ms)
+ GET /me 404 in 126ms (next.js: 10ms, application-code: 116ms)
+ GET /me 404 in 24ms (next.js: 9ms, application-code: 15ms)
+ GET /me 404 in 108ms (next.js: 60ms, application-code: 48ms)
+ GET /me 404 in 115ms (next.js: 9ms, application-code: 106ms)
+✓ Compiled in 46ms
+ GET /me 200 in 541ms (next.js: 5ms, application-code: 536ms)
+ GET /me 200 in 597ms (next.js: 5ms, application-code: 591ms)
+ GET /me 200 in 456ms (next.js: 8ms, application-code: 448ms)
+ GET /me 200 in 783ms (next.js: 112ms, application-code: 671ms)
+ GET /me 200 in 566ms (next.js: 29ms, application-code: 537ms)
+ GET /me 200 in 627ms (next.js: 5ms, application-code: 623ms)

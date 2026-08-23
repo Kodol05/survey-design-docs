@@ -1,10 +1,15 @@
 import Link from "next/link";
-import { CubeReading } from "@/components/charts/CubeReading";
-import { TraitProfile } from "@/components/charts/TraitProfile";
+import { AxisDetail } from "@/components/charts/AxisDetail";
+import { PairReadings } from "@/components/charts/PairReadings";
 import { TraitRadar } from "@/components/charts/TraitRadar";
+import {
+  CHARACTER,
+  TEMPERAMENT,
+  TraitOverview,
+} from "@/components/charts/TraitOverview";
 import { EmptyState } from "@/components/ui/Card";
 import { requireUser } from "@/lib/auth/guard";
-import { characterCube, temperamentCube, type AxisInput } from "@/lib/interpretation/cube";
+import { readPairs, type AxisInput } from "@/lib/interpretation/pairs";
 import { latestResult, orderedTraits } from "@/lib/survey/result";
 
 export const metadata = { title: "내 결과 — 7차원 성향 설문" };
@@ -32,15 +37,31 @@ export default async function MePage() {
   }
 
   const traits = orderedTraits(result.traits);
-
-  // 큐브 해석 — 기질에서 하나, 성격에서 하나. 서로 곱하지 않는다 (00 §2.2)
-  const axes: Record<string, AxisInput> = Object.fromEntries(
+  const byScale = new Map(traits.map((t) => [t.scale, t]));
+  const scores: Record<string, AxisInput> = Object.fromEntries(
     traits.map((t) => [t.scale, { percent: t.percent, band: t.band }]),
   );
 
+  const detail = (scale: string) => {
+    const t = byScale.get(scale as never);
+    if (!t) return null;
+    return (
+      <AxisDetail
+        key={scale}
+        scale={scale}
+        percent={t.percent}
+        band={t.band}
+        facets={Object.entries(t.facets ?? {}).map(([name, f]) => ({
+          name,
+          percent: f.percent,
+        }))}
+      />
+    );
+  };
+
   return (
     <main className="page-column py-16">
-      <header className="mb-16">
+      <header className="mb-14">
         <h1 className="text-screen-title mb-2">{me.name} 님의 결과</h1>
         <p className="text-axis text-ink-muted">
           {result.completedAt?.toLocaleDateString("ko-KR")} 응시
@@ -48,8 +69,8 @@ export default async function MePage() {
         </p>
       </header>
 
-      {/* 프로필이 주인공이다. 상자에 가두지 않고 넓게 편다. */}
-      <TraitProfile
+      {/* ① 한눈에 — 일곱 축이 한 화면에 들어와야 모양이 보인다 */}
+      <TraitOverview
         rows={traits.map((t) => ({
           scale: t.scale,
           percent: t.percent,
@@ -57,39 +78,63 @@ export default async function MePage() {
         }))}
       />
 
-      <section className="mt-24 border-t border-[--border] pt-10">
-        <h2 className="text-section-title mb-6">묶어서 보면</h2>
-        <CubeReading
-          temperament={temperamentCube(axes)}
-          character={characterCube(axes)}
-        />
-        <p className="text-axis text-ink-muted mt-8 max-w-3xl">
-          일곱 축을 따로 보는 것과 묶어서 보는 것은 다릅니다. 위는 세 축이 겹쳤을 때
-          어떤 모습이 되는지를 적은 것이고, 사람을 어떤 종류로 나누는 것이 아닙니다.
+      {/* ② 축별 상세 — 내 구간 설명 + 하위척도 */}
+      <section className="mt-20">
+        <h2 className="text-section-title mb-2">기질</h2>
+        <p className="text-ink-secondary mb-6">
+          타고난 부분입니다. 바꾸려 애쓰기보다 알고 쓰는 쪽이 맞습니다.
         </p>
+        {TEMPERAMENT.map(detail)}
       </section>
 
-      <section className="mt-20 grid gap-12 lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)] lg:items-center">
+      <section className="mt-20">
+        <h2 className="text-section-title mb-2">성격</h2>
+        <p className="text-ink-secondary mb-6">
+          살면서 형성된 부분입니다. 기질과 달리 시간이 지나며 달라질 수 있습니다.
+        </p>
+        {CHARACTER.map(detail)}
+      </section>
+
+      {/* ③ 두 축을 같이 보기 */}
+      <section className="mt-24 border-t border-[--border] pt-12">
+        <h2 className="text-section-title mb-2">두 축을 같이 보면</h2>
+        <p className="text-ink-secondary mb-10 max-w-[44rem]">
+          축을 하나씩 보는 것과 둘을 겹쳐 보는 것은 다릅니다. 서로 당기는 방향이 다른
+          축이 만나면 그 안에서 긴장이 생깁니다.
+        </p>
+        <PairReadings readings={readPairs(scores)} scores={scores} />
+      </section>
+
+      {/* ④ 모양 확인용 */}
+      <section className="mt-24 grid gap-12 border-t border-[--border] pt-12 lg:grid-cols-2 lg:items-center">
         <div>
           <h2 className="text-section-title mb-3">한눈에 보기</h2>
           <p className="text-ink-secondary max-w-[30rem]">
             일곱 축을 한 모양으로 겹쳐 본 것입니다. 어느 쪽으로 치우쳐 있는지 형태로
             읽으시면 됩니다.
           </p>
-          <div className="text-axis text-ink-secondary mt-8 flex flex-col gap-2 border-t border-[--border] pt-6">
-            <p>점수는 잘한다 못한다가 아니라 이런 편이다 정도로 보시면 됩니다.</p>
-            <p>이번 일을 어떻게 할지보다는 평소 일하는 방식을 보는 데 맞습니다.</p>
-          </div>
         </div>
         <TraitRadar data={traits.map((t) => ({ scale: t.scale, percent: t.percent }))} />
       </section>
 
       {/* 직무능력은 개인 화면에 표시하지 않는다 (00 D-35).
-          관리자가 성향과의 관계를 확인하는 데 쓰는 자료이고,
-          본인에게 "협력 62"를 보여주면 잘한다/못한다로 읽힌다.
           사내 위치도 마찬가지로 개인 화면에는 없다 (D-09). */}
 
-      <p className="mt-20">
+      {/* ⑤ 전체 안내를 한 번만 둔다. 곳곳에 경고를 흩뿌리면 아무도 안 읽는다 */}
+      <section className="text-axis text-ink-muted mt-24 max-w-[44rem] border-t border-[--border] pt-8">
+        <p className="text-ink-secondary mb-2 font-medium">읽으실 때</p>
+        <p className="mb-1">
+          점수는 잘한다 못한다가 아니라 이런 편이다 정도입니다. 이번 일을 어떻게 할지보다
+          평소 일하는 방식을 보는 데 맞습니다.
+        </p>
+        <p>
+          그리고 이 결과가 전부 맞지는 않을 수 있습니다. 스스로 답한 것을 모은 것이라 그날
+          상태에 따라 달라지고, 문항도 저희가 새로 쓴 것이라 아직 다듬는 중입니다. 자기
+          이해를 돕는 참고 자료로 보시면 됩니다.
+        </p>
+      </section>
+
+      <p className="mt-16">
         <Link href="/survey" className="text-table text-ink-secondary underline">
           다시 응시하기
         </Link>
