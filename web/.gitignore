@@ -43,3 +43,6 @@ next-env.d.ts
 
 # Prisma 생성물 — 스키마에서 다시 만들 수 있으므로 커밋하지 않는다
 src/generated/
+
+# 개발 서버 로그 — 커밋하지 않는다
+dev.log
