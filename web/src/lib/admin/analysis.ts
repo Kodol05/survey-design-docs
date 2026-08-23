@@ -1,0 +1,341 @@
+import { prisma } from "../db";
+import { ABILITY_AXES, ABILITY_AXIS_FROM_DB, TRAIT_SCALES } from "../items/types";
+import type { StoredAbilities, StoredTraits } from "../survey/result";
+import { MIN_N } from "@/components/ui/NBadge";
+import {
+  alphaVerdict,
+  correlate,
+  cronbachAlpha,
+  loocv,
+  type Correlation,
+  type LoocvResult,
+} from "./stats";
+
+/**
+ * DB에서 분석에 필요한 것을 꺼내 온다. 계산 자체는 `stats.ts`(순수 함수)가 한다.
+ *
+ * ⚠️ 응답 품질이 `poor`인 사람을 뺄 수 있게 열어 둔다. 50명 규모에서는
+ *    대충 찍은 네댓 명이 상관을 통째로 흔든다.
+ */
+
+export type Person = {
+  employeeId: string;
+  name: string;
+  traits: Record<string, number>;
+  abilities: Record<string, number>;
+  quality: string;
+};
+
+export async function loadPeople(excludePoor = false): Promise<Person[]> {
+  const rows = await prisma.testSession.findMany({
+    where: { status: "COMPLETED", result: { isNot: null } },
+    orderBy: { completedAt: "desc" },
+    include: { result: true, qualityFlag: true, employee: true },
+  });
+
+  // 같은 사람이 여러 번 응시했으면 가장 최근 것만
+  const seen = new Set<string>();
+  const people: Person[] = [];
+  for (const s of rows) {
+    if (seen.has(s.employeeId)) continue;
+    seen.add(s.employeeId);
+    const flag = s.qualityFlag?.flag ?? "ok";
+    if (excludePoor && flag === "poor") continue;
+    people.push({
+      employeeId: s.employeeId,
+      name: s.employee.name,
+      traits: Object.fromEntries(
+        Object.entries((s.result!.scoresJson ?? {}) as StoredTraits).map(([k, v]) => [
+          k,
+          v.percent,
+        ]),
+      ),
+      abilities: Object.fromEntries(
+        Object.entries((s.result!.abilityScoresJson ?? {}) as StoredAbilities).map(
+          ([k, v]) => [k, v.percent],
+        ),
+      ),
+      quality: flag,
+    });
+  }
+  return people;
+}
+
+const key = (a: string, b: string) => `${a} ${b}`;
+
+/** 성향 7축 × 직무능력 3축 — 사내 데이터로 낸 관련도 */
+export function traitAbilityMatrix(people: Person[]) {
+  const cells = new Map<string, Correlation>();
+  for (const scale of TRAIT_SCALES) {
+    for (const axis of ABILITY_AXES) {
+      const pairs = people
+        .map((p) => [p.traits[scale], p.abilities[axis]] as const)
+        .filter(([a, b]) => typeof a === "number" && typeof b === "number");
+      if (pairs.length < 2) continue;
+      cells.set(
+        key(scale, axis),
+        correlate(
+          pairs.map(([a]) => a),
+          pairs.map(([, b]) => b),
+        ),
+      );
+    }
+  }
+  return { cells, n: people.length, enough: people.length >= MIN_N };
+}
+
+export const cellOf = (
+  m: { cells: Map<string, Correlation> },
+  scale: string,
+  axis: string,
+) => m.cells.get(key(scale, axis));
+
+/** 산점도용 좌표. 이름을 같이 주어 점에 올렸을 때 누구인지 보이게 한다. */
+export function scatterPoints(people: Person[], scale: string, axis: string) {
+  return people
+    .filter((p) => typeof p.traits[scale] === "number" && typeof p.abilities[axis] === "number")
+    .map((p) => ({
+      id: p.employeeId,
+      name: p.name,
+      x: p.traits[scale],
+      y: p.abilities[axis],
+      quality: p.quality,
+    }));
+}
+
+/** 최소제곱 추세선. 점 50개를 그대로 두고 그 위에 얹는다. */
+export function trendLine(points: { x: number; y: number }[]) {
+  if (points.length < 3) return null;
+  const n = points.length;
+  const mx = points.reduce((s, p) => s + p.x, 0) / n;
+  const my = points.reduce((s, p) => s + p.y, 0) / n;
+  let sxy = 0;
+  let sxx = 0;
+  for (const p of points) {
+    sxy += (p.x - mx) * (p.y - my);
+    sxx += (p.x - mx) ** 2;
+  }
+  if (sxx === 0) return null;
+  const slope = sxy / sxx;
+  const intercept = my - slope * mx;
+  return [
+    { x: 0, y: intercept },
+    { x: 100, y: intercept + slope * 100 },
+  ];
+}
+
+// ── 순위 (세부 항목 포함) ────────────────────────────────────────────
+
+export type RankRow = { label: string; scale: string; corr: Correlation };
+
+/**
+ * 어느 능력과 관련이 큰 항목을 절댓값 순으로.
+ *
+ * ⚠️ 세부 항목 28개 × 능력 3개면 84개 상관이다. 관계가 없어도 네댓 개는
+ *    우연히 높게 나온다. 그래서 **상위 8개에서 자르고 경고를 상시 표시**한다
+ *    (11 §3.4). 전부 줄 세우면 노이즈를 발견으로 읽게 된다.
+ */
+export const RANK_LIMIT = 8;
+
+export async function rankForAbility(
+  axis: string,
+  excludePoor = false,
+): Promise<RankRow[]> {
+  const rows = await loadFacetLevel(excludePoor);
+  const out: RankRow[] = [];
+  for (const [label, values] of rows.facets) {
+    const pairs = values
+      .map((v, i) => [v, rows.abilities[axis]?.[i]] as const)
+      .filter(([a, b]) => typeof a === "number" && typeof b === "number");
+    if (pairs.length < 4) continue;
+    out.push({
+      label,
+      scale: label.split(" · ")[0],
+      corr: correlate(
+        pairs.map(([a]) => a),
+        pairs.map(([, b]) => b),
+      ),
+    });
+  }
+  return out
+    .sort((a, b) => Math.abs(b.corr.r) - Math.abs(a.corr.r))
+    .slice(0, RANK_LIMIT);
+}
+
+/** 세부 항목(하위척도) 단위 점수. 순위 화면에서만 쓴다. */
+async function loadFacetLevel(excludePoor: boolean) {
+  const rows = await prisma.testSession.findMany({
+    where: { status: "COMPLETED", result: { isNot: null } },
+    orderBy: { completedAt: "desc" },
+    include: { result: true, qualityFlag: true },
+  });
+  const seen = new Set<string>();
+  const facets = new Map<string, number[]>();
+  const abilities: Record<string, number[]> = {};
+
+  for (const s of rows) {
+    if (seen.has(s.employeeId)) continue;
+    seen.add(s.employeeId);
+    if (excludePoor && s.qualityFlag?.flag === "poor") continue;
+
+    const t = (s.result!.scoresJson ?? {}) as StoredTraits;
+    for (const [scale, v] of Object.entries(t))
+      for (const [facet, f] of Object.entries(v.facets ?? {})) {
+        const label = `${scale} · ${facet}`;
+        facets.set(label, [...(facets.get(label) ?? []), f.percent]);
+      }
+    const a = (s.result!.abilityScoresJson ?? {}) as StoredAbilities;
+    for (const [axis, v] of Object.entries(a))
+      abilities[axis] = [...(abilities[axis] ?? []), v.percent];
+  }
+  return { facets, abilities };
+}
+
+// ── 계산식 ──────────────────────────────────────────────────────────
+
+export type PredictionCheck = { axis: string; loocv: LoocvResult } | null;
+
+/**
+ * 성향 7축으로 직무능력을 맞춰본다.
+ *
+ * 세부 항목 28개로는 만들지 않는다 — 변수가 사람 수의 절반을 넘는다.
+ * 7축까지만 쓴다 (10-core-ideas.md).
+ */
+export function predictionCheck(people: Person[], axis: string): PredictionCheck {
+  const usable = people.filter(
+    (p) =>
+      TRAIT_SCALES.every((s) => typeof p.traits[s] === "number") &&
+      typeof p.abilities[axis] === "number",
+  );
+  if (usable.length < 12) return null;
+  const X = usable.map((p) => TRAIT_SCALES.map((s) => p.traits[s]));
+  const y = usable.map((p) => p.abilities[axis]);
+  return { axis, loocv: loocv(X, y) };
+}
+
+// ── 척도 신뢰도 ─────────────────────────────────────────────────────
+
+export type ScaleReliability = {
+  scale: string;
+  kind: "trait" | "ability";
+  itemCount: number;
+  alpha: number | null;
+  verdict: ReturnType<typeof alphaVerdict>;
+};
+
+/**
+ * 척도별 Cronbach's α.
+ *
+ * **α가 .60 아래인 척도는 그 상관을 볼 필요가 없다.** 이 화면이 없으면
+ * 못 만들어진 척도의 상관을 열심히 해석하게 된다.
+ */
+export async function loadReliability(): Promise<ScaleReliability[]> {
+  const assessment = await prisma.assessment.findFirst({ where: { isActive: true } });
+  if (!assessment) return [];
+
+  const items = await prisma.item.findMany({
+    where: { assessmentId: assessment.id, status: "ACTIVE" },
+    select: { id: true, kind: true, scale: true, abilityAxis: true, isReverse: true },
+  });
+  const responses = await prisma.response.findMany({
+    where: { session: { status: "COMPLETED" } },
+    select: { sessionId: true, itemId: true, value: true },
+  });
+
+  const bySession = new Map<string, Map<string, number>>();
+  for (const r of responses) {
+    if (!bySession.has(r.sessionId)) bySession.set(r.sessionId, new Map());
+    bySession.get(r.sessionId)!.set(r.itemId, r.value);
+  }
+
+  const groups = new Map<string, { kind: "trait" | "ability"; itemIds: string[] }>();
+  for (const it of items) {
+    const name =
+      it.kind === "TRAIT" ? it.scale! : ABILITY_AXIS_FROM_DB[it.abilityAxis!];
+    if (!name) continue;
+    const g = groups.get(name) ?? {
+      kind: it.kind === "TRAIT" ? ("trait" as const) : ("ability" as const),
+      itemIds: [],
+    };
+    g.itemIds.push(it.id);
+    groups.set(name, g);
+  }
+  const reverse = new Set(items.filter((i) => i.isReverse).map((i) => i.id));
+
+  const out: ScaleReliability[] = [];
+  for (const [scale, g] of groups) {
+    // 역채점을 적용한 값으로 계산한다. 안 하면 α가 항상 낮게 나온다
+    const rows: number[][] = [];
+    for (const answers of bySession.values()) {
+      const row = g.itemIds.map((id) => {
+        const v = answers.get(id);
+        return v === undefined ? NaN : reverse.has(id) ? 8 - v : v;
+      });
+      if (row.some(Number.isNaN)) continue;
+      rows.push(row);
+    }
+    const alpha = cronbachAlpha(rows);
+    out.push({
+      scale,
+      kind: g.kind,
+      itemCount: g.itemIds.length,
+      alpha,
+      verdict: alphaVerdict(alpha),
+    });
+  }
+
+  const order = [...TRAIT_SCALES, ...ABILITY_AXES] as string[];
+  return out.sort((a, b) => order.indexOf(a.scale) - order.indexOf(b.scale));
+}
+
+// ── 역방향: 성향에서 직무능력 보기 ──────────────────────────────────
+
+export type TercileCompare = {
+  axis: string;
+  /** 이 성향 축 상위 1/3의 평균 */
+  upper: number;
+  /** 하위 1/3의 평균 */
+  lower: number;
+  diff: number;
+  upperN: number;
+  lowerN: number;
+};
+
+/**
+ * 어떤 성향 축의 상위권과 하위권이 직무능력에서 얼마나 다른가.
+ *
+ * 상관계수 하나보다 "위쪽 사람들은 협력 62, 아래쪽은 51"이 훨씬 잘 읽힌다.
+ * 다만 3등분이라 각 무리가 12명 남짓이므로 **차이를 확정으로 읽으면 안 된다.**
+ */
+export function abilitiesByTraitTercile(
+  people: Person[],
+  scale: string,
+): TercileCompare[] {
+  const sorted = people
+    .filter((p) => typeof p.traits[scale] === "number")
+    .sort((a, b) => a.traits[scale] - b.traits[scale]);
+  if (sorted.length < 9) return [];
+
+  const cut = Math.floor(sorted.length / 3);
+  const low = sorted.slice(0, cut);
+  const high = sorted.slice(-cut);
+  const avg = (group: Person[], axis: string) => {
+    const vs = group.map((p) => p.abilities[axis]).filter((v) => typeof v === "number");
+    return vs.length ? vs.reduce((a, b) => a + b, 0) / vs.length : NaN;
+  };
+
+  return ABILITY_AXES.filter((axis) => people.some((p) => axis in p.abilities)).map(
+    (axis) => {
+      const upper = avg(high, axis);
+      const lower = avg(low, axis);
+      return {
+        axis,
+        upper,
+        lower,
+        diff: upper - lower,
+        upperN: high.length,
+        lowerN: low.length,
+      };
+    },
+  );
+}
