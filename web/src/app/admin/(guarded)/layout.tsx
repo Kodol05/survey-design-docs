@@ -10,8 +10,8 @@ export default async function AdminLayout({ children }: { children: React.ReactN
 
   return (
     <>
-      <header className="border-b border-[--border] bg-surface">
-        <div className="flex h-14 items-center justify-between px-6">
+      <header className="border-b border-[--border]">
+        <div className="flex h-16 items-center justify-between px-8">
           <nav className="flex items-center gap-6">
             <Link href="/admin" className="font-medium">관리자</Link>
             <Link href="/admin/employees" className="text-table text-ink-secondary">구성원</Link>
@@ -29,8 +29,8 @@ export default async function AdminLayout({ children }: { children: React.ReactN
       {/* 국면 잠금 (D-33) — 결과를 열기 전에는 상시 띄운다 */}
       {collecting && (
         <div
-          className="text-axis px-6 py-2"
-          style={{ background: "var(--surface)", borderBottom: "1px solid var(--border)" }}
+          className="text-axis px-8 py-2.5"
+          style={{ background: "var(--wash)" }}
         >
           <span aria-hidden>🔒</span>{" "}
           <span className="text-ink-secondary">
@@ -39,7 +39,7 @@ export default async function AdminLayout({ children }: { children: React.ReactN
         </div>
       )}
 
-      <div className="flex-1 px-6 py-8">{children}</div>
+      <div className="flex-1 px-8 py-10">{children}</div>
     </>
   );
 }

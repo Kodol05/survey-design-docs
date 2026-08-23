@@ -6,9 +6,13 @@
    다크 모드는 1차 범위 밖이지만 값을 갈아끼울 수 있게 변수로만 선언해 둔다.
    --------------------------------------------------------------------------- */
 :root {
-  /* 바탕과 글자 (11 §1.1) */
+  /* 바탕과 글자 (11 §1.1)
+     바탕은 한 톤이다. 요소마다 다른 바탕색을 깔고 테두리를 두르면
+     화면이 상자 모음처럼 보인다. 구분은 여백과 가는 선으로만 한다. */
+  --page: #fcfcfb;
   --surface: #fcfcfb;
-  --page: #f9f9f7;
+  /* 아주 가끔 살짝 눌러야 할 때만 (숫자 카드 등) */
+  --wash: #f3f2ee;
   --ink: #0b0b0b;
   --ink-secondary: #52514e;
   --ink-muted: #898781;
@@ -51,6 +55,7 @@
 @theme inline {
   --color-surface: var(--surface);
   --color-page: var(--page);
+  --color-wash: var(--wash);
   --color-ink: var(--ink);
   --color-ink-secondary: var(--ink-secondary);
   --color-ink-muted: var(--ink-muted);
@@ -103,12 +108,21 @@
   font-variant-numeric: tabular-nums;
 }
 
-/* 응시·결과 화면은 읽기 폭을 제한하고, 관리자 표는 전체 폭을 쓴다 (01 §2.3) */
+/* 읽기 폭 제한은 **글자에만** 건다 (11 §1.5).
+   척도 줄·표·차트는 글이 아니라서 줄 길이 문제가 없다. */
 @utility reading-column {
   width: 100%;
   max-width: var(--reading-width);
   margin-inline: auto;
   padding-inline: clamp(1rem, 4vw, 3rem);
+}
+
+/* 화면 전체를 담는 폭. 좁은 칸에 가둬두면 넓은 모니터에서 양옆이 빈다. */
+@utility page-column {
+  width: 100%;
+  max-width: 76rem;
+  margin-inline: auto;
+  padding-inline: clamp(1.25rem, 4vw, 3rem);
 }
 
 body {

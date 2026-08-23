@@ -17,7 +17,7 @@ export function OpenResultsButton({ completed }: { completed: number }) {
     );
 
   return (
-    <div className="rounded-lg border border-[--border] p-4">
+    <div className="border-l-2 py-1 pl-4" style={{ borderColor: "var(--status-serious)" }}>
       <p className="mb-1 font-medium">되돌릴 수 없습니다.</p>
       <p className="text-table text-ink-secondary mb-4">
         지금 열면 다시 잠글 수 없습니다. 대표님 평가가 모두 들어왔는지 확인하고 눌러 주세요.

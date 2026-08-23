@@ -50,15 +50,13 @@ export default async function EmployeeDetail(props: { params: Promise<{ id: stri
       </p>
 
       {!open ? (
-        <Card className="mb-6">
-          <p className="text-ink-secondary">
-            평가 수집 중이라 결과를 볼 수 없습니다. 대표님 평가가 끝나면 열립니다.
-          </p>
-        </Card>
+        <p className="text-ink-secondary mb-14 border-l-2 border-[--axis] py-1 pl-4">
+          평가 수집 중이라 결과를 볼 수 없습니다. 대표님 평가가 끝나면 열립니다.
+        </p>
       ) : !result ? (
-        <Card className="mb-6">
+        <div className="mb-14">
           <EmptyState message={session ? "응시가 진행 중입니다." : "아직 응시하지 않았습니다."} />
-        </Card>
+        </div>
       ) : (
         <ResultBlocks
           traits={result.scoresJson as unknown as StoredTraits}
@@ -67,7 +65,7 @@ export default async function EmployeeDetail(props: { params: Promise<{ id: stri
       )}
 
       {session?.qualityFlag && (
-        <Card title="응답 품질" className="mb-6">
+        <Card title="응답 품질" className="mb-14">
           <dl className="text-table grid grid-cols-2 gap-y-2 sm:grid-cols-4">
             <dt className="text-ink-secondary">판정</dt>
             <dd className="tabular">{session.qualityFlag.flag}</dd>
@@ -106,7 +104,8 @@ async function ResultBlocks({
 
   return (
     <>
-      <Card title="일곱 가지 성향" className="mb-6">
+      <Card title="일곱 가지 성향" className="mb-14">
+        <div className="max-w-2xl">
         <TraitRadar
           data={t.map((x) => ({
             scale: x.scale,
@@ -120,9 +119,10 @@ async function ResultBlocks({
             점선은 사내 평균입니다 ({dist.n}명 기준)
           </p>
         )}
+        </div>
       </Card>
 
-      <Card title="직무능력" className="mb-6">
+      <Card title="직무능력" className="mb-14">
         <table className="w-full text-table">
           <thead>
             <tr className="text-ink-secondary border-b border-[--border]">

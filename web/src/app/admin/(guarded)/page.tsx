@@ -10,10 +10,10 @@ export const metadata = { title: "대시보드 — 관리자" };
 
 function Stat({ label, value, hint }: { label: string; value: number | string; hint?: string }) {
   return (
-    <div className="rounded-lg border border-[--border] bg-surface p-6">
+    <div className="rounded-xl p-6" style={{ background: "var(--wash)" }}>
       <p className="text-axis text-ink-secondary">{label}</p>
-      <p className="mt-1 text-3xl font-semibold">{value}</p>
-      {hint && <p className="text-axis text-ink-muted mt-1">{hint}</p>}
+      <p className="tabular mt-1 text-4xl font-semibold">{value}</p>
+      {hint && <p className="text-axis text-ink-muted mt-2">{hint}</p>}
     </div>
   );
 }
@@ -30,7 +30,7 @@ export default async function AdminHome() {
     <>
       <h1 className="text-screen-title mb-6">대시보드</h1>
 
-      <div className="mb-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+      <div className="mb-14 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
         <Stat label="응시 완료" value={s.completed} />
         <Stat label="진행 중" value={s.inProgress} />
         <Stat label="가입한 사람" value={s.signedUp} hint="가입이 자유라 전체 인원은 알 수 없습니다" />
@@ -41,7 +41,7 @@ export default async function AdminHome() {
         />
       </div>
 
-      <Card title="평가·결과 국면" className="mb-6">
+      <Card title="평가·결과 국면" className="mb-14">
         {open ? (
           <p className="text-ink-secondary">
             결과가 공개되어 있습니다.{" "}

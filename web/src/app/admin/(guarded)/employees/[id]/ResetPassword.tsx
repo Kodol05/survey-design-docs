@@ -21,7 +21,7 @@ export function ResetPassword({ employeeId, name }: { employeeId: string; name: 
         <p className="mb-2">
           초기화했습니다. {name} 님께 임시 비밀번호를 전해 주세요.
         </p>
-        <p className="tabular rounded-lg border border-[--border] bg-page px-3 py-2 font-mono">
+        <p className="tabular rounded-lg px-3 py-2 font-mono" style={{ background: "var(--wash)" }}>
           {temp}
         </p>
         <p className="text-axis text-ink-muted mt-2">

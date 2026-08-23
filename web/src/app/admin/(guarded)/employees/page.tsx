@@ -52,11 +52,11 @@ export default async function EmployeesPage() {
       <p className="text-axis text-ink-muted mb-6">{employees.length}명</p>
 
       {/* 관리자 표는 조밀하게 — 50명을 훑는 것이 목적이다 (11 §1.4) */}
-      <div className="overflow-x-auto rounded-lg border border-[--border] bg-surface">
+      <div className="overflow-x-auto">
         <table className="w-full text-table">
           <thead>
             <tr className="border-b border-[--border] text-ink-secondary">
-              <th className="px-4 py-2 text-left font-medium">이름</th>
+              <th className="py-2 pr-4 text-left font-medium">이름</th>
               <th className="px-4 py-2 text-left font-medium">번호</th>
               <th className="px-4 py-2 text-left font-medium">상태</th>
               {open &&

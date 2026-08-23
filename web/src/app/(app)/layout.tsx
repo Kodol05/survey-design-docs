@@ -6,8 +6,8 @@ export default async function AppLayout({ children }: { children: React.ReactNod
   const me = await requireUser();
   return (
     <>
-      <header className="border-b border-[--border] bg-surface">
-        <div className="reading-column flex h-14 items-center justify-between">
+      <header className="border-b border-[--border]">
+        <div className="page-column flex h-16 items-center justify-between">
           <Link href="/me" className="font-medium">7차원 성향 설문</Link>
           <div className="text-axis text-ink-secondary flex items-center gap-4">
             <span>{me.name}</span>

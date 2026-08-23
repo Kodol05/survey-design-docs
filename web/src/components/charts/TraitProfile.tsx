@@ -28,12 +28,12 @@ const BAND_LABEL = { lower: "낮은 편", middle: "보통", upper: "높은 편" 
 function Row({ row }: { row: ProfileRow }) {
   const x = Math.max(0, Math.min(100, row.percent));
   return (
-    <div className="grid grid-cols-[7.5rem_1fr_5.5rem] items-center gap-4 py-3">
-      <span className="text-table font-medium">{row.scale}</span>
+    <div className="grid grid-cols-[9rem_1fr_7rem] items-center gap-6 py-4">
+      <span className="font-medium">{row.scale}</span>
 
-      <div className="relative h-9">
+      <div className="relative h-10">
         {/* 눈금 배경 — 구간 경계를 옅게 깔아 어디가 보통인지 보이게 한다 (D-26) */}
-        <div className="absolute inset-y-3 left-0 right-0 flex overflow-hidden rounded-full">
+        <div className="absolute inset-y-[0.9rem] left-0 right-0 flex overflow-hidden rounded-full">
           <div style={{ width: `${BAND.lower}%`, background: "var(--grid)" }} />
           <div
             style={{
@@ -50,7 +50,7 @@ function Row({ row }: { row: ProfileRow }) {
           style={{ left: `${x}%` }}
         >
           <span
-            className="block size-5 rounded-full ring-4"
+            className="block size-6 rounded-full ring-4"
             style={{
               background: "var(--series-1)",
               ["--tw-ring-color" as string]: "var(--surface)",
@@ -59,9 +59,9 @@ function Row({ row }: { row: ProfileRow }) {
         </div>
       </div>
 
-      <span className="text-table tabular text-right">
-        {Math.round(row.percent)}
-        <span className="text-ink-muted ml-2 text-axis">{BAND_LABEL[row.band]}</span>
+      <span className="tabular text-right">
+        <span className="text-lg font-medium">{Math.round(row.percent)}</span>
+        <span className="text-ink-muted text-axis ml-2">{BAND_LABEL[row.band]}</span>
       </span>
     </div>
   );
@@ -75,7 +75,7 @@ export function TraitProfile({ rows }: { rows: ProfileRow[] }) {
   return (
     <div>
       {/* 눈금 머리 — 한 번만 둔다. 축마다 반복하면 화면이 시끄러워진다 */}
-      <div className="grid grid-cols-[7.5rem_1fr_5.5rem] items-end gap-4 border-b border-[--border] pb-2">
+      <div className="grid grid-cols-[9rem_1fr_7rem] items-end gap-6 border-b border-[--border] pb-2">
         <span className="text-axis text-ink-muted">성향 축</span>
         <div className="text-axis text-ink-muted relative flex justify-between">
           <span>낮음</span>
@@ -86,8 +86,8 @@ export function TraitProfile({ rows }: { rows: ProfileRow[] }) {
       </div>
 
       <section>
-        <h3 className="text-table text-ink-secondary mt-6 mb-1 font-medium">
-          기질 <span className="text-ink-muted font-normal">— 타고난 부분</span>
+        <h3 className="text-ink-secondary mt-10 mb-2 font-medium">
+          기질 <span className="text-ink-muted text-table font-normal">— 타고난 부분</span>
         </h3>
         <div className="divide-y divide-[--border]">
           {group(TEMPERAMENT).map((r) => (
@@ -97,8 +97,8 @@ export function TraitProfile({ rows }: { rows: ProfileRow[] }) {
       </section>
 
       <section>
-        <h3 className="text-table text-ink-secondary mt-8 mb-1 font-medium">
-          성격 <span className="text-ink-muted font-normal">— 살면서 형성된 부분</span>
+        <h3 className="text-ink-secondary mt-12 mb-2 font-medium">
+          성격 <span className="text-ink-muted text-table font-normal">— 살면서 형성된 부분</span>
         </h3>
         <div className="divide-y divide-[--border]">
           {group(CHARACTER).map((r) => (
