@@ -31,14 +31,26 @@ export default async function AdminHome() {
   const meanAlpha = alphas.length ? alphas.reduce((a, b) => a + b, 0) / alphas.length : null;
   const poorScales = reliability.filter((r) => r.verdict === "poor");
 
-  // 사내 평균 — 우리 회사 사람들은 전반적으로 어떤 편인가 (01 §4.0 Q1)
-  const averages = TRAIT_SCALES.map((scale) => {
+  // 어느 축에서 사람이 갈리는가.
+  //
+  // 평균은 쓰지 않는다 — 눈금 자체가 문항 가운데를 50으로 잡은 것이라
+  // 비교할 바깥 기준이 없고, 어느 축이든 거의 50 근처로 나온다.
+  // 반면 **퍼진 정도**는 우리 회사 사람들을 실제로 가르는 축이 무엇인지 말해준다.
+  type Spread = { scale: string; sd: number; lo: number; hi: number };
+  const spread: Spread[] = [];
+  for (const scale of TRAIT_SCALES) {
     const vs = people.map((p) => p.traits[scale]).filter((v) => typeof v === "number");
-    return {
-      scale,
-      value: vs.length ? vs.reduce((a, b) => a + b, 0) / vs.length : null,
-    };
-  });
+    if (vs.length < 2) continue;
+    const m = vs.reduce((a, b) => a + b, 0) / vs.length;
+    const sd = Math.sqrt(vs.reduce((acc, v) => acc + (v - m) ** 2, 0) / (vs.length - 1));
+    spread.push({ scale, sd, lo: Math.min(...vs), hi: Math.max(...vs) });
+  }
+  spread.sort((a, b) => b.sd - a.sd);
+  const maxSd = spread[0]?.sd ?? 1;
+
+  // 지금 손봐야 할 것
+  const needsReview = people.filter((p) => p.quality !== "ok");
+  const poorNames = poorScales.map((r) => r.scale);
 
   // 가장 뚜렷한 관련 세 개 — 자세한 것은 분석 화면에서
   const top = TRAIT_SCALES.flatMap((scale) =>
@@ -96,39 +108,98 @@ export default async function AdminHome() {
         )}
       </section>
 
+      {(needsReview.length > 0 || poorNames.length > 0 || s.inProgress > 0) && (
+        <section className="mb-14">
+          <h2 className="text-section-title mb-4 border-b border-[--border] pb-2">
+            지금 볼 것
+          </h2>
+          <ul className="flex flex-col gap-3">
+            {needsReview.length > 0 && (
+              <li>
+                <span className="mr-2" style={{ color: "var(--status-warn)" }}>
+                  ●
+                </span>
+                응답 품질 검토가 필요한 사람 {needsReview.length}명 —{" "}
+                <span className="text-ink-secondary">
+                  {needsReview.slice(0, 6).map((p) => p.name).join(", ")}
+                  {needsReview.length > 6 && ` 외 ${needsReview.length - 6}명`}
+                </span>{" "}
+                <Link href="/admin/employees" className="underline">
+                  목록
+                </Link>
+              </li>
+            )}
+            {poorNames.length > 0 && (
+              <li>
+                <span className="mr-2" style={{ color: "var(--status-critical)" }}>
+                  ●
+                </span>
+                문항이 아직 안 맞물리는 척도 — {poorNames.join(", ")}{" "}
+                <Link href="/admin/stats?tab=reliability" className="underline">
+                  신뢰도 보기
+                </Link>
+              </li>
+            )}
+            {s.inProgress > 0 && (
+              <li>
+                <span className="text-ink-muted mr-2">●</span>
+                응시를 시작하고 끝내지 않은 사람 {s.inProgress}명
+              </li>
+            )}
+          </ul>
+        </section>
+      )}
+
       {open && (
         <>
           <section className="mb-14">
             <div className="mb-4 flex items-baseline justify-between border-b border-[--border] pb-2">
-              <h2 className="text-section-title">우리 회사는 어떤 편인가</h2>
-              <span className="text-axis text-ink-muted">{people.length}명 평균</span>
+              <h2 className="text-section-title">사람이 갈리는 축</h2>
+              <span className="text-axis text-ink-muted">{people.length}명</span>
             </div>
-            <ul className="max-w-2xl">
-              {averages.map((a) => (
-                <li key={a.scale} className="grid grid-cols-[7rem_1fr_2.5rem] items-center gap-4 py-2">
-                  <span className="text-table">{a.scale}</span>
-                  <div className="relative h-2.5 rounded-full" style={{ background: "var(--grid)" }}>
-                    {a.value !== null && (
-                      <>
-                        <div
-                          className="absolute inset-y-0 left-0 rounded-full"
-                          style={{ width: `${a.value}%`, background: colorAt(a.value) }}
-                        />
-                        <div
-                          className="absolute inset-y-[-3px] w-px"
-                          style={{ left: "50%", background: "var(--axis)" }}
-                        />
-                      </>
-                    )}
+
+            <ul className="max-w-3xl">
+              {spread.map((x) => (
+                <li
+                  key={x.scale}
+                  className="grid grid-cols-[7rem_1fr_5.5rem] items-center gap-5 py-2.5"
+                >
+                  <span className="text-table">{x.scale}</span>
+                  {/* 가장 낮은 사람부터 가장 높은 사람까지의 폭 */}
+                  <div className="relative h-3">
+                    <div
+                      className="absolute inset-y-1 left-0 right-0 rounded-full"
+                      style={{ background: "var(--grid)" }}
+                    />
+                    <div
+                      className="absolute inset-y-0 rounded-full"
+                      style={{
+                        left: `${x.lo}%`,
+                        width: `${Math.max(2, x.hi - x.lo)}%`,
+                        background: `linear-gradient(90deg, ${colorAt(x.lo)}, ${colorAt(x.hi)})`,
+                        opacity: 0.35 + 0.65 * (x.sd / maxSd),
+                      }}
+                    />
+                    <div
+                      className="absolute inset-y-[-2px] w-px"
+                      style={{ left: "50%", background: "var(--axis)" }}
+                    />
                   </div>
-                  <span className="tabular text-table text-right">
-                    {a.value === null ? "—" : Math.round(a.value)}
+                  <span className="tabular text-axis text-ink-secondary text-right">
+                    {Math.round(x.lo)}–{Math.round(x.hi)}
                   </span>
                 </li>
               ))}
             </ul>
-            <p className="text-axis text-ink-muted mt-3">
-              가운데 선이 50입니다. 모든 문항에 &ldquo;보통&rdquo;으로 답했을 때의 값입니다.
+
+            <p className="text-table text-ink-muted mt-4 max-w-[46rem]">
+              가장 낮은 사람부터 가장 높은 사람까지의 폭입니다. 넓게 퍼진 축일수록 우리
+              회사 사람들을 실제로 가릅니다. 좁은 축은 다들 비슷해서 그 축으로는 사람을
+              구분하기 어렵습니다.
+            </p>
+            <p className="text-axis text-ink-muted mt-2 max-w-[46rem]">
+              평균은 두지 않았습니다. 눈금 자체가 문항 가운데를 50으로 잡은 것이라 비교할
+              바깥 기준이 없고, 어느 축이든 거의 50 근처로 나옵니다.
             </p>
           </section>
 
