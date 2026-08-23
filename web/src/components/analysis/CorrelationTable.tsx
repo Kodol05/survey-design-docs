@@ -133,7 +133,7 @@ export function CorrelationLegend({ inHouse }: { inHouse?: boolean }) {
           className="h-3 w-24 rounded-sm"
           style={{
             background:
-              "linear-gradient(90deg, rgb(208 59 59), rgb(240 239 236), rgb(42 120 214))",
+              "linear-gradient(90deg, #b3623f, #e8e5dd, #44618d)",
           }}
         />
         음의 관계 ← → 양의 관계

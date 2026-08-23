@@ -1,23 +1,23 @@
 /** 눈금 색과 표식 — 프로필 계열 화면이 공유한다 */
 
 const STOPS: [number, string][] = [
-  [0, "#8b7ad6"],
-  [20, "#b6abe3"],
-  [38, "#ded9ec"],
-  [50, "#eceae4"],
-  [62, "#f3decb"],
-  [80, "#eec091"],
-  [100, "#e5904e"],
+  [0, "#44618d"],
+  [20, "#7f95b3"],
+  [38, "#c3cdda"],
+  [50, "#e8e5dd"],
+  [62, "#e3cfbe"],
+  [80, "#cb9a7c"],
+  [100, "#b3623f"],
 ];
 
-/** 왼쪽으로 갈수록 보라, 오른쪽으로 갈수록 주황. 가운데는 바탕에 가깝다.
+/** 왼쪽으로 갈수록 청회색, 오른쪽으로 갈수록 테라코타. 가운데는 바탕에 가깝다.
  *  빨강↔초록을 쓰지 않는다 — 낮음이 틀린 것도 높음이 맞는 것도 아닌데
  *  빨강·초록은 오답·정답으로 읽힌다. */
 export const GRADIENT = `linear-gradient(90deg, ${STOPS.map(([p, c]) => `${c} ${p}%`).join(", ")})`;
 
 /** 라벨용 색은 바 색보다 진하다. 옅은 색을 작은 글자에 쓰면 대비가 모자란다. */
-export const LOW_INK = "#5f4fb8";
-export const HIGH_INK = "#99551a";
+export const LOW_INK = "#3a5479";
+export const HIGH_INK = "#8f4c2d";
 
 export const TEMPERAMENT = ["자극추구", "위험회피", "사회적민감성", "인내력"];
 export const CHARACTER = ["자율성", "연대감", "자기초월"];
