@@ -59,7 +59,7 @@ export default async function MePage() {
     <main className="page-column py-16">
       <header className="mb-14">
         <h1 className="text-screen-title mb-2">{me.name} 님의 결과</h1>
-        <p className="text-axis text-ink-muted">
+        <p className="text-table text-ink-muted">
           {result.completedAt?.toLocaleDateString("ko-KR")} 응시
           {result.durationSec ? ` · ${Math.round(result.durationSec / 60)}분 소요` : ""}
         </p>
@@ -106,7 +106,7 @@ export default async function MePage() {
           사내 위치도 마찬가지로 개인 화면에는 없다 (D-09). */}
 
       {/* ⑤ 전체 안내를 한 번만 둔다. 곳곳에 경고를 흩뿌리면 아무도 안 읽는다 */}
-      <section className="text-axis text-ink-muted mt-24 max-w-[44rem] border-t border-[--border] pt-8">
+      <section className="text-table text-ink-muted mt-24 max-w-[46rem] border-t border-[--border] pt-8">
         <p className="text-ink-secondary mb-2 font-medium">읽으실 때</p>
         <p className="mb-1">
           점수는 잘한다 못한다가 아니라 이런 편이다 정도입니다. 이번 일을 어떻게 할지보다
@@ -120,7 +120,7 @@ export default async function MePage() {
       </section>
 
       <p className="mt-16">
-        <Link href="/survey" className="text-table text-ink-secondary underline">
+        <Link href="/survey" className="text-ink-secondary underline">
           다시 응시하기
         </Link>
       </p>

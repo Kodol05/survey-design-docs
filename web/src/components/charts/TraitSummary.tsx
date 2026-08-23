@@ -32,7 +32,7 @@ export function TraitSummary({ rows }: { rows: SummaryRow[] }) {
 
       <div>
         <TraitBars rows={ordered.map((r) => ({ scale: r.scale, percent: r.percent }))} />
-        <p className="text-axis text-ink-muted mt-3 text-center">
+        <p className="text-table text-ink-muted mt-3 text-center">
           앞의 네 개가 기질, 뒤의 세 개가 성격입니다
         </p>
       </div>

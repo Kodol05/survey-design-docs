@@ -27,11 +27,11 @@ export function TraitStrip({
           <div key={s} className="flex flex-1 flex-col items-center gap-1">
             <div
               title={has ? `${s} ${Math.round(v)}` : s}
-              className="h-7 w-full first:rounded-l-sm last:rounded-r-sm"
+              className="h-8 w-full first:rounded-l-sm last:rounded-r-sm"
               style={{ background: has ? colorAt(v) : "var(--grid)" }}
             />
             {labels && (
-              <span className="text-ink-muted" style={{ fontSize: 10 }}>
+              <span className="text-ink-muted" style={{ fontSize: 12 }}>
                 {SHORT[s]}
               </span>
             )}
@@ -66,7 +66,7 @@ export function TraitStripHeader() {
         <span
           key={s}
           className="text-ink-muted flex-1 text-center"
-          style={{ fontSize: 11 }}
+          style={{ fontSize: 13 }}
           title={s}
         >
           {SHORT[s]}
