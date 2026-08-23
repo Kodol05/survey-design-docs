@@ -73,3 +73,11 @@ export const EXPECTED = {
   /** 역방향 비율 상·하한. 성격검사의 표준 관행 30~40% (00 §2.3) */
   reverseRatio: [0.25, 0.45] as [number, number],
 } as const;
+
+/** DB enum → 한글 축 이름. 채점 결과는 항상 한글 이름으로 저장한다 —
+ *  화면과 통계가 전부 ABILITY_AXES 를 기준으로 돌기 때문이다. */
+export const ABILITY_AXIS_FROM_DB: Record<string, AbilityAxisName> = {
+  COOPERATION: "협력",
+  ORG_LIFE: "조직생활",
+  AUTONOMY: "자율적실행",
+};
