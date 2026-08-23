@@ -1,0 +1,218 @@
+// 7차원 성향 설문 — 데이터 모델
+// 근거: docs/00-design-notes.md §3, docs/07-job-ability.md
+// 2026-08-23 변경: 로그인 방식(D-05), 명단 사전 등록(D-25), 직무능력(D-31)
+
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+// Prisma 7부터 접속 URL은 여기가 아니라 prisma.config.ts 에 둔다
+datasource db {
+  provider = "postgresql"
+}
+
+enum Role {
+  USER
+  ADMIN
+}
+
+enum ItemStatus {
+  DRAFT
+  REVIEW
+  ACTIVE
+  RETIRED
+}
+
+enum SessionStatus {
+  IN_PROGRESS
+  COMPLETED
+  ABANDONED
+}
+
+/// 문항 종류. 성향 문항과 직무능력 문항이 한 설문에 섞여 나간다 (07)
+enum ItemKind {
+  TRAIT
+  ABILITY
+}
+
+/// 직무능력 3축 (D-31). 협력 · 조직생활 · 자율적 실행
+enum AbilityAxis {
+  COOPERATION
+  ORG_LIFE
+  AUTONOMY
+}
+
+/// 관리자가 미리 넣어두는 직원 명단 (D-25/D-30).
+/// 여기 있는 번호만 회원가입할 수 있다. 미응시자 집계의 모수이기도 하다.
+model Roster {
+  id         String    @id @default(cuid())
+  name       String
+  /// normalizePhone()을 반드시 통과한 값만 저장한다
+  phone      String    @unique
+  department String?
+  note       String?
+  createdAt  DateTime  @default(now())
+  employee   Employee?
+}
+
+model Employee {
+  id       String @id @default(cuid())
+  name     String
+  /// 사원 로그인 아이디 = 휴대폰번호 (D-05).
+  /// 내부 연결은 항상 id로 한다 — 번호가 바뀌어도 결과가 끊기지 않게 (D-06).
+  phone    String? @unique
+  /// 관리자 로그인 아이디. 관리자 계정은 사전 지정만 가능 (D-05)
+  loginId  String? @unique
+  /// 사원·관리자 모두 필수. bcrypt 해시. 평문 저장 금지
+  passwordHash      String
+  /// 비어 있으면 초기 비밀번호 상태 → 최초 로그인 시 변경 강제
+  passwordChangedAt DateTime?
+
+  rosterId   String? @unique
+  roster     Roster? @relation(fields: [rosterId], references: [id], onDelete: SetNull)
+
+  employeeNo String? @unique
+  department String?
+  position   String?
+  role       Role    @default(USER)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  authSessions AuthSession[]
+  testSessions TestSession[]
+  ratings      ManagerRating[]
+}
+
+model AuthSession {
+  id         String   @id @default(cuid())
+  employeeId String
+  employee   Employee @relation(fields: [employeeId], references: [id], onDelete: Cascade)
+  expiresAt  DateTime
+  createdAt  DateTime @default(now())
+
+  @@index([employeeId])
+}
+
+model Assessment {
+  id        String        @id @default(cuid())
+  version   Int           @unique
+  title     String
+  /// 114 = 성향 105 + 직무능력 9 (D-07)
+  itemCount Int
+  isActive  Boolean       @default(false)
+  createdAt DateTime      @default(now())
+  items     Item[]
+  sessions  TestSession[]
+}
+
+model Item {
+  id           String     @id @default(cuid())
+  assessmentId String
+  assessment   Assessment @relation(fields: [assessmentId], references: [id], onDelete: Cascade)
+  code         String
+  orderNo      Int
+  section      Int
+
+  kind ItemKind @default(TRAIT)
+
+  /// TRAIT일 때만 채운다 — 7축 이름
+  scale    String?
+  subscale String?
+  /// ABILITY일 때만 채운다
+  abilityAxis AbilityAxis?
+  /// ABILITY 직접형이면 true. 직접형 1 + 간접형 2 (07)
+  isDirect    Boolean?
+
+  content       String
+  isReverse     Boolean    @default(false)
+  status        ItemStatus @default(ACTIVE)
+  /// 근거 출처. 비어 있으면 seed에서 걸린다 (저작권 대응, 00 §5)
+  sourceRef     String
+  antonymPairId String?
+  responses     Response[]
+
+  @@unique([assessmentId, code])
+  @@unique([assessmentId, orderNo])
+  @@index([assessmentId, section])
+  @@index([assessmentId, kind])
+}
+
+model TestSession {
+  id                String        @id @default(cuid())
+  employeeId        String
+  employee          Employee      @relation(fields: [employeeId], references: [id], onDelete: Cascade)
+  assessmentId      String
+  assessment        Assessment    @relation(fields: [assessmentId], references: [id])
+  /// 세션 생성 시 고정(pin). 진행 중인 사람은 기존 버전으로 완주 (01 §2.6)
+  assessmentVersion Int
+  status            SessionStatus @default(IN_PROGRESS)
+  departmentAtTime  String?
+  startedAt         DateTime      @default(now())
+  completedAt       DateTime?
+  durationSec       Int?
+  responses         Response[]
+  result            Result?
+  qualityFlag       QualityFlag?
+
+  @@index([employeeId, status])
+}
+
+model Response {
+  id           String      @id @default(cuid())
+  sessionId    String
+  session      TestSession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+  itemId       String
+  item         Item        @relation(fields: [itemId], references: [id])
+  /// 1~7. 역채점은 8 - value (D-08)
+  value        Int
+  elapsedMs    Int
+  changedCount Int         @default(0)
+  answeredAt   DateTime    @default(now())
+
+  @@unique([sessionId, itemId])
+}
+
+model Result {
+  id        String      @id @default(cuid())
+  sessionId String      @unique
+  session   TestSession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+  /// 성향 7축 점수
+  scoresJson        Json
+  /// 직무능력 3축 점수 (D-31)
+  abilityScoresJson Json?
+  /// 결과 화면은 채점 시점 값으로 고정한다 (D-09)
+  snapshotJson      Json
+  /// 몇 명 기준으로 상대위치를 계산했는지. 30명 미만이면 null (D-24)
+  normBasisN        Int?
+  computedAt        DateTime @default(now())
+}
+
+model QualityFlag {
+  id               String      @id @default(cuid())
+  sessionId        String      @unique
+  session          TestSession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+  meanElapsedMs    Int
+  fastCount        Int
+  antonymAgreement Float
+  flag             String
+  computedAt       DateTime    @default(now())
+}
+
+/// 대표님 평가 (10-core-ideas.md 안건 — 확정 전).
+/// 테이블만 미리 두고 화면은 답을 받은 뒤 만든다.
+/// 반드시 검사 결과가 나오기 전에 입력해야 대조가 성립한다.
+model ManagerRating {
+  id         String      @id @default(cuid())
+  employeeId String
+  employee   Employee    @relation(fields: [employeeId], references: [id], onDelete: Cascade)
+  axis       AbilityAxis
+  /// 1~5
+  score      Int
+  ratedBy    String
+  ratedAt    DateTime    @default(now())
+
+  @@unique([employeeId, axis, ratedBy])
+  @@index([employeeId])
+}

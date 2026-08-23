@@ -1,0 +1,22 @@
+# 개발용 PostgreSQL. 사내 서버로 옮길 때 이 파일을 그대로 쓴다 (00 D-04)
+services:
+  db:
+    image: postgres:16-alpine
+    container_name: survey-db
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: survey
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-devpassword}
+      POSTGRES_DB: survey
+    ports:
+      - "5432:5432"
+    volumes:
+      - survey-pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U survey -d survey"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+volumes:
+  survey-pgdata:
