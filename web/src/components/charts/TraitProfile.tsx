@@ -11,6 +11,8 @@
  * 백분위가 아니다 — 사내 상대위치는 개인 화면에 표시하지 않는다 (00 D-09).
  */
 
+import { POLES } from "@/lib/interpretation/poles";
+
 export type ProfileRow = {
   scale: string;
   percent: number;
@@ -35,8 +37,9 @@ const GRADIENT =
 
 function Row({ row }: { row: ProfileRow }) {
   const x = Math.max(0, Math.min(100, row.percent));
+  const poles = POLES[row.scale];
   return (
-    <div className="py-6">
+    <div className="py-7">
       <p className="mb-3 text-center">
         <span className="text-lg font-medium">{row.scale}</span>
         <span className="text-ink-muted text-table ml-2">{BAND_LABEL[row.band]}</span>
@@ -69,6 +72,20 @@ function Row({ row }: { row: ProfileRow }) {
 
         <span className="text-axis text-ink-muted w-10 shrink-0 pt-2">높음</span>
       </div>
+
+      {/* 낮을 때·높을 때가 어떤 모습인지. 해당하는 쪽을 진하게 둔다. */}
+      {poles && (
+        <div className="text-axis mt-1 flex gap-6 px-14">
+          <p className={`flex-1 ${row.band === "lower" ? "text-ink" : "text-ink-muted"}`}>
+            {poles.low}
+          </p>
+          <p
+            className={`flex-1 text-right ${row.band === "upper" ? "text-ink" : "text-ink-muted"}`}
+          >
+            {poles.high}
+          </p>
+        </div>
+      )}
     </div>
   );
 }
