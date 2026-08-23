@@ -32,8 +32,39 @@ const BAND_LABEL = { lower: "낮은 편", middle: "보통", upper: "높은 편" 
  * 빨강↔초록을 쓰지 않는다. 낮음이 틀린 것도 높음이 맞는 것도 아닌데
  * 빨강·초록은 오답·정답으로 읽힌다.
  */
-const GRADIENT =
-  "linear-gradient(90deg, #8b7ad6 0%, #b6abe3 20%, #ded9ec 38%, #eceae4 50%, #f3decb 62%, #eec091 80%, #e5904e 100%)";
+const STOPS: [number, string][] = [
+  [0, "#8b7ad6"],
+  [20, "#b6abe3"],
+  [38, "#ded9ec"],
+  [50, "#eceae4"],
+  [62, "#f3decb"],
+  [80, "#eec091"],
+  [100, "#e5904e"],
+];
+
+const GRADIENT = `linear-gradient(90deg, ${STOPS.map(([p, c]) => `${c} ${p}%`).join(", ")})`;
+
+/**
+ * 라벨용 색은 바 색보다 진하다.
+ * 바에 쓰는 옅은 색을 작은 글자에 그대로 쓰면 대비가 모자라 안 읽힌다.
+ */
+const LOW_INK = "#5f4fb8";
+const HIGH_INK = "#99551a";
+
+/** 눈금 위 그 자리의 색. 점 안쪽을 이 색으로 채워 위치를 색으로도 알 수 있게 한다. */
+function colorAt(pct: number): string {
+  const x = Math.max(0, Math.min(100, pct));
+  let i = 0;
+  while (i < STOPS.length - 2 && x > STOPS[i + 1][0]) i++;
+  const [p0, c0] = STOPS[i];
+  const [p1, c1] = STOPS[i + 1];
+  const t = p1 === p0 ? 0 : (x - p0) / (p1 - p0);
+  const mix = (a: string, b: string, k: number) =>
+    Math.round(parseInt(a, 16) + (parseInt(b, 16) - parseInt(a, 16)) * k)
+      .toString(16)
+      .padStart(2, "0");
+  return `#${mix(c0.slice(1, 3), c1.slice(1, 3), t)}${mix(c0.slice(3, 5), c1.slice(3, 5), t)}${mix(c0.slice(5, 7), c1.slice(5, 7), t)}`;
+}
 
 function Row({ row }: { row: ProfileRow }) {
   const x = Math.max(0, Math.min(100, row.percent));
@@ -41,12 +72,14 @@ function Row({ row }: { row: ProfileRow }) {
   return (
     <div className="py-8">
       <p className="mb-3 text-center">
-        <span className="text-xl font-medium">{row.scale}</span>
+        <span className="text-2xl font-medium">{row.scale}</span>
         <span className="text-ink-muted text-table ml-2">{BAND_LABEL[row.band]}</span>
       </p>
 
       <div className="flex items-start gap-6">
-        <span className="text-ink-muted w-14 shrink-0 pt-1.5 text-right text-table">낮음</span>
+        <span className="w-14 shrink-0 pt-1 text-right font-medium" style={{ color: LOW_INK }}>
+          낮음
+        </span>
 
         <div className="relative flex-1 pb-7">
           <div className="h-4 w-full rounded-full" style={{ background: GRADIENT }} />
@@ -57,26 +90,35 @@ function Row({ row }: { row: ProfileRow }) {
             style={{ left: `${x}%` }}
           >
             <span
-              className="block size-6 rounded-full ring-4"
+              className="flex size-7 items-center justify-center rounded-full ring-4"
               style={{
                 background: "var(--ink)",
                 ["--tw-ring-color" as string]: "var(--page)",
-                marginTop: -4,
+                marginTop: -6,
               }}
-            />
+            >
+              <span
+                className="block size-3.5 rounded-full"
+                style={{ background: colorAt(row.percent) }}
+              />
+            </span>
             <span className="tabular mt-1.5 font-semibold">
               {Math.round(row.percent)}
             </span>
           </div>
         </div>
 
-        <span className="text-ink-muted w-14 shrink-0 pt-1.5 text-table">높음</span>
+        <span className="w-14 shrink-0 pt-1 font-medium" style={{ color: HIGH_INK }}>
+          높음
+        </span>
       </div>
 
       {/* 낮을 때·높을 때가 어떤 모습인지. 해당하는 쪽을 진하게 둔다. */}
       {poles && (
-        <div className="text-table mt-2 flex gap-8 px-20">
-          <p className={`flex-1 ${row.band === "lower" ? "text-ink" : "text-ink-muted"}`}>
+        <div className="text-table mt-3 flex gap-10">
+          <p
+            className={`flex-1 ${row.band === "lower" ? "text-ink" : "text-ink-muted"}`}
+          >
             {poles.low}
           </p>
           <p
