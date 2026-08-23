@@ -1,6 +1,6 @@
 import { BAND_TEXT, type BandKey } from "@/lib/interpretation/bands";
 import { POLES } from "@/lib/interpretation/poles";
-import { GRADIENT, HIGH_INK, LOW_INK, Marker } from "./TraitOverview";
+import { GRADIENT, HIGH_INK, LOW_INK, Marker } from "./scale";
 
 /**
  * 축 하나의 상세 — 실제 결과지 2페이지(하위척도)를 여기로 합쳤다.

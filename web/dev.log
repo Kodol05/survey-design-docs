@@ -742,3 +742,786 @@ https://nextjs.org/docs/messages/module-not-found
  GET /me 200 in 783ms (next.js: 112ms, application-code: 671ms)
  GET /me 200 in 566ms (next.js: 29ms, application-code: 537ms)
  GET /me 200 in 627ms (next.js: 5ms, application-code: 623ms)
+ GET /me 200 in 216ms (next.js: 5ms, application-code: 211ms)
+⨯ ./src/components/charts/AxisDetail.tsx:3:1
+Error: Module not found: Can't resolve './TraitOverview'
+  [90m1 |[0m [36mimport[0m { [33mBAND_TEXT[0m, [36mtype[0m [33mBandKey[0m } [36mfrom[0m [32m"@/lib/interpretation/bands"[0m;
+  [90m2 |[0m [36mimport[0m { [33mPOLES[0m } [36mfrom[0m [32m"@/lib/interpretation/poles"[0m;
+[31m[1m>[0m [90m3 |[0m [36mimport[0m { [33mGRADIENT[0m, [33mHIGH_INK[0m, [33mLOW_INK[0m, [33mMarker[0m } [36mfrom[0m [32m"./TraitOverview"[0m;
+  [90m  |[0m [31m[1m^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^[0m
+  [90m4 |[0m
+  [90m5 |[0m /**
+  [90m6 |[0m  * 축 하나의 상세 — 실제 결과지 [35m2[0m페이지(하위척도)를 여기로 합쳤다.
+
+
+
+Import trace:
+  Server Component:
+    ./src/components/charts/AxisDetail.tsx
+    ./src/app/(app)/me/page.tsx
+
+https://nextjs.org/docs/messages/module-not-found
+
+
+⨯ ./src/components/charts/AxisDetail.tsx:3:1
+Error: Module not found: Can't resolve './TraitOverview'
+  [90m1 |[0m [36mimport[0m { [33mBAND_TEXT[0m, [36mtype[0m [33mBandKey[0m } [36mfrom[0m [32m"@/lib/interpretation/bands"[0m;
+  [90m2 |[0m [36mimport[0m { [33mPOLES[0m } [36mfrom[0m [32m"@/lib/interpretation/poles"[0m;
+[31m[1m>[0m [90m3 |[0m [36mimport[0m { [33mGRADIENT[0m, [33mHIGH_INK[0m, [33mLOW_INK[0m, [33mMarker[0m } [36mfrom[0m [32m"./TraitOverview"[0m;
+  [90m  |[0m [31m[1m^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^[0m
+  [90m4 |[0m
+  [90m5 |[0m /**
+  [90m6 |[0m  * 축 하나의 상세 — 실제 결과지 [35m2[0m페이지(하위척도)를 여기로 합쳤다.
+
+
+
+Import trace:
+  Server Component:
+    ./src/components/charts/AxisDetail.tsx
+    ./src/app/(app)/me/page.tsx
+
+https://nextjs.org/docs/messages/module-not-found
+
+
+⨯ ./src/components/charts/AxisDetail.tsx:3:1
+Error: Module not found: Can't resolve './TraitOverview'
+  [90m1 |[0m [36mimport[0m { [33mBAND_TEXT[0m, [36mtype[0m [33mBandKey[0m } [36mfrom[0m [32m"@/lib/interpretation/bands"[0m;
+  [90m2 |[0m [36mimport[0m { [33mPOLES[0m } [36mfrom[0m [32m"@/lib/interpretation/poles"[0m;
+[31m[1m>[0m [90m3 |[0m [36mimport[0m { [33mGRADIENT[0m, [33mHIGH_INK[0m, [33mLOW_INK[0m, [33mMarker[0m } [36mfrom[0m [32m"./TraitOverview"[0m;
+  [90m  |[0m [31m[1m^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^[0m
+  [90m4 |[0m
+  [90m5 |[0m /**
+  [90m6 |[0m  * 축 하나의 상세 — 실제 결과지 [35m2[0m페이지(하위척도)를 여기로 합쳤다.
+
+
+
+Import trace:
+  Server Component:
+    ./src/components/charts/AxisDetail.tsx
+    ./src/app/(app)/me/page.tsx
+
+https://nextjs.org/docs/messages/module-not-found
+
+
+⨯ ./src/components/charts/AxisDetail.tsx:3:1
+Error: Module not found: Can't resolve './TraitOverview'
+  [90m1 |[0m [36mimport[0m { [33mBAND_TEXT[0m, [36mtype[0m [33mBandKey[0m } [36mfrom[0m [32m"@/lib/interpretation/bands"[0m;
+  [90m2 |[0m [36mimport[0m { [33mPOLES[0m } [36mfrom[0m [32m"@/lib/interpretation/poles"[0m;
+[31m[1m>[0m [90m3 |[0m [36mimport[0m { [33mGRADIENT[0m, [33mHIGH_INK[0m, [33mLOW_INK[0m, [33mMarker[0m } [36mfrom[0m [32m"./TraitOverview"[0m;
+  [90m  |[0m [31m[1m^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^[0m
+  [90m4 |[0m
+  [90m5 |[0m /**
+  [90m6 |[0m  * 축 하나의 상세 — 실제 결과지 [35m2[0m페이지(하위척도)를 여기로 합쳤다.
+
+
+
+Import trace:
+  Server Component:
+    ./src/components/charts/AxisDetail.tsx
+    ./src/app/(app)/me/page.tsx
+
+https://nextjs.org/docs/messages/module-not-found
+
+
+⨯ ./src/components/charts/AxisDetail.tsx:3:1
+Error: Module not found: Can't resolve './TraitOverview'
+  [90m1 |[0m [36mimport[0m { [33mBAND_TEXT[0m, [36mtype[0m [33mBandKey[0m } [36mfrom[0m [32m"@/lib/interpretation/bands"[0m;
+  [90m2 |[0m [36mimport[0m { [33mPOLES[0m } [36mfrom[0m [32m"@/lib/interpretation/poles"[0m;
+[31m[1m>[0m [90m3 |[0m [36mimport[0m { [33mGRADIENT[0m, [33mHIGH_INK[0m, [33mLOW_INK[0m, [33mMarker[0m } [36mfrom[0m [32m"./TraitOverview"[0m;
+  [90m  |[0m [31m[1m^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^[0m
+  [90m4 |[0m
+  [90m5 |[0m /**
+  [90m6 |[0m  * 축 하나의 상세 — 실제 결과지 [35m2[0m페이지(하위척도)를 여기로 합쳤다.
+
+
+
+Import trace:
+  Server Component:
+    ./src/components/charts/AxisDetail.tsx
+    ./src/app/(app)/me/page.tsx
+
+https://nextjs.org/docs/messages/module-not-found
+
+
+⨯ ./src/app/(app)/me/page.tsx:5:1
+Error: Module not found: Can't resolve '@/components/charts/TraitOverview'
+  [90m 3 |[0m [36mimport[0m { [33mPairReadings[0m } [36mfrom[0m [32m"@/components/charts/PairReadings"[0m;
+  [90m 4 |[0m [36mimport[0m { [33mTraitRadar[0m } [36mfrom[0m [32m"@/components/charts/TraitRadar"[0m;
+[31m[1m>[0m [90m 5 |[0m [36mimport[0m {
+  [90m   |[0m [31m[1m^^^^^^^[0m
+[31m[1m>[0m [90m 6 |[0m   [33mCHARACTER[0m,
+  [90m   |[0m [31m[1m^^^^^^^^^^^^[0m
+[31m[1m>[0m [90m 7 |[0m   [33mTEMPERAMENT[0m,
+  [90m   |[0m [31m[1m^^^^^^^^^^^^^^[0m
+[31m[1m>[0m [90m 8 |[0m   [33mTraitOverview[0m,
+  [90m   |[0m [31m[1m^^^^^^^^^^^^^^^^[0m
+[31m[1m>[0m [90m 9 |[0m } [36mfrom[0m [32m"@/components/charts/TraitOverview"[0m;
+  [90m   |[0m [31m[1m^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^[0m
+  [90m10 |[0m [36mimport[0m { [33mEmptyState[0m } [36mfrom[0m [32m"@/components/ui/Card"[0m;
+  [90m11 |[0m [36mimport[0m { requireUser } [36mfrom[0m [32m"@/lib/auth/guard"[0m;
+  [90m12 |[0m [36mimport[0m { readPairs, [36mtype[0m [33mAxisInput[0m } [36mfrom[0m [32m"@/lib/interpretation/pairs"[0m;
+
+Import map: aliased to relative './src/components/charts/TraitOverview' inside of [project]/
+
+
+https://nextjs.org/docs/messages/module-not-found
+
+
+⨯ ./src/app/(app)/me/page.tsx:5:1
+Error: Module not found: Can't resolve '@/components/charts/TraitOverview'
+  [90m 3 |[0m [36mimport[0m { [33mPairReadings[0m } [36mfrom[0m [32m"@/components/charts/PairReadings"[0m;
+  [90m 4 |[0m [36mimport[0m { [33mTraitRadar[0m } [36mfrom[0m [32m"@/components/charts/TraitRadar"[0m;
+[31m[1m>[0m [90m 5 |[0m [36mimport[0m {
+  [90m   |[0m [31m[1m^^^^^^^[0m
+[31m[1m>[0m [90m 6 |[0m   [33mCHARACTER[0m,
+  [90m   |[0m [31m[1m^^^^^^^^^^^^[0m
+[31m[1m>[0m [90m 7 |[0m   [33mTEMPERAMENT[0m,
+  [90m   |[0m [31m[1m^^^^^^^^^^^^^^[0m
+[31m[1m>[0m [90m 8 |[0m   [33mTraitOverview[0m,
+  [90m   |[0m [31m[1m^^^^^^^^^^^^^^^^[0m
+[31m[1m>[0m [90m 9 |[0m } [36mfrom[0m [32m"@/components/charts/TraitOverview"[0m;
+  [90m   |[0m [31m[1m^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^[0m
+  [90m10 |[0m [36mimport[0m { [33mEmptyState[0m } [36mfrom[0m [32m"@/components/ui/Card"[0m;
+  [90m11 |[0m [36mimport[0m { requireUser } [36mfrom[0m [32m"@/lib/auth/guard"[0m;
+  [90m12 |[0m [36mimport[0m { readPairs, [36mtype[0m [33mAxisInput[0m } [36mfrom[0m [32m"@/lib/interpretation/pairs"[0m;
+
+Import map: aliased to relative './src/components/charts/TraitOverview' inside of [project]/
+
+
+https://nextjs.org/docs/messages/module-not-found
+
+
+⨯ ./src/app/(app)/me/page.tsx:5:1
+Error: Module not found: Can't resolve '@/components/charts/TraitOverview'
+  [90m 3 |[0m [36mimport[0m { [33mPairReadings[0m } [36mfrom[0m [32m"@/components/charts/PairReadings"[0m;
+  [90m 4 |[0m [36mimport[0m { [33mTraitRadar[0m } [36mfrom[0m [32m"@/components/charts/TraitRadar"[0m;
+[31m[1m>[0m [90m 5 |[0m [36mimport[0m {
+  [90m   |[0m [31m[1m^^^^^^^[0m
+[31m[1m>[0m [90m 6 |[0m   [33mCHARACTER[0m,
+  [90m   |[0m [31m[1m^^^^^^^^^^^^[0m
+[31m[1m>[0m [90m 7 |[0m   [33mTEMPERAMENT[0m,
+  [90m   |[0m [31m[1m^^^^^^^^^^^^^^[0m
+[31m[1m>[0m [90m 8 |[0m   [33mTraitOverview[0m,
+  [90m   |[0m [31m[1m^^^^^^^^^^^^^^^^[0m
+[31m[1m>[0m [90m 9 |[0m } [36mfrom[0m [32m"@/components/charts/TraitOverview"[0m;
+  [90m   |[0m [31m[1m^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^[0m
+  [90m10 |[0m [36mimport[0m { [33mEmptyState[0m } [36mfrom[0m [32m"@/components/ui/Card"[0m;
+  [90m11 |[0m [36mimport[0m { requireUser } [36mfrom[0m [32m"@/lib/auth/guard"[0m;
+  [90m12 |[0m [36mimport[0m { readPairs, [36mtype[0m [33mAxisInput[0m } [36mfrom[0m [32m"@/lib/interpretation/pairs"[0m;
+
+Import map: aliased to relative './src/components/charts/TraitOverview' inside of [project]/
+
+
+https://nextjs.org/docs/messages/module-not-found
+
+
+⨯ ./src/app/(app)/me/page.tsx:5:1
+Error: Module not found: Can't resolve '@/components/charts/TraitOverview'
+  [90m 3 |[0m [36mimport[0m { [33mPairReadings[0m } [36mfrom[0m [32m"@/components/charts/PairReadings"[0m;
+  [90m 4 |[0m [36mimport[0m { [33mTraitRadar[0m } [36mfrom[0m [32m"@/components/charts/TraitRadar"[0m;
+[31m[1m>[0m [90m 5 |[0m [36mimport[0m {
+  [90m   |[0m [31m[1m^^^^^^^[0m
+[31m[1m>[0m [90m 6 |[0m   [33mCHARACTER[0m,
+  [90m   |[0m [31m[1m^^^^^^^^^^^^[0m
+[31m[1m>[0m [90m 7 |[0m   [33mTEMPERAMENT[0m,
+  [90m   |[0m [31m[1m^^^^^^^^^^^^^^[0m
+[31m[1m>[0m [90m 8 |[0m   [33mTraitOverview[0m,
+  [90m   |[0m [31m[1m^^^^^^^^^^^^^^^^[0m
+[31m[1m>[0m [90m 9 |[0m } [36mfrom[0m [32m"@/components/charts/TraitOverview"[0m;
+  [90m   |[0m [31m[1m^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^[0m
+  [90m10 |[0m [36mimport[0m { [33mEmptyState[0m } [36mfrom[0m [32m"@/components/ui/Card"[0m;
+  [90m11 |[0m [36mimport[0m { requireUser } [36mfrom[0m [32m"@/lib/auth/guard"[0m;
+  [90m12 |[0m [36mimport[0m { readPairs, [36mtype[0m [33mAxisInput[0m } [36mfrom[0m [32m"@/lib/interpretation/pairs"[0m;
+
+Import map: aliased to relative './src/components/charts/TraitOverview' inside of [project]/
+
+
+https://nextjs.org/docs/messages/module-not-found
+
+
+⨯ ./src/components/charts/AxisDetail.tsx:3:1
+Error: Module not found: Can't resolve './TraitOverview'
+  [90m1 |[0m [36mimport[0m { [33mBAND_TEXT[0m, [36mtype[0m [33mBandKey[0m } [36mfrom[0m [32m"@/lib/interpretation/bands"[0m;
+  [90m2 |[0m [36mimport[0m { [33mPOLES[0m } [36mfrom[0m [32m"@/lib/interpretation/poles"[0m;
+[31m[1m>[0m [90m3 |[0m [36mimport[0m { [33mGRADIENT[0m, [33mHIGH_INK[0m, [33mLOW_INK[0m, [33mMarker[0m } [36mfrom[0m [32m"./TraitOverview"[0m;
+  [90m  |[0m [31m[1m^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^[0m
+  [90m4 |[0m
+  [90m5 |[0m /**
+  [90m6 |[0m  * 축 하나의 상세 — 실제 결과지 [35m2[0m페이지(하위척도)를 여기로 합쳤다.
+
+
+
+Import trace:
+  Server Component:
+    ./src/components/charts/AxisDetail.tsx
+    ./src/app/(app)/me/page.tsx
+
+https://nextjs.org/docs/messages/module-not-found
+
+
+⨯ ./src/components/charts/AxisDetail.tsx:3:1
+Error: Module not found: Can't resolve './TraitOverview'
+  [90m1 |[0m [36mimport[0m { [33mBAND_TEXT[0m, [36mtype[0m [33mBandKey[0m } [36mfrom[0m [32m"@/lib/interpretation/bands"[0m;
+  [90m2 |[0m [36mimport[0m { [33mPOLES[0m } [36mfrom[0m [32m"@/lib/interpretation/poles"[0m;
+[31m[1m>[0m [90m3 |[0m [36mimport[0m { [33mGRADIENT[0m, [33mHIGH_INK[0m, [33mLOW_INK[0m, [33mMarker[0m } [36mfrom[0m [32m"./TraitOverview"[0m;
+  [90m  |[0m [31m[1m^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^[0m
+  [90m4 |[0m
+  [90m5 |[0m /**
+  [90m6 |[0m  * 축 하나의 상세 — 실제 결과지 [35m2[0m페이지(하위척도)를 여기로 합쳤다.
+
+
+
+Import trace:
+  Server Component:
+    ./src/components/charts/AxisDetail.tsx
+    ./src/app/(app)/me/page.tsx
+
+https://nextjs.org/docs/messages/module-not-found
+
+
+⨯ ./src/components/charts/AxisDetail.tsx:3:1
+Error: Module not found: Can't resolve './TraitOverview'
+  [90m1 |[0m [36mimport[0m { [33mBAND_TEXT[0m, [36mtype[0m [33mBandKey[0m } [36mfrom[0m [32m"@/lib/interpretation/bands"[0m;
+  [90m2 |[0m [36mimport[0m { [33mPOLES[0m } [36mfrom[0m [32m"@/lib/interpretation/poles"[0m;
+[31m[1m>[0m [90m3 |[0m [36mimport[0m { [33mGRADIENT[0m, [33mHIGH_INK[0m, [33mLOW_INK[0m, [33mMarker[0m } [36mfrom[0m [32m"./TraitOverview"[0m;
+  [90m  |[0m [31m[1m^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^[0m
+  [90m4 |[0m
+  [90m5 |[0m /**
+  [90m6 |[0m  * 축 하나의 상세 — 실제 결과지 [35m2[0m페이지(하위척도)를 여기로 합쳤다.
+
+
+
+Import trace:
+  Server Component:
+    ./src/components/charts/AxisDetail.tsx
+    ./src/app/(app)/me/page.tsx
+
+https://nextjs.org/docs/messages/module-not-found
+
+
+⨯ ./src/components/charts/AxisDetail.tsx:3:1
+Error: Module not found: Can't resolve './TraitOverview'
+  [90m1 |[0m [36mimport[0m { [33mBAND_TEXT[0m, [36mtype[0m [33mBandKey[0m } [36mfrom[0m [32m"@/lib/interpretation/bands"[0m;
+  [90m2 |[0m [36mimport[0m { [33mPOLES[0m } [36mfrom[0m [32m"@/lib/interpretation/poles"[0m;
+[31m[1m>[0m [90m3 |[0m [36mimport[0m { [33mGRADIENT[0m, [33mHIGH_INK[0m, [33mLOW_INK[0m, [33mMarker[0m } [36mfrom[0m [32m"./TraitOverview"[0m;
+  [90m  |[0m [31m[1m^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^[0m
+  [90m4 |[0m
+  [90m5 |[0m /**
+  [90m6 |[0m  * 축 하나의 상세 — 실제 결과지 [35m2[0m페이지(하위척도)를 여기로 합쳤다.
+
+
+
+Import trace:
+  Server Component:
+    ./src/components/charts/AxisDetail.tsx
+    ./src/app/(app)/me/page.tsx
+
+https://nextjs.org/docs/messages/module-not-found
+
+
+⨯ ./src/components/charts/AxisDetail.tsx:3:1
+Error: Module not found: Can't resolve './TraitOverview'
+  [90m1 |[0m [36mimport[0m { [33mBAND_TEXT[0m, [36mtype[0m [33mBandKey[0m } [36mfrom[0m [32m"@/lib/interpretation/bands"[0m;
+  [90m2 |[0m [36mimport[0m { [33mPOLES[0m } [36mfrom[0m [32m"@/lib/interpretation/poles"[0m;
+[31m[1m>[0m [90m3 |[0m [36mimport[0m { [33mGRADIENT[0m, [33mHIGH_INK[0m, [33mLOW_INK[0m, [33mMarker[0m } [36mfrom[0m [32m"./TraitOverview"[0m;
+  [90m  |[0m [31m[1m^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^[0m
+  [90m4 |[0m
+  [90m5 |[0m /**
+  [90m6 |[0m  * 축 하나의 상세 — 실제 결과지 [35m2[0m페이지(하위척도)를 여기로 합쳤다.
+
+
+
+Import trace:
+  Server Component:
+    ./src/components/charts/AxisDetail.tsx
+    ./src/app/(app)/me/page.tsx
+
+https://nextjs.org/docs/messages/module-not-found
+
+
+⨯ ./src/app/(app)/me/page.tsx:5:1
+Error: Module not found: Can't resolve '@/components/charts/TraitOverview'
+  [90m 3 |[0m [36mimport[0m { [33mPairReadings[0m } [36mfrom[0m [32m"@/components/charts/PairReadings"[0m;
+  [90m 4 |[0m [36mimport[0m { [33mTraitRadar[0m } [36mfrom[0m [32m"@/components/charts/TraitRadar"[0m;
+[31m[1m>[0m [90m 5 |[0m [36mimport[0m {
+  [90m   |[0m [31m[1m^^^^^^^[0m
+[31m[1m>[0m [90m 6 |[0m   [33mCHARACTER[0m,
+  [90m   |[0m [31m[1m^^^^^^^^^^^^[0m
+[31m[1m>[0m [90m 7 |[0m   [33mTEMPERAMENT[0m,
+  [90m   |[0m [31m[1m^^^^^^^^^^^^^^[0m
+[31m[1m>[0m [90m 8 |[0m   [33mTraitOverview[0m,
+  [90m   |[0m [31m[1m^^^^^^^^^^^^^^^^[0m
+[31m[1m>[0m [90m 9 |[0m } [36mfrom[0m [32m"@/components/charts/TraitOverview"[0m;
+  [90m   |[0m [31m[1m^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^[0m
+  [90m10 |[0m [36mimport[0m { [33mEmptyState[0m } [36mfrom[0m [32m"@/components/ui/Card"[0m;
+  [90m11 |[0m [36mimport[0m { requireUser } [36mfrom[0m [32m"@/lib/auth/guard"[0m;
+  [90m12 |[0m [36mimport[0m { readPairs, [36mtype[0m [33mAxisInput[0m } [36mfrom[0m [32m"@/lib/interpretation/pairs"[0m;
+
+Import map: aliased to relative './src/components/charts/TraitOverview' inside of [project]/
+
+
+https://nextjs.org/docs/messages/module-not-found
+
+
+⨯ ./src/app/(app)/me/page.tsx:5:1
+Error: Module not found: Can't resolve '@/components/charts/TraitOverview'
+  [90m 3 |[0m [36mimport[0m { [33mPairReadings[0m } [36mfrom[0m [32m"@/components/charts/PairReadings"[0m;
+  [90m 4 |[0m [36mimport[0m { [33mTraitRadar[0m } [36mfrom[0m [32m"@/components/charts/TraitRadar"[0m;
+[31m[1m>[0m [90m 5 |[0m [36mimport[0m {
+  [90m   |[0m [31m[1m^^^^^^^[0m
+[31m[1m>[0m [90m 6 |[0m   [33mCHARACTER[0m,
+  [90m   |[0m [31m[1m^^^^^^^^^^^^[0m
+[31m[1m>[0m [90m 7 |[0m   [33mTEMPERAMENT[0m,
+  [90m   |[0m [31m[1m^^^^^^^^^^^^^^[0m
+[31m[1m>[0m [90m 8 |[0m   [33mTraitOverview[0m,
+  [90m   |[0m [31m[1m^^^^^^^^^^^^^^^^[0m
+[31m[1m>[0m [90m 9 |[0m } [36mfrom[0m [32m"@/components/charts/TraitOverview"[0m;
+  [90m   |[0m [31m[1m^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^[0m
+  [90m10 |[0m [36mimport[0m { [33mEmptyState[0m } [36mfrom[0m [32m"@/components/ui/Card"[0m;
+  [90m11 |[0m [36mimport[0m { requireUser } [36mfrom[0m [32m"@/lib/auth/guard"[0m;
+  [90m12 |[0m [36mimport[0m { readPairs, [36mtype[0m [33mAxisInput[0m } [36mfrom[0m [32m"@/lib/interpretation/pairs"[0m;
+
+Import map: aliased to relative './src/components/charts/TraitOverview' inside of [project]/
+
+
+https://nextjs.org/docs/messages/module-not-found
+
+
+⨯ ./src/app/(app)/me/page.tsx:5:1
+Error: Module not found: Can't resolve '@/components/charts/TraitOverview'
+  [90m 3 |[0m [36mimport[0m { [33mPairReadings[0m } [36mfrom[0m [32m"@/components/charts/PairReadings"[0m;
+  [90m 4 |[0m [36mimport[0m { [33mTraitRadar[0m } [36mfrom[0m [32m"@/components/charts/TraitRadar"[0m;
+[31m[1m>[0m [90m 5 |[0m [36mimport[0m {
+  [90m   |[0m [31m[1m^^^^^^^[0m
+[31m[1m>[0m [90m 6 |[0m   [33mCHARACTER[0m,
+  [90m   |[0m [31m[1m^^^^^^^^^^^^[0m
+[31m[1m>[0m [90m 7 |[0m   [33mTEMPERAMENT[0m,
+  [90m   |[0m [31m[1m^^^^^^^^^^^^^^[0m
+[31m[1m>[0m [90m 8 |[0m   [33mTraitOverview[0m,
+  [90m   |[0m [31m[1m^^^^^^^^^^^^^^^^[0m
+[31m[1m>[0m [90m 9 |[0m } [36mfrom[0m [32m"@/components/charts/TraitOverview"[0m;
+  [90m   |[0m [31m[1m^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^[0m
+  [90m10 |[0m [36mimport[0m { [33mEmptyState[0m } [36mfrom[0m [32m"@/components/ui/Card"[0m;
+  [90m11 |[0m [36mimport[0m { requireUser } [36mfrom[0m [32m"@/lib/auth/guard"[0m;
+  [90m12 |[0m [36mimport[0m { readPairs, [36mtype[0m [33mAxisInput[0m } [36mfrom[0m [32m"@/lib/interpretation/pairs"[0m;
+
+Import map: aliased to relative './src/components/charts/TraitOverview' inside of [project]/
+
+
+https://nextjs.org/docs/messages/module-not-found
+
+
+⨯ ./src/app/(app)/me/page.tsx:5:1
+Error: Module not found: Can't resolve '@/components/charts/TraitOverview'
+  [90m 3 |[0m [36mimport[0m { [33mPairReadings[0m } [36mfrom[0m [32m"@/components/charts/PairReadings"[0m;
+  [90m 4 |[0m [36mimport[0m { [33mTraitRadar[0m } [36mfrom[0m [32m"@/components/charts/TraitRadar"[0m;
+[31m[1m>[0m [90m 5 |[0m [36mimport[0m {
+  [90m   |[0m [31m[1m^^^^^^^[0m
+[31m[1m>[0m [90m 6 |[0m   [33mCHARACTER[0m,
+  [90m   |[0m [31m[1m^^^^^^^^^^^^[0m
+[31m[1m>[0m [90m 7 |[0m   [33mTEMPERAMENT[0m,
+  [90m   |[0m [31m[1m^^^^^^^^^^^^^^[0m
+[31m[1m>[0m [90m 8 |[0m   [33mTraitOverview[0m,
+  [90m   |[0m [31m[1m^^^^^^^^^^^^^^^^[0m
+[31m[1m>[0m [90m 9 |[0m } [36mfrom[0m [32m"@/components/charts/TraitOverview"[0m;
+  [90m   |[0m [31m[1m^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^[0m
+  [90m10 |[0m [36mimport[0m { [33mEmptyState[0m } [36mfrom[0m [32m"@/components/ui/Card"[0m;
+  [90m11 |[0m [36mimport[0m { requireUser } [36mfrom[0m [32m"@/lib/auth/guard"[0m;
+  [90m12 |[0m [36mimport[0m { readPairs, [36mtype[0m [33mAxisInput[0m } [36mfrom[0m [32m"@/lib/interpretation/pairs"[0m;
+
+Import map: aliased to relative './src/components/charts/TraitOverview' inside of [project]/
+
+
+https://nextjs.org/docs/messages/module-not-found
+
+
+⨯ ./src/components/charts/AxisDetail.tsx:3:1
+Error: Module not found: Can't resolve './TraitOverview'
+  [90m1 |[0m [36mimport[0m { [33mBAND_TEXT[0m, [36mtype[0m [33mBandKey[0m } [36mfrom[0m [32m"@/lib/interpretation/bands"[0m;
+  [90m2 |[0m [36mimport[0m { [33mPOLES[0m } [36mfrom[0m [32m"@/lib/interpretation/poles"[0m;
+[31m[1m>[0m [90m3 |[0m [36mimport[0m { [33mGRADIENT[0m, [33mHIGH_INK[0m, [33mLOW_INK[0m, [33mMarker[0m } [36mfrom[0m [32m"./TraitOverview"[0m;
+  [90m  |[0m [31m[1m^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^[0m
+  [90m4 |[0m
+  [90m5 |[0m /**
+  [90m6 |[0m  * 축 하나의 상세 — 실제 결과지 [35m2[0m페이지(하위척도)를 여기로 합쳤다.
+
+
+
+Import trace:
+  Server Component:
+    ./src/components/charts/AxisDetail.tsx
+    ./src/app/(app)/me/page.tsx
+
+https://nextjs.org/docs/messages/module-not-found
+
+
+⨯ ./src/components/charts/AxisDetail.tsx:3:1
+Error: Module not found: Can't resolve './TraitOverview'
+  [90m1 |[0m [36mimport[0m { [33mBAND_TEXT[0m, [36mtype[0m [33mBandKey[0m } [36mfrom[0m [32m"@/lib/interpretation/bands"[0m;
+  [90m2 |[0m [36mimport[0m { [33mPOLES[0m } [36mfrom[0m [32m"@/lib/interpretation/poles"[0m;
+[31m[1m>[0m [90m3 |[0m [36mimport[0m { [33mGRADIENT[0m, [33mHIGH_INK[0m, [33mLOW_INK[0m, [33mMarker[0m } [36mfrom[0m [32m"./TraitOverview"[0m;
+  [90m  |[0m [31m[1m^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^[0m
+  [90m4 |[0m
+  [90m5 |[0m /**
+  [90m6 |[0m  * 축 하나의 상세 — 실제 결과지 [35m2[0m페이지(하위척도)를 여기로 합쳤다.
+
+
+
+Import trace:
+  Server Component:
+    ./src/components/charts/AxisDetail.tsx
+    ./src/app/(app)/me/page.tsx
+
+https://nextjs.org/docs/messages/module-not-found
+
+
+⨯ ./src/components/charts/AxisDetail.tsx:3:1
+Error: Module not found: Can't resolve './TraitOverview'
+  [90m1 |[0m [36mimport[0m { [33mBAND_TEXT[0m, [36mtype[0m [33mBandKey[0m } [36mfrom[0m [32m"@/lib/interpretation/bands"[0m;
+  [90m2 |[0m [36mimport[0m { [33mPOLES[0m } [36mfrom[0m [32m"@/lib/interpretation/poles"[0m;
+[31m[1m>[0m [90m3 |[0m [36mimport[0m { [33mGRADIENT[0m, [33mHIGH_INK[0m, [33mLOW_INK[0m, [33mMarker[0m } [36mfrom[0m [32m"./TraitOverview"[0m;
+  [90m  |[0m [31m[1m^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^[0m
+  [90m4 |[0m
+  [90m5 |[0m /**
+  [90m6 |[0m  * 축 하나의 상세 — 실제 결과지 [35m2[0m페이지(하위척도)를 여기로 합쳤다.
+
+
+
+Import trace:
+  Server Component:
+    ./src/components/charts/AxisDetail.tsx
+    ./src/app/(app)/me/page.tsx
+
+https://nextjs.org/docs/messages/module-not-found
+
+
+⨯ ./src/components/charts/AxisDetail.tsx:3:1
+Error: Module not found: Can't resolve './TraitOverview'
+  [90m1 |[0m [36mimport[0m { [33mBAND_TEXT[0m, [36mtype[0m [33mBandKey[0m } [36mfrom[0m [32m"@/lib/interpretation/bands"[0m;
+  [90m2 |[0m [36mimport[0m { [33mPOLES[0m } [36mfrom[0m [32m"@/lib/interpretation/poles"[0m;
+[31m[1m>[0m [90m3 |[0m [36mimport[0m { [33mGRADIENT[0m, [33mHIGH_INK[0m, [33mLOW_INK[0m, [33mMarker[0m } [36mfrom[0m [32m"./TraitOverview"[0m;
+  [90m  |[0m [31m[1m^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^[0m
+  [90m4 |[0m
+  [90m5 |[0m /**
+  [90m6 |[0m  * 축 하나의 상세 — 실제 결과지 [35m2[0m페이지(하위척도)를 여기로 합쳤다.
+
+
+
+Import trace:
+  Server Component:
+    ./src/components/charts/AxisDetail.tsx
+    ./src/app/(app)/me/page.tsx
+
+https://nextjs.org/docs/messages/module-not-found
+
+
+⨯ ./src/components/charts/AxisDetail.tsx:3:1
+Error: Module not found: Can't resolve './TraitOverview'
+  [90m1 |[0m [36mimport[0m { [33mBAND_TEXT[0m, [36mtype[0m [33mBandKey[0m } [36mfrom[0m [32m"@/lib/interpretation/bands"[0m;
+  [90m2 |[0m [36mimport[0m { [33mPOLES[0m } [36mfrom[0m [32m"@/lib/interpretation/poles"[0m;
+[31m[1m>[0m [90m3 |[0m [36mimport[0m { [33mGRADIENT[0m, [33mHIGH_INK[0m, [33mLOW_INK[0m, [33mMarker[0m } [36mfrom[0m [32m"./TraitOverview"[0m;
+  [90m  |[0m [31m[1m^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^[0m
+  [90m4 |[0m
+  [90m5 |[0m /**
+  [90m6 |[0m  * 축 하나의 상세 — 실제 결과지 [35m2[0m페이지(하위척도)를 여기로 합쳤다.
+
+
+
+Import trace:
+  Server Component:
+    ./src/components/charts/AxisDetail.tsx
+    ./src/app/(app)/me/page.tsx
+
+https://nextjs.org/docs/messages/module-not-found
+
+
+⨯ ./src/app/(app)/me/page.tsx:5:1
+Error: Module not found: Can't resolve '@/components/charts/TraitOverview'
+  [90m 3 |[0m [36mimport[0m { [33mPairReadings[0m } [36mfrom[0m [32m"@/components/charts/PairReadings"[0m;
+  [90m 4 |[0m [36mimport[0m { [33mTraitRadar[0m } [36mfrom[0m [32m"@/components/charts/TraitRadar"[0m;
+[31m[1m>[0m [90m 5 |[0m [36mimport[0m {
+  [90m   |[0m [31m[1m^^^^^^^[0m
+[31m[1m>[0m [90m 6 |[0m   [33mCHARACTER[0m,
+  [90m   |[0m [31m[1m^^^^^^^^^^^^[0m
+[31m[1m>[0m [90m 7 |[0m   [33mTEMPERAMENT[0m,
+  [90m   |[0m [31m[1m^^^^^^^^^^^^^^[0m
+[31m[1m>[0m [90m 8 |[0m   [33mTraitOverview[0m,
+  [90m   |[0m [31m[1m^^^^^^^^^^^^^^^^[0m
+[31m[1m>[0m [90m 9 |[0m } [36mfrom[0m [32m"@/components/charts/TraitOverview"[0m;
+  [90m   |[0m [31m[1m^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^[0m
+  [90m10 |[0m [36mimport[0m { [33mEmptyState[0m } [36mfrom[0m [32m"@/components/ui/Card"[0m;
+  [90m11 |[0m [36mimport[0m { requireUser } [36mfrom[0m [32m"@/lib/auth/guard"[0m;
+  [90m12 |[0m [36mimport[0m { readPairs, [36mtype[0m [33mAxisInput[0m } [36mfrom[0m [32m"@/lib/interpretation/pairs"[0m;
+
+Import map: aliased to relative './src/components/charts/TraitOverview' inside of [project]/
+
+
+https://nextjs.org/docs/messages/module-not-found
+
+
+⨯ ./src/app/(app)/me/page.tsx:5:1
+Error: Module not found: Can't resolve '@/components/charts/TraitOverview'
+  [90m 3 |[0m [36mimport[0m { [33mPairReadings[0m } [36mfrom[0m [32m"@/components/charts/PairReadings"[0m;
+  [90m 4 |[0m [36mimport[0m { [33mTraitRadar[0m } [36mfrom[0m [32m"@/components/charts/TraitRadar"[0m;
+[31m[1m>[0m [90m 5 |[0m [36mimport[0m {
+  [90m   |[0m [31m[1m^^^^^^^[0m
+[31m[1m>[0m [90m 6 |[0m   [33mCHARACTER[0m,
+  [90m   |[0m [31m[1m^^^^^^^^^^^^[0m
+[31m[1m>[0m [90m 7 |[0m   [33mTEMPERAMENT[0m,
+  [90m   |[0m [31m[1m^^^^^^^^^^^^^^[0m
+[31m[1m>[0m [90m 8 |[0m   [33mTraitOverview[0m,
+  [90m   |[0m [31m[1m^^^^^^^^^^^^^^^^[0m
+[31m[1m>[0m [90m 9 |[0m } [36mfrom[0m [32m"@/components/charts/TraitOverview"[0m;
+  [90m   |[0m [31m[1m^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^[0m
+  [90m10 |[0m [36mimport[0m { [33mEmptyState[0m } [36mfrom[0m [32m"@/components/ui/Card"[0m;
+  [90m11 |[0m [36mimport[0m { requireUser } [36mfrom[0m [32m"@/lib/auth/guard"[0m;
+  [90m12 |[0m [36mimport[0m { readPairs, [36mtype[0m [33mAxisInput[0m } [36mfrom[0m [32m"@/lib/interpretation/pairs"[0m;
+
+Import map: aliased to relative './src/components/charts/TraitOverview' inside of [project]/
+
+
+https://nextjs.org/docs/messages/module-not-found
+
+
+⨯ ./src/app/(app)/me/page.tsx:5:1
+Error: Module not found: Can't resolve '@/components/charts/TraitOverview'
+  [90m 3 |[0m [36mimport[0m { [33mPairReadings[0m } [36mfrom[0m [32m"@/components/charts/PairReadings"[0m;
+  [90m 4 |[0m [36mimport[0m { [33mTraitRadar[0m } [36mfrom[0m [32m"@/components/charts/TraitRadar"[0m;
+[31m[1m>[0m [90m 5 |[0m [36mimport[0m {
+  [90m   |[0m [31m[1m^^^^^^^[0m
+[31m[1m>[0m [90m 6 |[0m   [33mCHARACTER[0m,
+  [90m   |[0m [31m[1m^^^^^^^^^^^^[0m
+[31m[1m>[0m [90m 7 |[0m   [33mTEMPERAMENT[0m,
+  [90m   |[0m [31m[1m^^^^^^^^^^^^^^[0m
+[31m[1m>[0m [90m 8 |[0m   [33mTraitOverview[0m,
+  [90m   |[0m [31m[1m^^^^^^^^^^^^^^^^[0m
+[31m[1m>[0m [90m 9 |[0m } [36mfrom[0m [32m"@/components/charts/TraitOverview"[0m;
+  [90m   |[0m [31m[1m^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^[0m
+  [90m10 |[0m [36mimport[0m { [33mEmptyState[0m } [36mfrom[0m [32m"@/components/ui/Card"[0m;
+  [90m11 |[0m [36mimport[0m { requireUser } [36mfrom[0m [32m"@/lib/auth/guard"[0m;
+  [90m12 |[0m [36mimport[0m { readPairs, [36mtype[0m [33mAxisInput[0m } [36mfrom[0m [32m"@/lib/interpretation/pairs"[0m;
+
+Import map: aliased to relative './src/components/charts/TraitOverview' inside of [project]/
+
+
+https://nextjs.org/docs/messages/module-not-found
+
+
+⨯ ./src/app/(app)/me/page.tsx:5:1
+Error: Module not found: Can't resolve '@/components/charts/TraitOverview'
+  [90m 3 |[0m [36mimport[0m { [33mPairReadings[0m } [36mfrom[0m [32m"@/components/charts/PairReadings"[0m;
+  [90m 4 |[0m [36mimport[0m { [33mTraitRadar[0m } [36mfrom[0m [32m"@/components/charts/TraitRadar"[0m;
+[31m[1m>[0m [90m 5 |[0m [36mimport[0m {
+  [90m   |[0m [31m[1m^^^^^^^[0m
+[31m[1m>[0m [90m 6 |[0m   [33mCHARACTER[0m,
+  [90m   |[0m [31m[1m^^^^^^^^^^^^[0m
+[31m[1m>[0m [90m 7 |[0m   [33mTEMPERAMENT[0m,
+  [90m   |[0m [31m[1m^^^^^^^^^^^^^^[0m
+[31m[1m>[0m [90m 8 |[0m   [33mTraitOverview[0m,
+  [90m   |[0m [31m[1m^^^^^^^^^^^^^^^^[0m
+[31m[1m>[0m [90m 9 |[0m } [36mfrom[0m [32m"@/components/charts/TraitOverview"[0m;
+  [90m   |[0m [31m[1m^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^[0m
+  [90m10 |[0m [36mimport[0m { [33mEmptyState[0m } [36mfrom[0m [32m"@/components/ui/Card"[0m;
+  [90m11 |[0m [36mimport[0m { requireUser } [36mfrom[0m [32m"@/lib/auth/guard"[0m;
+  [90m12 |[0m [36mimport[0m { readPairs, [36mtype[0m [33mAxisInput[0m } [36mfrom[0m [32m"@/lib/interpretation/pairs"[0m;
+
+Import map: aliased to relative './src/components/charts/TraitOverview' inside of [project]/
+
+
+https://nextjs.org/docs/messages/module-not-found
+
+
+⨯ ./src/app/(app)/me/page.tsx:5:1
+Error: Module not found: Can't resolve '@/components/charts/TraitOverview'
+  [90m 3 |[0m [36mimport[0m { [33mPairReadings[0m } [36mfrom[0m [32m"@/components/charts/PairReadings"[0m;
+  [90m 4 |[0m [36mimport[0m { [33mTraitRadar[0m } [36mfrom[0m [32m"@/components/charts/TraitRadar"[0m;
+[31m[1m>[0m [90m 5 |[0m [36mimport[0m {
+  [90m   |[0m [31m[1m^^^^^^^[0m
+[31m[1m>[0m [90m 6 |[0m   [33mCHARACTER[0m,
+  [90m   |[0m [31m[1m^^^^^^^^^^^^[0m
+[31m[1m>[0m [90m 7 |[0m   [33mTEMPERAMENT[0m,
+  [90m   |[0m [31m[1m^^^^^^^^^^^^^^[0m
+[31m[1m>[0m [90m 8 |[0m   [33mTraitOverview[0m,
+  [90m   |[0m [31m[1m^^^^^^^^^^^^^^^^[0m
+[31m[1m>[0m [90m 9 |[0m } [36mfrom[0m [32m"@/components/charts/TraitOverview"[0m;
+  [90m   |[0m [31m[1m^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^[0m
+  [90m10 |[0m [36mimport[0m { [33mEmptyState[0m } [36mfrom[0m [32m"@/components/ui/Card"[0m;
+  [90m11 |[0m [36mimport[0m { requireUser } [36mfrom[0m [32m"@/lib/auth/guard"[0m;
+  [90m12 |[0m [36mimport[0m { readPairs, [36mtype[0m [33mAxisInput[0m } [36mfrom[0m [32m"@/lib/interpretation/pairs"[0m;
+
+Import map: aliased to relative './src/components/charts/TraitOverview' inside of [project]/
+
+
+https://nextjs.org/docs/messages/module-not-found
+
+
+⨯ ./src/app/(app)/me/page.tsx:5:1
+Error: Module not found: Can't resolve '@/components/charts/TraitOverview'
+  [90m 3 |[0m [36mimport[0m { [33mPairReadings[0m } [36mfrom[0m [32m"@/components/charts/PairReadings"[0m;
+  [90m 4 |[0m [36mimport[0m { [33mTraitRadar[0m } [36mfrom[0m [32m"@/components/charts/TraitRadar"[0m;
+[31m[1m>[0m [90m 5 |[0m [36mimport[0m {
+  [90m   |[0m [31m[1m^^^^^^^[0m
+[31m[1m>[0m [90m 6 |[0m   [33mCHARACTER[0m,
+  [90m   |[0m [31m[1m^^^^^^^^^^^^[0m
+[31m[1m>[0m [90m 7 |[0m   [33mTEMPERAMENT[0m,
+  [90m   |[0m [31m[1m^^^^^^^^^^^^^^[0m
+[31m[1m>[0m [90m 8 |[0m   [33mTraitOverview[0m,
+  [90m   |[0m [31m[1m^^^^^^^^^^^^^^^^[0m
+[31m[1m>[0m [90m 9 |[0m } [36mfrom[0m [32m"@/components/charts/TraitOverview"[0m;
+  [90m   |[0m [31m[1m^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^[0m
+  [90m10 |[0m [36mimport[0m { [33mEmptyState[0m } [36mfrom[0m [32m"@/components/ui/Card"[0m;
+  [90m11 |[0m [36mimport[0m { requireUser } [36mfrom[0m [32m"@/lib/auth/guard"[0m;
+  [90m12 |[0m [36mimport[0m { readPairs, [36mtype[0m [33mAxisInput[0m } [36mfrom[0m [32m"@/lib/interpretation/pairs"[0m;
+
+Import map: aliased to relative './src/components/charts/TraitOverview' inside of [project]/
+
+
+https://nextjs.org/docs/messages/module-not-found
+
+
+⨯ ./src/app/(app)/me/page.tsx:5:1
+Error: Module not found: Can't resolve '@/components/charts/TraitOverview'
+  [90m 3 |[0m [36mimport[0m { [33mPairReadings[0m } [36mfrom[0m [32m"@/components/charts/PairReadings"[0m;
+  [90m 4 |[0m [36mimport[0m { [33mTraitRadar[0m } [36mfrom[0m [32m"@/components/charts/TraitRadar"[0m;
+[31m[1m>[0m [90m 5 |[0m [36mimport[0m {
+  [90m   |[0m [31m[1m^^^^^^^[0m
+[31m[1m>[0m [90m 6 |[0m   [33mCHARACTER[0m,
+  [90m   |[0m [31m[1m^^^^^^^^^^^^[0m
+[31m[1m>[0m [90m 7 |[0m   [33mTEMPERAMENT[0m,
+  [90m   |[0m [31m[1m^^^^^^^^^^^^^^[0m
+[31m[1m>[0m [90m 8 |[0m   [33mTraitOverview[0m,
+  [90m   |[0m [31m[1m^^^^^^^^^^^^^^^^[0m
+[31m[1m>[0m [90m 9 |[0m } [36mfrom[0m [32m"@/components/charts/TraitOverview"[0m;
+  [90m   |[0m [31m[1m^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^[0m
+  [90m10 |[0m [36mimport[0m { [33mEmptyState[0m } [36mfrom[0m [32m"@/components/ui/Card"[0m;
+  [90m11 |[0m [36mimport[0m { requireUser } [36mfrom[0m [32m"@/lib/auth/guard"[0m;
+  [90m12 |[0m [36mimport[0m { readPairs, [36mtype[0m [33mAxisInput[0m } [36mfrom[0m [32m"@/lib/interpretation/pairs"[0m;
+
+Import map: aliased to relative './src/components/charts/TraitOverview' inside of [project]/
+
+
+https://nextjs.org/docs/messages/module-not-found
+
+
+⨯ ./src/app/(app)/me/page.tsx:5:1
+Error: Module not found: Can't resolve '@/components/charts/TraitOverview'
+  [90m 3 |[0m [36mimport[0m { [33mPairReadings[0m } [36mfrom[0m [32m"@/components/charts/PairReadings"[0m;
+  [90m 4 |[0m [36mimport[0m { [33mTraitRadar[0m } [36mfrom[0m [32m"@/components/charts/TraitRadar"[0m;
+[31m[1m>[0m [90m 5 |[0m [36mimport[0m {
+  [90m   |[0m [31m[1m^^^^^^^[0m
+[31m[1m>[0m [90m 6 |[0m   [33mCHARACTER[0m,
+  [90m   |[0m [31m[1m^^^^^^^^^^^^[0m
+[31m[1m>[0m [90m 7 |[0m   [33mTEMPERAMENT[0m,
+  [90m   |[0m [31m[1m^^^^^^^^^^^^^^[0m
+[31m[1m>[0m [90m 8 |[0m   [33mTraitOverview[0m,
+  [90m   |[0m [31m[1m^^^^^^^^^^^^^^^^[0m
+[31m[1m>[0m [90m 9 |[0m } [36mfrom[0m [32m"@/components/charts/TraitOverview"[0m;
+  [90m   |[0m [31m[1m^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^[0m
+  [90m10 |[0m [36mimport[0m { [33mEmptyState[0m } [36mfrom[0m [32m"@/components/ui/Card"[0m;
+  [90m11 |[0m [36mimport[0m { requireUser } [36mfrom[0m [32m"@/lib/auth/guard"[0m;
+  [90m12 |[0m [36mimport[0m { readPairs, [36mtype[0m [33mAxisInput[0m } [36mfrom[0m [32m"@/lib/interpretation/pairs"[0m;
+
+Import map: aliased to relative './src/components/charts/TraitOverview' inside of [project]/
+
+
+https://nextjs.org/docs/messages/module-not-found
+
+
+⨯ ./src/app/(app)/me/page.tsx:5:1
+Error: Module not found: Can't resolve '@/components/charts/TraitOverview'
+  [90m 3 |[0m [36mimport[0m { [33mPairReadings[0m } [36mfrom[0m [32m"@/components/charts/PairReadings"[0m;
+  [90m 4 |[0m [36mimport[0m { [33mTraitRadar[0m } [36mfrom[0m [32m"@/components/charts/TraitRadar"[0m;
+[31m[1m>[0m [90m 5 |[0m [36mimport[0m {
+  [90m   |[0m [31m[1m^^^^^^^[0m
+[31m[1m>[0m [90m 6 |[0m   [33mCHARACTER[0m,
+  [90m   |[0m [31m[1m^^^^^^^^^^^^[0m
+[31m[1m>[0m [90m 7 |[0m   [33mTEMPERAMENT[0m,
+  [90m   |[0m [31m[1m^^^^^^^^^^^^^^[0m
+[31m[1m>[0m [90m 8 |[0m   [33mTraitOverview[0m,
+  [90m   |[0m [31m[1m^^^^^^^^^^^^^^^^[0m
+[31m[1m>[0m [90m 9 |[0m } [36mfrom[0m [32m"@/components/charts/TraitOverview"[0m;
+  [90m   |[0m [31m[1m^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^[0m
+  [90m10 |[0m [36mimport[0m { [33mEmptyState[0m } [36mfrom[0m [32m"@/components/ui/Card"[0m;
+  [90m11 |[0m [36mimport[0m { requireUser } [36mfrom[0m [32m"@/lib/auth/guard"[0m;
+  [90m12 |[0m [36mimport[0m { readPairs, [36mtype[0m [33mAxisInput[0m } [36mfrom[0m [32m"@/lib/interpretation/pairs"[0m;
+
+Import map: aliased to relative './src/components/charts/TraitOverview' inside of [project]/
+
+
+https://nextjs.org/docs/messages/module-not-found
+
+
+⨯ ./src/app/(app)/me/page.tsx:5:1
+Error: Module not found: Can't resolve '@/components/charts/TraitOverview'
+  [90m 3 |[0m [36mimport[0m { [33mPairReadings[0m } [36mfrom[0m [32m"@/components/charts/PairReadings"[0m;
+  [90m 4 |[0m [36mimport[0m { [33mTraitRadar[0m } [36mfrom[0m [32m"@/components/charts/TraitRadar"[0m;
+[31m[1m>[0m [90m 5 |[0m [36mimport[0m {
+  [90m   |[0m [31m[1m^^^^^^^[0m
+[31m[1m>[0m [90m 6 |[0m   [33mCHARACTER[0m,
+  [90m   |[0m [31m[1m^^^^^^^^^^^^[0m
+[31m[1m>[0m [90m 7 |[0m   [33mTEMPERAMENT[0m,
+  [90m   |[0m [31m[1m^^^^^^^^^^^^^^[0m
+[31m[1m>[0m [90m 8 |[0m   [33mTraitOverview[0m,
+  [90m   |[0m [31m[1m^^^^^^^^^^^^^^^^[0m
+[31m[1m>[0m [90m 9 |[0m } [36mfrom[0m [32m"@/components/charts/TraitOverview"[0m;
+  [90m   |[0m [31m[1m^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^[0m
+  [90m10 |[0m [36mimport[0m { [33mEmptyState[0m } [36mfrom[0m [32m"@/components/ui/Card"[0m;
+  [90m11 |[0m [36mimport[0m { requireUser } [36mfrom[0m [32m"@/lib/auth/guard"[0m;
+  [90m12 |[0m [36mimport[0m { readPairs, [36mtype[0m [33mAxisInput[0m } [36mfrom[0m [32m"@/lib/interpretation/pairs"[0m;
+
+Import map: aliased to relative './src/components/charts/TraitOverview' inside of [project]/
+
+
+https://nextjs.org/docs/messages/module-not-found
+
+
+⨯ ./src/app/(app)/me/page.tsx:5:1
+Error: Module not found: Can't resolve '@/components/charts/TraitOverview'
+  [90m 3 |[0m [36mimport[0m { [33mPairReadings[0m } [36mfrom[0m [32m"@/components/charts/PairReadings"[0m;
+  [90m 4 |[0m [36mimport[0m { [33mTraitRadar[0m } [36mfrom[0m [32m"@/components/charts/TraitRadar"[0m;
+[31m[1m>[0m [90m 5 |[0m [36mimport[0m {
+  [90m   |[0m [31m[1m^^^^^^^[0m
+[31m[1m>[0m [90m 6 |[0m   [33mCHARACTER[0m,
+  [90m   |[0m [31m[1m^^^^^^^^^^^^[0m
+[31m[1m>[0m [90m 7 |[0m   [33mTEMPERAMENT[0m,
+  [90m   |[0m [31m[1m^^^^^^^^^^^^^^[0m
+[31m[1m>[0m [90m 8 |[0m   [33mTraitOverview[0m,
+  [90m   |[0m [31m[1m^^^^^^^^^^^^^^^^[0m
+[31m[1m>[0m [90m 9 |[0m } [36mfrom[0m [32m"@/components/charts/TraitOverview"[0m;
+  [90m   |[0m [31m[1m^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^[0m
+  [90m10 |[0m [36mimport[0m { [33mEmptyState[0m } [36mfrom[0m [32m"@/components/ui/Card"[0m;
+  [90m11 |[0m [36mimport[0m { requireUser } [36mfrom[0m [32m"@/lib/auth/guard"[0m;
+  [90m12 |[0m [36mimport[0m { readPairs, [36mtype[0m [33mAxisInput[0m } [36mfrom[0m [32m"@/lib/interpretation/pairs"[0m;
+
+Import map: aliased to relative './src/components/charts/TraitOverview' inside of [project]/
+
+
+https://nextjs.org/docs/messages/module-not-found
+
+
+⨯ ./src/app/(app)/me/page.tsx:5:1
+Error: Module not found: Can't resolve '@/components/charts/TraitOverview'
+  [90m 3 |[0m [36mimport[0m { [33mPairReadings[0m } [36mfrom[0m [32m"@/components/charts/PairReadings"[0m;
+  [90m 4 |[0m [36mimport[0m { [33mTraitRadar[0m } [36mfrom[0m [32m"@/components/charts/TraitRadar"[0m;
+[31m[1m>[0m [90m 5 |[0m [36mimport[0m {
+  [90m   |[0m [31m[1m^^^^^^^[0m
+[31m[1m>[0m [90m 6 |[0m   [33mCHARACTER[0m,
+  [90m   |[0m [31m[1m^^^^^^^^^^^^[0m
+[31m[1m>[0m [90m 7 |[0m   [33mTEMPERAMENT[0m,
+  [90m   |[0m [31m[1m^^^^^^^^^^^^^^[0m
+[31m[1m>[0m [90m 8 |[0m   [33mTraitOverview[0m,
+  [90m   |[0m [31m[1m^^^^^^^^^^^^^^^^[0m
+[31m[1m>[0m [90m 9 |[0m } [36mfrom[0m [32m"@/components/charts/TraitOverview"[0m;
+  [90m   |[0m [31m[1m^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^[0m
+  [90m10 |[0m [36mimport[0m { [33mEmptyState[0m } [36mfrom[0m [32m"@/components/ui/Card"[0m;
+  [90m11 |[0m [36mimport[0m { requireUser } [36mfrom[0m [32m"@/lib/auth/guard"[0m;
+  [90m12 |[0m [36mimport[0m { readPairs, [36mtype[0m [33mAxisInput[0m } [36mfrom[0m [32m"@/lib/interpretation/pairs"[0m;
+
+Import map: aliased to relative './src/components/charts/TraitOverview' inside of [project]/
+
+
+https://nextjs.org/docs/messages/module-not-found
+
+
+✓ Compiled in 113ms
+ GET /me 200 in 93ms (next.js: 18ms, application-code: 74ms)

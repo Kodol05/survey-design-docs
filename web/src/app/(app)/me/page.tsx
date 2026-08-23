@@ -1,12 +1,8 @@
 import Link from "next/link";
 import { AxisDetail } from "@/components/charts/AxisDetail";
 import { PairReadings } from "@/components/charts/PairReadings";
-import { TraitRadar } from "@/components/charts/TraitRadar";
-import {
-  CHARACTER,
-  TEMPERAMENT,
-  TraitOverview,
-} from "@/components/charts/TraitOverview";
+import { TraitSummary } from "@/components/charts/TraitSummary";
+import { CHARACTER, TEMPERAMENT } from "@/components/charts/scale";
 import { EmptyState } from "@/components/ui/Card";
 import { requireUser } from "@/lib/auth/guard";
 import { readPairs, type AxisInput } from "@/lib/interpretation/pairs";
@@ -69,8 +65,9 @@ export default async function MePage() {
         </p>
       </header>
 
-      {/* ① 한눈에 — 일곱 축이 한 화면에 들어와야 모양이 보인다 */}
-      <TraitOverview
+      {/* ① 한눈에 — 형태부터 본다. 막대 개관을 따로 두지 않는다.
+             아래 축별 상세에 같은 막대가 다시 나오기 때문이다. */}
+      <TraitSummary
         rows={traits.map((t) => ({
           scale: t.scale,
           percent: t.percent,
@@ -103,18 +100,6 @@ export default async function MePage() {
           축이 만나면 그 안에서 긴장이 생깁니다.
         </p>
         <PairReadings readings={readPairs(scores)} scores={scores} />
-      </section>
-
-      {/* ④ 모양 확인용 */}
-      <section className="mt-24 grid gap-12 border-t border-[--border] pt-12 lg:grid-cols-2 lg:items-center">
-        <div>
-          <h2 className="text-section-title mb-3">한눈에 보기</h2>
-          <p className="text-ink-secondary max-w-[30rem]">
-            일곱 축을 한 모양으로 겹쳐 본 것입니다. 어느 쪽으로 치우쳐 있는지 형태로
-            읽으시면 됩니다.
-          </p>
-        </div>
-        <TraitRadar data={traits.map((t) => ({ scale: t.scale, percent: t.percent }))} />
       </section>
 
       {/* 직무능력은 개인 화면에 표시하지 않는다 (00 D-35).
