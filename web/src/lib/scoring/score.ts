@@ -9,8 +9,11 @@
 export const SCALE_MIN = 1;
 export const SCALE_MAX = 7;
 
-/** 구간 경계 (D-26). 근거 있는 값이 아니라 편의값이다 — 응답 30건 후 재조정한다. */
-export const BAND = { lower: 50, upper: 65 } as const;
+/**
+ * 구간 경계 (D-26). 편의값이지만 **중립(50)을 기준으로 대칭**이다.
+ * 7점 척도에서 ±0.6점쯤에 해당한다. 응답 30건 후 재조정한다.
+ */
+export const BAND = { lower: 40, upper: 60 } as const;
 
 export type Band = "lower" | "middle" | "upper";
 
@@ -35,9 +38,11 @@ export type Answer = { code: string; value: number };
 export type AxisScore = {
   /** 역채점을 적용한 뒤의 합 */
   raw: number;
-  /** 이 축에서 받을 수 있는 최대 점수 */
+  /** 이 축에서 받을 수 있는 최저 점수 (문항 수 × 1) */
+  min: number;
+  /** 이 축에서 받을 수 있는 최대 점수 (문항 수 × 7) */
   max: number;
-  /** 만점 대비 % — 개인에게 보여주는 값 (D-09) */
+  /** 범위 대비 % — 개인에게 보여주는 값 (D-09) */
   percent: number;
   band: Band;
   itemCount: number;
@@ -62,10 +67,20 @@ export function reverseValue(value: number): number {
   return SCALE_MIN + SCALE_MAX - value;
 }
 
-/** 만점 대비 %. 중립(4점)으로 일관되게 답하면 57.1%가 나온다 — D-26의 기준점. */
-export function toPercent(raw: number, max: number): number {
-  if (max <= 0) return 0;
-  return (raw / max) * 100;
+/**
+ * 범위 대비 %.
+ *
+ * 7점 척도의 최저는 0이 아니라 문항 수 × 1이다. 만점으로만 나누면
+ * 전 문항 최저로 답해도 14.3%가 나오고 **중립이 57.1%로 밀려서
+ * 눈금의 가운데가 가운데가 아니게 된다.**
+ *
+ * 그래서 받을 수 있는 범위로 나눈다.
+ *   전 문항 1점 → 0     전 문항 4점 → 50     전 문항 7점 → 100
+ */
+export function toPercent(raw: number, itemCount: number): number {
+  const span = itemCount * (SCALE_MAX - SCALE_MIN);
+  if (span <= 0) return 0;
+  return ((raw - itemCount * SCALE_MIN) / span) * 100;
 }
 
 export function toBand(percent: number): Band {
@@ -75,9 +90,15 @@ export function toBand(percent: number): Band {
 }
 
 function makeAxisScore(raw: number, itemCount: number): AxisScore {
-  const max = itemCount * SCALE_MAX;
-  const percent = toPercent(raw, max);
-  return { raw, max, percent, band: toBand(percent), itemCount };
+  const percent = toPercent(raw, itemCount);
+  return {
+    raw,
+    min: itemCount * SCALE_MIN,
+    max: itemCount * SCALE_MAX,
+    percent,
+    band: toBand(percent),
+    itemCount,
+  };
 }
 
 /**

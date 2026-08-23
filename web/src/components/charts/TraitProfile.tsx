@@ -7,8 +7,8 @@
  * 기질과 성격을 나눠 보여준다. 08의 첫 문장이 "타고난 기질과 살면서 형성된
  * 성격을 나눠 재고"이므로 화면에서도 갈라져 있어야 한다.
  *
- * 눈금은 **만점 대비 %**다. 백분위가 아니다 — 사내 상대위치는 개인 화면에
- * 표시하지 않는다 (00 D-09).
+ * 눈금은 **범위 대비 %**다. 전 문항 최저가 0, 중립이 50, 최고가 100이다.
+ * 백분위가 아니다 — 사내 상대위치는 개인 화면에 표시하지 않는다 (00 D-09).
  */
 
 import { BAND } from "@/lib/scoring/score";
@@ -16,8 +16,6 @@ import { BAND } from "@/lib/scoring/score";
 export type ProfileRow = {
   scale: string;
   percent: number;
-  raw: number;
-  max: number;
   band: "lower" | "middle" | "upper";
 };
 

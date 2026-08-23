@@ -56,3 +56,6 @@
  GET /me 200 in 38ms (next.js: 4ms, application-code: 33ms)
 ✓ Compiled in 70ms
  GET /me 200 in 71ms (next.js: 15ms, application-code: 56ms)
+ GET /me 200 in 183ms (next.js: 5ms, application-code: 179ms)
+ GET /me 200 in 101ms (next.js: 5ms, application-code: 96ms)
+ GET /me 200 in 65ms (next.js: 11ms, application-code: 54ms)

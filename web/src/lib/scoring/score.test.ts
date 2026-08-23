@@ -39,39 +39,50 @@ describe("역채점", () => {
       { code: "A", value: 7 },
       { code: "B", value: 1 },
     ]);
-    // 7 + (8-1) = 14 → 만점 14 → 100%
+    // 7 + (8-1) = 14 → 받을 수 있는 최대 14 → 100%
     expect(r.traits["자율성"].raw).toBe(14);
     expect(r.traits["자율성"].percent).toBe(100);
   });
 });
 
-describe("만점 대비 %", () => {
-  it("중립(4점)으로 일관되게 답하면 57.1%가 나온다 — D-26의 기준점", () => {
+describe("범위 대비 %", () => {
+  it("중립(4점)으로 일관되게 답하면 정확히 50이 나온다 — 눈금의 가운데", () => {
     const items = [trait("A", "인내력", "근면"), trait("B", "인내력", "끈기")];
     const r = scoreAssessment(items, answerAll(items, 4));
-    expect(r.traits["인내력"].percent).toBeCloseTo(57.14, 1);
+    expect(r.traits["인내력"].percent).toBe(50);
   });
 
-  it("중립 응답은 middle 구간에 들어온다 — 이게 D-26 경계값의 근거", () => {
-    expect(toBand(toPercent(4, 7))).toBe("middle");
-  });
-
-  it("최저·최고 응답", () => {
+  it("눈금이 0에서 시작한다 — 만점으로만 나누면 최저가 14.3%가 된다", () => {
     const items = [trait("A", "연대감", "공감")];
-    expect(scoreAssessment(items, answerAll(items, 1)).traits["연대감"].percent).toBeCloseTo(14.3, 1);
+    expect(scoreAssessment(items, answerAll(items, 1)).traits["연대감"].percent).toBe(0);
     expect(scoreAssessment(items, answerAll(items, 7)).traits["연대감"].percent).toBe(100);
+  });
+
+  it("한 칸 위아래가 대칭이다", () => {
+    const items = [trait("A", "연대감", "공감")];
+    const up = scoreAssessment(items, answerAll(items, 5)).traits["연대감"].percent;
+    const down = scoreAssessment(items, answerAll(items, 3)).traits["연대감"].percent;
+    expect(up - 50).toBeCloseTo(50 - down, 5);
+  });
+
+  it("중립 응답은 middle 구간에 들어온다", () => {
+    expect(toBand(toPercent(4, 1))).toBe("middle");
   });
 });
 
 describe("구간 경계 (D-26)", () => {
-  it("50 미만은 lower, 65 초과는 upper", () => {
-    expect(toBand(49.9)).toBe("lower");
-    expect(toBand(65.1)).toBe("upper");
+  it("40 미만은 lower, 60 초과는 upper", () => {
+    expect(toBand(39.9)).toBe("lower");
+    expect(toBand(60.1)).toBe("upper");
   });
 
   it("경계값 자체는 middle에 들어간다", () => {
     expect(toBand(BAND.lower)).toBe("middle");
     expect(toBand(BAND.upper)).toBe("middle");
+  });
+
+  it("경계가 중립(50)을 기준으로 대칭이다", () => {
+    expect(50 - BAND.lower).toBe(BAND.upper - 50);
   });
 });
 
@@ -167,10 +178,10 @@ describe("실제 문항 114개", () => {
     expect(Object.keys(r.abilities)).toHaveLength(3);
   });
 
-  it("전 문항 중립이면 모든 축이 57.1% middle — 역채점이 한쪽으로 쏠리지 않았다는 뜻", () => {
+  it("전 문항 중립이면 모든 축이 정확히 50 — 역채점이 한쪽으로 쏠리지 않았다는 뜻", () => {
     const r = scoreAssessment(items, answerAll(items, 4));
     for (const [, s] of Object.entries(r.traits)) {
-      expect(s.percent).toBeCloseTo(57.14, 1);
+      expect(s.percent).toBe(50);
       expect(s.band).toBe("middle");
     }
     for (const [, s] of Object.entries(r.abilities)) {

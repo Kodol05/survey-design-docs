@@ -46,14 +46,12 @@ export default async function MePage() {
           rows={traits.map((t) => ({
             scale: t.scale,
             percent: t.percent,
-            raw: t.raw,
-            max: t.max,
             band: t.band,
           }))}
         />
         <p className="text-axis text-ink-muted mt-8">
-          점수는 만점 대비 비율입니다. 가운데 밝은 구간이 보통입니다. 모든 문항에 중립으로
-          답하면 57이 나옵니다.
+          눈금은 0에서 100까지입니다. 모든 문항에 &ldquo;보통&rdquo;으로 답하면 정확히 50이
+          나오고, 가운데 밝은 구간이 보통입니다.
         </p>
       </Card>
 
