@@ -1,0 +1,79 @@
+# 7차원 성향 설문 — 문항 v1
+#
+# 이 파일이 검사의 실체다. 고칠 때 프로그램은 건드리지 않는다.
+# seed 전에 형식 검사를 통과해야 한다 (src/lib/items/validate.ts).
+#
+# sourceRef 규칙 — 어디서 온 문항인지 반드시 적는다 (00 §5 저작권 대응).
+#   IPIP 프록시는 "어떤 내용이 이 척도와 상관이 높은가"를 알려주는 참고자료일 뿐,
+#   문항을 그대로 옮기는 것이 아니다. 한국어로 새로 쓴다.
+#
+# 성향 문항은 직장 맥락으로 쓴다 (08). 다만 기질 축은 상황과 무관하게
+# 나타나는 것을 재므로 전부 직장 상황으로 바꾸지 않는다.
+#
+# ⚠️ 아래는 포맷 확인용 예시 8개다. 본 문항 114개는 Task 4에서 쓴다.
+
+version: 1
+title: 7차원 성향 설문 v1
+
+items:
+  # ── 성향 ──────────────────────────────────────────────
+  - kind: trait
+    code: NS1-01
+    scale: 자극추구
+    subscale: 자극추구성 흥분
+    content: 처음 맡는 거래처를 배정받으면 부담보다 흥미가 앞선다.
+    sourceRef: IPIP Variety-seeking 구성개념 참고 (00 §2.1)
+    antonymOf: NS1-02
+
+  - kind: trait
+    code: NS1-02
+    scale: 자극추구
+    subscale: 자극추구성 흥분
+    content: 늘 하던 방식대로 하는 일이 마음이 편하다.
+    reverse: true
+    sourceRef: IPIP Variety-seeking 구성개념 참고 (역방향)
+    antonymOf: NS1-01
+
+  - kind: trait
+    code: HA3-01
+    scale: 위험회피
+    subscale: 낯선사람 수줍음
+    content: 처음 보는 사람이 많은 자리에서는 말수가 줄어든다.
+    sourceRef: IPIP Social discomfort 구성개념 참고 (원본 상관 .81)
+
+  - kind: trait
+    code: PS3-01
+    scale: 인내력
+    subscale: 성취에 대한 야망
+    content: 목표를 정하면 어지간해서는 중간에 놓지 않는다.
+    sourceRef: IPIP Achievement-striving 구성개념 참고 (원본 상관 .68)
+
+  - kind: trait
+    code: SD5-01
+    scale: 자율성
+    subscale: 자기일치
+    content: 하기 싫은 일이라도 해야 할 때는 미루지 않는다.
+    sourceRef: IPIP Impulse control 구성개념 참고 (원본 상관 .72)
+
+  # ── 직무능력 ──────────────────────────────────────────
+  # 능력당 직접형 1 + 간접형 2 (07). 성향 문항 사이에 섞어 배치한다.
+  - kind: ability
+    code: AB-COOP-01
+    axis: 협력
+    direct: true
+    content: 여러 사람과 하는 일에서 내 몫을 잘 해내는 편이다.
+    sourceRef: 07-job-ability.md 직접형
+
+  - kind: ability
+    code: AB-COOP-02
+    axis: 협력
+    direct: false
+    content: 일이 밀릴 것 같으면 미리 동료에게 알린다.
+    sourceRef: 07-job-ability.md 간접형 — 능력이 아니라 행동을 묻는다
+
+  - kind: ability
+    code: AB-COOP-03
+    axis: 협력
+    direct: false
+    content: 내 담당이 아니어도 옆에서 막히면 한 번은 들여다본다.
+    sourceRef: 07-job-ability.md 간접형
