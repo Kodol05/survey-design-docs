@@ -1,26 +1,123 @@
 @import "tailwindcss";
 
+/* ---------------------------------------------------------------------------
+   시각 토큰 — docs/11-ui-guide.md §1
+   색은 색맹 대응·대비 검사를 통과한 값이다. 임의로 바꾸지 말 것.
+   다크 모드는 1차 범위 밖이지만 값을 갈아끼울 수 있게 변수로만 선언해 둔다.
+   --------------------------------------------------------------------------- */
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  /* 바탕과 글자 (11 §1.1) */
+  --surface: #fcfcfb;
+  --page: #f9f9f7;
+  --ink: #0b0b0b;
+  --ink-secondary: #52514e;
+  --ink-muted: #898781;
+  --grid: #e1e0d9;
+  --axis: #c3c2b7;
+  --border: rgb(11 11 11 / 0.1);
+
+  /* 계열 색 — 순서 고정. 돌려쓰지 않는다. 넷째 슬롯은 없다 */
+  --series-1: #2a78d6; /* 본인 · 주 계열 */
+  --series-2: #eb6834; /* 사내 평균 · 비교 대상 */
+  --series-3: #1baf7a; /* 밝은 배경 대비 2.74 — 반드시 글자 라벨 동반 */
+
+  /* 발산 색 — 상관 표 전용. 0이 가운데 (11 §1.1) */
+  --diverge-neg: #d03b3b;
+  --diverge-mid: #f0efec;
+  --diverge-pos: #2a78d6;
+
+  /* 상태 색 — 계열 색과 겹치지 않는다. 항상 아이콘/글자 동반 */
+  --status-good: #0ca30c;
+  --status-warn: #fab219;
+  --status-serious: #ec835a;
+  --status-critical: #d03b3b;
+
+  /* 간격 — 4px 눈금만. 중간값을 만들지 않는다 (11 §1.3) */
+  --space-1: 0.25rem;
+  --space-2: 0.5rem;
+  --space-3: 0.75rem;
+  --space-4: 1rem;
+  --space-6: 1.5rem;
+  --space-8: 2rem;
+  --space-12: 3rem;
+  --space-16: 4rem;
+
+  /* 데이터 밀도 (11 §1.4) — 관리자 표는 조밀, 응시 화면은 여유 */
+  --row-admin: 2rem; /* 32px — 50명을 훑는 것이 목적 */
+  --tap-target: 2.75rem; /* 44px — 터치 최소 크기 */
+  --reading-width: 46rem; /* 한 줄 40~50자 (01 §2.3) */
 }
 
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --color-surface: var(--surface);
+  --color-page: var(--page);
+  --color-ink: var(--ink);
+  --color-ink-secondary: var(--ink-secondary);
+  --color-ink-muted: var(--ink-muted);
+  --color-grid: var(--grid);
+  --color-axis: var(--axis);
+
+  --color-series-1: var(--series-1);
+  --color-series-2: var(--series-2);
+  --color-series-3: var(--series-3);
+
+  --color-diverge-neg: var(--diverge-neg);
+  --color-diverge-mid: var(--diverge-mid);
+  --color-diverge-pos: var(--diverge-pos);
+
+  --color-status-good: var(--status-good);
+  --color-status-warn: var(--status-warn);
+  --color-status-serious: var(--status-serious);
+  --color-status-critical: var(--status-critical);
+
+  --font-sans: var(--font-pretendard), system-ui, -apple-system, "Segoe UI",
+    sans-serif;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+/* 글자 크기 — 고정 px을 쓰지 않는다 (01 §2.3, 11 §1.2) */
+@utility text-screen-title {
+  font-size: clamp(1.5rem, 1.3rem + 0.8vw, 2rem);
+  line-height: 1.3;
+  font-weight: 600;
+}
+@utility text-section-title {
+  font-size: clamp(1.125rem, 1rem + 0.4vw, 1.375rem);
+  line-height: 1.4;
+  font-weight: 600;
+}
+@utility text-item {
+  font-size: clamp(1rem, 0.9rem + 0.4vw, 1.25rem);
+  line-height: 1.6;
+}
+@utility text-table {
+  font-size: 0.875rem;
+  line-height: 1.5;
+}
+@utility text-axis {
+  font-size: 0.8125rem;
+  line-height: 1.4;
+}
+
+/* 표·축의 숫자는 자릿수가 세로로 맞아야 훑어볼 수 있다 (11 §1.2) */
+@utility tabular {
+  font-variant-numeric: tabular-nums;
+}
+
+/* 응시·결과 화면은 읽기 폭을 제한하고, 관리자 표는 전체 폭을 쓴다 (01 §2.3) */
+@utility reading-column {
+  width: 100%;
+  max-width: var(--reading-width);
+  margin-inline: auto;
+  padding-inline: clamp(1rem, 4vw, 3rem);
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background: var(--page);
+  color: var(--ink);
+}
+
+/* 키보드 초점은 항상 보이게 (01 §2.4 — 접근성은 타협하지 않는다) */
+:focus-visible {
+  outline: 2px solid var(--series-1);
+  outline-offset: 2px;
 }
