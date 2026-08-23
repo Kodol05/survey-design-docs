@@ -220,3 +220,32 @@ model ManagerRating {
   @@unique([employeeId, axis, ratedBy])
   @@index([employeeId])
 }
+
+/// 평가·결과 국면 (D-33). 한 줄만 존재한다.
+enum RatingPhase {
+  /// 초기 상태. 관리자는 결과 화면에 들어갈 수 없다
+  COLLECTING
+  /// 한 번 전환하면 되돌릴 수 없다
+  OPEN
+}
+
+/// 시스템 전역 상태. `id = 1` 한 줄만 쓴다.
+model AppState {
+  id          Int         @id @default(1)
+  ratingPhase RatingPhase @default(COLLECTING)
+  /// 국면을 언제 누가 열었는지. 되돌릴 수 없으므로 기록해 둔다
+  openedAt    DateTime?
+  openedBy    String?
+  updatedAt   DateTime    @updatedAt
+}
+
+/// 로그인 실패 제한 (00 §1).
+/// IP가 아니라 계정 단위로 잠근다 — 사무실이 공인 IP를 공유하므로
+/// IP로 막으면 한 사람 때문에 전체가 로그인을 못 하게 된다.
+model LoginAttempt {
+  /// 사원은 정규화한 전화번호, 관리자는 loginId
+  key         String    @id
+  count       Int       @default(0)
+  lockedUntil DateTime?
+  updatedAt   DateTime  @updatedAt
+}

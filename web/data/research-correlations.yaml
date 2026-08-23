@@ -1,0 +1,122 @@
+# 성향 축 × 직무능력 — 연구에서 나온 관련도
+#
+# 08-onepager.md 의 표, 07-job-ability.md 의 상세판이 이 파일이다.
+#
+# ── 중요 ─────────────────────────────────────────────────────────────
+#
+# 1. 이 값으로 점수를 계산하지 않는다 (07 「왜 환산하지 않는가」).
+#    화면에 참고로 보여주기만 한다. 합쳐서 읽는 것은 보는 사람의 몫이다.
+#
+# 2. 상태가 세 가지다. 절대 하나로 뭉개지 말 것.
+#      value: <숫자>   연구에서 이만큼의 관련이 나왔다
+#      state: none     연구에서 봤는데 관련이 나오지 않았다
+#      state: unstudied 아무도 이 조합을 연구하지 않았다
+#    "없음"과 "—"는 완전히 다른 정보다. null 하나로 저장하면
+#    화면에서 되살릴 수 없다.
+#
+# 3. 서로 다른 연구에서 온 값이다. 표본도 지표도 나라도 다르다.
+#    한 표에 놓았다고 서로 비교할 수 있는 값이 아니다 (07 ⚠️).
+#
+# 4. 조직생활은 열이 통째로 비어 있다. 이 개념을 정의한 연구 자체를
+#    찾지 못했다. 세 능력 중 대표님이 가장 궁금해하실 항목인데
+#    근거가 하나도 없다 — 대표님 평가(D-34)가 필요한 가장 큰 이유다.
+
+version: 1
+
+sources:
+  jang2016:
+    label: Jang & Park (2016), Saudi Med J 37(12)
+    sample: 의대생 80명, 동료평가
+    measured: 팀 학습에서 참여도·준비도·의사소통·기여도를 동료가 평가
+    note: 협력을 실제 행동으로 잰 유일한 연구. 다만 표본이 작고 직장인이 아니다
+    url: https://pmc.ncbi.nlm.nih.gov/articles/PMC5303776/
+  kono2015:
+    label: Kono et al. (2015), Psychology 6
+    sample: 일본 IT기업 직원 434명
+    measured: 정신적·대인적 업무 수행 제약
+    note: 자율적 실행과 정확히 같은 개념은 아니다
+    url: https://content.scirp.org/pdf/psych_2015120713370375.pdf
+
+# 축 이름은 src/lib/items/types.ts 의 TRAIT_SCALES / ABILITY_AXES 와 같아야 한다
+correlations:
+  # ── 협력 ──
+  - scale: 자극추구
+    ability: 협력
+    state: unstudied
+  - scale: 위험회피
+    ability: 협력
+    value: -0.25
+    source: jang2016
+  - scale: 사회적민감성
+    ability: 협력
+    value: -0.34
+    source: jang2016
+    note: 높을수록 사전 준비가 부족했다. 이름과 결과가 어긋나는 자리
+  - scale: 인내력
+    ability: 협력
+    value: 0.28
+    source: jang2016
+    note: 협력에서 가장 큰 값이 나온 축
+  - scale: 자율성
+    ability: 협력
+    state: unstudied
+  - scale: 연대감
+    ability: 협력
+    state: none
+    source: jang2016
+    note: 이름이 "연대감"인데 정작 협력과는 관련이 없었다
+  - scale: 자기초월
+    ability: 협력
+    state: unstudied
+
+  # ── 조직생활 ──
+  # 전부 unstudied. 이 개념을 정의한 연구를 찾지 못했다 (07).
+  - scale: 자극추구
+    ability: 조직생활
+    state: unstudied
+  - scale: 위험회피
+    ability: 조직생활
+    state: unstudied
+  - scale: 사회적민감성
+    ability: 조직생활
+    state: unstudied
+  - scale: 인내력
+    ability: 조직생활
+    state: unstudied
+  - scale: 자율성
+    ability: 조직생활
+    state: unstudied
+  - scale: 연대감
+    ability: 조직생활
+    state: unstudied
+  - scale: 자기초월
+    ability: 조직생활
+    state: unstudied
+
+  # ── 자율적 실행 ──
+  - scale: 자극추구
+    ability: 자율적실행
+    state: unstudied
+  - scale: 위험회피
+    ability: 자율적실행
+    value: -0.36
+    source: kono2015
+  - scale: 사회적민감성
+    ability: 자율적실행
+    state: unstudied
+  - scale: 인내력
+    ability: 자율적실행
+    value: 0.14
+    source: kono2015
+  - scale: 자율성
+    ability: 자율적실행
+    value: 0.48
+    source: kono2015
+    note: 표 전체에서 가장 큰 값
+  - scale: 연대감
+    ability: 자율적실행
+    value: 0.23
+    source: kono2015
+  - scale: 자기초월
+    ability: 자율적실행
+    state: unstudied
