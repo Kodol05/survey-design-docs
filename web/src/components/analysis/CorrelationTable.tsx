@@ -177,8 +177,8 @@ export function CorrelationLegend({ inHouse }: { inHouse?: boolean }) {
         <span className="tabular">.50</span> 매우 뚜렷함
       </span>
       <span>
-        <span style={{ color: "var(--status-warn)" }}>불확실</span> = 신뢰구간이 0을
-        걸쳐 방향조차 정해지지 않음
+        등급 뒤 <strong className="text-ink-secondary">?</strong> = 신뢰구간이 0을 걸쳐
+        방향이 아직 확정되지 않음
       </span>
       {inHouse ? (
         <span>n 부족 = 30명 미만</span>

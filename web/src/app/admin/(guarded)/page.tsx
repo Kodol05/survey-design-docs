@@ -341,26 +341,109 @@ export default async function AdminHome() {
         </section>
       </div>
 
+            {/*
+        바로 가기 — **밑줄 친 낱말 세 개**였다. 어디로 가는지는 알겠는데
+        가서 무엇을 볼지 모르니 누를 이유가 없었다.
+
+        지금은 각 칸이 **그 화면의 지금 상태를 한 줄로 미리 보여준다.**
+        볼 것이 있는 칸만 눌러도 되니 화면을 헤매지 않는다.
+      */}
       <section>
         <h2 className="text-section-title mb-4 border-b border-[--border] pb-2">
           바로 가기
         </h2>
-        <div className="flex flex-wrap gap-x-8 gap-y-2">
-          <Link href="/admin/employees" className="text-table underline">
-            구성원 목록
-          </Link>
-          <Link href="/admin/stats" className="text-table underline">
-            분석
-          </Link>
-          <Link
+        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+          <Shortcut
+            href="/admin/employees"
+            title="구성원 목록"
+            lines={[
+              `${s.completed}명 완료 · ${s.inProgress}명 진행 중`,
+              needsReview.length
+                ? `검토가 필요한 응답 ${needsReview.length}명`
+                : "검토가 필요한 응답 없음",
+            ]}
+          />
+          <Shortcut
+            href="/admin/stats"
+            title="분석"
+            lines={[
+              matrix.enough
+                ? `성향 7축 × 직무능력 3축 · ${matrix.n}명`
+                : `${MIN_N}명이 넘어야 열립니다 (지금 ${matrix.n}명)`,
+              top.length
+                ? `값이 0을 확실히 벗어난 조합 ${top.length}개`
+                : "아직 확정된 조합 없음",
+            ]}
+          />
+          <Shortcut
             href="/admin/stats?tab=reliability"
-            className="text-table underline"
-          >
-            검사 신뢰도
-          </Link>
+            title="검사 신뢰도"
+            lines={[
+              meanAlpha === null
+                ? "아직 계산할 수 없습니다"
+                : `척도 평균 α ${meanAlpha.toFixed(2)}`,
+              poorScales.length
+                ? `미달 척도 ${poorScales.length}개 — ${poorScales.map((r) => r.scale).join(" · ")}`
+                : "미달 척도 없음",
+            ]}
+          />
+          <Shortcut
+            href="/admin/stats?tab=prediction"
+            title="예측 대 실제"
+            lines={[
+              "논문 값으로 본 예측과 실제를 맞대 봅니다",
+              "누가 예측보다 높고 낮은지 이름으로 나옵니다",
+            ]}
+          />
+          <Shortcut
+            href="/admin/ratings"
+            title="대표님 평가"
+            lines={[
+              `${rating.done} / ${rating.total}명 · ${rating.cells} / ${rating.cellTotal}칸`,
+              rating.done >= rating.total
+                ? "다 매기셨습니다"
+                : `${rating.total - rating.done}명 남았습니다`,
+            ]}
+          />
         </div>
       </section>
     </>
+  );
+}
+
+/**
+ * 바로 가기 한 칸 — 제목 + 그 화면의 지금 상태 두 줄.
+ *
+ * 링크만 있으면 "가서 뭘 보지?"가 남는다. 숫자를 미리 보여주면
+ * **볼 것이 있는 칸만 눌러도 된다.**
+ */
+function Shortcut({
+  href,
+  title,
+  lines,
+}: {
+  href: string;
+  title: string;
+  lines: string[];
+}) {
+  return (
+    <Link
+      href={href}
+      className="block rounded-xl p-5 transition hover:brightness-95"
+      style={{ background: "var(--wash)" }}
+    >
+      <p className="text-table font-medium">
+        {title}
+        <span aria-hidden className="text-ink-muted ml-2">
+          →
+        </span>
+      </p>
+      {lines.map((l) => (
+        <p key={l} className="text-axis text-ink-secondary mt-1 leading-snug">
+          {l}
+        </p>
+      ))}
+    </Link>
   );
 }
 

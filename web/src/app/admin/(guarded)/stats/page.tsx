@@ -12,7 +12,6 @@ import {
   loadPeople,
   loadPersonQuality,
   loadReliability,
-  predictionCheck,
   rankForAbility,
   scatterPoints,
   traitAbilityMatrix,
@@ -32,6 +31,8 @@ import {
 } from "@/lib/admin/abilitySource";
 import { countRatedEmployees } from "@/lib/admin/ratings";
 import { Note } from "@/components/ui/Note";
+import { PredictionPanel } from "./PredictionPanel";
+import { predictFromResearch } from "@/lib/admin/researchPrediction";
 import { LowQualityList, QualityRanking } from "./PersonQuality";
 import { CorrelationPanel } from "./CorrelationPanel";
 import { RankPanel } from "./RankPanel";
@@ -41,7 +42,7 @@ export const metadata = { title: "분석 — 관리자" };
 const TABS = [
   { key: "matrix", label: "직무능력과 성향" },
   { key: "rank", label: "순위" },
-  { key: "prediction", label: "계산식" },
+  { key: "prediction", label: "예측 대 실제" },
   { key: "reliability", label: "검사 신뢰도" },
 ] as const;
 
@@ -385,72 +386,67 @@ async function RankTab({
 // ── 계산식 ──────────────────────────────────────────────────────────
 
 function PredictionTab({ people }: { people: People }) {
-  const checks = ABILITY_AXES.map((axis) =>
-    predictionCheck(people, axis),
-  ).filter((c): c is NonNullable<typeof c> => c !== null);
+  const items = ABILITY_AXES.map((axis) => predictFromResearch(people, axis)).filter(
+    (x): x is NonNullable<typeof x> => x !== null,
+  );
 
-  if (!checks.length)
-    return (
-      <section>
-        <WarningBadge kind="smallSample" />
-        <p className="text-ink-secondary mt-4">
-          아직 계산식을 만들 만큼 모이지 않았습니다.
-        </p>
-      </section>
-    );
+  const missing = ABILITY_AXES.filter((a) => !items.some((i) => i.axis === a));
 
   return (
     <section>
-      <p className="text-ink-secondary mb-4 max-w-[56rem]">
-        성향 일곱 축으로 직무능력을 맞춰봅니다. 한 명씩 빼고 나머지로 식을
-        만들어 뺀 사람을 맞추는 방식이라, 외운 것을 다시 묻는 착시가 없습니다.
+      {/*
+        설명을 위에 크게 둔다. 이 화면은 무엇을 보는 것인지 모르면
+        숫자가 아무 말도 하지 않는다.
+      */}
+      <h2 className="text-section-title mb-3">논문이 본 것과 우리가 잰 것</h2>
+      <p className="text-item text-ink-secondary mb-4 max-w-[52rem]">
+        논문에서 나온 성향×직무능력 상관을 가중치로 삼아{" "}
+        <strong>이 사람의 직무능력이 얼마쯤일지 계산</strong>하고, 실제로 나온 값과
+        나란히 놓았습니다.
       </p>
-      <div className="mb-10 max-w-[56rem]">
-        <WarningBadge kind="overfitting" />
-      </div>
-
-      <div className="grid gap-12 lg:grid-cols-3">
-        {checks.map(({ axis, loocv }) => (
-          <div key={axis}>
-            <h3 className="mb-1 font-medium">{axis}</h3>
-            <p className="text-axis text-ink-muted tabular mb-4">
-              그냥 맞추면 평균 {loocv.trainMae.toFixed(1)}점 차이 · 한 명씩 빼고
-              맞추면{" "}
-              <strong className="text-ink">{loocv.cvMae.toFixed(1)}점</strong>
-            </p>
-            <ScatterPlot
-              points={loocv.points.map((p, i) => ({
-                id: String(i),
-                name: `실제 ${Math.round(p.actual)} · 예측 ${Math.round(p.predicted)}`,
-                x: p.actual,
-                y: p.predicted,
-                quality: "ok",
-              }))}
-              trend={[
-                { x: 0, y: 0 },
-                { x: 100, y: 100 },
-              ]}
-              xLabel="실제"
-              yLabel="예측"
-            />
-            <p className="text-axis text-ink-muted mt-2">
-              대각선에 가까울수록 잘 맞은 것입니다. 차이 {loocv.gap.toFixed(1)}
-              점이 착시의 크기입니다.
-            </p>
-          </div>
-        ))}
-      </div>
-
-      <p className="text-axis text-ink-secondary mt-12 max-w-[56rem] border-t border-[--border] pt-6">
-        이 화면이 답하는 것은 <strong>설문 안에서 앞뒤가 맞는가</strong>입니다.
-        성향 문항과 직무능력 문항을 같은 사람이 이어서 답하므로, 잘 맞는다고
-        실제와 맞는 것은 아닙니다. 그건 대표님 평가와 대조해야 알 수 있습니다.
+      <p className="text-ink-secondary mb-10 max-w-[52rem]">
+        어긋난다면 둘 중 하나입니다 — <strong>우리 회사가 논문과 다르거나</strong>,{" "}
+        <strong>그 사람이 남다르거나.</strong> 둘 다 볼 만한 이야기입니다.
       </p>
+
+      {items.length === 0 ? (
+        <>
+          <WarningBadge kind="smallSample" />
+          <p className="text-ink-secondary mt-4">
+            아직 맞대 볼 만큼 모이지 않았거나, 쓸 수 있는 논문 값이 없습니다.
+          </p>
+        </>
+      ) : (
+        <PredictionPanel items={items} />
+      )}
+
+      {missing.length > 0 && (
+        <p className="text-axis text-ink-muted mt-8">
+          <strong>{missing.join(" · ")}</strong>은 예측할 수 없습니다. 이 개념을 정의한
+          연구를 찾지 못해 가중치가 하나도 없습니다. 0으로 채우면 「예측이 맞았다」는
+          착각이 생기므로 빈칸으로 둡니다.
+        </p>
+      )}
+
+      <Note label="이 예측을 어디까지 믿을 수 있는지" className="mt-8">
+        <p className="mb-2">
+          <strong>서로 다른 논문에서 온 값을 한 식에 넣습니다.</strong> 표본도 지표도
+          나라도 다릅니다. 이렇게 만든 예측은 대략의 눈금이지 정밀한 값이 아닙니다.
+        </p>
+        <p className="mb-2">
+          논문이 주는 것은 <strong>모양이지 눈금이 아닙니다.</strong> 상관만으로는
+          「이 사람이 62점」이라고 말할 수 없어서, 우리 데이터의 퍼진 정도를 빌려
+          점수로 되돌립니다.
+        </p>
+        <p>
+          전에 있던 「계산식」 화면은 <strong>우리 데이터로 만든 식이 우리 데이터를</strong>{" "}
+          맞추는지를 봤습니다. 자기 답으로 자기 답을 맞추는 셈이라 답이 거의 늘
+          「맞는다」였습니다. 여기서는 바깥에서 온 값을 씁니다.
+        </p>
+      </Note>
     </section>
   );
 }
-
-// ── 신뢰도 ──────────────────────────────────────────────────────────
 
 function ReliabilityTab({
   rows,
