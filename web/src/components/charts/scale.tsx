@@ -1,23 +1,25 @@
 /** 눈금 색과 표식 — 프로필 계열 화면이 공유한다 */
 
-const STOPS: [number, string][] = [
-  [0, "#3a5fa0"],
-  [20, "#7c93bf"],
-  [38, "#c1cbdf"],
-  [50, "#ddd8ce"],
-  [62, "#e0c8b3"],
-  [80, "#cb9a7c"],
-  [100, "#b3623f"],
-];
+/*
+  눈금 색을 **CSS 토큰에서 읽어 섞는다** (2026-08-24).
+
+  전에는 hex를 상수로 두고 자바스크립트에서 보간했다. 그러면 다크 모드에서
+  같이 못 바뀐다 — 어두운 바탕에 밝은 곳 색을 그대로 깔게 된다.
+  `color-mix`는 브라우저가 그릴 때 계산하므로 `--scale-*` 토큰만 테마마다
+  갈아 끼우면 알아서 따라온다.
+*/
+const STOPS = [0, 20, 38, 50, 62, 80, 100];
 
 /** 왼쪽으로 갈수록 청회색, 오른쪽으로 갈수록 테라코타. 가운데는 바탕보다 한 단 어둡다.
  *  빨강↔초록을 쓰지 않는다 — 낮음이 틀린 것도 높음이 맞는 것도 아닌데
  *  빨강·초록은 오답·정답으로 읽힌다. */
-export const GRADIENT = `linear-gradient(90deg, ${STOPS.map(([p, c]) => `${c} ${p}%`).join(", ")})`;
+export const GRADIENT = `linear-gradient(90deg, ${STOPS.map(
+  (p) => `var(--scale-${p}) ${p}%`,
+).join(", ")})`;
 
 /** 라벨용 색은 바 색보다 진하다. 옅은 색을 작은 글자에 쓰면 대비가 모자란다. */
-export const LOW_INK = "#3a5479";
-export const HIGH_INK = "#8f4c2d";
+export const LOW_INK = "var(--scale-ink-low)";
+export const HIGH_INK = "var(--scale-ink-high)";
 
 export const TEMPERAMENT = ["자극추구", "위험회피", "사회적민감성", "인내력"];
 export const CHARACTER = ["자율성", "연대감", "자기초월"];
@@ -26,15 +28,11 @@ export const CHARACTER = ["자율성", "연대감", "자기초월"];
 export function colorAt(pct: number): string {
   const x = Math.max(0, Math.min(100, pct));
   let i = 0;
-  while (i < STOPS.length - 2 && x > STOPS[i + 1][0]) i++;
-  const [p0, c0] = STOPS[i];
-  const [p1, c1] = STOPS[i + 1];
+  while (i < STOPS.length - 2 && x > STOPS[i + 1]) i++;
+  const p0 = STOPS[i];
+  const p1 = STOPS[i + 1];
   const t = p1 === p0 ? 0 : (x - p0) / (p1 - p0);
-  const mix = (a: string, b: string, k: number) =>
-    Math.round(parseInt(a, 16) + (parseInt(b, 16) - parseInt(a, 16)) * k)
-      .toString(16)
-      .padStart(2, "0");
-  return `#${mix(c0.slice(1, 3), c1.slice(1, 3), t)}${mix(c0.slice(3, 5), c1.slice(3, 5), t)}${mix(c0.slice(5, 7), c1.slice(5, 7), t)}`;
+  return `color-mix(in oklab, var(--scale-${p1}) ${(t * 100).toFixed(1)}%, var(--scale-${p0}))`;
 }
 
 /** 바깥 검정 링 + 안쪽은 그 자리의 색. 색을 못 봐도 링 위치로 읽힌다. */
@@ -70,31 +68,21 @@ export function Marker({ percent, size = 24 }: { percent: number; size?: number 
   옅은 쪽을 배경보다 확실히 아래로 둔다 — 그러지 않으면 낮은 값이 빈 칸처럼
   보인다. 상관 표에서 겪은 것과 같은 문제다.
 */
-const ABILITY_STOPS: [number, string][] = [
-  [0, "#d8dee7"],
-  [35, "#a8b6cb"],
-  [65, "#6c85aa"],
-  [100, "#2f4a72"],
-];
+const ABILITY_STOPS = [0, 35, 65, 100];
 
 export function abilityColorAt(pct: number): string {
   const v = Math.max(0, Math.min(100, pct));
   for (let i = 1; i < ABILITY_STOPS.length; i++) {
-    const [p1, c1] = ABILITY_STOPS[i - 1];
-    const [p2, c2] = ABILITY_STOPS[i];
+    const p1 = ABILITY_STOPS[i - 1];
+    const p2 = ABILITY_STOPS[i];
     if (v > p2) continue;
     const t = p2 === p1 ? 0 : (v - p1) / (p2 - p1);
-    const mix = [0, 1, 2].map((k) => {
-      const a = parseInt(c1.slice(1 + k * 2, 3 + k * 2), 16);
-      const b = parseInt(c2.slice(1 + k * 2, 3 + k * 2), 16);
-      return Math.round(a + (b - a) * t);
-    });
-    return `rgb(${mix.join(" ")})`;
+    return `color-mix(in oklab, var(--ability-${p2}) ${(t * 100).toFixed(1)}%, var(--ability-${p1}))`;
   }
-  return ABILITY_STOPS[ABILITY_STOPS.length - 1][1];
+  return "var(--ability-100)";
 }
 
 /** 범례용 띠 */
 export const ABILITY_GRADIENT = `linear-gradient(90deg, ${ABILITY_STOPS.map(
-  ([p, c]) => `${c} ${p}%`,
+  (p) => `var(--ability-${p}) ${p}%`,
 ).join(", ")})`;

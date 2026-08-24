@@ -44,6 +44,30 @@
   --diverge-mid: #eae6de;
   --diverge-pos: #3a5fa0;
 
+  /*
+    성향 눈금(낮음↔높음) 일곱 단계. `charts/scale.tsx`가 이 값을 읽는다.
+    상수로 박아 두면 다크 모드에서 같이 못 바뀐다.
+  */
+  --scale-0: #3a5fa0;
+  --scale-20: #7c93bf;
+  --scale-38: #c1cbdf;
+  --scale-50: #ddd8ce;
+  --scale-62: #e0c8b3;
+  --scale-80: #cb9a7c;
+  --scale-100: #b3623f;
+  /* 라벨용은 바 색보다 진하다. 옅은 색을 작은 글자에 쓰면 대비가 모자란다 */
+  --scale-ink-low: #33507a;
+  --scale-ink-high: #8f4c2d;
+
+  /*
+    직무능력 램프 — **한 가지 색의 진하기**만 쓴다.
+    성향처럼 갈라지면 안 된다. 높을수록 좋은 값이라 낮음이 곱게 보이면 반대로 읽힌다.
+  */
+  --ability-0: #d8dee7;
+  --ability-35: #a8b6cb;
+  --ability-65: #6c85aa;
+  --ability-100: #2f4a72;
+
   /* 상태 색 — 계열 색과 겹치지 않는다. 항상 아이콘/글자 동반 */
   --status-good: #0ca30c;
   --status-warn: #fab219;
@@ -56,6 +80,67 @@
   */
   --status-warn-ink: #8a5d05;
 
+}
+
+/*
+  ── 다크 모드 (2026-08-24) ────────────────────────────────────────────
+
+  **밝은 화면을 자동으로 뒤집은 것이 아니다.** 계열 색은 어두운 바탕에서
+  다시 골랐다 — 밝은 배경용 색을 그대로 쓰면 어두운 데서 탁해지고 대비가
+  무너진다. 검사기(`dataviz/validate_palette.js`)를 어두운 바탕(#1a1917)에
+  대고 다시 돌려 전 항목 통과하는 값으로 맞췄다.
+
+    밝은 곳  #3a5fa0  #b3623f  #6f5aa8
+    어두운 곳 #5f8ad2  #cb7a46  #9376d0
+             밝기 대역 · 채도 · 색맹 분리 20.4 · 정상 21.7 · 대비 모두 통과
+
+  바탕도 순수 검정을 쓰지 않는다. 팔레트가 따뜻한 계열이라 차가운 검정을
+  깔면 색들이 서로 겉돈다. 갈색이 살짝 도는 어두운 색을 쓴다.
+*/
+:root[data-theme="dark"] {
+  --page: #1a1917;
+  --surface: #1a1917;
+  --wash: #2b2723;
+  --ink: #ece9e3;
+  --ink-secondary: #b5b0a7;
+  --ink-muted: #8a847c;
+  --grid: #35312c;
+  --axis: #4d4842;
+  --border: rgb(236 233 227 / 0.14);
+
+  --series-1: #5f8ad2;
+  --series-2: #cb7a46;
+  --series-3: #9376d0;
+
+  --diverge-neg: #cb7a46;
+  /* 배경(#1a1917)보다 한 단 위. 밝은 곳과 방향만 반대다 */
+  --diverge-mid: #2f2b26;
+  --diverge-pos: #5f8ad2;
+
+  --scale-0: #5f8ad2;
+  --scale-20: #4a6a9e;
+  --scale-38: #3b4a63;
+  --scale-50: #3a3630;
+  --scale-62: #5d4535;
+  --scale-80: #94603c;
+  --scale-100: #cb7a46;
+  --scale-ink-low: #8ab0e8;
+  --scale-ink-high: #e2a071;
+
+  --ability-0: #33302b;
+  --ability-35: #4a5a72;
+  --ability-65: #6f8dbe;
+  --ability-100: #9dbaea;
+
+  /* 상태 색도 어두운 바탕에서 다시 잡는다 — 밝은 곳 값은 여기서 너무 진하다 */
+  --status-good: #4cb84c;
+  --status-warn: #e8b64a;
+  --status-serious: #ef9a72;
+  --status-critical: #e86b6b;
+  --status-warn-ink: #d9a83c;
+}
+
+:root {
   /* 간격 — 4px 눈금만. 중간값을 만들지 않는다 (11 §1.3) */
   --space-1: 0.25rem;
   --space-2: 0.5rem;
@@ -163,9 +248,10 @@
 /* 화면 전체를 담는 폭. 좁은 칸에 가둬두면 넓은 모니터에서 양옆이 빈다. */
 @utility page-column {
   width: 100%;
-  max-width: 90rem;
+  max-width: 88rem;
   margin-inline: auto;
-  padding-inline: clamp(1.25rem, 4vw, 3rem);
+  /* 여백을 한 단 넓혔다 (2026-08-24) — 내용이 화면 끝까지 붙어 있었다 */
+  padding-inline: clamp(1.5rem, 5vw, 4.5rem);
 }
 
 body {
@@ -177,6 +263,41 @@ body {
 }
 
 /* 키보드 초점은 항상 보이게 (01 §2.4 — 접근성은 타협하지 않는다) */
+/*
+  화면을 옮길 때 톡 끊기지 않게 (2026-08-24).
+
+  브라우저가 지원하면 옛 화면을 살짝 흐려 보내고 새 화면을 받는다.
+  **움직임을 줄이도록 설정한 사람에게는 걸지 않는다** — 전환 효과는
+  어지럼증을 유발할 수 있어서 접근성 설정이 우선이다.
+*/
+@view-transition {
+  navigation: auto;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  @view-transition {
+    navigation: none;
+  }
+}
+
+::view-transition-old(root) {
+  animation: fade-out 0.12s ease both;
+}
+::view-transition-new(root) {
+  animation: fade-in 0.18s ease both;
+}
+
+@keyframes fade-out {
+  to {
+    opacity: 0;
+  }
+}
+@keyframes fade-in {
+  from {
+    opacity: 0;
+  }
+}
+
 :focus-visible {
   outline: 2px solid var(--series-1);
   outline-offset: 2px;

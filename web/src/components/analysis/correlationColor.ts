@@ -22,9 +22,15 @@
  * 바닥을 깐다. 값이 있는 칸은 **언제나 칠해져 있다.**
  */
 
-const NEG = [0xb3, 0x62, 0x3f]; // #b3623f 테라코타
-const MID = [0xea, 0xe6, 0xde]; // #eae6de 흐린 모래 — 배경(#f5f4f0)보다 반 단 아래
-const POS = [0x3a, 0x5f, 0xa0]; // #3a5fa0 청색 — 채도 하한을 통과하는 값 (11 §1.1)
+/*
+  색을 **숫자로 박지 않고 CSS 토큰으로 섞는다** (2026-08-24).
+
+  전에는 rgb 값을 상수로 두고 자바스크립트에서 섞었다. 그러면 다크 모드에서
+  같이 못 바뀐다 — 어두운 바탕에 밝은 곳 색을 그대로 깔게 된다.
+
+  `color-mix`는 브라우저가 그릴 때 계산하므로 `--diverge-*` 토큰이 테마마다
+  달라지면 **알아서 따라온다.** 섞는 비율만 우리가 정한다.
+*/
 
 /*
   ── 색 세기를 **등급 경계에 맞춘다** (2026-08-24) ──
@@ -68,11 +74,10 @@ function mixFor(absR: number): number {
  *   읽을 수 없게 된다. 색만 가운데 쪽으로 되돌린다.
  */
 export function correlationFill(r: number, faded = false): string {
-  const end = r < 0 ? NEG : POS;
+  const end = r < 0 ? "var(--diverge-neg)" : "var(--diverge-pos)";
   let k = mixFor(Math.abs(r));
   if (faded) k *= 0.45;
-  const mix = MID.map((m, i) => Math.round(m + (end[i] - m) * k));
-  return `rgb(${mix.join(" ")})`;
+  return `color-mix(in oklab, ${end} ${(k * 100).toFixed(1)}%, var(--diverge-mid))`;
 }
 
 /** 소수 둘째 자리, 앞의 0 생략, 부호 항상 — `+.28` (11 §3.2) */

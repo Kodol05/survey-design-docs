@@ -194,12 +194,6 @@ export default async function AdminHome() {
             )}
           </div>
           <CompletionTrend points={trend} />
-          {trend.length > 0 && (
-            <p className="text-axis text-ink-muted mt-3">
-              평평한 구간은 아무도 응시하지 않은 기간입니다. 끝이 평평하면 지금
-              멈춰 있다는 뜻입니다.
-            </p>
-          )}
         </section>
 
         {/* ── 우상 · 관련 ── */}
@@ -223,20 +217,12 @@ export default async function AdminHome() {
               </p>
             </>
           ) : (
-            <>
-              <TopRelations items={top} />
-
-              <div className="mt-4 flex flex-col gap-2">
-                <WarningBadge kind="multipleComparison" />
-                <p className="text-axis text-ink-muted">
-                  <strong className="text-ink-secondary">
-                    같이 움직인다는 뜻이지, 한쪽이 원인이라는 뜻은 아닙니다.
-                  </strong>{" "}
-                  21개 조합 중 값이 0을 확실히 벗어난 것만 센 것이고, 표 전체와
-                  점 분포는 분석 화면에서 봅니다.
-                </p>
-              </div>
-            </>
+            /*
+              경고 배지와 두 문장을 뺐다 (2026-08-24 사용자 요청).
+              **같은 말이 분석 화면에 그대로 있다** — 첫 화면은 훑는 자리라
+              읽을 것이 적어야 한다. 「자세히」로 넘어가면 거기서 다시 만난다.
+            */
+            <TopRelations items={top} />
           )}
         </section>
 
@@ -301,7 +287,8 @@ export default async function AdminHome() {
           poorNames.length === 0 &&
           s.inProgress === 0 ? (
             <p className="text-ink-muted text-table">
-              손볼 것이 없습니다. 신뢰도가 낮은 응답도, 끝내지 않은 사람도 없습니다.
+              손볼 것이 없습니다. 신뢰도가 낮은 응답도, 끝내지 않은 사람도
+              없습니다.
             </p>
           ) : (
             <ul className="flex flex-col gap-3">
@@ -355,7 +342,7 @@ export default async function AdminHome() {
         </section>
       </div>
 
-            {/*
+      {/*
         바로 가기 — **밑줄 친 낱말 세 개**였다. 어디로 가는지는 알겠는데
         가서 무엇을 볼지 모르니 누를 이유가 없었다.
 
