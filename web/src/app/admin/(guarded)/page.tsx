@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { WarningBadge } from "@/components/ui/WarningBadge";
 import { formatR } from "@/components/analysis/correlationColor";
-import { describeCorrelation, strengthOf } from "@/components/analysis/correlationWords";
+import { describeCorrelation, gradeOf, isNotable } from "@/components/analysis/correlationWords";
 import { colorAt } from "@/components/charts/scale";
 import { CompletionTrend } from "@/components/charts/CompletionTrend";
 import { getAppState } from "@/lib/admin/phase";
@@ -270,15 +270,12 @@ export default async function AdminHome() {
                       </p>
                       <p className="text-axis text-ink-muted flex flex-wrap items-baseline gap-x-3">
                         <span
-                          className="font-medium"
+                          className={isNotable(c!.r) ? "font-medium" : undefined}
                           style={{
-                            color:
-                              strengthOf(c!.r) === "뚜렷함"
-                                ? "var(--ink-secondary)"
-                                : undefined,
+                            color: isNotable(c!.r) ? "var(--ink-secondary)" : undefined,
                           }}
                         >
-                          {strengthOf(c!.r)}
+                          {gradeOf(c!.r, c!.ci)}
                         </span>
                         <span className="tabular">{c!.n}명</span>
                         <span className="tabular" title="두 값이 함께 움직인 정도. −1에서 +1 사이">

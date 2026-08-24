@@ -10,6 +10,7 @@ import {
 import { ScatterPlot, type Point } from "@/components/analysis/ScatterPlot";
 import { WarningBadge } from "@/components/ui/WarningBadge";
 import { formatR } from "@/components/analysis/correlationColor";
+import { GradeTag } from "@/components/analysis/GradeTag";
 
 /**
  * 관련도 표 + 산점도.
@@ -72,9 +73,10 @@ export function CorrelationPanel({
               <h3 className="font-medium">
                 {sel.row} × {sel.col}
               </h3>
-              <span className="tabular text-table">
-                {formatR(cell.r)}
-                <span className="text-ink-muted ml-2">
+              <span className="text-table">
+                <span className="tabular">{formatR(cell.r)}</span>
+                <GradeTag r={cell.r} ci={cell.ci} className="ml-2" />
+                <span className="tabular text-axis text-ink-muted ml-2">
                   n={cell.n} · {formatR(cell.ci[0])}~{formatR(cell.ci[1])}
                 </span>
               </span>

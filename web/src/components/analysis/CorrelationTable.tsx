@@ -1,6 +1,8 @@
 "use client";
 
 import { correlationFill, formatR } from "./correlationColor";
+import { GradeTag } from "./GradeTag";
+import { gradeOf } from "./correlationWords";
 
 /**
  * 상관 표 — docs/11-ui-guide.md §3.2
@@ -72,7 +74,7 @@ export function CorrelationTable({
                       disabled={!clickable}
                       onClick={() => clickable && onSelect?.({ row: r, col: c })}
                       aria-label={describe(r, c, v)}
-                      className={`flex h-16 w-full flex-col items-center justify-center rounded-md transition ${
+                      className={`flex h-[4.75rem] w-full flex-col items-center justify-center rounded-md transition ${
                         clickable ? "cursor-pointer hover:brightness-95" : "cursor-default"
                       }`}
                       style={{
@@ -107,8 +109,9 @@ function Body({ cell }: { cell: Cell }) {
     return <span className="text-axis text-ink-muted">n 부족</span>;
   return (
     <>
-      <span className="tabular font-medium">{formatR(cell.r)}</span>
-      <span className="text-axis tabular text-ink-secondary mt-0.5">
+      <span className="tabular font-medium leading-tight">{formatR(cell.r)}</span>
+      <GradeTag r={cell.r} ci={cell.ci} className="mt-0.5 leading-tight" />
+      <span className="text-axis tabular text-ink-muted leading-tight">
         n={cell.n}
       </span>
     </>
@@ -119,7 +122,7 @@ function describe(row: string, col: string, c: Cell) {
   if (c.kind === "unstudied") return `${row} × ${col}, 연구된 적 없음`;
   if (c.kind === "none") return `${row} × ${col}, 관련 없음`;
   if (c.kind === "tooFew") return `${row} × ${col}, 표본 부족`;
-  return `${row} × ${col}, 상관 ${formatR(c.r)}, ${c.n}명, 신뢰구간 ${formatR(
+  return `${row} × ${col}, ${gradeOf(c.r, c.ci)}, 상관 ${formatR(c.r)}, ${c.n}명, 신뢰구간 ${formatR(
     c.ci[0],
   )}에서 ${formatR(c.ci[1])}`;
 }
@@ -138,7 +141,16 @@ export function CorrelationLegend({ inHouse }: { inHouse?: boolean }) {
         />
         음의 관계 ← → 양의 관계
       </span>
-      <span>흐린 칸은 신뢰구간이 0을 걸칩니다</span>
+      <span className="text-ink-secondary">
+        등급 <span className="tabular">.10</span> 약함 ·{" "}
+        <span className="tabular">.20</span> 어느 정도 ·{" "}
+        <span className="tabular">.30</span> 뚜렷함 ·{" "}
+        <span className="tabular">.50</span> 매우 뚜렷함
+      </span>
+      <span>
+        <span style={{ color: "var(--status-warn)" }}>불확실</span> = 신뢰구간이 0을
+        걸쳐 방향조차 정해지지 않음
+      </span>
       {inHouse ? (
         <span>n 부족 = 30명 미만</span>
       ) : (

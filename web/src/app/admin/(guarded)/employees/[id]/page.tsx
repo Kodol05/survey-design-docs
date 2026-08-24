@@ -5,6 +5,8 @@ import { Card, EmptyState } from "@/components/ui/Card";
 import { DistributionBar } from "@/components/ui/DistributionBar";
 import { requireAdmin } from "@/lib/auth/guard";
 import { formatPhone } from "@/lib/auth/phone";
+import { formatR } from "@/components/analysis/correlationColor";
+import { strengthOf } from "@/components/analysis/correlationWords";
 import { averageOf, bandOf, loadDistribution } from "@/lib/admin/distribution";
 import { isResultsOpen } from "@/lib/admin/phase";
 import { prisma } from "@/lib/db";
@@ -14,7 +16,7 @@ import { ResetPassword } from "./ResetPassword";
 
 export const metadata = { title: "구성원 상세 — 관리자" };
 
-const sign = (v: number) => (v < 0 ? "−" : "+");
+
 
 export default async function EmployeeDetail(props: { params: Promise<{ id: string }> }) {
   await requireAdmin();
@@ -154,7 +156,8 @@ async function ResultBlocks({
                         <span key={r.scale}>
                           {i > 0 && " · "}
                           {r.scale} {traits[r.scale] ? Math.round(traits[r.scale].percent) : "—"}{" "}
-                          <span className="text-ink-muted">({sign(r.value)})</span>
+                          <span className="text-ink-muted tabular">{formatR(r.value)}</span>{" "}
+                          <span className="text-ink-muted">{strengthOf(r.value)}</span>
                         </span>
                       ))
                     ) : (

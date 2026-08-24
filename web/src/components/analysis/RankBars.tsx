@@ -1,4 +1,5 @@
 import { correlationFill, formatR } from "./correlationColor";
+import { GradeTag } from "./GradeTag";
 
 /**
  * 순위 막대 — docs/11-ui-guide.md §3.4
@@ -31,7 +32,7 @@ export function RankBars({ items }: { items: RankItem[] }) {
         return (
           <li
             key={it.label}
-            className="grid grid-cols-[11rem_1fr_9rem] items-center gap-4 py-1.5"
+            className="grid grid-cols-[11rem_1fr_13rem] items-center gap-4 py-1.5"
             style={{ opacity: uncertain ? 0.5 : 1 }}
           >
             <span className="text-table truncate" title={it.label}>
@@ -54,9 +55,12 @@ export function RankBars({ items }: { items: RankItem[] }) {
               />
             </div>
 
-            <span className="text-axis tabular text-right">
-              <span className="text-table font-medium">{formatR(it.r)}</span>
-              <span className="text-ink-muted ml-2">
+            <span className="text-axis text-right">
+              <span className="tabular">
+                <span className="text-table font-medium">{formatR(it.r)}</span>
+              </span>
+              <GradeTag r={it.r} ci={it.ci} className="ml-2" />
+              <span className="tabular text-ink-muted block leading-tight">
                 {formatR(it.ci[0])}~{formatR(it.ci[1])}
               </span>
             </span>
