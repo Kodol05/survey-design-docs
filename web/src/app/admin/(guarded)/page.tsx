@@ -97,7 +97,7 @@ export default async function AdminHome() {
         <Tile
           label="검토가 필요한 응답"
           value={s.quality.review + s.quality.poor}
-          hint={s.quality.poor ? `그중 ${s.quality.poor}건은 미달` : undefined}
+          hint={s.quality.poor ? `그중 ${s.quality.poor}건은 낮음` : undefined}
         />
         <Tile
           label="척도 평균 α"
@@ -287,7 +287,7 @@ export default async function AdminHome() {
           poorNames.length === 0 &&
           s.inProgress === 0 ? (
             <p className="text-ink-muted text-table">
-              손볼 것이 없습니다. 품질 미달 응답도, 끝내지 않은 사람도 없습니다.
+              손볼 것이 없습니다. 신뢰도가 낮은 응답도, 끝내지 않은 사람도 없습니다.
             </p>
           ) : (
             <ul className="flex flex-col gap-3">
@@ -299,7 +299,7 @@ export default async function AdminHome() {
                   >
                     ●
                   </span>
-                  응답 품질 검토가 필요한 사람 {needsReview.length}명 —{" "}
+                  응답 신뢰도를 확인할 사람 {needsReview.length}명 —{" "}
                   <span className="text-ink-secondary">
                     {needsReview
                       .slice(0, 6)
@@ -383,8 +383,8 @@ export default async function AdminHome() {
                 ? "아직 계산할 수 없습니다"
                 : `척도 평균 α ${meanAlpha.toFixed(2)}`,
               poorScales.length
-                ? `미달 척도 ${poorScales.length}개 — ${poorScales.map((r) => r.scale).join(" · ")}`
-                : "미달 척도 없음",
+                ? `기준 아래 척도 ${poorScales.length}개 — ${poorScales.map((r) => r.scale).join(" · ")}`
+                : "기준 아래 척도 없음",
             ]}
           />
           <Shortcut

@@ -6,11 +6,11 @@ import { QUALITY } from "@/lib/scoring/quality";
  * 사람별 응답 품질 — **문항 품질(α)과는 다른 이야기다.**
  *
  * α는 「문항이 잘 만들어졌는가」, 이쪽은 「이 사람 답을 믿을 수 있는가」.
- * 척도 α가 아무리 높아도 대충 찍은 사람의 값은 못 쓴다. 두 가지를 같은
+ * 척도 α가 아무리 높아도 서둘러 넘긴 응답의 값은 쓰기 어렵다. 두 가지를 같은
  * 화면에 두되 절을 나눠 둔다.
  *
  * 잣대는 **반대 문항 일치도**다. 서로 반대인 문항에 같은 방향으로 답했는지를
- * 재는데, 무작위로 찍으면 .60 근처가 나온다 (모의로 확인, 00 §2.3).
+ * 재는데, 무작위로 답하면 .60 근처가 나온다 (모의로 확인, 00 §2.3).
  */
 
 const BAR = { low: 50, high: 100 };
@@ -26,14 +26,25 @@ const toneOf = (a: number) =>
       ? "var(--status-warn)"
       : "var(--status-critical)";
 
-/** 오른쪽 칸 — 걸린 사람만 짧게 */
+/*
+  이름을 어떻게 붙일지가 이 화면에서 제일 조심스러운 부분이다.
+
+  「걸린 사람」이라고 썼다가 고쳤다. 잘못한 사람을 잡아냈다는 말로 읽힌다.
+  여기서 낮게 나온 것은 **그 사람이 아니라 그 응답**이다 — 서둘러 넘겼거나
+  문항을 반대로 읽었을 수도 있다. 그래서 사람을 가리키는 말 대신
+  「신뢰도 위험」처럼 값을 가리키는 말을 쓴다.
+
+  같은 이유로 「미달」·「성실」 같은 낱말도 화면에서 뺐다.
+*/
+
+/** 오른쪽 칸 — 위험 표시가 붙은 사람만 짧게 */
 export function LowQualityList({ rows }: { rows: PersonQuality[] }) {
   const flagged = rows.filter((r) => r.flag !== "ok");
 
   if (flagged.length === 0)
     return (
       <div>
-        <h3 className="text-section-title mb-1">걸린 사람</h3>
+        <h3 className="text-section-title mb-1">신뢰도 위험</h3>
         <p className="text-ink-secondary">
           없습니다. 응답이 전부 기준 안에 들어옵니다.
         </p>
@@ -42,9 +53,9 @@ export function LowQualityList({ rows }: { rows: PersonQuality[] }) {
 
   return (
     <div>
-      <h3 className="text-section-title mb-1">걸린 사람</h3>
+      <h3 className="text-section-title mb-1">신뢰도 위험</h3>
       <p className="text-axis text-ink-muted mb-5">
-        {flagged.length}명 · 이 사람들을 상관에서 뺄지 정하실 수 있습니다
+        {flagged.length}명 · 분석에서 뺄지 정하실 수 있습니다
       </p>
 
       <ul className="flex flex-col">
@@ -95,7 +106,7 @@ export function QualityRanking({ rows }: { rows: PersonQuality[] }) {
             평균 <strong className="tabular">{Math.round(mean * 100)}</strong>점.{" "}
           </>
         )}
-        아래로 갈수록 성실하게 답한 쪽입니다.
+        아래로 갈수록 앞뒤가 맞게 답한 쪽입니다.
       </p>
 
       <ul className="flex flex-col">

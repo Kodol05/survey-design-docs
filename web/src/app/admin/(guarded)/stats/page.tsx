@@ -100,10 +100,10 @@ export default async function StatsPage(props: {
           hint="척도 평균 α"
         />
         <Tile
-          label="검사 신뢰도 미달"
+          label="기준 아래 척도"
           value={poorCount}
           href="/admin/stats?tab=reliability"
-          hint={poorCount ? `${ALPHA.poor} 아래인 척도` : "미달 척도 없음"}
+          hint={poorCount ? `α ${ALPHA.poor} 아래` : "전부 기준 안"}
         />
       </div>
 
@@ -464,7 +464,7 @@ function ReliabilityTab({
   const LABEL = {
     good: "괜찮음",
     fair: "보통",
-    poor: "미달",
+    poor: "기준 아래",
     unknown: "계산 불가",
   } as const;
 
@@ -536,7 +536,7 @@ function ReliabilityTab({
       <section>
         <h2 className="text-section-title mb-1">사람별 응답 신뢰도</h2>
         <p className="text-axis text-ink-muted mb-6">
-          서로 반대인 문항에 같은 방향으로 답했는지 — 아무렇게나 찍으면 60
+          서로 반대인 문항에 같은 방향으로 답했는지 — 무작위로 답하면 60
           근처가 나옵니다
         </p>
         <QualityRanking rows={quality} />
@@ -548,8 +548,8 @@ function ReliabilityTab({
           </p>
           <p>
             위 α와는 다른 이야기입니다. α는 문항이 잘 만들어졌는지를, 이쪽은 그
-            문항에 답한 사람이 성실했는지를 봅니다. α가 아무리 높아도 대충 찍은
-            사람의 값은 못 씁니다.
+            문항에 답한 방식이 앞뒤가 맞는지를 봅니다. α가 아무리 높아도 서둘러
+            넘긴 응답의 값은 쓰기 어렵습니다.
           </p>
         </Note>
       </section>

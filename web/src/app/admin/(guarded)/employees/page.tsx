@@ -208,12 +208,12 @@ export default async function EmployeesPage(props: {
           쓰지 않고 한 가지 색의 길이로만 표시합니다.
         </p>
         <p className="max-w-[56rem]">
-          <strong className="text-ink-secondary">품질</strong> 숫자는 반대 문항 일치도입니다
+          <strong className="text-ink-secondary">신뢰도</strong> 숫자는 반대 문항 일치도입니다
           — 서로 반대인 문항에 같은 방향으로 답했는지를 100점으로 잰 값이고, 아무렇게나
-          찍으면 60 근처가 나옵니다. <strong>성격에 대한 판정이 아니라 이 응답을 믿을 수
+          답하면 60 근처가 나옵니다. <strong>성격에 대한 판정이 아니라 이 응답을 믿을 수
           있는지</strong>에 대한 값입니다. <span style={{ color: "var(--status-warn)" }}>검토</span>
           {" · "}
-          <span style={{ color: "var(--status-critical)" }}>미달</span>이 붙은 사람은 값이
+          <span style={{ color: "var(--status-critical)" }}>낮음</span>이 붙은 사람은 값이
           낮은 경우이고, <span style={{ color: "var(--status-warn)" }}>속도</span>는 일치도는
           괜찮지만 문항을 너무 빨리 넘긴 경우입니다.
         </p>

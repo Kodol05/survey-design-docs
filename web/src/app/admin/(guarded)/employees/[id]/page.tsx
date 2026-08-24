@@ -61,7 +61,7 @@ export default async function EmployeeDetail(props: { params: Promise<{ id: stri
       )}
 
       {session?.qualityFlag && (
-        <Card title="응답 품질" className="mb-14">
+        <Card title="응답 신뢰도" className="mb-14">
           <dl className="text-table grid grid-cols-2 gap-y-2 sm:grid-cols-4">
             <dt className="text-ink-secondary">판정</dt>
             <dd className="tabular">{session.qualityFlag.flag}</dd>

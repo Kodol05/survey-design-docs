@@ -38,7 +38,8 @@ export type Row = {
 
 const FLAG = {
   review: { label: "검토", color: "var(--status-warn)" },
-  poor: { label: "미달", color: "var(--status-critical)" },
+  // 「미달」이라고 쓰지 않는다 — 사람을 깎는 말로 읽힌다. 낮은 것은 응답의 값이다
+  poor: { label: "낮음", color: "var(--status-critical)" },
 } as const;
 
 const STATUS = { COMPLETED: "완료", IN_PROGRESS: "진행 중" } as const;
@@ -66,7 +67,7 @@ export function EmployeeList({ rows }: { rows: Row[] }) {
             <th className="w-44 pb-2 text-left font-medium">이름</th>
             <th className="w-36 pb-2 text-left font-medium">번호</th>
             <th className="w-20 pb-2 text-left font-medium">상태</th>
-            <th className="w-24 pb-2 text-left font-medium">품질</th>
+            <th className="w-24 pb-2 text-left font-medium">신뢰도</th>
             <th className="w-16 pb-2 text-left font-medium">완료</th>
             <th className="w-[42%] pb-2 pl-4 text-left font-medium">
               <TraitStripHeader />
@@ -144,7 +145,7 @@ export function EmployeeList({ rows }: { rows: Row[] }) {
  *
  * 숫자는 **반대 문항 일치도**를 쓴다. 저장된 값 중 "이 응답을 믿을 수 있는가"에
  * 가장 곧바로 답하는 값이다 — 서로 반대인 문항에 같은 방향으로 답했는지를 잰다.
- * 100이면 짝마다 완전히 일관됐고, 무작위로 찍으면 60 근처가 나온다.
+ * 100이면 짝마다 완전히 일관됐고, 무작위로 답하면 60 근처가 나온다.
  *
  * ⚠️ 등급은 일치도만으로 정해지지 않는다. **너무 빨리 넘긴 문항 비율**도 같이
  *    본다(00 §2.3). 그래서 일치도가 높은데 `미달`인 사람이 있을 수 있고,
