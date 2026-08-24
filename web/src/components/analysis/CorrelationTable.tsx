@@ -56,10 +56,15 @@ export function CorrelationTable({
         폭을 지정하지 않은 열은 고정 레이아웃에서 남는 폭을 **똑같이** 나눠 갖는다.
         그래서 성향 축 이름 열에만 폭을 주고 나머지는 비워 둔다.
       */}
-      <table
-        className="w-full table-fixed border-separate"
-        style={{ borderSpacing: 2 }}
-      >
+      {/*
+        칸 사이를 **띄우지 않고 선으로 나눈다** (2026-08-24).
+
+        전에는 2px씩 벌리고 칸마다 안쪽 그림자로 테두리를 흉내 냈다. 그러면
+        선이 칸마다 끊겨서 **가로세로로 쭉 이어지지 않는다** — 표를 훑을 때
+        눈이 줄을 따라가지 못한다. `border-collapse`로 붙이고 1px 선을 그으면
+        격자가 끝까지 이어진다.
+      */}
+      <table className="w-full table-fixed border-collapse">
         <colgroup>
           <col style={{ width: "10.5rem" }} />
           {cols.map((c) => (
@@ -68,11 +73,14 @@ export function CorrelationTable({
         </colgroup>
         <thead>
           <tr>
-            <th className="text-axis text-ink-muted pb-2 text-left font-medium">
+            <th className="text-axis text-ink-muted border-b border-[--border] px-2 pb-2 text-left font-medium">
               성향 축
             </th>
             {cols.map((c) => (
-              <th key={c} className="text-table pb-2 text-center font-medium">
+              <th
+                key={c}
+                className="text-table border-b border-[--border] pb-2 text-center font-medium"
+              >
                 {c}
               </th>
             ))}
@@ -81,7 +89,10 @@ export function CorrelationTable({
         <tbody>
           {rows.map((r) => (
             <tr key={r}>
-              <th scope="row" className="text-table pr-3 text-left font-normal">
+              <th
+                scope="row"
+                className="text-table border-b border-[--border] px-2 text-left font-normal"
+              >
                 {r}
               </th>
               {cols.map((c) => {
@@ -89,13 +100,13 @@ export function CorrelationTable({
                 const on = selected?.row === r && selected?.col === c;
                 const clickable = Boolean(onSelect) && v.kind === "value";
                 return (
-                  <td key={c} className="p-0">
+                  <td key={c} className="border border-[--border] p-0">
                     <button
                       type="button"
                       disabled={!clickable}
                       onClick={() => clickable && onSelect?.({ row: r, col: c })}
                       aria-label={describe(r, c, v)}
-                      className={`flex h-[6.25rem] w-full flex-col items-center justify-center rounded-md transition ${
+                      className={`flex h-[6.25rem] w-full flex-col items-center justify-center transition ${
                         clickable ? "cursor-pointer hover:brightness-95" : "cursor-default"
                       }`}
                       style={{
@@ -110,10 +121,6 @@ export function CorrelationTable({
                             ? correlationFill(v.r, crosses(v.ci))
                             : "transparent",
                         color: v.kind === "value" ? "var(--ink)" : undefined,
-                        boxShadow:
-                          v.kind === "value"
-                            ? "inset 0 0 0 1px rgb(34 32 29 / 0.08)"
-                            : undefined,
                         outline: on ? "2px solid var(--ink)" : undefined,
                         outlineOffset: -2,
                       }}
@@ -234,7 +241,7 @@ export function CorrelationLegend({ inHouse }: { inHouse?: boolean }) {
           className="h-3 w-24 rounded-sm"
           style={{
             background:
-              "linear-gradient(90deg, #b3623f, #ddd8ce, #44618d)",
+              "linear-gradient(90deg, #b3623f, #eae6de, #44618d)",
           }}
         />
         음의 관계 ← → 양의 관계
