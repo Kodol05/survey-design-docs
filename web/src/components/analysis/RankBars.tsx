@@ -33,7 +33,6 @@ export function RankBars({ items }: { items: RankItem[] }) {
           <li
             key={it.label}
             className="grid grid-cols-[11rem_1fr_13rem] items-center gap-4 py-1.5"
-            style={{ opacity: uncertain ? 0.5 : 1 }}
           >
             <span className="text-table truncate" title={it.label}>
               {it.label}
@@ -48,7 +47,7 @@ export function RankBars({ items }: { items: RankItem[] }) {
               <div
                 className="absolute inset-y-1 rounded-sm"
                 style={{
-                  background: correlationFill(it.r),
+                  background: correlationFill(it.r, uncertain),
                   left: it.r < 0 ? `${50 - w}%` : "50%",
                   width: `${w}%`,
                 }}

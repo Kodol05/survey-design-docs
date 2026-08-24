@@ -78,9 +78,21 @@ export function CorrelationTable({
                         clickable ? "cursor-pointer hover:brightness-95" : "cursor-default"
                       }`}
                       style={{
+                        /*
+                          값이 있는 칸은 언제나 칠한다. 안 칠하면 0에 가까운 칸이
+                          "연구된 적 없음" 칸과 같아 보인다.
+                          방향이 확정 안 된 칸은 투명도가 아니라 색으로 옅게 만든다 —
+                          투명도를 걸면 안에 든 숫자까지 흐려져 안 읽힌다.
+                        */
                         background:
-                          v.kind === "value" ? correlationFill(v.r) : "transparent",
-                        opacity: v.kind === "value" && crosses(v.ci) ? 0.45 : 1,
+                          v.kind === "value"
+                            ? correlationFill(v.r, crosses(v.ci))
+                            : "transparent",
+                        color: v.kind === "value" ? "var(--ink)" : undefined,
+                        boxShadow:
+                          v.kind === "value"
+                            ? "inset 0 0 0 1px rgb(34 32 29 / 0.08)"
+                            : undefined,
                         outline: on ? "2px solid var(--ink)" : undefined,
                         outlineOffset: -2,
                       }}
@@ -110,8 +122,8 @@ function Body({ cell }: { cell: Cell }) {
   return (
     <>
       <span className="tabular font-medium leading-tight">{formatR(cell.r)}</span>
-      <GradeTag r={cell.r} ci={cell.ci} className="mt-0.5 leading-tight" />
-      <span className="text-axis tabular text-ink-muted leading-tight">
+      <GradeTag r={cell.r} ci={cell.ci} onFill className="mt-0.5 leading-tight" />
+      <span className="text-axis tabular leading-tight" style={{ opacity: 0.7 }}>
         n={cell.n}
       </span>
     </>
@@ -136,7 +148,7 @@ export function CorrelationLegend({ inHouse }: { inHouse?: boolean }) {
           className="h-3 w-24 rounded-sm"
           style={{
             background:
-              "linear-gradient(90deg, #b3623f, #e8e5dd, #44618d)",
+              "linear-gradient(90deg, #b3623f, #ddd8ce, #44618d)",
           }}
         />
         음의 관계 ← → 양의 관계
