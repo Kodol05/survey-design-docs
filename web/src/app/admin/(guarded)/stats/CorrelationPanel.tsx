@@ -154,8 +154,12 @@ export function CorrelationPanel({
                   key={f.key}
                   type="button"
                   onClick={() => setSel({ row: f.row, col: f.col })}
-                  className="rounded-xl p-3 text-left transition hover:brightness-95"
-                  style={{ background: "var(--wash)" }}
+                  /*
+                    바탕색을 깔지 않는다. 11 §2 — 바탕은 한 톤, 감싸는 테두리도
+                    쓰지 않는다. 넷을 상자로 묶으면 그래프보다 상자가 먼저 보인다.
+                    구분은 여백과 제목으로만 한다.
+                  */
+                  className="-mx-2 rounded-xl px-2 py-1 text-left transition hover:bg-[--wash]"
                 >
                   <p className="text-table mb-1 font-medium">
                     {f.row} <span className="text-ink-muted">×</span> {f.col}
