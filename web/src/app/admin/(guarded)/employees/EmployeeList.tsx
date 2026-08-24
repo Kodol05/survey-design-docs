@@ -10,7 +10,7 @@ import {
   TraitStrip,
   TraitStripHeader,
 } from "@/components/analysis/TraitStrip";
-import { CHARACTER, TEMPERAMENT } from "@/components/charts/scale";
+import { CHARACTER, TEMPERAMENT, colorAt } from "@/components/charts/scale";
 import { ABILITY_AXES } from "@/lib/items/types";
 import { formatPhone } from "@/lib/auth/phone";
 
@@ -214,82 +214,65 @@ function Panel({ row }: { row: Row }) {
   const ordered = [...TEMPERAMENT, ...CHARACTER]
     .filter((s) => typeof traits[s] === "number")
     .map((s) => ({ scale: s, percent: traits[s] }));
-
-  const abilities = row.abilities ?? {};
-  const hasAbility = Object.keys(abilities).length > 0;
+  // 순서를 고정한다 — Object.entries는 저장된 순서를 따라가서 사람마다 뒤바뀔 수 있다
+  const abilities = ABILITY_AXES.filter(
+    (a) => typeof row.abilities?.[a] === "number",
+  ).map((a) => [a, row.abilities![a]] as const);
 
   return (
     <div>
-      <div className="mb-4 flex flex-wrap items-baseline justify-between gap-4">
+      <div className="mb-6 flex flex-wrap items-center justify-between gap-4">
         <h3 className="text-section-title">{row.name}</h3>
         <Link
           href={`/admin/employees/${row.id}`}
-          className="text-table text-ink-secondary underline"
+          className="inline-flex h-11 items-center rounded-lg px-5 font-medium"
+          style={{ background: "var(--series-1)", color: "#fff" }}
         >
-          상세 보기 — 하위척도 · 응답 품질 · 관련 성향 축
+          상세 보기 →
         </Link>
       </div>
 
-      <div className="grid items-center gap-8 lg:grid-cols-[minmax(0,21rem)_minmax(0,1fr)_minmax(0,17rem)]">
-        {/* 폭이 높이를 정하므로 여기서 묶어둔다 */}
-        <div className="mx-auto w-full max-w-[21rem]">
+      {/* 폭을 고정한다. 늘어나게 두면 막대가 화면 끝까지 퍼져서 읽기 나쁘다 */}
+      <div className="flex flex-wrap items-start gap-10">
+        <div className="w-full max-w-[20rem]">
           <TraitRadar data={ordered} showValues />
         </div>
 
-        <TraitBars rows={ordered} />
-
-        <div>
-          <p className="text-table text-ink-secondary mb-3">직무능력</p>
-          {hasAbility ? (
-            <AbilityMeters abilities={abilities} />
-          ) : (
-            <p className="text-axis text-ink-muted">아직 값이 없습니다.</p>
-          )}
+        <div className="w-full max-w-[26rem]">
+          <TraitBars rows={ordered} height={230} />
         </div>
+
+        {abilities.length > 0 && (
+          <div className="w-full max-w-[16rem]">
+            <p className="text-table text-ink-secondary mb-3">직무능력</p>
+            <ul className="flex flex-col gap-3">
+              {abilities.map(([axis, v]) => (
+                <li key={axis}>
+                  <div className="mb-1 flex items-baseline justify-between">
+                    <span className="text-table">{axis}</span>
+                    <span className="tabular font-medium">{Math.round(v)}</span>
+                  </div>
+                  <div
+                    className="h-2.5 w-full overflow-hidden rounded-full"
+                    style={{ background: "var(--grid)" }}
+                  >
+                    <div
+                      className="h-full rounded-full"
+                      style={{
+                        width: `${Math.max(2, Math.min(100, v))}%`,
+                        background: colorAt(v),
+                      }}
+                    />
+                  </div>
+                </li>
+              ))}
+            </ul>
+            <p className="text-axis text-ink-muted mt-3">
+              사내 위치와 관련 성향 축은 상세 보기에 있습니다.
+            </p>
+          </div>
+        )}
       </div>
     </div>
-  );
-}
-
-/**
- * 직무능력 3축 — 값을 길이로 읽는다.
- *
- * 성향의 발산 색을 쓰지 않는다. 성향은 어느 쪽도 좋고 나쁜 게 아니지만
- * 직무능력은 높을수록 좋은 값이라(D-34), 갈라지는 색을 쓰면 낮은 값이
- * 고운 청회색으로 보여 반대로 읽힌다. 한 가지 색의 길이로만 말한다.
- *
- * 50에 눈금을 둔다 — 전 문항에 "보통"으로 답하면 나오는 값이라
- * 여기가 위인지 아래인지가 숫자보다 먼저 읽힌다 (막대 차트의 기준선과 같은 뜻).
- */
-function AbilityMeters({ abilities }: { abilities: Record<string, number> }) {
-  return (
-    <dl className="flex flex-col gap-3">
-      {ABILITY_AXES.filter((a) => typeof abilities[a] === "number").map((a) => {
-        const v = Math.max(0, Math.min(100, abilities[a]));
-        return (
-          <div key={a} className="grid grid-cols-[4.5rem_1fr_2rem] items-center gap-3">
-            <dt className="text-axis text-ink-secondary truncate" title={a}>
-              {a}
-            </dt>
-            <dd className="relative h-2.5">
-              <span
-                className="absolute inset-0 rounded-full"
-                style={{ background: "var(--grid)" }}
-              />
-              <span
-                className="absolute inset-y-0 left-0 rounded-full"
-                style={{ width: `${Math.max(2, v)}%`, background: "var(--series-1)" }}
-              />
-              <span
-                aria-hidden
-                className="absolute inset-y-[-2px] left-1/2 w-px"
-                style={{ background: "var(--axis)" }}
-              />
-            </dd>
-            <dd className="tabular text-table text-right font-medium">{Math.round(v)}</dd>
-          </div>
-        );
-      })}
-    </dl>
   );
 }

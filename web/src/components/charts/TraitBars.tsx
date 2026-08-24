@@ -24,11 +24,11 @@ import { colorAt } from "./scale";
 
 export type BarRow = { scale: string; percent: number };
 
-export function TraitBars({ rows }: { rows: BarRow[] }) {
+export function TraitBars({ rows, height = 280 }: { rows: BarRow[]; height?: number }) {
   const data = rows.map((r) => ({ ...r, value: Math.round(r.percent) }));
 
   return (
-    <div className="w-full" style={{ height: 280 }}>
+    <div className="w-full" style={{ height }}>
       <ResponsiveContainer>
         <BarChart data={data} margin={{ top: 24, right: 4, bottom: 4, left: 4 }}>
           <YAxis domain={[0, 100]} hide />
