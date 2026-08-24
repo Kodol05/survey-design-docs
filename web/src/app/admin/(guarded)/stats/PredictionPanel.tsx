@@ -81,28 +81,59 @@ export function PredictionPanel({
           extra={<GradeTag r={cur.corr} className="mt-1 block" />}
         />
         <Fact
-          label="평균 빗나간 폭"
-          value={`${cur.meanAbsGap.toFixed(1)}점`}
-          extra={<span className="text-axis text-ink-muted">100점 눈금</span>}
+          label="실제로 나타난 기울기"
+          value={cur.fit.slope.toFixed(2)}
+          extra={
+            <span className="text-axis text-ink-muted">
+              논문이 본 차이의 {Math.round(Math.max(0, cur.fit.slope) * 100)}%
+            </span>
+          }
         />
         <Fact
           label="크게 어긋난 사람"
           value={`${cur.farOff}명`}
-          extra={<span className="text-axis text-ink-muted">10점 넘게 · {cur.n}명 중</span>}
+          extra={
+            <span className="text-axis text-ink-muted">
+              10점 넘게 · {cur.n}명 중 · 평균 {cur.meanAbsGap.toFixed(1)}점
+            </span>
+          }
         />
       </div>
 
       <div className="grid gap-12 xl:grid-cols-[minmax(0,38rem)_minmax(0,1fr)]">
         <div>
           <h3 className="text-table mb-1 font-medium">예측 대 실제</h3>
+          {/* 선이 둘이라는 것을 글자로도 적는다. 색만으로 읽게 두지 않는다 */}
+          <div className="text-axis mb-3 flex flex-wrap gap-x-6 gap-y-1">
+            <span className="flex items-center gap-2">
+              <span
+                className="inline-block h-0.5 w-8"
+                style={{
+                  background:
+                    "repeating-linear-gradient(90deg, var(--ink-muted) 0 6px, transparent 6px 11px)",
+                }}
+              />
+              <span className="text-ink-secondary">
+                논문대로면 <span className="tabular">기울기 1.00</span>
+              </span>
+            </span>
+            <span className="flex items-center gap-2">
+              <span
+                className="inline-block h-0.5 w-8"
+                style={{ background: "var(--series-1)" }}
+              />
+              <span className="text-ink-secondary">
+                실제{" "}
+                <strong className="tabular">
+                  기울기 {cur.fit.slope.toFixed(2)}
+                </strong>
+              </span>
+            </span>
+          </div>
           <p className="text-axis text-ink-muted mb-3">
-            <strong>대각선은 「예측과 실제가 똑같다」는 선</strong>입니다 — 데이터로 그은
-            추세선이 아닙니다. 위에 있으면 실제가 예측보다 높은 사람입니다.
-          </p>
-          <p className="text-axis text-ink-muted mb-3">
-            두 축 모두 <strong>설문 점수 눈금(0~100)</strong>입니다. 가로축의 가운데와
-            퍼진 정도는 <strong>설문 값에서 빌려온 것</strong>이고, 논문이 정하는 것은
-            <strong> 사람들의 순서</strong>뿐입니다.
+            두 축 모두 <strong>설문 점수 눈금(0~100)</strong>입니다. 논문이 정하는 것은{" "}
+            <strong>사람들의 순서</strong>뿐이고, 가로축의 가운데와 퍼진 정도는{" "}
+            <strong>설문 값에서 빌려온 것</strong>입니다.
           </p>
           <ScatterPlot
             height={480}
@@ -113,9 +144,26 @@ export function PredictionPanel({
               y: r.actual,
               quality: "ok",
             }))}
-            trend={[
-              { x: 0, y: 0 },
-              { x: 100, y: 100 },
+            trend={null}
+            guides={[
+              // 논문 예측이 그대로 맞았다면 — 기울기 1
+              {
+                points: [
+                  { x: 0, y: 0 },
+                  { x: 100, y: 100 },
+                ],
+                color: "var(--ink-muted)",
+                dashed: true,
+              },
+              // 실제로 나타난 기울기
+              {
+                points: [
+                  { x: 0, y: cur.fit.intercept },
+                  { x: 100, y: cur.fit.intercept + cur.fit.slope * 100 },
+                ],
+                color: "var(--series-1)",
+                width: 3,
+              },
             ]}
             xLabel="논문으로 본 예측"
             yLabel="실제"

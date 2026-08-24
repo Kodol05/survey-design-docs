@@ -89,3 +89,32 @@ describe("predictFromResearch", () => {
     }
   });
 });
+
+describe("회귀선 기울기", () => {
+  const axis = studiedAxis();
+
+  it("기울기는 예측 ↔ 실제 상관과 같다", () => {
+    /*
+      예측값을 실제값의 표준편차에 맞춰 두었기 때문에 성립한다.
+      이 성질이 깨지면 화면의 「논문이 본 차이의 N%」 문구가 틀린 말이 된다.
+    */
+    for (const link of [0.2, 0.5, 0.9]) {
+      const out = predictFromResearch(makePeople(30, link, axis), axis)!;
+      expect(out.fit.slope).toBeCloseTo(out.corr, 6);
+    }
+  });
+
+  it("회귀선은 두 평균을 지난다", () => {
+    const out = predictFromResearch(makePeople(30, 0.6, axis), axis)!;
+    const pm = out.rows.reduce((n, r) => n + r.predicted, 0) / out.n;
+    const am = out.rows.reduce((n, r) => n + r.actual, 0) / out.n;
+    expect(out.fit.intercept + out.fit.slope * pm).toBeCloseTo(am, 6);
+  });
+
+  it("관계가 강할수록 기울기가 1에 가까워진다", () => {
+    const weak = predictFromResearch(makePeople(30, 0.2, axis), axis)!;
+    const strong = predictFromResearch(makePeople(30, 0.95, axis), axis)!;
+    expect(strong.fit.slope).toBeGreaterThan(weak.fit.slope);
+    expect(strong.fit.slope).toBeLessThanOrEqual(1.000001);
+  });
+});

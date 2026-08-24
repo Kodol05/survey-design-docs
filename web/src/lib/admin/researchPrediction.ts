@@ -57,6 +57,17 @@ export type ResearchPrediction = {
   meanAbsGap: number;
   /** 10점 넘게 어긋난 사람 수 */
   farOff: number;
+  /**
+   * 실제값을 예측값에 대해 회귀한 선.
+   *
+   * **기울기가 이 화면의 답이다.** 대각선(기울기 1)은 「논문 예측이 그대로
+   * 맞았다면」이고, 이 선의 기울기는 「실제로 그중 얼마가 나타났는가」다.
+   * 0.35면 논문이 본 차이의 3분의 1쯤만 실제로 벌어졌다는 뜻이다.
+   *
+   * 예측값을 실제값의 퍼진 정도에 맞춰 뒀으므로 이 기울기는 상관계수와 같다.
+   * 그래도 최소제곱으로 직접 구한다 — 그 성질이 깨지면 바로 드러나야 한다.
+   */
+  fit: { slope: number; intercept: number };
 };
 
 const mean = (xs: number[]) => xs.reduce((a, b) => a + b, 0) / xs.length;
@@ -148,9 +159,21 @@ export function predictFromResearch(
   */
   const FAR = 10;
 
+  // 최소제곱 회귀 — 실제 = a + b × 예측
+  const pm = mean(predicted);
+  const amActual = mean(actual);
+  let sxy = 0;
+  let sxx = 0;
+  for (let i = 0; i < predicted.length; i++) {
+    sxy += (predicted[i] - pm) * (actual[i] - amActual);
+    sxx += (predicted[i] - pm) ** 2;
+  }
+  const slope = sxx === 0 ? 0 : sxy / sxx;
+
   return {
     axis,
     n: usable.length,
+    fit: { slope, intercept: amActual - slope * pm },
     weights,
     rows,
     corr: corrOf(predicted, actual),

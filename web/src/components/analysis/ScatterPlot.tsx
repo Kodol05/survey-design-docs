@@ -29,6 +29,7 @@ export function ScatterPlot({
   height = 360,
   points,
   trend,
+  guides,
   xLabel,
   yLabel,
 }: {
@@ -36,6 +37,19 @@ export function ScatterPlot({
   height?: number;
   points: Point[];
   trend: { x: number; y: number }[] | null;
+  /**
+   * 선을 여러 개 겹쳐 그린다.
+   *
+   * 예측 화면에서는 두 개가 필요하다 — **「예측대로면 이 기울기」(대각선)와
+   * 「실제로는 이 기울기」(회귀선).** 대각선 하나만 두면 얼마나 벗어났는지는
+   * 보이지만 실제 기울기가 몇인지는 안 보인다.
+   */
+  guides?: {
+    points: { x: number; y: number }[];
+    color: string;
+    dashed?: boolean;
+    width?: number;
+  }[];
   xLabel: string;
   yLabel: string;
 }) {
@@ -88,6 +102,19 @@ export function ScatterPlot({
               legendType="none"
             />
           )}
+          {guides?.map((g, i) => (
+            <Line
+              key={i}
+              data={g.points}
+              dataKey="y"
+              dot={false}
+              stroke={g.color}
+              strokeWidth={g.width ?? 2}
+              strokeDasharray={g.dashed ? "6 5" : undefined}
+              isAnimationActive={false}
+              legendType="none"
+            />
+          ))}
           <Scatter
             data={points}
             fill="var(--series-1)"
