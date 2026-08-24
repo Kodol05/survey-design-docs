@@ -110,9 +110,18 @@ export default async function AdminHome() {
       )}
 
       {/*
-        네 자리로 나눈다 — 왼쪽 위가 흐름, 오른쪽 위가 지금 할 일,
-        아래 두 칸이 결과 해석이다. 위는 국면과 무관하게 늘 차고,
-        아래는 결과가 열렸을 때만 찬다.
+        네 자리로 나눈다.
+
+          왼쪽 위   응시 흐름          오른쪽 위   가장 뚜렷한 관련
+          왼쪽 아래 사람이 갈리는 축   오른쪽 아래 지금 볼 것
+
+        **결과 해석을 위로 올려 뒀다.** 처음에는 오른쪽 위가 「지금 볼 것」이었는데,
+        그건 손볼 거리(품질 검토·미완료)라 화면을 열자마자 잡일부터 보게 됐다.
+        이 화면을 여는 이유는 사람을 아는 것이므로 관련이 먼저 온다. 할 일 목록은
+        짧고 링크로 넘어가는 것이라 아래에 있어도 놓치지 않는다.
+
+        오른쪽 두 칸은 결과가 열렸을 때만 찬다. 아직 수집 중이면 오른쪽 위가
+        비므로 「지금 볼 것」이 자연스럽게 위로 올라온다 — 그때는 그게 맞다.
 
         테두리를 두르지 않는다 (11 §2 — 감싸는 테두리는 쓰지 않음).
         구분은 열 간격(64px)과 제목 아래 가는 선으로만 한다.
@@ -135,108 +144,7 @@ export default async function AdminHome() {
           )}
         </section>
 
-        {/* ── 우상 · 지금 할 일 ── */}
-        <section>
-          <h2 className="text-section-title mb-4 border-b border-[--border] pb-2">
-            지금 볼 것
-          </h2>
-          {needsReview.length === 0 && poorNames.length === 0 && s.inProgress === 0 ? (
-            <p className="text-ink-muted text-table">
-              손볼 것이 없습니다. 품질 미달 응답도, 끝내지 않은 사람도 없습니다.
-            </p>
-          ) : (
-            <ul className="flex flex-col gap-3">
-            {needsReview.length > 0 && (
-              <li>
-                <span className="mr-2" style={{ color: "var(--status-warn)" }}>
-                  ●
-                </span>
-                응답 품질 검토가 필요한 사람 {needsReview.length}명 —{" "}
-                <span className="text-ink-secondary">
-                  {needsReview.slice(0, 6).map((p) => p.name).join(", ")}
-                  {needsReview.length > 6 && ` 외 ${needsReview.length - 6}명`}
-                </span>{" "}
-                <Link href="/admin/employees" className="underline">
-                  목록
-                </Link>
-              </li>
-            )}
-            {poorNames.length > 0 && (
-              <li>
-                <span className="mr-2" style={{ color: "var(--status-critical)" }}>
-                  ●
-                </span>
-                문항이 아직 안 맞물리는 척도 — {poorNames.join(", ")}{" "}
-                <Link href="/admin/stats?tab=reliability" className="underline">
-                  신뢰도 보기
-                </Link>
-              </li>
-            )}
-            {s.inProgress > 0 && (
-              <li>
-                <span className="text-ink-muted mr-2">●</span>
-                응시를 시작하고 끝내지 않은 사람 {s.inProgress}명
-              </li>
-            )}
-            </ul>
-          )}
-        </section>
-
-        {/* ── 좌하 · 분포 ── */}
-        {open && (
-          <section>
-            <div className="mb-4 flex items-baseline justify-between border-b border-[--border] pb-2">
-              <h2 className="text-section-title">사람이 갈리는 축</h2>
-              <span className="text-axis text-ink-muted">{people.length}명</span>
-            </div>
-
-            <ul>
-              {spread.map((x) => (
-                <li
-                  key={x.scale}
-                  className="grid grid-cols-[5rem_1fr_4rem] items-center gap-4 py-2.5"
-                >
-                  <span className="text-table">{x.scale}</span>
-                  {/* 가장 낮은 사람부터 가장 높은 사람까지의 폭 */}
-                  <div className="relative h-3">
-                    <div
-                      className="absolute inset-y-1 left-0 right-0 rounded-full"
-                      style={{ background: "var(--grid)" }}
-                    />
-                    <div
-                      className="absolute inset-y-0 rounded-full"
-                      style={{
-                        left: `${x.lo}%`,
-                        width: `${Math.max(2, x.hi - x.lo)}%`,
-                        background: `linear-gradient(90deg, ${colorAt(x.lo)}, ${colorAt(x.hi)})`,
-                        opacity: 0.35 + 0.65 * (x.sd / maxSd),
-                      }}
-                    />
-                    <div
-                      className="absolute inset-y-[-2px] w-px"
-                      style={{ left: "50%", background: "var(--axis)" }}
-                    />
-                  </div>
-                  <span className="tabular text-axis text-ink-secondary text-right">
-                    {Math.round(x.lo)}–{Math.round(x.hi)}
-                  </span>
-                </li>
-              ))}
-            </ul>
-
-            <p className="text-table text-ink-muted mt-4">
-              가장 낮은 사람부터 가장 높은 사람까지의 폭입니다. 넓게 퍼진 축일수록 우리
-              회사 사람들을 실제로 가릅니다. 좁은 축은 다들 비슷해서 그 축으로는 사람을
-              구분하기 어렵습니다.
-            </p>
-            <p className="text-axis text-ink-muted mt-2">
-              평균은 두지 않았습니다. 눈금 자체가 문항 가운데를 50으로 잡은 것이라 비교할
-              바깥 기준이 없고, 어느 축이든 거의 50 근처로 나옵니다.
-            </p>
-          </section>
-        )}
-
-        {/* ── 우하 · 관련 ── */}
+        {/* ── 우상 · 관련 ── */}
         {open && (
           <section>
             <div className="mb-4 flex items-baseline justify-between border-b border-[--border] pb-2">
@@ -304,6 +212,106 @@ export default async function AdminHome() {
             )}
           </section>
         )}
+        {/* ── 좌하 · 분포 ── */}
+        {open && (
+          <section>
+            <div className="mb-4 flex items-baseline justify-between border-b border-[--border] pb-2">
+              <h2 className="text-section-title">사람이 갈리는 축</h2>
+              <span className="text-axis text-ink-muted">{people.length}명</span>
+            </div>
+
+            <ul>
+              {spread.map((x) => (
+                <li
+                  key={x.scale}
+                  className="grid grid-cols-[5rem_1fr_4rem] items-center gap-4 py-2.5"
+                >
+                  <span className="text-table">{x.scale}</span>
+                  {/* 가장 낮은 사람부터 가장 높은 사람까지의 폭 */}
+                  <div className="relative h-3">
+                    <div
+                      className="absolute inset-y-1 left-0 right-0 rounded-full"
+                      style={{ background: "var(--grid)" }}
+                    />
+                    <div
+                      className="absolute inset-y-0 rounded-full"
+                      style={{
+                        left: `${x.lo}%`,
+                        width: `${Math.max(2, x.hi - x.lo)}%`,
+                        background: `linear-gradient(90deg, ${colorAt(x.lo)}, ${colorAt(x.hi)})`,
+                        opacity: 0.35 + 0.65 * (x.sd / maxSd),
+                      }}
+                    />
+                    <div
+                      className="absolute inset-y-[-2px] w-px"
+                      style={{ left: "50%", background: "var(--axis)" }}
+                    />
+                  </div>
+                  <span className="tabular text-axis text-ink-secondary text-right">
+                    {Math.round(x.lo)}–{Math.round(x.hi)}
+                  </span>
+                </li>
+              ))}
+            </ul>
+
+            <p className="text-table text-ink-muted mt-4">
+              가장 낮은 사람부터 가장 높은 사람까지의 폭입니다. 넓게 퍼진 축일수록 우리
+              회사 사람들을 실제로 가릅니다. 좁은 축은 다들 비슷해서 그 축으로는 사람을
+              구분하기 어렵습니다.
+            </p>
+            <p className="text-axis text-ink-muted mt-2">
+              평균은 두지 않았습니다. 눈금 자체가 문항 가운데를 50으로 잡은 것이라 비교할
+              바깥 기준이 없고, 어느 축이든 거의 50 근처로 나옵니다.
+            </p>
+          </section>
+        )}
+
+        {/* ── 우하 · 지금 할 일 ── */}
+        <section>
+          <h2 className="text-section-title mb-4 border-b border-[--border] pb-2">
+            지금 볼 것
+          </h2>
+          {needsReview.length === 0 && poorNames.length === 0 && s.inProgress === 0 ? (
+            <p className="text-ink-muted text-table">
+              손볼 것이 없습니다. 품질 미달 응답도, 끝내지 않은 사람도 없습니다.
+            </p>
+          ) : (
+            <ul className="flex flex-col gap-3">
+            {needsReview.length > 0 && (
+              <li>
+                <span className="mr-2" style={{ color: "var(--status-warn)" }}>
+                  ●
+                </span>
+                응답 품질 검토가 필요한 사람 {needsReview.length}명 —{" "}
+                <span className="text-ink-secondary">
+                  {needsReview.slice(0, 6).map((p) => p.name).join(", ")}
+                  {needsReview.length > 6 && ` 외 ${needsReview.length - 6}명`}
+                </span>{" "}
+                <Link href="/admin/employees" className="underline">
+                  목록
+                </Link>
+              </li>
+            )}
+            {poorNames.length > 0 && (
+              <li>
+                <span className="mr-2" style={{ color: "var(--status-critical)" }}>
+                  ●
+                </span>
+                문항이 아직 안 맞물리는 척도 — {poorNames.join(", ")}{" "}
+                <Link href="/admin/stats?tab=reliability" className="underline">
+                  신뢰도 보기
+                </Link>
+              </li>
+            )}
+            {s.inProgress > 0 && (
+              <li>
+                <span className="text-ink-muted mr-2">●</span>
+                응시를 시작하고 끝내지 않은 사람 {s.inProgress}명
+              </li>
+            )}
+            </ul>
+          )}
+        </section>
       </div>
 
       <section>
