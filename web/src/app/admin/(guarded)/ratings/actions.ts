@@ -4,7 +4,7 @@ import { revalidatePath } from "next/cache";
 import { unstable_rethrow } from "next/navigation";
 import { prisma } from "@/lib/db";
 import { requireAdmin } from "@/lib/auth/guard";
-import { isValidRating } from "@/lib/admin/abilitySource";
+import { RATER, isValidRating } from "@/lib/admin/abilitySource";
 import { ABILITY_AXES } from "@/lib/items/types";
 import type { AbilityAxis } from "@/generated/prisma/enums";
 
@@ -15,7 +15,7 @@ const TO_DB: Record<string, AbilityAxis> = {
 };
 
 /** 대표님 평가는 한 사람이 낸다. 여러 평가자를 받을 일이 생기면 이 값을 나눈다 */
-const RATED_BY = "대표";
+const RATED_BY = RATER.real;
 
 export type RateState = { error?: string; savedAt?: number } | undefined;
 

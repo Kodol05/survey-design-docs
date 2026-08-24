@@ -3,7 +3,7 @@ import { EmptyState } from "@/components/ui/Card";
 import { EmployeeList, type Row } from "./EmployeeList";
 import { prisma } from "@/lib/db";
 import { requireAdmin } from "@/lib/auth/guard";
-import { ABILITY_AXIS_FROM_DB, TRAIT_SCALES } from "@/lib/items/types";
+import { TRAIT_SCALES } from "@/lib/items/types";
 import { SourcePicker } from "@/components/analysis/SourcePicker";
 import {
   SOURCE_LABEL,
@@ -11,7 +11,7 @@ import {
   parseSource,
   resolveAbilities,
 } from "@/lib/admin/abilitySource";
-import { countRatedEmployees } from "@/lib/admin/ratings";
+import { countRatedEmployees, pickBossScores } from "@/lib/admin/ratings";
 import type { StoredAbilities, StoredTraits } from "@/lib/survey/result";
 
 export const metadata = { title: "구성원 — 관리자" };
@@ -68,11 +68,7 @@ export default async function EmployeesPage(props: {
         const self = ability
           ? Object.fromEntries(Object.entries(ability).map(([k, v]) => [k, v.percent]))
           : {};
-        const boss = Object.fromEntries(
-          e.ratings
-            .map((r) => [ABILITY_AXIS_FROM_DB[r.axis], r.score] as const)
-            .filter(([axis]) => Boolean(axis)),
-        );
+        const boss = pickBossScores(e.ratings);
         const out = resolveAbilities(source, self, boss);
         return Object.keys(out).length ? out : null;
       })(),

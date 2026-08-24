@@ -63,6 +63,9 @@ const gauss = () => {
  * 직무능력을 만들 가중치. 07 관련도 표의 값을 그대로 쓴다.
  * 조직생활만 연구 값이 없어 우리가 정한다 — 사내에서만 보이는 관계.
  */
+/** 심은 평가에 붙이는 이름. 대표님이 직접 매긴 것(`대표`)과 구분한다 */
+const DEMO_RATER = "데모";
+
 /** 한글 축 이름 → DB enum. `ABILITY_AXIS_FROM_DB`의 반대 방향 */
 const TO_DB_AXIS: Record<string, "COOPERATION" | "ORG_LIFE" | "AUTONOMY"> = {
   협력: "COOPERATION",
@@ -223,7 +226,9 @@ for (let n = 0; n < N; n++) {
         employeeId: emp.id,
         axis: TO_DB_AXIS[axis],
         score,
-        ratedBy: "대표",
+        // ⚠️ **"대표"로 넣지 않는다.** 대표님이 직접 매긴 것과 섞이면
+        //    "평가한 적 없는데 기록이 있다"가 된다. 실제로 그렇게 됐었다.
+        ratedBy: DEMO_RATER,
       },
     });
   }

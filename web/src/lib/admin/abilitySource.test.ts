@@ -72,3 +72,22 @@ describe("resolveAbilities", () => {
     expect(out).toEqual({ 협력: 55 });
   });
 });
+
+describe("pickBossScores", () => {
+  it("대표님이 매긴 값이 심은 값을 이긴다", async () => {
+    const { pickBossScores } = await import("./ratings");
+    const out = pickBossScores([
+      { axis: "COOPERATION", score: 3, ratedBy: "데모" },
+      { axis: "COOPERATION", score: 9, ratedBy: "대표" },
+      { axis: "ORG_LIFE", score: 4, ratedBy: "데모" },
+    ]);
+    expect(out).toEqual({ 협력: 9, 조직생활: 4 });
+  });
+
+  it("모르는 축은 버린다", async () => {
+    const { pickBossScores } = await import("./ratings");
+    expect(
+      pickBossScores([{ axis: "없는축", score: 5, ratedBy: "대표" }]),
+    ).toEqual({});
+  });
+});

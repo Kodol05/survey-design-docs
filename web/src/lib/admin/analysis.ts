@@ -2,6 +2,7 @@ import { prisma } from "../db";
 import { ABILITY_AXES, ABILITY_AXIS_FROM_DB, TRAIT_SCALES } from "../items/types";
 import type { StoredAbilities, StoredTraits } from "../survey/result";
 import { MIN_N } from "@/components/ui/NBadge";
+import { pickBossScores } from "./ratings";
 import {
   resolveAbilities,
   type AbilitySource,
@@ -50,14 +51,14 @@ export async function loadPeople(
       : prisma.managerRating.findMany(),
   ]);
 
-  const boss = new Map<string, Record<string, number>>();
+  const byPerson = new Map<string, typeof ratings>();
   for (const r of ratings) {
-    const axis = ABILITY_AXIS_FROM_DB[r.axis];
-    if (!axis) continue;
-    const m = boss.get(r.employeeId) ?? {};
-    m[axis] = r.score;
-    boss.set(r.employeeId, m);
+    const list = byPerson.get(r.employeeId) ?? [];
+    list.push(r);
+    byPerson.set(r.employeeId, list);
   }
+  const boss = new Map<string, Record<string, number>>();
+  for (const [id, list] of byPerson) boss.set(id, pickBossScores(list));
 
   // 같은 사람이 여러 번 응시했으면 가장 최근 것만
   const seen = new Set<string>();

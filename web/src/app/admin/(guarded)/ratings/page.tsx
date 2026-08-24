@@ -3,7 +3,7 @@ import { EmptyState } from "@/components/ui/Card";
 import { RatingGrid, type RatingRow } from "./RatingGrid";
 import { prisma } from "@/lib/db";
 import { requireAdmin } from "@/lib/auth/guard";
-import { RATING } from "@/lib/admin/abilitySource";
+import { RATER, RATING } from "@/lib/admin/abilitySource";
 import { ABILITY_AXES, ABILITY_AXIS_FROM_DB } from "@/lib/items/types";
 
 export const metadata = { title: "대표님 평가 — 관리자" };
@@ -23,7 +23,9 @@ export default async function RatingsPage() {
   const employees = await prisma.employee.findMany({
     where: { role: "USER" },
     orderBy: { name: "asc" },
-    include: { ratings: true },
+    // 대표님이 직접 매긴 것만 가져온다. 데모로 심은 값이 여기 뜨면
+    // "평가한 적 없는데 기록이 있다"가 된다
+    include: { ratings: { where: { ratedBy: RATER.real } } },
   });
 
   const rows: RatingRow[] = employees.map((e) => ({
@@ -38,6 +40,9 @@ export default async function RatingsPage() {
 
   const total = rows.length * ABILITY_AXES.length;
   const done = rows.reduce((n, r) => n + Object.keys(r.scores).length, 0);
+
+  // 확인용으로 심어 둔 값이 얼마나 있는지. 대표님 것과 따로 센다
+  const demo = await prisma.managerRating.count({ where: { ratedBy: RATER.demo } });
 
   return (
     <>
@@ -58,6 +63,14 @@ export default async function RatingsPage() {
           「직원 설문」 · 「대표님 평가」 · 「두 값 평균」으로 바꿔 보실 수 있습니다.
         </p>
       </div>
+
+      {demo > 0 && (
+        <p className="text-axis text-ink-muted mb-4 max-w-[56rem] border-l-2 border-[--axis] py-1 pl-4">
+          이 목록에는 <strong>대표님이 직접 매기신 것만</strong> 나옵니다. 화면 확인용으로
+          심어 둔 값 <span className="tabular">{demo}</span>칸이 따로 있는데, 데모 계정에
+          붙어 있고 여기서는 보이지 않습니다.
+        </p>
+      )}
 
       <p className="text-axis text-ink-muted mb-8 max-w-[56rem]">
         언제든 고치실 수 있습니다. 다만 <strong>결과 화면을 보시기 전에 매기는 편이

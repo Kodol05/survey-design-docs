@@ -37,6 +37,16 @@ export function parseSource(v: string | undefined): AbilitySource {
   return ABILITY_SOURCES.includes(v as AbilitySource) ? (v as AbilitySource) : "self";
 }
 
+/**
+ * 평가자 이름.
+ *
+ * `대표`는 대표님이 화면에서 직접 매긴 것, `데모`는 확인용으로 심은 것이다.
+ * **섞으면 "평가한 적 없는데 기록이 있다"가 된다** — 실제로 한 번 그렇게 됐다.
+ *
+ * 입력 화면은 `대표`만 보여주고, 분석 화면은 둘 다 읽되 `대표`를 우선한다.
+ */
+export const RATER = { real: "대표", demo: "데모" } as const;
+
 /** 대표님 평가 눈금 — 1~10 (2026-08-24 사용자 결정) */
 export const RATING = { min: 1, max: 10 } as const;
 
