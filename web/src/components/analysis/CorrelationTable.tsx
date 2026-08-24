@@ -153,7 +153,7 @@ function CellBar({ r, faded }: { r: number; faded: boolean }) {
   const w = Math.min(50, (Math.abs(r) / FULL) * 50);
   return (
     // 배경색을 옅게 내린 만큼 막대는 굵고 넓게 — 이제 크기를 이쪽이 진다
-    <span className="relative my-1 block h-3 w-[82%]">
+    <span className="relative my-1.5 block h-3.5 w-[86%]">
       <span
         className="absolute inset-y-0 left-1/2 w-px"
         style={{ background: "var(--ink)", opacity: 0.3 }}
@@ -201,7 +201,9 @@ function Body({ cell }: { cell: Cell }) {
     return <span className="text-axis text-ink-muted">n 부족</span>;
   return (
     <>
-      <span className="tabular font-medium leading-tight">{formatR(cell.r)}</span>
+      <span className="tabular text-axis leading-tight" style={{ opacity: 0.75 }}>
+        {gradeOf(cell.r)}
+      </span>
       {/*
         **칸을 작은 그래프로 만든다.**
 
@@ -212,9 +214,15 @@ function Body({ cell }: { cell: Cell }) {
         0을 가운데 둔 막대를 깔면 **길이가 크기, 방향이 좌우**를 맡는다.
         그만큼 배경색은 옅게 물러난다 (`correlationColor.ts`).
       */}
+      {/*
+        **막대가 칸의 가운데다.** 숫자·등급은 위아래로 물리고 막대에 자리를
+        내준다. 표를 훑을 때 먼저 잡히는 것이 「얼마나 큰가」여야 한다 —
+        숫자는 그다음에 확인하는 것이다.
+      */}
       <CellBar r={cell.r} faded={crosses(cell.ci)} />
-      <span className="text-axis tabular leading-tight" style={{ opacity: 0.75 }}>
-        {gradeOf(cell.r)} · n={cell.n}
+      <span className="tabular font-medium leading-tight">{formatR(cell.r)}</span>
+      <span className="text-axis tabular leading-tight" style={{ opacity: 0.6 }}>
+        n={cell.n}
       </span>
     </>
   );
