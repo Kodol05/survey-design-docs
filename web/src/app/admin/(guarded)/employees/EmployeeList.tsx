@@ -11,6 +11,7 @@ import {
   TraitStripHeader,
 } from "@/components/analysis/TraitStrip";
 import { CHARACTER, TEMPERAMENT, colorAt } from "@/components/charts/scale";
+import { QuickRead } from "@/components/analysis/QuickRead";
 import { ABILITY_AXES } from "@/lib/items/types";
 import { formatPhone } from "@/lib/auth/phone";
 
@@ -267,11 +268,15 @@ function Panel({ row }: { row: Row }) {
                 </li>
               ))}
             </ul>
-            <p className="text-axis text-ink-muted mt-3">
-              사내 위치와 관련 성향 축은 상세 보기에 있습니다.
-            </p>
           </div>
         )}
+
+        <div className="w-full max-w-[19rem]">
+          <QuickRead traits={traits} />
+          <p className="text-axis text-ink-muted mt-4">
+            사내 위치와 관련 성향 축은 상세 보기에 있습니다.
+          </p>
+        </div>
       </div>
     </div>
   );

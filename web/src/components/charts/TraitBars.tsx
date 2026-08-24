@@ -30,7 +30,12 @@ export function TraitBars({ rows, height = 280 }: { rows: BarRow[]; height?: num
   return (
     <div className="w-full" style={{ height }}>
       <ResponsiveContainer>
-        <BarChart data={data} margin={{ top: 24, right: 4, bottom: 4, left: 4 }}>
+        <BarChart
+          data={data}
+          margin={{ top: 24, right: 4, bottom: 4, left: 4 }}
+          /* 막대 사이를 벌린다. 붙어 있으면 일곱 개가 한 덩어리로 읽힌다 */
+          barCategoryGap="26%"
+        >
           <YAxis domain={[0, 100]} hide />
           <XAxis
             dataKey="scale"
@@ -51,7 +56,7 @@ export function TraitBars({ rows, height = 280 }: { rows: BarRow[]; height?: num
               fontSize: 14,
             }}
           />
-          <Bar dataKey="value" radius={[4, 4, 0, 0]} maxBarSize={44} isAnimationActive={false}>
+          <Bar dataKey="value" radius={[4, 4, 0, 0]} maxBarSize={30} isAnimationActive={false}>
             {data.map((d) => (
               <Cell key={d.scale} fill={colorAt(d.percent)} />
             ))}
