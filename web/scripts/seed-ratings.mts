@@ -15,12 +15,20 @@ import { PrismaClient } from "../src/generated/prisma/client";
  * 그러면 **두 값을 나눠 둔 이유 자체를 확인할 수 없다.** 실제로도 자기보고와
  * 상사 평가는 곧잘 어긋나고, 어긋나는 사람을 찾는 것이 이 기능의 목적이다.
  *
- * 그래서 네 부류를 섞는다.
+ * 그래서 네 부류를 섞되 **어긋나는 쪽은 몇 명으로 못 박는다.**
  *
- *   일치 40%   본인 점수 ±1     — 대표님이 보시는 것과 본인 생각이 맞는 사람
- *   느슨 30%   본인 점수 ±2~3   — 대체로 맞지만 축마다 갈리는 사람
- *   무관 15%   아무 값          — 본인 답과 상관없는 인상
- *   반대 15%   11 − 본인 점수   — 본인은 높게, 대표님은 낮게 (또는 반대)
+ *   반대  1명    뒤집힌 값     — 본인은 높게, 대표님은 낮게
+ *   무관  1명    아무 값       — 본인 답과 상관없는 인상
+ *   느슨  나머지의 30%         — 대체로 맞지만 축마다 갈리는 사람
+ *   일치  나머지 전부          — 대표님이 보시는 것과 본인 생각이 맞는 사람
+ *
+ * 처음에는 어긋나는 쪽을 비율(15% + 15%)로 뒀는데, 37명에서 11명이 어긋나
+ * **축별 일치도가 .3~.4까지 떨어졌다.** 그 정도면 두 값이 서로 다른 것을 재고
+ * 있다는 뜻이라, 화면에서 「대체로 맞는데 한둘이 튄다」는 그림이 안 나온다.
+ * 눈에 띄는 사람을 찾는 것이 목적이므로 어긋나는 쪽은 **딱 둘**로 둔다.
+ *
+ * ⚠️ 37명에서 뒤집힌 사람 하나가 축별 일치도를 .05~.08쯤 끌어내린다.
+ *    인원을 늘릴 때 이 비율을 그대로 두면 어긋나는 쪽이 묻힌다.
  *
  * 부류는 사람 단위로 정한다. 축마다 바꾸면 사람별로 뭉치지 않아서
  * 「이 사람은 대표님과 어긋난다」는 이야기가 성립하지 않는다.
@@ -42,19 +50,23 @@ const rnd = () => {
 };
 
 type Kind = "일치" | "느슨" | "무관" | "반대";
-const KINDS: [Kind, number][] = [
-  ["일치", 0.4],
-  ["느슨", 0.3],
-  ["무관", 0.15],
-  ["반대", 0.15],
-];
+const KINDS: Kind[] = ["일치", "느슨", "무관", "반대"];
 
-function kindFor(i: number, n: number): Kind {
-  // 비율대로 순서를 만들어 놓고 섞는다. 확률로 뽑으면 44명에서 비율이 크게 틀어진다
-  const bag: Kind[] = [];
-  for (const [k, share] of KINDS) bag.push(...Array(Math.round(n * share)).fill(k));
+/** 어긋나는 사람은 몇 명으로 못 박는다. 비율로 두면 인원이 늘 때 같이 늘어난다 */
+const ODD = { 반대: 1, 무관: 1 } as const;
+/** 남은 사람 중 느슨한 쪽의 비율 */
+const LOOSE_SHARE = 0.3;
+
+function bagOf(n: number): Kind[] {
+  const bag: Kind[] = [
+    ...Array<Kind>(ODD.반대).fill("반대"),
+    ...Array<Kind>(ODD.무관).fill("무관"),
+  ];
+  const rest = Math.max(0, n - bag.length);
+  const loose = Math.round(rest * LOOSE_SHARE);
+  bag.push(...Array<Kind>(loose).fill("느슨"));
   while (bag.length < n) bag.push("일치");
-  return bag[i % bag.length];
+  return bag.slice(0, n);
 }
 
 /** 0~100 → 1~10 */
@@ -76,16 +88,43 @@ const people = await prisma.employee.findMany({
 
 const rated = people.filter((p) => p.testSessions[0]?.result);
 
-// 부류를 사람 단위로 섞어 배정한다
-const order = rated.map((_, i) => i);
-for (let i = order.length - 1; i > 0; i--) {
-  const j = Math.floor(rnd() * (i + 1));
-  [order[i], order[j]] = [order[j], order[i]];
-}
+/** 세 축 평균을 1~10으로 (부류를 고를 때만 쓴다) */
+const meanScore = (p: (typeof rated)[number]) => {
+  const a = (p.testSessions[0].result!.abilityScoresJson ?? {}) as Record<
+    string,
+    { percent: number }
+  >;
+  const vs = Object.keys(AXES)
+    .map((axis) => a[axis]?.percent)
+    .filter((v): v is number => typeof v === "number");
+  return vs.length ? toScore(vs.reduce((x, y) => x + y, 0) / vs.length) : 5.5;
+};
+
+/*
+  뒤집을 사람은 **아무나 고르지 않는다.**
+
+  본인 점수가 가운데(5.5)에 있는 사람을 뒤집으면 값이 거의 그대로라
+  화면에서 아무 일도 일어나지 않는다. 실제로 한 번 그렇게 나왔다 —
+  「반대」로 찍힌 사람이 어긋난 사람 목록에 들어오지도 못했다.
+
+  그래서 가운데에서 가장 멀리 떨어진 사람을 뒤집는다. 눈에 띄라고 만든
+  자료인데 안 띄면 만든 값이 없다.
+*/
 const kindOf = new Map<string, Kind>();
-order.forEach((personIndex, slot) => {
-  kindOf.set(rated[personIndex].id, kindFor(slot, rated.length));
-});
+const pool = [...rated].sort(
+  (a, b) => Math.abs(meanScore(b) - 5.5) - Math.abs(meanScore(a) - 5.5),
+);
+for (let i = 0; i < ODD.반대 && i < pool.length; i++)
+  kindOf.set(pool[i].id, "반대");
+
+// 나머지는 섞어서 배정한다
+const rest = pool.filter((p) => !kindOf.has(p.id));
+for (let i = rest.length - 1; i > 0; i--) {
+  const j = Math.floor(rnd() * (i + 1));
+  [rest[i], rest[j]] = [rest[j], rest[i]];
+}
+const bag = bagOf(rated.length).filter((k) => k !== "반대");
+rest.forEach((p, slot) => kindOf.set(p.id, bag[slot] ?? "일치"));
 
 // 기존 시험 데이터를 걷어낸다 — 두 벌이 겹치면 무엇을 보고 있는지 알 수 없다
 const wiped = await prisma.managerRating.deleteMany({
@@ -125,8 +164,8 @@ for (const p of rated) {
     */
     const off = own - 5.5;
     let raw: number;
-    if (kind === "일치") raw = 5.5 + off * 1.5 + (rnd() - 0.5) * 1.6 + bias;
-    else if (kind === "느슨") raw = 5.5 + off * 1.2 + (rnd() - 0.5) * 4.5 + bias;
+    if (kind === "일치") raw = 5.5 + off * 1.7 + (rnd() - 0.5) * 0.8 + bias * 0.4;
+    else if (kind === "느슨") raw = 5.5 + off * 1.5 + (rnd() - 0.5) * 2 + bias * 0.7;
     else if (kind === "무관") raw = 1 + rnd() * 9;
     else raw = 5.5 - off * 1.9 + (rnd() - 0.5) * 1.6;
 
@@ -183,7 +222,7 @@ console.log(
 );
 
 console.log("\n부류별 상관 (사람 단위 · 세 축 평균)");
-for (const [k] of KINDS) {
+for (const k of KINDS) {
   const list = byKind.get(k) ?? [];
   if (list.length < 3) continue;
   const r = corr(list.map((x) => x.self), list.map((x) => x.boss));
