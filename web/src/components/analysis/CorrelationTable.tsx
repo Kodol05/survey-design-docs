@@ -73,13 +73,19 @@ export function CorrelationTable({
         </colgroup>
         <thead>
           <tr>
-            <th className="text-axis text-ink-muted border-b border-[--border] px-2 pb-2 text-left font-medium">
+            {/*
+              머리글 칸에도 **좌우 선**을 준다. 아래쪽 선만 주면 세로선이
+              본문에서 끊겨 시작해서, 「협력」이 어느 열의 이름인지 눈으로
+              따라가지지 않는다. 위쪽 선은 두지 않는다 — 표 바깥을 가두면
+              감싸는 테두리가 된다 (11 §2).
+            */}
+            <th className="text-axis text-ink-muted border-r border-b border-[--border] px-2 pb-2 text-left font-medium">
               성향 축
             </th>
             {cols.map((c) => (
               <th
                 key={c}
-                className="text-table border-b border-[--border] pb-2 text-center font-medium"
+                className="text-table border-r border-b border-[--border] pb-2 text-center font-medium last:border-r-0"
               >
                 {c}
               </th>
@@ -91,7 +97,7 @@ export function CorrelationTable({
             <tr key={r}>
               <th
                 scope="row"
-                className="text-table border-b border-[--border] px-2 text-left font-normal"
+                className="text-table border-r border-b border-[--border] px-2 text-left font-normal"
               >
                 {r}
               </th>
@@ -100,7 +106,10 @@ export function CorrelationTable({
                 const on = selected?.row === r && selected?.col === c;
                 const clickable = Boolean(onSelect) && v.kind === "value";
                 return (
-                  <td key={c} className="border border-[--border] p-0">
+                  <td
+                    key={c}
+                    className="border-r border-b border-[--border] p-0 last:border-r-0"
+                  >
                     <button
                       type="button"
                       disabled={!clickable}
