@@ -91,3 +91,23 @@ describe("pickBossScores", () => {
     ).toEqual({});
   });
 });
+
+describe("순위 화면의 축 길이 맞춤", () => {
+  it("대표님이 안 매긴 사람도 자리를 지켜야 한다", async () => {
+    /*
+      세부 항목 값과 직무능력 값을 순서로 짝지어 상관을 낸다.
+      한 축만 사람 수가 줄면 **엉뚱한 사람끼리 짝지어진다.**
+      그래서 없는 값은 빼지 않고 NaN으로 자리를 채운 뒤 상관 낼 때 거른다.
+    */
+    const { resolveAbilities } = await import("./abilitySource");
+    const self = { 협력: 70, 조직생활: 50, 자율적실행: 60 };
+    const out = resolveAbilities("boss", self, { 협력: 8 });
+
+    // boss는 안 매긴 축을 빼 버린다 — 부르는 쪽이 NaN으로 메워야 한다
+    expect(Object.keys(out)).toEqual(["협력"]);
+    for (const axis of ["협력", "조직생활", "자율적실행"]) {
+      const v = out[axis] ?? NaN;
+      expect(typeof v).toBe("number");
+    }
+  });
+});

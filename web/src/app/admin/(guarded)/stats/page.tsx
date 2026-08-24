@@ -134,7 +134,13 @@ export default async function StatsPage(props: {
         />
       )}
       {tab === "rank" && (
-        <RankTab axis={sp.axis} scale={sp.scale} people={people} />
+        <RankTab
+          axis={sp.axis}
+          scale={sp.scale}
+          people={people}
+          source={source}
+          bossCount={bossCount}
+        />
       )}
       {tab === "prediction" && <PredictionTab people={people} />}
       {tab === "reliability" && (
@@ -353,10 +359,14 @@ async function RankTab({
   axis,
   scale,
   people,
+  source,
+  bossCount,
 }: {
   axis?: string;
   scale?: string;
   people: People;
+  source: AbilitySource;
+  bossCount: number;
 }) {
   const pickedAxis = ABILITY_AXES.includes(axis as never)
     ? axis!
@@ -365,7 +375,7 @@ async function RankTab({
     ? scale!
     : TRAIT_SCALES[0];
 
-  const ranks = await rankForAbility(pickedAxis);
+  const ranks = await rankForAbility(pickedAxis, false, source);
   const tercile = abilitiesByTraitTercile(people, pickedScale);
 
   return (
@@ -382,6 +392,8 @@ async function RankTab({
         ci: r.corr.ci,
       }))}
       tercile={tercile}
+      source={source}
+      bossCount={bossCount}
     />
   );
 }

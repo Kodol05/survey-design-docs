@@ -4,6 +4,8 @@ import Link from "next/link";
 import { RankBars, type RankItem } from "@/components/analysis/RankBars";
 import { WarningBadge } from "@/components/ui/WarningBadge";
 import type { TercileCompare } from "@/lib/admin/analysis";
+import { SourcePicker } from "@/components/analysis/SourcePicker";
+import { SOURCE_NOTE, type AbilitySource } from "@/lib/admin/abilitySource";
 
 /**
  * 양방향 순위 화면.
@@ -21,6 +23,8 @@ export function RankPanel({
   limit,
   items,
   tercile,
+  source,
+  bossCount,
 }: {
   abilities: string[];
   scales: string[];
@@ -29,65 +33,91 @@ export function RankPanel({
   limit: number;
   items: RankItem[];
   tercile: TercileCompare[];
+  source: AbilitySource;
+  bossCount: number;
 }) {
   return (
-    <div className="grid gap-14 xl:grid-cols-2">
-      <section>
-        <h2 className="text-section-title mb-1">능력에서 성향 찾기</h2>
-        <p className="text-ink-secondary mb-5">
-          이 능력과 관련이 큰 세부 항목을 순서대로 봅니다.
+    <div>
+      {/*
+        전환기를 절마다 두지 않고 **위에 하나만** 둔다. 양쪽 절이 같은
+        직무능력 값을 쓰므로 따로 고르게 하면 좌우가 다른 값을 보게 된다.
+      */}
+      <div className="mb-10">
+        <SourcePicker value={source} bossCount={bossCount} />
+        <p className="text-axis text-ink-muted mt-2 max-w-[52rem]">
+          {SOURCE_NOTE[source]}
         </p>
+      </div>
 
-        <Picker
-          options={abilities}
-          picked={pickedAxis}
-          href={(v) => `/admin/stats?tab=rank&axis=${encodeURIComponent(v)}&scale=${encodeURIComponent(pickedScale)}`}
-        />
-
-        <div className="mt-6">
-          <RankBars items={items} />
-        </div>
-
-        <div className="mt-6">
-          <WarningBadge kind="multipleComparison" />
-        </div>
-        <p className="text-axis text-ink-muted mt-3 max-w-[42rem]">
-          세부 항목 28개 × 능력 3개면 84개 상관입니다. 관계가 없어도 네댓 개는 우연히
-          높게 나오므로 상위 {limit}개까지만 보여드립니다.
-        </p>
-      </section>
-
-      <section>
-        <h2 className="text-section-title mb-1">성향에서 능력 찾기</h2>
-        <p className="text-ink-secondary mb-5">
-          이 성향 <strong>상위 3분의 1</strong>과 <strong>하위 3분의 1</strong>의 직무능력
-          평균이 얼마나 벌어지는지 봅니다.
-        </p>
-
-        <Picker
-          options={scales}
-          picked={pickedScale}
-          href={(v) => `/admin/stats?tab=rank&axis=${encodeURIComponent(pickedAxis)}&scale=${encodeURIComponent(v)}`}
-        />
-
-        {tercile.length === 0 ? (
-          <p className="text-ink-muted mt-8">아직 나눠 볼 만큼 모이지 않았습니다.</p>
-        ) : (
-          <div className="mt-8 flex flex-col gap-8">
-            {tercile.map((t) => (
-              <TercileRow key={t.axis} row={t} scale={pickedScale} />
-            ))}
-          </div>
-        )}
-
-        {tercile.length > 0 && (
-          <p className="text-axis text-ink-muted mt-8 max-w-[42rem]">
-            각 무리가 {tercile[0].upperN}명씩입니다. <strong>차이만 보면 안 됩니다</strong> —
-            12명씩이면 관계가 없어도 10점 안팎은 그냥 나옵니다. 아래 구간이 0을
-            지나가면 방향조차 확정된 것이 아닙니다.
+      <div className="grid gap-14 xl:grid-cols-2">
+        <section>
+          <h2 className="text-section-title mb-1">이 능력과 관련이 큰 성향</h2>
+          <p className="text-ink-secondary mb-5">
+            고른 직무능력과 함께 움직이는 <strong>세부 성향 항목</strong>을 큰
+            순서대로 늘어놓습니다.
           </p>
-        )}
-      </section>
+
+          <Picker
+            options={abilities}
+            picked={pickedAxis}
+            href={(v) =>
+              `/admin/stats?tab=rank&axis=${encodeURIComponent(v)}&scale=${encodeURIComponent(pickedScale)}`
+            }
+          />
+
+          <div className="mt-6">
+            <RankBars items={items} />
+          </div>
+
+          <div className="mt-6">
+            <WarningBadge kind="multipleComparison" />
+          </div>
+          <p className="text-axis text-ink-muted mt-3 max-w-[42rem]">
+            세부 항목 28개 × 능력 3개면 84개 상관입니다. 관계가 없어도 네댓 개는
+            우연히 높게 나오므로 상위 {limit}개까지만 보여드립니다.
+          </p>
+        </section>
+
+        <section>
+          <h2 className="text-section-title mb-1">
+            이 성향으로 갈리는 직무능력
+          </h2>
+          <p className="text-ink-secondary mb-5">
+            이 성향 <strong>상위 3분의 1</strong>과{" "}
+            <strong>하위 3분의 1</strong>의 직무능력 평균이 얼마나 벌어지는지
+            봅니다.
+          </p>
+
+          <Picker
+            options={scales}
+            picked={pickedScale}
+            href={(v) =>
+              `/admin/stats?tab=rank&axis=${encodeURIComponent(pickedAxis)}&scale=${encodeURIComponent(v)}`
+            }
+          />
+
+          {tercile.length === 0 ? (
+            <p className="text-ink-muted mt-8">
+              아직 나눠 볼 만큼 모이지 않았습니다.
+            </p>
+          ) : (
+            <div className="mt-8 flex flex-col gap-8">
+              {tercile.map((t) => (
+                <TercileRow key={t.axis} row={t} scale={pickedScale} />
+              ))}
+            </div>
+          )}
+
+          {tercile.length > 0 && (
+            <p className="text-axis text-ink-muted mt-8 max-w-[42rem]">
+              각 무리가 {tercile[0].upperN}명씩입니다.{" "}
+              <strong>차이만 보면 안 됩니다</strong> — 12명씩이면 관계가 없어도
+              10점 안팎은 그냥 나옵니다. 아래 구간이 0을 지나가면 방향조차
+              확정된 것이 아닙니다.
+            </p>
+          )}
+        </section>
+      </div>
     </div>
   );
 }
@@ -124,7 +154,9 @@ function Picker({
 /** 눈금을 0~100 전부 쓰지 않는다. 직무능력 값이 30~75에 몰려 있어 다 그리면 붙는다 */
 const AXIS = { from: 25, to: 80 };
 const posOf = (v: number) =>
-  ((Math.max(AXIS.from, Math.min(AXIS.to, v)) - AXIS.from) / (AXIS.to - AXIS.from)) * 100;
+  ((Math.max(AXIS.from, Math.min(AXIS.to, v)) - AXIS.from) /
+    (AXIS.to - AXIS.from)) *
+  100;
 
 /**
  * 한 직무능력 축의 두 무리 비교.
@@ -149,7 +181,10 @@ function TercileRow({ row, scale }: { row: TercileCompare; scale: string }) {
         <h3 className="text-table font-medium">{row.axis}</h3>
         <span className="text-axis tabular text-ink-secondary">
           차이{" "}
-          <strong className="text-table" style={{ color: solid ? "var(--ink)" : "var(--ink-muted)" }}>
+          <strong
+            className="text-table"
+            style={{ color: solid ? "var(--ink)" : "var(--ink-muted)" }}
+          >
             {row.diff >= 0 ? "+" : "−"}
             {Math.abs(row.diff).toFixed(1)}
           </strong>
@@ -160,7 +195,10 @@ function TercileRow({ row, scale }: { row: TercileCompare; scale: string }) {
                 {Math.abs(st.ci[0]).toFixed(1)} ~ {st.ci[1] >= 0 ? "+" : "−"}
                 {Math.abs(st.ci[1]).toFixed(1)}
               </span>
-              <span className="text-ink-muted ml-3" title="퍼진 정도로 나눈 차이. 눈금이 달라도 크기를 견줄 수 있습니다">
+              <span
+                className="text-ink-muted ml-3"
+                title="퍼진 정도로 나눈 차이. 눈금이 달라도 크기를 견줄 수 있습니다"
+              >
                 d {Math.abs(st.d).toFixed(2)}
               </span>
             </>
@@ -182,8 +220,18 @@ function TercileRow({ row, scale }: { row: TercileCompare; scale: string }) {
             background: solid ? "var(--ink-secondary)" : "var(--grid)",
           }}
         />
-        <Dot at={lo} label={`${scale} 낮은 쪽`} value={row.lower} tone="var(--series-2)" />
-        <Dot at={hi} label={`${scale} 높은 쪽`} value={row.upper} tone="var(--series-1)" />
+        <Dot
+          at={lo}
+          label={`${scale} 낮은 쪽`}
+          value={row.lower}
+          tone="var(--series-2)"
+        />
+        <Dot
+          at={hi}
+          label={`${scale} 높은 쪽`}
+          value={row.upper}
+          tone="var(--series-1)"
+        />
       </div>
 
       {/* 차이의 신뢰구간 — 0을 지나가는지가 핵심 */}
@@ -209,7 +257,10 @@ function Dot({
       style={{ left: `${at}%` }}
       title={`${label} 평균 ${value.toFixed(1)}`}
     >
-      <span className="block size-4 rounded-full" style={{ background: tone, outline: "2px solid var(--page)" }} />
+      <span
+        className="block size-4 rounded-full"
+        style={{ background: tone, outline: "2px solid var(--page)" }}
+      />
       <span className="text-axis tabular text-ink-muted absolute top-full left-1/2 mt-1 -translate-x-1/2">
         {Math.round(value)}
       </span>
@@ -220,7 +271,8 @@ function Dot({
 /** 차이의 신뢰구간. 0 선을 지나가면 방향이 확정된 것이 아니다 */
 function DiffBar({ ci, diff }: { ci: [number, number]; diff: number }) {
   const SPAN = 30; // −30 ~ +30점
-  const at = (v: number) => ((Math.max(-SPAN, Math.min(SPAN, v)) + SPAN) / (SPAN * 2)) * 100;
+  const at = (v: number) =>
+    ((Math.max(-SPAN, Math.min(SPAN, v)) + SPAN) / (SPAN * 2)) * 100;
   const crosses = ci[0] <= 0 && ci[1] >= 0;
 
   return (
@@ -241,12 +293,18 @@ function DiffBar({ ci, diff }: { ci: [number, number]; diff: number }) {
         />
         <span
           className="absolute top-1/2 size-2.5 -translate-x-1/2 -translate-y-1/2 rounded-full"
-          style={{ left: `${at(diff)}%`, background: crosses ? "var(--ink-muted)" : "var(--series-1)" }}
+          style={{
+            left: `${at(diff)}%`,
+            background: crosses ? "var(--ink-muted)" : "var(--series-1)",
+          }}
         />
       </div>
       <p className="text-axis text-ink-muted mt-1">
         {crosses ? (
-          <>구간이 <strong>0을 지나갑니다</strong> — 이 차이는 우연일 수 있습니다</>
+          <>
+            구간이 <strong>0을 지나갑니다</strong> — 이 차이는 우연일 수
+            있습니다
+          </>
         ) : (
           <>구간이 0을 벗어납니다 — 방향은 확정입니다</>
         )}

@@ -173,13 +173,20 @@ export const RANK_LIMIT = 8;
 export async function rankForAbility(
   axis: string,
   excludePoor = false,
+  source: AbilitySource = "self",
 ): Promise<RankRow[]> {
-  const rows = await loadFacetLevel(excludePoor);
+  const rows = await loadFacetLevel(excludePoor, source);
   const out: RankRow[] = [];
   for (const [label, values] of rows.facets) {
     const pairs = values
       .map((v, i) => [v, rows.abilities[axis]?.[i]] as const)
-      .filter(([a, b]) => typeof a === "number" && typeof b === "number");
+      .filter(
+        ([a, b]) =>
+          typeof a === "number" &&
+          typeof b === "number" &&
+          !Number.isNaN(a) &&
+          !Number.isNaN(b),
+      );
     if (pairs.length < 4) continue;
     out.push({
       label,
@@ -195,13 +202,31 @@ export async function rankForAbility(
     .slice(0, RANK_LIMIT);
 }
 
-/** 세부 항목(하위척도) 단위 점수. 순위 화면에서만 쓴다. */
-async function loadFacetLevel(excludePoor: boolean) {
-  const rows = await prisma.testSession.findMany({
-    where: { status: "COMPLETED", result: { isNot: null } },
-    orderBy: { completedAt: "desc" },
-    include: { result: true, qualityFlag: true },
-  });
+/**
+ * 세부 항목(하위척도) 단위 점수. 순위 화면에서만 쓴다.
+ *
+ * 직무능력은 고른 출처를 따른다 — 대표님 평가로 보면 **자기보고끼리의**
+ * 부풀림이 빠져서 순위가 달라질 수 있다. 그 차이를 보는 것이 요점이다.
+ */
+async function loadFacetLevel(
+  excludePoor: boolean,
+  source: AbilitySource = "self",
+) {
+  const [rows, ratings] = await Promise.all([
+    prisma.testSession.findMany({
+      where: { status: "COMPLETED", result: { isNot: null } },
+      orderBy: { completedAt: "desc" },
+      include: { result: true, qualityFlag: true },
+    }),
+    source === "self" ? Promise.resolve([]) : prisma.managerRating.findMany(),
+  ]);
+
+  const byPerson = new Map<string, typeof ratings>();
+  for (const r of ratings) {
+    const list = byPerson.get(r.employeeId) ?? [];
+    list.push(r);
+    byPerson.set(r.employeeId, list);
+  }
   const seen = new Set<string>();
   const facets = new Map<string, number[]>();
   const abilities: Record<string, number[]> = {};
@@ -217,9 +242,23 @@ async function loadFacetLevel(excludePoor: boolean) {
         const label = `${scale} · ${facet}`;
         facets.set(label, [...(facets.get(label) ?? []), f.percent]);
       }
+    /*
+      ⚠️ 축마다 **사람 수가 어긋나면 안 된다.** 세부 항목 값과 짝을 맞춰
+         상관을 내는데, 대표님이 안 매긴 사람에서 한 축만 빠지면 배열 길이가
+         달라져 엉뚱한 사람끼리 짝지어진다. 없으면 NaN을 넣어 자리를 지키고,
+         상관 낼 때 걸러낸다.
+    */
     const a = (s.result!.abilityScoresJson ?? {}) as StoredAbilities;
-    for (const [axis, v] of Object.entries(a))
-      abilities[axis] = [...(abilities[axis] ?? []), v.percent];
+    const self = Object.fromEntries(
+      Object.entries(a).map(([axis, v]) => [axis, v.percent]),
+    );
+    const resolved = resolveAbilities(
+      source,
+      self,
+      pickBossScores(byPerson.get(s.employeeId) ?? []),
+    );
+    for (const axis of ABILITY_AXES)
+      abilities[axis] = [...(abilities[axis] ?? []), resolved[axis] ?? NaN];
   }
   return { facets, abilities };
 }

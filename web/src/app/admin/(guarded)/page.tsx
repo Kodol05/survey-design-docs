@@ -92,20 +92,34 @@ export default async function AdminHome() {
       <h1 className="text-screen-title mb-8">대시보드</h1>
 
       <div className="mb-14 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-        <Tile label="응시 완료" value={s.completed} />
-        <Tile label="진행 중" value={s.inProgress} />
+        <Tile
+          label="응시 완료"
+          value={s.completed}
+          href="/admin/employees?status=completed"
+          hint="누가 했는지 보기"
+        />
+        <Tile
+          label="진행 중"
+          value={s.inProgress}
+          href="/admin/employees?status=inprogress"
+          hint={s.inProgress ? "누구인지 보기" : undefined}
+        />
         <Tile
           label="검토가 필요한 응답"
           value={s.quality.review + s.quality.poor}
-          hint={s.quality.poor ? `그중 ${s.quality.poor}건은 낮음` : undefined}
+          href="/admin/employees?flag=review"
+          hint={
+            s.quality.poor ? `그중 ${s.quality.poor}건은 낮음` : "누구인지 보기"
+          }
         />
         <Tile
-          label="척도 평균 α"
+          label="검사 신뢰도"
           value={meanAlpha === null ? "—" : meanAlpha.toFixed(2)}
+          href="/admin/stats?tab=reliability"
           hint={
             poorScales.length
               ? `${poorScales.length}개 척도가 ${ALPHA.poor} 아래`
-              : undefined
+              : "척도 평균 α"
           }
         />
       </div>
@@ -447,20 +461,48 @@ function Shortcut({
   );
 }
 
+/**
+ * 숫자 타일 — `href`를 주면 누를 수 있다.
+ *
+ * 숫자만 보여주고 끝내면 "37명이 했다는데 누구지?"에서 화면을 다시 뒤져야
+ * 한다. 세는 자리에서 바로 명단으로 넘어가는 것이 자연스럽다.
+ * 분석 화면의 타일과 같은 규칙을 쓴다.
+ */
 function Tile({
   label,
   value,
   hint,
+  href,
 }: {
   label: string;
   value: number | string;
   hint?: string;
+  href?: string;
 }) {
-  return (
-    <div className="rounded-xl p-6" style={{ background: "var(--wash)" }}>
+  const body = (
+    <>
       <p className="text-axis text-ink-secondary">{label}</p>
       <p className="mt-1 text-5xl font-semibold">{value}</p>
-      {hint && <p className="text-axis text-ink-muted mt-2">{hint}</p>}
+      {hint && (
+        <p className="text-axis text-ink-muted mt-2">
+          {hint}
+          {href && <span aria-hidden> →</span>}
+        </p>
+      )}
+    </>
+  );
+  const style = { background: "var(--wash)" };
+  return href ? (
+    <Link
+      href={href}
+      className="block rounded-xl p-6 transition hover:brightness-95"
+      style={style}
+    >
+      {body}
+    </Link>
+  ) : (
+    <div className="rounded-xl p-6" style={style}>
+      {body}
     </div>
   );
 }
