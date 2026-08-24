@@ -4,8 +4,14 @@ import Link from "next/link";
 import { Fragment, useState } from "react";
 import { TraitBars } from "@/components/charts/TraitBars";
 import { TraitRadar } from "@/components/charts/TraitRadar";
-import { TraitStrip, TraitStripHeader } from "@/components/analysis/TraitStrip";
+import {
+  AbilityStrip,
+  AbilityStripHeader,
+  TraitStrip,
+  TraitStripHeader,
+} from "@/components/analysis/TraitStrip";
 import { CHARACTER, TEMPERAMENT } from "@/components/charts/scale";
+import { ABILITY_AXES } from "@/lib/items/types";
 import { formatPhone } from "@/lib/auth/phone";
 
 /**
@@ -22,6 +28,9 @@ export type Row = {
   phone: string | null;
   status: string | null;
   flag: string;
+  agreement: number | null;
+  fastCount: number | null;
+  completedLabel: string | null;
   traits: Record<string, number> | null;
   abilities: Record<string, number> | null;
 };
@@ -37,33 +46,48 @@ export function EmployeeList({ rows, open }: { rows: Row[]; open: boolean }) {
   const [openId, setOpenId] = useState<string | null>(null);
 
   return (
+    /*
+      폭 배분이 이 표의 핵심이다.
+
+      전에는 이름·번호·상태·성향이 전부 고정폭이고 **마지막 품질 칸이 남는 폭을
+      전부 흡수**했다. 1920 화면에서 성향과 품질 사이가 1,000px 가까이 벌어져
+      품질만 오른쪽 끝에 홀로 떠 있었다 — "전체화면이라 애매하다"의 정체.
+
+      고치는 방향은 폭을 줄이는 게 아니다. 11 §1.4가 관리자 표는 `max-width` 없이
+      전체 폭을 쓴다고 정해뒀다. 대신 **남는 폭을 데이터가 가져가게** 한다 —
+      성향(42%)과 직무능력(18%)에 퍼센트를 주면 넓어질수록 두 스트립이 벌어져
+      숫자 간격이 편해지고, 빈 칸이 생기지 않는다.
+    */
     <div className="overflow-x-auto">
       <table className="w-full">
         <thead>
           <tr className="text-axis text-ink-muted border-b border-[--border]">
-            <th className="w-44 pb-2 text-left font-medium">이름</th>
+            <th className="w-36 pb-2 text-left font-medium">이름</th>
             <th className="w-28 pb-2 text-left font-medium">번호</th>
-            <th className="w-20 pb-2 text-left font-medium">상태</th>
-            <th className="w-px pb-2 text-left font-medium whitespace-nowrap">
+            <th className="w-14 pb-2 text-left font-medium">상태</th>
+            <th className="w-20 pb-2 text-left font-medium">품질</th>
+            <th className="w-12 pb-2 text-left font-medium">완료</th>
+            <th className="w-[42%] pb-2 pl-4 text-left font-medium">
               {open ? <TraitStripHeader /> : "성향"}
             </th>
-            <th className="pb-2 pl-8 text-left font-medium">품질</th>
+            <th className="w-[18%] pb-2 pl-4 text-left font-medium">
+              {open ? <AbilityStripHeader /> : "직무능력"}
+            </th>
           </tr>
         </thead>
         <tbody>
           {rows.map((r) => {
-            const flag = FLAG[r.flag as keyof typeof FLAG];
             const expanded = openId === r.id;
             const canExpand = open && Boolean(r.traits);
             return (
               <Fragment key={r.id}>
                 <tr
                   onClick={() => canExpand && setOpenId(expanded ? null : r.id)}
-                  className={`border-b border-[--border] ${
+                  className={`h-8 border-b border-[--border] ${
                     canExpand ? "cursor-pointer hover:bg-[--wash]" : ""
                   } ${expanded ? "bg-[--wash]" : ""}`}
                 >
-                  <td className="py-3">
+                  <td className="py-1.5">
                     <span className="font-medium">{r.name}</span>
                     {canExpand && (
                       <span className="text-ink-muted text-axis ml-2">
@@ -71,27 +95,41 @@ export function EmployeeList({ rows, open }: { rows: Row[]; open: boolean }) {
                       </span>
                     )}
                   </td>
-                  <td className="text-axis tabular text-ink-secondary py-3">
+                  <td className="text-axis tabular text-ink-secondary py-1.5">
                     {r.phone ? formatPhone(r.phone) : "—"}
                   </td>
-                  <td className="text-axis text-ink-secondary py-3">
+                  <td className="text-axis text-ink-secondary py-1.5">
                     {r.status ? STATUS[r.status as keyof typeof STATUS] : "미응시"}
                   </td>
-                  <td className="py-3 whitespace-nowrap">
+                  <td className="py-1.5">
+                    <Quality
+                      flag={r.flag}
+                      agreement={r.agreement}
+                      fastCount={r.fastCount}
+                    />
+                  </td>
+                  <td className="text-axis tabular text-ink-muted py-1.5">
+                    {r.completedLabel ?? "—"}
+                  </td>
+                  <td className="py-1.5 pl-4 whitespace-nowrap">
                     {open ? (
                       <TraitStrip traits={r.traits} />
                     ) : (
                       <span className="text-axis text-ink-muted">공개 전</span>
                     )}
                   </td>
-                  <td className="text-axis py-3 pl-8" style={{ color: flag?.color }}>
-                    {flag?.label ?? ""}
+                  <td className="py-1.5 pl-4 whitespace-nowrap">
+                    {open ? (
+                      <AbilityStrip abilities={r.abilities} />
+                    ) : (
+                      <span className="text-axis text-ink-muted">공개 전</span>
+                    )}
                   </td>
                 </tr>
 
                 {expanded && r.traits && (
                   <tr className="border-b border-[--border]">
-                    <td colSpan={5} className="bg-[--wash] px-4 py-8">
+                    <td colSpan={7} className="bg-[--wash] px-4 py-6">
                       <Panel row={r} />
                     </td>
                   </tr>
@@ -105,15 +143,84 @@ export function EmployeeList({ rows, open }: { rows: Row[]; open: boolean }) {
   );
 }
 
+/**
+ * 응답 품질 — 등급만 있던 것을 **숫자와 같이** 보여준다.
+ *
+ * 종전에는 `검토`·`미달` 두 글자뿐이라, 아무것도 안 적힌 사람들 사이에서
+ * 누가 아슬아슬하고 누가 넉넉한지 구분되지 않았다. `ok` 안에서도 편차가 크다.
+ *
+ * 숫자는 **반대 문항 일치도**를 쓴다. 저장된 값 중 "이 응답을 믿을 수 있는가"에
+ * 가장 곧바로 답하는 값이다 — 서로 반대인 문항에 같은 방향으로 답했는지를 잰다.
+ * 100이면 짝마다 완전히 일관됐고, 무작위로 찍으면 60 근처가 나온다.
+ *
+ * ⚠️ 등급은 일치도만으로 정해지지 않는다. **너무 빨리 넘긴 문항 비율**도 같이
+ *    본다(00 §2.3). 그래서 일치도가 높은데 `미달`인 사람이 있을 수 있고,
+ *    그 경우가 헷갈리지 않도록 속도 쪽이 걸린 것이면 따로 표시한다.
+ */
+function Quality({
+  flag,
+  agreement,
+  fastCount,
+}: {
+  flag: string;
+  agreement: number | null;
+  fastCount: number | null;
+}) {
+  if (agreement === null) return <span className="text-ink-muted text-axis">—</span>;
+
+  const pct = Math.round(agreement * 100);
+  const meta = FLAG[flag as keyof typeof FLAG];
+  // 일치도는 멀쩡한데 등급이 걸렸다면 속도 쪽이 원인이다
+  const bySpeed = Boolean(meta) && agreement >= 0.7;
+
+  return (
+    <span
+      className="flex items-baseline gap-1.5"
+      title={
+        `반대 문항 일치도 ${pct}점` +
+        (fastCount !== null ? ` · 1.5초 안에 답한 문항 ${fastCount}개` : "") +
+        (meta ? ` · ${meta.label}` : "")
+      }
+    >
+      <span
+        className="tabular text-table font-medium"
+        style={{ color: meta ? meta.color : "var(--ink-secondary)" }}
+      >
+        {pct}
+      </span>
+      {meta && (
+        <span className="text-axis" style={{ color: meta.color }}>
+          {bySpeed ? "속도" : meta.label}
+        </span>
+      )}
+    </span>
+  );
+}
+
+/**
+ * 펼침 패널.
+ *
+ * **세로로 짧게 두는 것이 이 패널의 제약이다.** 목록 한가운데를 밀어내며
+ * 열리기 때문에, 키가 크면 앞뒤 줄이 화면 밖으로 밀려 "50명을 훑는다"는
+ * 목록의 목적이 깨진다.
+ *
+ * 그래서 두 가지를 지킨다.
+ *  1. **한 줄 3단**으로 늘어놓는다 — 레이더·막대·직무능력을 세로로 쌓지 않는다.
+ *  2. **레이더에 상한을 둔다.** `aspectRatio`가 걸려 있어 폭이 곧 높이다.
+ *     상한이 없으면 넓은 화면일수록 패널이 커진다 (1920에서 806px까지 갔다).
+ */
 function Panel({ row }: { row: Row }) {
   const traits = row.traits!;
   const ordered = [...TEMPERAMENT, ...CHARACTER]
     .filter((s) => typeof traits[s] === "number")
     .map((s) => ({ scale: s, percent: traits[s] }));
 
+  const abilities = row.abilities ?? {};
+  const hasAbility = Object.keys(abilities).length > 0;
+
   return (
     <div>
-      <div className="mb-6 flex flex-wrap items-baseline justify-between gap-4">
+      <div className="mb-4 flex flex-wrap items-baseline justify-between gap-4">
         <h3 className="text-section-title">{row.name}</h3>
         <Link
           href={`/admin/employees/${row.id}`}
@@ -123,24 +230,66 @@ function Panel({ row }: { row: Row }) {
         </Link>
       </div>
 
-      <div className="grid gap-8 lg:grid-cols-2 lg:items-center">
-        <TraitRadar data={ordered} showValues />
-        <TraitBars rows={ordered} />
-      </div>
-
-      {row.abilities && Object.keys(row.abilities).length > 0 && (
-        <div className="mt-8 border-t border-[--border] pt-5">
-          <p className="text-table text-ink-secondary mb-3">직무능력</p>
-          <dl className="flex flex-wrap gap-x-10 gap-y-2">
-            {Object.entries(row.abilities).map(([axis, v]) => (
-              <div key={axis} className="flex items-baseline gap-2">
-                <dt className="text-ink-secondary">{axis}</dt>
-                <dd className="tabular text-lg font-medium">{Math.round(v)}</dd>
-              </div>
-            ))}
-          </dl>
+      <div className="grid items-center gap-8 lg:grid-cols-[minmax(0,21rem)_minmax(0,1fr)_minmax(0,17rem)]">
+        {/* 폭이 높이를 정하므로 여기서 묶어둔다 */}
+        <div className="mx-auto w-full max-w-[21rem]">
+          <TraitRadar data={ordered} showValues />
         </div>
-      )}
+
+        <TraitBars rows={ordered} />
+
+        <div>
+          <p className="text-table text-ink-secondary mb-3">직무능력</p>
+          {hasAbility ? (
+            <AbilityMeters abilities={abilities} />
+          ) : (
+            <p className="text-axis text-ink-muted">아직 값이 없습니다.</p>
+          )}
+        </div>
+      </div>
     </div>
+  );
+}
+
+/**
+ * 직무능력 3축 — 값을 길이로 읽는다.
+ *
+ * 성향의 발산 색을 쓰지 않는다. 성향은 어느 쪽도 좋고 나쁜 게 아니지만
+ * 직무능력은 높을수록 좋은 값이라(D-34), 갈라지는 색을 쓰면 낮은 값이
+ * 고운 청회색으로 보여 반대로 읽힌다. 한 가지 색의 길이로만 말한다.
+ *
+ * 50에 눈금을 둔다 — 전 문항에 "보통"으로 답하면 나오는 값이라
+ * 여기가 위인지 아래인지가 숫자보다 먼저 읽힌다 (막대 차트의 기준선과 같은 뜻).
+ */
+function AbilityMeters({ abilities }: { abilities: Record<string, number> }) {
+  return (
+    <dl className="flex flex-col gap-3">
+      {ABILITY_AXES.filter((a) => typeof abilities[a] === "number").map((a) => {
+        const v = Math.max(0, Math.min(100, abilities[a]));
+        return (
+          <div key={a} className="grid grid-cols-[4.5rem_1fr_2rem] items-center gap-3">
+            <dt className="text-axis text-ink-secondary truncate" title={a}>
+              {a}
+            </dt>
+            <dd className="relative h-2.5">
+              <span
+                className="absolute inset-0 rounded-full"
+                style={{ background: "var(--grid)" }}
+              />
+              <span
+                className="absolute inset-y-0 left-0 rounded-full"
+                style={{ width: `${Math.max(2, v)}%`, background: "var(--series-1)" }}
+              />
+              <span
+                aria-hidden
+                className="absolute inset-y-[-2px] left-1/2 w-px"
+                style={{ background: "var(--axis)" }}
+              />
+            </dd>
+            <dd className="tabular text-table text-right font-medium">{Math.round(v)}</dd>
+          </div>
+        );
+      })}
+    </dl>
   );
 }

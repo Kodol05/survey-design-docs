@@ -1,9 +1,11 @@
 import Link from "next/link";
 import { WarningBadge } from "@/components/ui/WarningBadge";
 import { formatR } from "@/components/analysis/correlationColor";
+import { describeCorrelation, strengthOf } from "@/components/analysis/correlationWords";
 import { colorAt } from "@/components/charts/scale";
+import { CompletionTrend } from "@/components/charts/CompletionTrend";
 import { getAppState } from "@/lib/admin/phase";
-import { loadSummary } from "@/lib/admin/summary";
+import { loadCompletionByDate, loadSummary } from "@/lib/admin/summary";
 import {
   cellOf,
   loadPeople,
@@ -18,11 +20,12 @@ import { OpenResultsButton } from "./OpenResultsButton";
 export const metadata = { title: "대시보드 — 관리자" };
 
 export default async function AdminHome() {
-  const [state, s, people, reliability] = await Promise.all([
+  const [state, s, people, reliability, trend] = await Promise.all([
     getAppState(),
     loadSummary(),
     loadPeople(),
     loadReliability(),
+    loadCompletionByDate(),
   ]);
   const open = state.ratingPhase === "OPEN";
   const matrix = traitAbilityMatrix(people);
@@ -79,41 +82,70 @@ export default async function AdminHome() {
         />
       </div>
 
-      {/* 국면 — 결과를 열기 전에는 이게 가장 위에 와야 한다 */}
-      <section className="mb-14">
-        <h2 className="text-section-title mb-4 border-b border-[--border] pb-2">
-          평가·결과 국면
-        </h2>
-        {open ? (
-          <p className="text-ink-secondary">
-            결과가 공개되어 있습니다.
-            {state.openedAt && (
-              <span className="text-ink-muted ml-2">
-                {state.openedAt.toLocaleString("ko-KR")}에 열렸습니다.
-              </span>
-            )}
-          </p>
-        ) : (
-          <>
-            <p className="text-ink-secondary mb-4 max-w-[46rem]">
-              지금은 <strong>평가 수집 중</strong>입니다. 대표님 평가가 끝나기 전에는
-              결과를 볼 수 없습니다. 결과를 먼저 보면 그 인상이 섞여서 대조하는 의미가
-              없어지기 때문입니다.
-            </p>
-            <p className="text-axis text-ink-muted mb-5">
-              응시 현황과 응답 품질, 문항 목록은 지금도 보실 수 있습니다.
-            </p>
-            <OpenResultsButton completed={s.completed} />
-          </>
-        )}
-      </section>
-
-      {(needsReview.length > 0 || poorNames.length > 0 || s.inProgress > 0) && (
+      {/* 국면 — 열기 전에는 이게 가장 위에 와야 한다. 열린 뒤에는 한 줄이면 된다. */}
+      {open ? (
+        <p className="text-table text-ink-secondary mb-14 border-b border-[--border] pb-4">
+          결과가 공개되어 있습니다.
+          {state.openedAt && (
+            <span className="text-ink-muted ml-2">
+              {state.openedAt.toLocaleString("ko-KR")}에 열렸습니다.
+            </span>
+          )}
+        </p>
+      ) : (
         <section className="mb-14">
+          <h2 className="text-section-title mb-4 border-b border-[--border] pb-2">
+            평가·결과 국면
+          </h2>
+          <p className="text-ink-secondary mb-4 max-w-[46rem]">
+            지금은 <strong>평가 수집 중</strong>입니다. 대표님 평가가 끝나기 전에는
+            결과를 볼 수 없습니다. 결과를 먼저 보면 그 인상이 섞여서 대조하는 의미가
+            없어지기 때문입니다.
+          </p>
+          <p className="text-axis text-ink-muted mb-5">
+            응시 현황과 응답 품질, 문항 목록은 지금도 보실 수 있습니다.
+          </p>
+          <OpenResultsButton completed={s.completed} />
+        </section>
+      )}
+
+      {/*
+        네 자리로 나눈다 — 왼쪽 위가 흐름, 오른쪽 위가 지금 할 일,
+        아래 두 칸이 결과 해석이다. 위는 국면과 무관하게 늘 차고,
+        아래는 결과가 열렸을 때만 찬다.
+
+        테두리를 두르지 않는다 (11 §2 — 감싸는 테두리는 쓰지 않음).
+        구분은 열 간격(64px)과 제목 아래 가는 선으로만 한다.
+      */}
+      <div className="mb-14 grid gap-x-16 gap-y-14 lg:grid-cols-2">
+        {/* ── 좌상 · 흐름 ── */}
+        <section>
+          <div className="mb-4 flex items-baseline justify-between border-b border-[--border] pb-2">
+            <h2 className="text-section-title">날짜별 누적 완료</h2>
+            {trend.length > 0 && (
+              <span className="text-axis text-ink-muted">{trend.length}일째</span>
+            )}
+          </div>
+          <CompletionTrend points={trend} />
+          {trend.length > 0 && (
+            <p className="text-axis text-ink-muted mt-3">
+              평평한 구간은 아무도 응시하지 않은 기간입니다. 끝이 평평하면 지금 멈춰 있다는
+              뜻입니다.
+            </p>
+          )}
+        </section>
+
+        {/* ── 우상 · 지금 할 일 ── */}
+        <section>
           <h2 className="text-section-title mb-4 border-b border-[--border] pb-2">
             지금 볼 것
           </h2>
-          <ul className="flex flex-col gap-3">
+          {needsReview.length === 0 && poorNames.length === 0 && s.inProgress === 0 ? (
+            <p className="text-ink-muted text-table">
+              손볼 것이 없습니다. 품질 미달 응답도, 끝내지 않은 사람도 없습니다.
+            </p>
+          ) : (
+            <ul className="flex flex-col gap-3">
             {needsReview.length > 0 && (
               <li>
                 <span className="mr-2" style={{ color: "var(--status-warn)" }}>
@@ -146,23 +178,23 @@ export default async function AdminHome() {
                 응시를 시작하고 끝내지 않은 사람 {s.inProgress}명
               </li>
             )}
-          </ul>
+            </ul>
+          )}
         </section>
-      )}
 
-      {open && (
-        <>
-          <section className="mb-14">
+        {/* ── 좌하 · 분포 ── */}
+        {open && (
+          <section>
             <div className="mb-4 flex items-baseline justify-between border-b border-[--border] pb-2">
               <h2 className="text-section-title">사람이 갈리는 축</h2>
               <span className="text-axis text-ink-muted">{people.length}명</span>
             </div>
 
-            <ul className="max-w-3xl">
+            <ul>
               {spread.map((x) => (
                 <li
                   key={x.scale}
-                  className="grid grid-cols-[7rem_1fr_5.5rem] items-center gap-5 py-2.5"
+                  className="grid grid-cols-[5rem_1fr_4rem] items-center gap-4 py-2.5"
                 >
                   <span className="text-table">{x.scale}</span>
                   {/* 가장 낮은 사람부터 가장 높은 사람까지의 폭 */}
@@ -192,22 +224,25 @@ export default async function AdminHome() {
               ))}
             </ul>
 
-            <p className="text-table text-ink-muted mt-4 max-w-[46rem]">
+            <p className="text-table text-ink-muted mt-4">
               가장 낮은 사람부터 가장 높은 사람까지의 폭입니다. 넓게 퍼진 축일수록 우리
               회사 사람들을 실제로 가릅니다. 좁은 축은 다들 비슷해서 그 축으로는 사람을
               구분하기 어렵습니다.
             </p>
-            <p className="text-axis text-ink-muted mt-2 max-w-[46rem]">
+            <p className="text-axis text-ink-muted mt-2">
               평균은 두지 않았습니다. 눈금 자체가 문항 가운데를 50으로 잡은 것이라 비교할
               바깥 기준이 없고, 어느 축이든 거의 50 근처로 나옵니다.
             </p>
           </section>
+        )}
 
-          <section className="mb-14">
+        {/* ── 우하 · 관련 ── */}
+        {open && (
+          <section>
             <div className="mb-4 flex items-baseline justify-between border-b border-[--border] pb-2">
               <h2 className="text-section-title">가장 뚜렷한 관련</h2>
               <Link href="/admin/stats" className="text-table text-ink-secondary underline">
-                통계 자세히 보기
+                자세히
               </Link>
             </div>
 
@@ -224,33 +259,55 @@ export default async function AdminHome() {
               </p>
             ) : (
               <>
-                <ul className="max-w-2xl">
+                <ul className="flex flex-col">
                   {top.map(({ scale, axis, c }) => (
                     <li
                       key={`${scale}-${axis}`}
-                      className="flex items-baseline justify-between border-b border-[--border] py-3 last:border-0"
+                      className="flex flex-col gap-1 border-b border-[--border] py-3 last:border-0"
                     >
-                      <span>
-                        {scale} <span className="text-ink-muted">×</span> {axis}
-                      </span>
-                      <span className="tabular">
-                        <span className="font-medium">{formatR(c!.r)}</span>
-                        <span className="text-ink-muted text-axis ml-3">
-                          n={c!.n} · {formatR(c!.ci[0])}~{formatR(c!.ci[1])}
+                      <p className="leading-snug">
+                        {describeCorrelation(scale, axis, c!.r)}
+                      </p>
+                      <p className="text-axis text-ink-muted flex flex-wrap items-baseline gap-x-3">
+                        <span
+                          className="font-medium"
+                          style={{
+                            color:
+                              strengthOf(c!.r) === "뚜렷함"
+                                ? "var(--ink-secondary)"
+                                : undefined,
+                          }}
+                        >
+                          {strengthOf(c!.r)}
                         </span>
-                      </span>
+                        <span className="tabular">{c!.n}명</span>
+                        <span className="tabular" title="두 값이 함께 움직인 정도. −1에서 +1 사이">
+                          관련도 {formatR(c!.r)}
+                        </span>
+                        <span
+                          className="tabular"
+                          title="사람이 바뀌어도 이 범위 안에 들어올 것으로 보는 구간"
+                        >
+                          95% 구간 {formatR(c!.ci[0])}~{formatR(c!.ci[1])}
+                        </span>
+                      </p>
                     </li>
                   ))}
                 </ul>
-                <p className="text-axis text-ink-muted mt-3 max-w-[44rem]">
-                  신뢰구간이 0을 벗어난 조합만 골라 절댓값 순으로 셋입니다. 이 화면은
-                  요약이고, 표 전체와 점 분포는 분석 화면에서 봅니다.
-                </p>
+
+                <div className="mt-4 flex flex-col gap-2">
+                  <WarningBadge kind="multipleComparison" />
+                  <p className="text-axis text-ink-muted">
+                    <strong className="text-ink-secondary">같이 움직인다는 뜻이지, 한쪽이
+                    원인이라는 뜻은 아닙니다.</strong> 21개 조합 중 값이 0을 확실히 벗어난
+                    것만 골라 센 셋이고, 표 전체와 점 분포는 분석 화면에서 봅니다.
+                  </p>
+                </div>
               </>
             )}
           </section>
-        </>
-      )}
+        )}
+      </div>
 
       <section>
         <h2 className="text-section-title mb-4 border-b border-[--border] pb-2">바로 가기</h2>

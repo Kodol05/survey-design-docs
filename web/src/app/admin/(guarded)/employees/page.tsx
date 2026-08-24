@@ -38,6 +38,16 @@ export default async function EmployeesPage(props: {
       phone: e.phone,
       status: s?.status ?? null,
       flag: s?.qualityFlag?.flag ?? "ok",
+      // 품질을 등급(검토/미달)뿐 아니라 숫자로도 보여주기 위한 값.
+      // 일치도는 0~1로 저장돼 있다 — 화면에서 100점으로 환산한다.
+      agreement: s?.qualityFlag?.antonymAgreement ?? null,
+      fastCount: s?.qualityFlag?.fastCount ?? null,
+      // 이미 세션에 있는데 표에서 안 쓰고 있던 값.
+      // 소요시간은 넣지 않는다 — 품질 플래그가 이미 "너무 빨리 넘긴 응답"을 잡는다.
+      //
+      // 날짜는 **서버에서 문자열로 만들어 넘긴다.** 목록이 클라이언트 컴포넌트라
+      // 브라우저에서 다시 포맷하면 서버 시간대와 어긋나 하이드레이션이 깨진다.
+      completedLabel: s?.completedAt ? dayLabel(s.completedAt) : null,
       traits: stored
         ? Object.fromEntries(Object.entries(stored).map(([k, v]) => [k, v.percent]))
         : null,
@@ -52,8 +62,24 @@ export default async function EmployeesPage(props: {
 
   // 축 이름으로 정렬하면 그 성향이 두드러진 사람이 위로 온다 (01 §4.0 Q3)
   const sortAxis = TRAIT_SCALES.includes(sort as never) ? sort! : null;
-  if (sortAxis)
-    rows = [...rows].sort((a, b) => (b.traits?.[sortAxis] ?? -1) - (a.traits?.[sortAxis] ?? -1));
+
+  /*
+    무엇으로 정렬하든 **완료한 사람이 먼저**다.
+
+    진행 중·미응시는 성향 값이 아예 없어서, 축으로 정렬하면 값 없는 사람이
+    맨 위나 맨 아래에 뭉쳐 목록을 가로막는다. 이름순에서도 마찬가지로
+    "볼 것이 있는 줄"과 "아직 없는 줄"이 섞여 훑기가 어렵다.
+    그래서 상태를 1차 기준으로 고정하고, 고른 정렬은 그 안에서만 적용한다.
+  */
+  const statusRank = (s: string | null) =>
+    s === "COMPLETED" ? 0 : s === "IN_PROGRESS" ? 1 : 2;
+
+  rows = [...rows].sort(
+    (a, b) =>
+      statusRank(a.status) - statusRank(b.status) ||
+      (sortAxis ? (b.traits?.[sortAxis] ?? -1) - (a.traits?.[sortAxis] ?? -1) : 0) ||
+      a.name.localeCompare(b.name, "ko"),
+  );
 
   const link = (params: Record<string, string | undefined>) => {
     const sp = new URLSearchParams();
@@ -114,15 +140,47 @@ export default async function EmployeesPage(props: {
         <EmployeeList rows={rows} open={open} />
       )}
 
-      <p className="text-table text-ink-muted mt-6 max-w-[46rem]">
-        일곱 칸은 성향 축을 왼쪽부터 늘어놓은 것입니다.{" "}
-        <span style={{ color: "#44618d" }}>■</span> 낮음{" "}
-        <span style={{ color: "#b3623f" }}>■</span> 높음. 색으로 모양을 먼저 보고 숫자로
-        값을 확인하시면 됩니다. <strong>줄을 누르면 그 자리에서 그래프가 펼쳐집니다.</strong>
-      </p>
+      <div className="text-table text-ink-muted mt-6 flex flex-col gap-2">
+        <p className="max-w-[46rem]">
+          <strong className="text-ink-secondary">성향</strong> 일곱 칸은 축을 왼쪽부터
+          늘어놓은 것입니다. <span style={{ color: "#44618d" }}>■</span> 낮음{" "}
+          <span style={{ color: "#b3623f" }}>■</span> 높음 — 어느 쪽도 좋고 나쁜 것이
+          아닙니다. 색으로 모양을 먼저 보고 숫자로 값을 확인하시면 됩니다.
+        </p>
+        <p className="max-w-[46rem]">
+          <strong className="text-ink-secondary">직무능력</strong> 세 칸은 막대 길이가
+          값입니다. 여기는 성향과 달리 <strong>높을수록 좋은 값</strong>이라 갈라지는 색을
+          쓰지 않고 한 가지 색의 길이로만 표시합니다.
+        </p>
+        <p className="max-w-[46rem]">
+          <strong className="text-ink-secondary">품질</strong> 숫자는 반대 문항 일치도입니다
+          — 서로 반대인 문항에 같은 방향으로 답했는지를 100점으로 잰 값이고, 아무렇게나
+          찍으면 60 근처가 나옵니다. <strong>성격에 대한 판정이 아니라 이 응답을 믿을 수
+          있는지</strong>에 대한 값입니다. <span style={{ color: "var(--status-warn)" }}>검토</span>
+          {" · "}
+          <span style={{ color: "var(--status-critical)" }}>미달</span>이 붙은 사람은 값이
+          낮은 경우이고, <span style={{ color: "var(--status-warn)" }}>속도</span>는 일치도는
+          괜찮지만 문항을 너무 빨리 넘긴 경우입니다.
+        </p>
+        <p className="max-w-[46rem]">
+          정렬을 무엇으로 바꾸든 <strong>완료한 사람이 먼저</strong> 나오고, 진행 중·미응시는
+          아래에 모입니다. <strong>줄을 누르면 그 자리에서 그래프가 펼쳐집니다.</strong>
+        </p>
+      </div>
     </>
   );
 }
+
+/** "8/23" — 목록에서는 연도가 필요 없다. 전부 같은 해에 몰려 있다 */
+const dayLabel = (d: Date) =>
+  new Intl.DateTimeFormat("ko-KR", {
+    timeZone: "Asia/Seoul",
+    month: "numeric",
+    day: "numeric",
+  })
+    .format(d)
+    .replace(/\.\s*$/, "")
+    .replace(/\.\s*/g, "/");
 
 const sortStyle = (on: boolean) => ({
   background: on ? "var(--ink)" : "var(--wash)",

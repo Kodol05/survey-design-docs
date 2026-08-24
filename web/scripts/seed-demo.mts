@@ -203,11 +203,18 @@ for (let n = 0; n < N; n++) {
       flag: q.flag,
     },
   });
+  // 완료 시각을 지난 3주에 흩는다. 전부 `new Date()`로 두면 40여 명이 같은
+  // 초에 끝낸 것이 되어 **날짜별 누적 차트가 점 하나로 찌그러진다.**
+  // 실제로도 응시는 몇 주에 걸쳐 들어온다.
+  // 뒤로 갈수록 촘촘하게(제곱) 둔다 — 공지 직후 몰리고 뒤로 갈수록 잦아드는 모양.
+  const daysAgo = Math.round(21 * rnd() ** 2);
+  const completedAt = new Date(Date.now() - daysAgo * 86_400_000 - Math.round(rnd() * 36e5 * 8));
+
   await prisma.testSession.update({
     where: { id: session.id },
     data: {
       status: "COMPLETED",
-      completedAt: new Date(),
+      completedAt,
       durationSec: 900 + Math.round(rnd() * 600),
     },
   });
