@@ -111,7 +111,7 @@ export default async function AdminHome() {
           <h2 className="text-section-title mb-4 border-b border-[--border] pb-2">
             평가·결과 국면
           </h2>
-          <p className="text-ink-secondary mb-4 max-w-[46rem]">
+          <p className="text-ink-secondary mb-4 max-w-[56rem]">
             지금은 <strong>평가 수집 중</strong>입니다. 대표님 평가가 끝나기 전에는
             결과를 볼 수 없습니다. 결과를 먼저 보면 그 인상이 섞여서 대조하는 의미가
             없어지기 때문입니다.
@@ -323,7 +323,7 @@ function Tile({
   return (
     <div className="rounded-xl p-6" style={{ background: "var(--wash)" }}>
       <p className="text-axis text-ink-secondary">{label}</p>
-      <p className="mt-1 text-4xl font-semibold">{value}</p>
+      <p className="mt-1 text-5xl font-semibold">{value}</p>
       {hint && <p className="text-axis text-ink-muted mt-2">{hint}</p>}
     </div>
   );

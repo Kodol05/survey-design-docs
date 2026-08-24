@@ -105,7 +105,7 @@ export default async function EmployeesPage(props: {
             name="q"
             defaultValue={keyword}
             placeholder="이름"
-            className="text-table h-9 w-40 rounded-lg border border-[--border] bg-surface px-3"
+            className="text-table h-12 w-48 rounded-lg border border-[--border] bg-surface px-3"
           />
           {sortAxis && <input type="hidden" name="sort" value={sortAxis} />}
           <button className="text-table text-ink-secondary underline">찾기</button>
@@ -115,7 +115,7 @@ export default async function EmployeesPage(props: {
           <span className="text-ink-muted mr-1">정렬</span>
           <Link
             href={link({ q: keyword })}
-            className="rounded-md px-2.5 py-1"
+            className="rounded-md px-3 py-1.5"
             style={sortStyle(!sortAxis)}
           >
             이름
@@ -125,7 +125,7 @@ export default async function EmployeesPage(props: {
               <Link
                 key={s}
                 href={link({ sort: s, q: keyword })}
-                className="rounded-md px-2.5 py-1"
+                className="rounded-md px-3 py-1.5"
                 style={sortStyle(sortAxis === s)}
               >
                 {s}
@@ -141,18 +141,18 @@ export default async function EmployeesPage(props: {
       )}
 
       <div className="text-table text-ink-muted mt-6 flex flex-col gap-2">
-        <p className="max-w-[46rem]">
+        <p className="max-w-[56rem]">
           <strong className="text-ink-secondary">성향</strong> 일곱 칸은 축을 왼쪽부터
           늘어놓은 것입니다. <span style={{ color: "#44618d" }}>■</span> 낮음{" "}
           <span style={{ color: "#b3623f" }}>■</span> 높음 — 어느 쪽도 좋고 나쁜 것이
           아닙니다. 색으로 모양을 먼저 보고 숫자로 값을 확인하시면 됩니다.
         </p>
-        <p className="max-w-[46rem]">
+        <p className="max-w-[56rem]">
           <strong className="text-ink-secondary">직무능력</strong> 세 칸은 막대 길이가
           값입니다. 여기는 성향과 달리 <strong>높을수록 좋은 값</strong>이라 갈라지는 색을
           쓰지 않고 한 가지 색의 길이로만 표시합니다.
         </p>
-        <p className="max-w-[46rem]">
+        <p className="max-w-[56rem]">
           <strong className="text-ink-secondary">품질</strong> 숫자는 반대 문항 일치도입니다
           — 서로 반대인 문항에 같은 방향으로 답했는지를 100점으로 잰 값이고, 아무렇게나
           찍으면 60 근처가 나옵니다. <strong>성격에 대한 판정이 아니라 이 응답을 믿을 수
@@ -162,7 +162,7 @@ export default async function EmployeesPage(props: {
           낮은 경우이고, <span style={{ color: "var(--status-warn)" }}>속도</span>는 일치도는
           괜찮지만 문항을 너무 빨리 넘긴 경우입니다.
         </p>
-        <p className="max-w-[46rem]">
+        <p className="max-w-[56rem]">
           정렬을 무엇으로 바꾸든 <strong>완료한 사람이 먼저</strong> 나오고, 진행 중·미응시는
           아래에 모입니다. <strong>줄을 누르면 그 자리에서 그래프가 펼쳐집니다.</strong>
         </p>

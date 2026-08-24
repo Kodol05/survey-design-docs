@@ -15,12 +15,12 @@ const base =
   "transition-colors disabled:cursor-not-allowed disabled:opacity-50";
 
 const variants = {
-  // 44px
-  primary: "h-11 bg-series-1 text-white hover:brightness-110",
-  // 36px — 세로는 작아도 터치 영역은 44px를 유지한다
+  // 52px
+  primary: "h-13 bg-series-1 text-white hover:brightness-110",
+  // 44px — 세로는 작아도 터치 영역은 44px를 유지한다
   secondary:
-    "h-9 min-h-11 sm:min-h-9 border border-[--border] bg-surface text-ink hover:bg-page",
-  quiet: "h-9 min-h-11 sm:min-h-9 text-ink-secondary hover:text-ink",
+    "h-11 min-h-11 border border-[--border] bg-surface text-ink hover:bg-page",
+  quiet: "h-11 min-h-11 text-ink-secondary hover:text-ink",
 } as const;
 
 export function Button({ variant = "primary", className = "", ...rest }: Props) {

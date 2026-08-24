@@ -7,7 +7,7 @@ export const metadata = { title: "관리자 로그인" };
 export default function AdminLoginPage() {
   return (
     <main className="reading-column flex flex-1 items-center py-16">
-      <div className="mx-auto w-full max-w-sm">
+      <div className="mx-auto w-full max-w-md">
         <h1 className="text-screen-title mb-6">관리자 로그인</h1>
         <AuthForm action={adminLogin} submitLabel="로그인">
           <Field label="아이디" name="loginId" autoComplete="username" required />

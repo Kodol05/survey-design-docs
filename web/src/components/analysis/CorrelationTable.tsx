@@ -57,7 +57,7 @@ export function CorrelationTable({
         style={{ borderSpacing: 2 }}
       >
         <colgroup>
-          <col style={{ width: "8rem" }} />
+          <col style={{ width: "10.5rem" }} />
           {cols.map((c) => (
             <col key={c} />
           ))}
@@ -91,7 +91,7 @@ export function CorrelationTable({
                       disabled={!clickable}
                       onClick={() => clickable && onSelect?.({ row: r, col: c })}
                       aria-label={describe(r, c, v)}
-                      className={`flex h-[4.75rem] w-full flex-col items-center justify-center rounded-md transition ${
+                      className={`flex h-[6.25rem] w-full flex-col items-center justify-center rounded-md transition ${
                         clickable ? "cursor-pointer hover:brightness-95" : "cursor-default"
                       }`}
                       style={{

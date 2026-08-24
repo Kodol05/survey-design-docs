@@ -14,7 +14,7 @@ export default async function PasswordPage() {
 
   return (
     <main className="reading-column flex flex-1 items-center py-16">
-      <div className="mx-auto w-full max-w-sm">
+      <div className="mx-auto w-full max-w-md">
         <h1 className="text-screen-title mb-2">비밀번호 변경</h1>
         {initial && (
           <p className="text-ink-secondary mb-6">

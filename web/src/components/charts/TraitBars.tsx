@@ -41,7 +41,7 @@ export function TraitBars({ rows, height = 280 }: { rows: BarRow[]; height?: num
             dataKey="scale"
             tickLine={false}
             axisLine={{ stroke: "var(--axis)" }}
-            tick={{ fill: "var(--ink-secondary)", fontSize: 14 }}
+            tick={{ fill: "var(--ink-secondary)", fontSize: 18 }}
             interval={0}
           />
           {/* 중립선 — 전 문항에 "보통"으로 답하면 나오는 값 */}
@@ -53,7 +53,7 @@ export function TraitBars({ rows, height = 280 }: { rows: BarRow[]; height?: num
               value: "보통",
               position: "left",
               fill: "var(--ink-muted)",
-              fontSize: 14,
+              fontSize: 18,
             }}
           />
           <Bar dataKey="value" radius={[4, 4, 0, 0]} maxBarSize={30} isAnimationActive={false}>
@@ -64,7 +64,7 @@ export function TraitBars({ rows, height = 280 }: { rows: BarRow[]; height?: num
               dataKey="value"
               position="top"
               fill="var(--ink)"
-              fontSize={15}
+              fontSize={19}
               fontWeight={600}
             />
           </Bar>

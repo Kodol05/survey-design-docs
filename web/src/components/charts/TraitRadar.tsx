@@ -32,7 +32,7 @@ function Tick({ payload, x, y, textAnchor, values }: TickProps) {
   const v = values?.get(name);
   return (
     <text x={x} y={y} textAnchor={textAnchor as never} dominantBaseline="central">
-      <tspan x={x} dy={v === undefined ? 0 : -7} fill="var(--ink-secondary)" fontSize={15}>
+      <tspan x={x} dy={v === undefined ? 0 : -9} fill="var(--ink-secondary)" fontSize={19}>
         {name}
       </tspan>
       {v !== undefined && (
@@ -40,7 +40,7 @@ function Tick({ payload, x, y, textAnchor, values }: TickProps) {
           x={x}
           dy={19}
           fill="var(--ink)"
-          fontSize={16}
+          fontSize={21}
           fontWeight={600}
           style={{ fontVariantNumeric: "tabular-nums" }}
         >

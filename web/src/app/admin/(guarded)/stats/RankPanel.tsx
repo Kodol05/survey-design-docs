@@ -51,7 +51,7 @@ export function RankPanel({
         <div className="mt-6">
           <WarningBadge kind="multipleComparison" />
         </div>
-        <p className="text-axis text-ink-muted mt-3 max-w-[34rem]">
+        <p className="text-axis text-ink-muted mt-3 max-w-[42rem]">
           세부 항목 28개 × 능력 3개면 84개 상관입니다. 관계가 없어도 네댓 개는 우연히
           높게 나오므로 상위 {limit}개까지만 보여드립니다.
         </p>
@@ -72,7 +72,7 @@ export function RankPanel({
         {tercile.length === 0 ? (
           <p className="text-ink-muted mt-8">아직 나눠 볼 만큼 모이지 않았습니다.</p>
         ) : (
-          <table className="text-table mt-6 w-full max-w-lg">
+          <table className="text-table mt-6 w-full max-w-xl">
             <thead>
               <tr className="text-ink-secondary border-b border-[--border]">
                 <th className="py-2 text-left font-medium">직무능력</th>
@@ -108,7 +108,7 @@ export function RankPanel({
         )}
 
         {tercile.length > 0 && (
-          <p className="text-axis text-ink-muted mt-4 max-w-[34rem]">
+          <p className="text-axis text-ink-muted mt-4 max-w-[42rem]">
             각 무리가 {tercile[0].upperN}명씩입니다. 사람이 적어 차이를 확정으로 읽으면
             안 됩니다. 몇 점 차이는 우연히도 나옵니다.
           </p>

@@ -107,7 +107,7 @@ async function ResultBlocks({
   return (
     <>
       <Card title="일곱 가지 성향" className="mb-14">
-        <div className="max-w-2xl">
+        <div className="max-w-3xl">
         <TraitRadar
           data={t.map((x) => ({
             scale: x.scale,

@@ -15,7 +15,7 @@ export function PairReadings({
     <div className="grid gap-x-12 gap-y-10 lg:grid-cols-2">
       {readings.map((r) => (
         <section key={r.pair.title}>
-          <h3 className="mb-1 text-xl font-medium">{r.pair.title}</h3>
+          <h3 className="mb-1 text-2xl font-medium">{r.pair.title}</h3>
           <p className="text-table text-ink-muted mb-3 tabular">
             {r.pair.a} {Math.round(scores[r.pair.a]?.percent ?? 0)} · {r.pair.b}{" "}
             {Math.round(scores[r.pair.b]?.percent ?? 0)}

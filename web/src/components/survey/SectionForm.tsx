@@ -113,7 +113,7 @@ export function SectionForm({
                 첫 글자를 찾느라 눈이 헤맨다 (01 §2.3). 아래 척도 줄은 글이
                 아니므로 이 제한을 받지 않는다. */}
             <p
-              className={`mx-auto mb-10 max-w-[44rem] text-center transition-opacity ${
+              className={`mx-auto mb-10 max-w-[54rem] text-center transition-opacity ${
                 done || current ? "opacity-100" : "opacity-45"
               }`}
               style={{
@@ -147,7 +147,7 @@ export function SectionForm({
         <p className="text-axis text-ink-muted tabular">
           {answered} / {items.length}
         </p>
-        <Button onClick={next} disabled={pending} className="h-14 min-w-64 text-lg">
+        <Button onClick={next} disabled={pending} className="h-16 min-w-72 text-xl">
           {pending ? "저장 중…" : isLast ? "제출하고 결과 보기" : "다음 묶음"}
         </Button>
       </div>

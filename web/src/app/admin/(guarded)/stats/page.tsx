@@ -123,7 +123,7 @@ function Tile({
   return (
     <div className="rounded-xl p-6" style={{ background: "var(--wash)" }}>
       <p className="text-axis text-ink-secondary">{label}</p>
-      <p className="mt-1 text-4xl font-semibold">{value}</p>
+      <p className="mt-1 text-5xl font-semibold">{value}</p>
       {hint && <p className="text-axis text-ink-muted mt-2">{hint}</p>}
     </div>
   );
@@ -213,7 +213,7 @@ function InHouseSection({
   return (
     <section>
       <h2 className="text-section-title mb-1">우리 회사 데이터</h2>
-      <p className="text-ink-secondary mb-8 max-w-[46rem]">
+      <p className="text-ink-secondary mb-8 max-w-[56rem]">
         우리 직원 {matrix.n}명의 응답으로 직접 낸 값입니다. 사람이 늘거나 재검사가 쌓이면
         달라집니다. <strong>칸을 누르면 그 조합의 점 분포가 옆에 나옵니다.</strong>
       </p>
@@ -248,7 +248,7 @@ function ResearchSection({ compare }: { compare: React.ReactNode }) {
   return (
     <section>
       <h2 className="text-section-title mb-1">연구에서 나온 값</h2>
-      <p className="text-ink-secondary mb-8 max-w-[46rem]">
+      <p className="text-ink-secondary mb-8 max-w-[56rem]">
         논문 값을 그대로 적은 것입니다. 사람이 늘어도 바뀌지 않고, 점수 계산에도 쓰지
         않습니다.
       </p>
@@ -261,7 +261,7 @@ function ResearchSection({ compare }: { compare: React.ReactNode }) {
         inHouse={false}
         aside={compare}
       />
-      <p className="text-axis text-ink-muted mt-6 max-w-[46rem]">
+      <p className="text-axis text-ink-muted mt-6 max-w-[56rem]">
         서로 다른 연구에서 온 값이라 칸끼리 비교할 수 있는 값은 아닙니다. 조직생활 열이
         통째로 빈 것은 이 개념을 정의한 연구를 찾지 못해서입니다.
       </p>
@@ -321,11 +321,11 @@ function PredictionTab({ people }: { people: People }) {
 
   return (
     <section>
-      <p className="text-ink-secondary mb-4 max-w-[46rem]">
+      <p className="text-ink-secondary mb-4 max-w-[56rem]">
         성향 일곱 축으로 직무능력을 맞춰봅니다. 한 명씩 빼고 나머지로 식을 만들어 뺀
         사람을 맞추는 방식이라, 외운 것을 다시 묻는 착시가 없습니다.
       </p>
-      <div className="mb-10 max-w-[46rem]">
+      <div className="mb-10 max-w-[56rem]">
         <WarningBadge kind="overfitting" />
       </div>
 
@@ -360,7 +360,7 @@ function PredictionTab({ people }: { people: People }) {
         ))}
       </div>
 
-      <p className="text-axis text-ink-secondary mt-12 max-w-[46rem] border-t border-[--border] pt-6">
+      <p className="text-axis text-ink-secondary mt-12 max-w-[56rem] border-t border-[--border] pt-6">
         이 화면이 답하는 것은 <strong>설문 안에서 앞뒤가 맞는가</strong>입니다. 성향
         문항과 직무능력 문항을 같은 사람이 이어서 답하므로, 잘 맞는다고 실제와 맞는 것은
         아닙니다. 그건 대표님 평가와 대조해야 알 수 있습니다.
@@ -391,13 +391,13 @@ function ReliabilityTab({
 
   return (
     <section>
-      <p className="text-ink-secondary mb-8 max-w-[46rem]">
+      <p className="text-ink-secondary mb-8 max-w-[56rem]">
         한 척도의 문항들이 서로 맞물려 같은 것을 재고 있는지를 봅니다.{" "}
         <strong>α가 {ALPHA.poor} 아래인 척도는 그 상관을 볼 필요가 없습니다.</strong>{" "}
         문항이 아직 제대로 만들어지지 않았다는 뜻입니다.
       </p>
 
-      <div className="max-w-2xl overflow-x-auto">
+      <div className="max-w-3xl overflow-x-auto">
         <table className="text-table w-full">
           <thead>
             <tr className="text-ink-secondary border-b border-[--border]">
@@ -429,7 +429,7 @@ function ReliabilityTab({
         </table>
       </div>
 
-      <p className="text-axis text-ink-secondary mt-8 max-w-[46rem]">
+      <p className="text-axis text-ink-secondary mt-8 max-w-[56rem]">
         직무능력은 능력당 문항이 세 개뿐이라 α가 낮게 나오기 쉽습니다. 값을 보고 문항을
         늘릴지 판단합니다. 이 지표는 <strong>응시 인원과 무관</strong>하게 문항 품질을
         말해줍니다.

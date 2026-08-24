@@ -32,7 +32,7 @@ export function RankBars({ items }: { items: RankItem[] }) {
         return (
           <li
             key={it.label}
-            className="grid grid-cols-[11rem_1fr_13rem] items-center gap-4 py-1.5"
+            className="grid grid-cols-[14rem_1fr_16rem] items-center gap-4 py-1.5"
           >
             <span className="text-table truncate" title={it.label}>
               {it.label}

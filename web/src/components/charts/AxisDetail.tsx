@@ -27,8 +27,8 @@ export function AxisDetail({ scale, percent, band, facets }: AxisDetailProps) {
   return (
     <section className="border-t border-[--border] py-10">
       <div className="mb-6 flex items-baseline gap-3">
-        <h3 className="text-3xl font-medium">{scale}</h3>
-        <span className="tabular text-xl">{Math.round(percent)}</span>
+        <h3 className="text-4xl font-medium">{scale}</h3>
+        <span className="tabular text-2xl">{Math.round(percent)}</span>
         <span className="text-ink-muted">{BAND_LABEL[band]}</span>
       </div>
 

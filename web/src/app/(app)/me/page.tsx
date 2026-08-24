@@ -95,7 +95,7 @@ export default async function MePage() {
       {/* ③ 두 축을 같이 보기 */}
       <section className="mt-24 border-t border-[--border] pt-12">
         <h2 className="text-section-title mb-2">두 축을 같이 보면</h2>
-        <p className="text-ink-secondary mb-10 max-w-[44rem]">
+        <p className="text-ink-secondary mb-10 max-w-[54rem]">
           축을 하나씩 보는 것과 둘을 겹쳐 보는 것은 다릅니다. 서로 당기는 방향이 다른
           축이 만나면 그 안에서 긴장이 생깁니다.
         </p>
@@ -106,7 +106,7 @@ export default async function MePage() {
           사내 위치도 마찬가지로 개인 화면에는 없다 (D-09). */}
 
       {/* ⑤ 전체 안내를 한 번만 둔다. 곳곳에 경고를 흩뿌리면 아무도 안 읽는다 */}
-      <section className="text-table text-ink-muted mt-24 max-w-[46rem] border-t border-[--border] pt-8">
+      <section className="text-table text-ink-muted mt-24 max-w-[56rem] border-t border-[--border] pt-8">
         <p className="text-ink-secondary mb-2 font-medium">읽으실 때</p>
         <p className="mb-1">
           점수는 잘한다 못한다가 아니라 이런 편이다 정도입니다. 이번 일을 어떻게 할지보다

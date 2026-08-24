@@ -48,13 +48,13 @@ export function ScatterPlot({
             ticks={[0, 25, 50, 75, 100]}
             tickLine={false}
             axisLine={{ stroke: "var(--axis)" }}
-            tick={{ fill: "var(--ink-muted)", fontSize: 14 }}
+            tick={{ fill: "var(--ink-muted)", fontSize: 18 }}
             label={{
               value: xLabel,
               position: "insideBottom",
               offset: -16,
               fill: "var(--ink-secondary)",
-              fontSize: 15,
+              fontSize: 19,
             }}
           />
           <YAxis
@@ -64,13 +64,13 @@ export function ScatterPlot({
             ticks={[0, 25, 50, 75, 100]}
             tickLine={false}
             axisLine={{ stroke: "var(--axis)" }}
-            tick={{ fill: "var(--ink-muted)", fontSize: 12 }}
+            tick={{ fill: "var(--ink-muted)", fontSize: 16 }}
             label={{
               value: yLabel,
               angle: -90,
               position: "insideLeft",
               fill: "var(--ink-secondary)",
-              fontSize: 15,
+              fontSize: 19,
             }}
           />
           <ZAxis range={[90, 90]} />

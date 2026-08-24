@@ -42,7 +42,7 @@ export function CompletionTrend({ points }: { points: CompletionPoint[] }) {
   if (n === 1) {
     return (
       <div className="py-6">
-        <p className="tabular text-4xl font-semibold">{top}</p>
+        <p className="tabular text-5xl font-semibold">{top}</p>
         <p className="text-axis text-ink-muted mt-2">
           {short(points[0].date)} 하루에 몰려 있어 아직 흐름이 그려지지 않습니다. 응시가
           이틀 이상으로 나뉘면 선이 나타납니다.
@@ -99,7 +99,7 @@ export function CompletionTrend({ points }: { points: CompletionPoint[] }) {
           x={x(n - 1) + 12}
           y={y(top) + 5}
           fill="var(--ink)"
-          fontSize={17}
+          fontSize={22}
           fontWeight={600}
           className="tabular"
         >
@@ -112,7 +112,7 @@ export function CompletionTrend({ points }: { points: CompletionPoint[] }) {
             x={x(i)}
             y={H - 6}
             fill="var(--ink-muted)"
-            fontSize={14}
+            fontSize={18}
             textAnchor={i === 0 ? "start" : i === n - 1 ? "end" : "middle"}
           >
             {short(points[i].date)}

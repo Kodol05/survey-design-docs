@@ -17,14 +17,14 @@ import { ABILITY_AXES, TRAIT_SCALES } from "@/lib/items/types";
 // **한 칸 안의 스트립까지 끝없이 늘리면 반대 문제가 생긴다** — 2560 화면에서
 // 7칸이 1,200px로 퍼지면 숫자와 머리글이 멀어져 어느 축인지 못 찾는다.
 // 그래서 셀은 늘어나되 스트립 전체에 상한을 둔다. 남는 폭은 여백으로 둔다.
-const CELL = "min-w-[3.25rem] flex-1";
+const CELL = "min-w-[4rem] flex-1";
 
 export function TraitStrip({ traits }: { traits: Record<string, number> | null }) {
   if (!traits)
     return <span className="text-ink-muted text-axis">아직 결과가 없습니다</span>;
 
   return (
-    <div className="flex w-full max-w-[46rem] gap-3" role="img" aria-label={describe(traits)}>
+    <div className="flex w-full max-w-[56rem] gap-3" role="img" aria-label={describe(traits)}>
       {TRAIT_SCALES.map((s) => {
         const v = traits[s];
         const has = typeof v === "number";
@@ -37,7 +37,7 @@ export function TraitStrip({ traits }: { traits: Record<string, number> | null }
             <span className="tabular text-table">{has ? Math.round(v) : "—"}</span>
             <span
               aria-hidden
-              className="size-3 shrink-0 rounded-[3px]"
+              className="size-3.5 shrink-0 rounded-[3px]"
               style={{ background: has ? colorAt(v) : "var(--grid)" }}
             />
           </span>
@@ -47,7 +47,7 @@ export function TraitStrip({ traits }: { traits: Record<string, number> | null }
   );
 }
 
-const A_CELL = "min-w-[3.75rem] flex-1";
+const A_CELL = "min-w-[4.75rem] flex-1";
 
 /**
  * 직무능력 3축 한 줄 표시 — 관리자 목록 전용.
@@ -64,7 +64,7 @@ export function AbilityStrip({ abilities }: { abilities: Record<string, number> 
     return <span className="text-ink-muted text-axis">—</span>;
 
   return (
-    <div className="flex w-full max-w-[20rem] gap-3" role="img" aria-label={describeAbility(abilities)}>
+    <div className="flex w-full max-w-[25rem] gap-3" role="img" aria-label={describeAbility(abilities)}>
       {ABILITY_AXES.map((a) => {
         const v = abilities[a];
         const has = typeof v === "number";
@@ -73,7 +73,7 @@ export function AbilityStrip({ abilities }: { abilities: Record<string, number> 
             <span className="tabular text-table block text-right leading-none">
               {has ? Math.round(v) : "—"}
             </span>
-            <span aria-hidden className="mt-1 block h-[3px] rounded-full" style={{ background: "var(--grid)" }}>
+            <span aria-hidden className="mt-1 block h-1 rounded-full" style={{ background: "var(--grid)" }}>
               <span
                 className="block h-full rounded-full"
                 style={{
@@ -91,9 +91,9 @@ export function AbilityStrip({ abilities }: { abilities: Record<string, number> 
 
 export function AbilityStripHeader() {
   return (
-    <div className="flex w-full max-w-[20rem] gap-3">
+    <div className="flex w-full max-w-[25rem] gap-3">
       {ABILITY_AXES.map((a) => (
-        <span key={a} className={`${A_CELL} text-ink-muted text-right`} style={{ fontSize: 13 }}>
+        <span key={a} className={`${A_CELL} text-ink-muted text-right`} style={{ fontSize: 17 }}>
           {A_SHORT[a]}
         </span>
       ))}
@@ -132,12 +132,12 @@ function describe(traits: Record<string, number>) {
 /** 목록 머리에 한 번 두는 축 이름 줄. 아래 칸과 자리를 맞춘다. */
 export function TraitStripHeader() {
   return (
-    <div className="flex w-full max-w-[46rem] gap-3">
+    <div className="flex w-full max-w-[56rem] gap-3">
       {TRAIT_SCALES.map((s) => (
         <span
           key={s}
-          className={`${CELL} text-ink-muted pr-[1.125rem] text-right`}
-          style={{ fontSize: 13 }}
+          className={`${CELL} text-ink-muted pr-[1.5rem] text-right`}
+          style={{ fontSize: 17 }}
           title={s}
         >
           {SHORT[s]}

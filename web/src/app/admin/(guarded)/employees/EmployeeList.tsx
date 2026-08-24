@@ -63,11 +63,11 @@ export function EmployeeList({ rows, open }: { rows: Row[]; open: boolean }) {
       <table className="w-full">
         <thead>
           <tr className="text-axis text-ink-muted border-b border-[--border]">
-            <th className="w-36 pb-2 text-left font-medium">이름</th>
-            <th className="w-28 pb-2 text-left font-medium">번호</th>
-            <th className="w-14 pb-2 text-left font-medium">상태</th>
-            <th className="w-20 pb-2 text-left font-medium">품질</th>
-            <th className="w-12 pb-2 text-left font-medium">완료</th>
+            <th className="w-44 pb-2 text-left font-medium">이름</th>
+            <th className="w-36 pb-2 text-left font-medium">번호</th>
+            <th className="w-20 pb-2 text-left font-medium">상태</th>
+            <th className="w-24 pb-2 text-left font-medium">품질</th>
+            <th className="w-16 pb-2 text-left font-medium">완료</th>
             <th className="w-[42%] pb-2 pl-4 text-left font-medium">
               {open ? <TraitStripHeader /> : "성향"}
             </th>
@@ -84,11 +84,11 @@ export function EmployeeList({ rows, open }: { rows: Row[]; open: boolean }) {
               <Fragment key={r.id}>
                 <tr
                   onClick={() => canExpand && setOpenId(expanded ? null : r.id)}
-                  className={`h-8 border-b border-[--border] ${
+                  className={`border-b border-[--border] ${
                     canExpand ? "cursor-pointer hover:bg-[--wash]" : ""
                   } ${expanded ? "bg-[--wash]" : ""}`}
                 >
-                  <td className="py-1.5">
+                  <td className="py-2.5">
                     <span className="font-medium">{r.name}</span>
                     {canExpand && (
                       <span className="text-ink-muted text-axis ml-2">
@@ -96,30 +96,30 @@ export function EmployeeList({ rows, open }: { rows: Row[]; open: boolean }) {
                       </span>
                     )}
                   </td>
-                  <td className="text-axis tabular text-ink-secondary py-1.5">
+                  <td className="text-axis tabular text-ink-secondary py-2.5">
                     {r.phone ? formatPhone(r.phone) : "—"}
                   </td>
-                  <td className="text-axis text-ink-secondary py-1.5">
+                  <td className="text-axis text-ink-secondary py-2.5">
                     {r.status ? STATUS[r.status as keyof typeof STATUS] : "미응시"}
                   </td>
-                  <td className="py-1.5">
+                  <td className="py-2.5">
                     <Quality
                       flag={r.flag}
                       agreement={r.agreement}
                       fastCount={r.fastCount}
                     />
                   </td>
-                  <td className="text-axis tabular text-ink-muted py-1.5">
+                  <td className="text-axis tabular text-ink-muted py-2.5">
                     {r.completedLabel ?? "—"}
                   </td>
-                  <td className="py-1.5 pl-4 whitespace-nowrap">
+                  <td className="py-2.5 pl-4 whitespace-nowrap">
                     {open ? (
                       <TraitStrip traits={r.traits} />
                     ) : (
                       <span className="text-axis text-ink-muted">공개 전</span>
                     )}
                   </td>
-                  <td className="py-1.5 pl-4 whitespace-nowrap">
+                  <td className="py-2.5 pl-4 whitespace-nowrap">
                     {open ? (
                       <AbilityStrip abilities={r.abilities} />
                     ) : (
@@ -226,7 +226,7 @@ function Panel({ row }: { row: Row }) {
         <h3 className="text-section-title">{row.name}</h3>
         <Link
           href={`/admin/employees/${row.id}`}
-          className="inline-flex h-11 items-center rounded-lg px-5 font-medium"
+          className="inline-flex h-13 items-center rounded-lg px-6 font-medium"
           style={{ background: "var(--series-1)", color: "#fff" }}
         >
           상세 보기 →
@@ -235,16 +235,16 @@ function Panel({ row }: { row: Row }) {
 
       {/* 폭을 고정한다. 늘어나게 두면 막대가 화면 끝까지 퍼져서 읽기 나쁘다 */}
       <div className="flex flex-wrap items-start gap-10">
-        <div className="w-full max-w-[20rem]">
+        <div className="w-full max-w-[23rem]">
           <TraitRadar data={ordered} showValues />
         </div>
 
-        <div className="w-full max-w-[26rem]">
-          <TraitBars rows={ordered} height={230} />
+        <div className="w-full max-w-[31rem]">
+          <TraitBars rows={ordered} height={280} />
         </div>
 
         {abilities.length > 0 && (
-          <div className="w-full max-w-[16rem]">
+          <div className="w-full max-w-[19rem]">
             <p className="text-table text-ink-secondary mb-3">직무능력</p>
             <ul className="flex flex-col gap-3">
               {abilities.map(([axis, v]) => (
@@ -271,7 +271,7 @@ function Panel({ row }: { row: Row }) {
           </div>
         )}
 
-        <div className="w-full max-w-[19rem]">
+        <div className="w-full max-w-[23rem]">
           <QuickRead traits={traits} />
           <p className="text-axis text-ink-muted mt-4">
             사내 위치와 관련 성향 축은 상세 보기에 있습니다.
