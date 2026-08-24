@@ -73,6 +73,15 @@ export function PredictionPanel({
         ))}
       </div>
 
+      {cur.fromEstimates && (
+        <p className="text-axis text-ink-secondary mb-6 max-w-[52rem] border-l-2 border-[--axis] py-1 pl-4">
+          <strong>{cur.axis}</strong>은 직접 잰 연구가 없어, 가까운 개념 둘
+          (<strong>조직시민행동</strong> 0.6 + <strong>직무만족</strong> 0.4)을 섞어
+          <strong> 계산한 추정 가중치</strong>로 예측했습니다. 다른 축보다 근거가 한 단
+          약합니다.
+        </p>
+      )}
+
       {/* 한 줄 요약 — 이 화면의 답 */}
       <div className="mb-10 grid gap-4 sm:grid-cols-3">
         <Fact
@@ -216,13 +225,18 @@ export function PredictionPanel({
       </div>
 
       <p className="text-axis text-ink-muted mt-10">
-        예측에 쓴 논문 값 —{" "}
+        예측에 쓴 가중치 —{" "}
         {cur.weights.map((w, i) => (
           <span key={w.scale}>
             {i > 0 && " · "}
-            {w.scale} <span className="tabular">{formatR(w.r)}</span>
+            {w.scale}{" "}
+            <span className="tabular">
+              {w.estimated && "≈"}
+              {formatR(w.r)}
+            </span>
           </span>
         ))}
+        {cur.fromEstimates && <> · ≈ 는 계산한 추정치입니다</>}
       </p>
     </div>
   );

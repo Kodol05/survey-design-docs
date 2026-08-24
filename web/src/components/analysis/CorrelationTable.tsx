@@ -28,7 +28,7 @@ export type Cell =
    * 직접 잰 연구는 없지만 쪼개서 **방향만** 세운 칸 (조직생활).
    * 숫자가 없으므로 칠하지 않는다 — 칠하면 잰 값처럼 보인다.
    */
-  | { kind: "expected"; direction: 1 | -1; basis: string }
+  | { kind: "expected"; direction: 1 | -1; basis: string; estimate?: number }
   /** 사내 데이터가 아직 모자란다 */
   | { kind: "tooFew"; n: number };
 
@@ -139,14 +139,23 @@ function Body({ cell }: { cell: Cell }) {
   if (cell.kind === "expected")
     return (
       <span
-        className="text-axis rounded-md px-2 py-1"
+        className="flex flex-col items-center rounded-md px-2 py-1"
         style={{
           color: "var(--ink-secondary)",
           outline: "1px dashed var(--border)",
         }}
         title={cell.basis}
       >
-        {cell.direction > 0 ? "+" : "−"} 예상
+        <span className="tabular font-medium">
+          {cell.estimate === undefined
+            ? cell.direction > 0
+              ? "+"
+              : "−"
+            : `≈${cell.estimate < 0 ? "−" : "+"}${Math.abs(cell.estimate)
+                .toFixed(2)
+                .replace(/^0/, "")}`}
+        </span>
+        <span className="text-axis leading-tight">추정</span>
       </span>
     );
   if (cell.kind === "none")
@@ -211,9 +220,10 @@ export function CorrelationLegend({ inHouse }: { inHouse?: boolean }) {
             className="rounded px-1.5"
             style={{ outline: "1px dashed var(--border)", color: "var(--ink-secondary)" }}
           >
-            + 예상
+            ≈+.08 추정
           </span>{" "}
-          직접 잰 연구는 없고 쪼개서 방향만 세운 것 (숫자 없음)
+          직접 잰 연구가 없어 가까운 개념 둘을 섞어 <strong>계산</strong>한 값. 잰 값이
+          아닙니다
         </span>
       )}
     </div>

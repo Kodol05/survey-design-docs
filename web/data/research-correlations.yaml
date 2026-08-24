@@ -41,7 +41,25 @@ sources:
     note: 자율적 실행과 정확히 같은 개념은 아니다
     url: https://content.scirp.org/pdf/psych_2015120713370375.pdf
 
-  # ── 아래 둘은 조직생활을 "쪼개서" 방향만 세우는 데 쓴다 (state: expected) ──
+  # ── 아래 셋은 조직생활을 "쪼개서" 세우는 데 쓴다 (state: expected) ──
+  judge2002:
+    label: Judge, Heller & Mount (2002), J Appl Psychol 87(3) 530-541
+    sample: 163개 독립 표본 · 상관 334개 메타분석
+    measured: 5요인 성격 → 직무만족
+    note: >-
+      신경증 -.29 · 외향성 +.25 · 성실성 +.26 · 우호성 +.17 · 개방성 +.02.
+      직무만족은 조직생활과 같은 것이 아니다. 다만 오래 다니는 것과 강하게
+      이어지고 대인 융화와도 겹쳐, 지금 구할 수 있는 가장 가까운 대리 지표다.
+    url: https://home.ubalt.edu/tmitch/642/articles%20syllabus/Judge%20Heller%20Mount%205%20fact%20model%20&%20job%20sat%202002.pdf
+  organ1995:
+    label: Organ & Ryan (1995), Personnel Psychology 48(4) 775-802
+    sample: 조직시민행동 연구 55편 메타분석
+    measured: 5요인 성격 -> 조직시민행동 (동료를 자발적으로 돕는 행동)
+    note: >-
+      우호성-예의 .12 · 성실성-규범준수 .15 (Konovsky & Organ 1996).
+      메타분석 결론은 "성격은 조직시민행동을 그리 잘 예측하지 못한다"이다.
+      대인 융화에 가장 가까운 개념인데 계수가 직무만족보다 오히려 작다.
+    url: https://onlinelibrary.wiley.com/doi/abs/10.1111/j.1744-6570.1995.tb01781.x
   zimmerman2008:
     label: Zimmerman (2008), Personnel Psychology 61(2) 309–348
     sample: 이직 연구 메타분석
@@ -114,7 +132,8 @@ correlations:
     state: expected
     direction: -1
     weight: 0.5
-    basis: 근속 — 위험회피↔신경증(+), 신경증이 이직의도를 가장 강하게 (+)예측
+    basis: 위험회피↔신경증(+), 신경증→직무만족 -.29
+    chain: 방향만 - 위험회피↔신경증 계수를 구하지 못했다
     source: zimmerman2008
   - scale: 사회적민감성
     ability: 조직생활
@@ -124,22 +143,28 @@ correlations:
     state: expected
     direction: 1
     weight: 0.5
-    basis: 근속 — 인내력↔성실성 .46~.57, 성실성이 실제 이직을 (−)예측
-    source: zimmerman2008
+    estimate: 0.10
+    basis: 인내력↔성실성 .51 -> 조직시민행동 .15 / 직무만족 .26
+    chain: .51 x (0.6 x .15 + 0.4 x .26) = .10
+    source: judge2002
   - scale: 자율성
     ability: 조직생활
     state: expected
     direction: 1
     weight: 0.5
-    basis: 근속 — 자율성↔성실성 .40~.45, 성실성이 실제 이직을 (−)예측
-    source: zimmerman2008
+    estimate: 0.08
+    basis: 자율성↔성실성 .43 -> 조직시민행동 .15 / 직무만족 .26
+    chain: .43 x (0.6 x .15 + 0.4 x .26) = .08
+    source: judge2002
   - scale: 연대감
     ability: 조직생활
     state: expected
     direction: 1
     weight: 1.0
-    basis: 대인 융화 + 근속 양쪽 — 연대감↔우호성 .51~.64, 우호성이 실제 이직을 (−)예측
-    source: defruyt2000
+    estimate: 0.08
+    basis: 연대감↔우호성 .57 -> 조직시민행동 .12 / 직무만족 .17
+    chain: .57 x (0.6 x .12 + 0.4 x .17) = .08
+    source: organ1995
   - scale: 자기초월
     ability: 조직생활
     state: unstudied

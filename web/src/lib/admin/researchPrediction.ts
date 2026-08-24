@@ -49,7 +49,9 @@ export type ResearchPrediction = {
   axis: string;
   n: number;
   /** 예측에 쓴 성향 축과 그 가중치 */
-  weights: { scale: string; r: number }[];
+  weights: { scale: string; r: number; estimated?: boolean }[];
+  /** 가중치가 직접 잰 값이 아니라 계산한 추정치인가 (조직생활) */
+  fromEstimates: boolean;
   rows: PredictionRow[];
   /** 예측 ↔ 실제 상관. 이 값이 예측이 맞았는지를 말한다 */
   corr: number;
@@ -95,11 +97,19 @@ export function predictFromResearch(
   axis: string,
 ): ResearchPrediction | null {
   const table = loadResearchTable();
-  const weights: { scale: string; r: number }[] = [];
+  const weights: { scale: string; r: number; estimated?: boolean }[] = [];
   for (const scale of TRAIT_SCALES) {
     const c = getCell(table, scale, axis);
     // `없음`(연구했는데 관련 없음)과 `—`(안 쟀음) 둘 다 가중치가 없다
     if (c.kind === "value" && c.value !== 0) weights.push({ scale, r: c.value });
+    /*
+      가까운 개념을 섞어 **계산한** 추정치도 가중치로 쓴다 (조직생활).
+      직접 잰 값과 섞이지 않도록 표시를 달아 화면에서 구분한다.
+      부호만 있고 숫자가 없는 칸(위험회피)은 쓸 수 없다 — 크기가 없으면
+      더할 수가 없다.
+    */
+    if (c.kind === "expected" && typeof c.estimate === "number" && c.estimate !== 0)
+      weights.push({ scale, r: c.estimate, estimated: true });
   }
   if (weights.length === 0) return null;
 
@@ -173,6 +183,7 @@ export function predictFromResearch(
   return {
     axis,
     n: usable.length,
+    fromEstimates: weights.some((w) => w.estimated),
     fit: { slope, intercept: amActual - slope * pm },
     weights,
     rows,

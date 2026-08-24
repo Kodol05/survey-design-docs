@@ -38,14 +38,33 @@ describe("predictFromResearch", () => {
     expect(predictFromResearch(makePeople(5, 1, axis), axis)).toBeNull();
   });
 
-  it("논문 값이 없는 축은 예측하지 않는다 — 0으로 채우지 않는다", () => {
-    // 조직생활은 연구를 찾지 못해 가중치가 없다 (07)
+  it("쓸 가중치가 하나도 없으면 예측하지 않는다 — 0으로 채우지 않는다", () => {
+    /*
+      가중치가 될 수 있는 것은 두 가지다 — 직접 잰 값(value)과 계산한
+      추정치(estimate). 둘 다 없으면 예측을 만들지 않는다.
+    */
     const table = loadResearchTable();
-    const hasAny = TRAIT_SCALES.some(
-      (s) => getCell(table, s, "조직생활").kind === "value",
-    );
-    if (!hasAny)
-      expect(predictFromResearch(makePeople(30, 1, "조직생활"), "조직생활")).toBeNull();
+    for (const axis of ["협력", "조직생활", "자율적실행"]) {
+      const usable = TRAIT_SCALES.some((s) => {
+        const c = getCell(table, s, axis);
+        return (
+          (c.kind === "value" && c.value !== 0) ||
+          (c.kind === "expected" && typeof c.estimate === "number" && c.estimate !== 0)
+        );
+      });
+      const out = predictFromResearch(makePeople(30, 0.6, axis), axis);
+      if (usable) expect(out).not.toBeNull();
+      else expect(out).toBeNull();
+    }
+  });
+
+  it("추정 가중치로 만든 축은 그렇다고 표시된다", () => {
+    const out = predictFromResearch(makePeople(30, 0.6, "조직생활"), "조직생활");
+    if (out) {
+      expect(out.fromEstimates).toBe(true);
+      // 조직생활은 직접 잰 값이 하나도 없어야 한다
+      expect(out.weights.every((w) => w.estimated)).toBe(true);
+    }
   });
 
   it("예측을 실제와 같은 눈금으로 되돌린다", () => {

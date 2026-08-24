@@ -325,7 +325,12 @@ function ResearchSection({ compare }: { compare: React.ReactNode }) {
           : c.kind === "none"
             ? { kind: "none" }
             : c.kind === "expected"
-              ? { kind: "expected", direction: c.direction, basis: c.basis }
+              ? {
+                  kind: "expected",
+                  direction: c.direction,
+                  basis: c.chain ? `${c.basis} — ${c.chain}` : c.basis,
+                  estimate: c.estimate,
+                }
               : { kind: "unstudied" };
     }
 
@@ -414,25 +419,11 @@ function PredictionTab({ people }: { people: People }) {
         숫자가 아무 말도 하지 않는다.
       */}
       <h2 className="text-section-title mb-3">논문이 본 것과 우리가 잰 것</h2>
-      <p className="text-item text-ink-secondary mb-4 max-w-[52rem]">
-        논문에서 나온 성향×직무능력 상관을 가중치로 삼아{" "}
-        <strong>이 사람의 직무능력이 얼마쯤일지 계산</strong>하고, 실제로 나온 값과
-        나란히 놓았습니다.
+      <p className="text-item text-ink-secondary mb-8 max-w-[52rem]">
+        논문 상관을 가중치로 삼아 <strong>이 사람의 직무능력이 얼마쯤일지 계산</strong>하고
+        실제 값과 나란히 놓았습니다. 어긋난다면{" "}
+        <strong>우리 회사가 논문과 다르거나, 그 사람이 남다르거나</strong>입니다.
       </p>
-      <p className="text-ink-secondary mb-6 max-w-[52rem]">
-        어긋난다면 둘 중 하나입니다 — <strong>우리 회사가 논문과 다르거나</strong>,{" "}
-        <strong>그 사람이 남다르거나.</strong> 둘 다 볼 만한 이야기입니다.
-      </p>
-      {missing.length > 0 && (
-        <p className="text-ink-secondary mb-10 max-w-[52rem] border-l-2 border-[--axis] py-1 pl-4">
-          <strong>{missing.join(" · ")}</strong>은 여기에 없습니다. 직접 잰 연구가 없어{" "}
-          <strong>크기(계수)가 하나도 없습니다.</strong> 쪼개서 <strong>방향</strong>은
-          세워 뒀는데(연구 표의 <span className="whitespace-nowrap">「+ 예상」</span> 칸),
-          방향만으로는 점수를 계산할 수 없습니다. 0으로 채우면 「예측이 맞았다」는
-          착각이 생기므로 빈칸으로 둡니다 — <strong>대표님 평가가 필요한 가장 큰 이유</strong>가
-          이것입니다.
-        </p>
-      )}
 
       {items.length === 0 ? (
         <>
