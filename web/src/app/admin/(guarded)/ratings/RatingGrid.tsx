@@ -36,10 +36,10 @@ export function RatingGrid({ rows }: { rows: RatingRow[] }) {
       {rows.map((r) => (
         <li
           key={r.id}
-          className="grid items-center gap-x-8 gap-y-3 border-b border-[--border] py-5 lg:grid-cols-[12rem_1fr]"
+          className="grid items-center gap-x-8 gap-y-4 border-b border-[--border] py-6 lg:grid-cols-[12rem_1fr]"
         >
           <span className="text-table font-medium">{r.name}</span>
-          <div className="flex flex-col gap-2">
+          <div className="flex flex-col gap-3">
             {ABILITY_AXES.map((axis) => (
               <AxisRow
                 key={axis}
@@ -82,9 +82,14 @@ function AxisRow({
   };
 
   return (
-    <div className="flex flex-wrap items-center gap-x-4 gap-y-2">
-      <span className="text-axis text-ink-secondary w-24 shrink-0">{axis}</span>
-      <div className="flex gap-1" style={{ opacity: pending ? 0.6 : 1 }}>
+    <div className="flex flex-wrap items-center gap-x-5 gap-y-2">
+      <span className="text-table text-ink-secondary w-28 shrink-0">{axis}</span>
+      {/*
+        칸을 키우고 사이를 벌린다 (2026-08-24). 오른쪽 폭이 한참 남는데
+        40px짜리가 다닥다닥 붙어 있었다. **누르기 쉬워야 하는 화면**이다 —
+        한 사람에 세 번씩 132번을 누른다.
+      */}
+      <div className="flex gap-2" style={{ opacity: pending ? 0.6 : 1 }}>
         {STEPS.map((v) => {
           const on = score === v;
           return (
@@ -94,7 +99,7 @@ function AxisRow({
               onClick={() => pick(v)}
               aria-pressed={on}
               aria-label={`${axis} ${v}점`}
-              className="tabular text-axis size-10 rounded-md"
+              className="tabular text-table size-14 rounded-lg"
               style={{
                 background: on ? "var(--series-1)" : "var(--wash)",
                 color: on ? "#fff" : "var(--ink-secondary)",
