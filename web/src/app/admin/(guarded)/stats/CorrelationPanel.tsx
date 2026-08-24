@@ -25,6 +25,7 @@ export function CorrelationPanel({
   scatter,
   trends,
   inHouse,
+  aside,
 }: {
   rows: string[];
   cols: string[];
@@ -32,6 +33,11 @@ export function CorrelationPanel({
   scatter: Record<string, Point[]>;
   trends: Record<string, { x: number; y: number }[] | null>;
   inHouse: boolean;
+  /**
+   * 오른쪽 칸에 대신 넣을 것. 연구 표에는 점 분포가 없어 이 칸이 비는데,
+   * 안내 문구로 채우면 화면 절반이 놀게 된다. 볼 것을 넣는다.
+   */
+  aside?: React.ReactNode;
 }) {
   const firstValue = Object.entries(cells).find(([, c]) => c.kind === "value")?.[0];
   const [sel, setSel] = useState<Selected>(
@@ -57,12 +63,7 @@ export function CorrelationPanel({
 
       <div>
         {!inHouse ? (
-          <div className="text-ink-secondary flex h-full items-center">
-            <p className="max-w-[26rem]">
-              이 표는 논문에서 나온 값이라 우리 직원의 점 분포가 없습니다. 옆 탭의 우리
-              회사 데이터에서는 칸을 누르면 실제 점을 볼 수 있습니다.
-            </p>
-          </div>
+          aside
         ) : !sel || cell?.kind !== "value" ? (
           <p className="text-ink-muted py-16 text-center">
             왼쪽 표에서 칸을 누르면 그 조합의 점 분포가 여기 나옵니다.
