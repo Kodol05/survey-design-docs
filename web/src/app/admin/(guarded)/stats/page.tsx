@@ -297,7 +297,7 @@ function InHouseSection({
       <SourcePicker value={source} bossCount={bossCount} className="mb-1" />
       <p className="text-ink-secondary mb-8 max-w-[56rem]">
         우리 직원 {matrix.n}명 값입니다. {SOURCE_NOTE[source]}{" "}
-        <strong>칸을 누르면 그 조합의 점 분포가 옆에 나옵니다.</strong>
+        <strong>칸을 누르면 그 조합만 크게 보고, 다시 누르면 돌아옵니다.</strong>
       </p>
       <CorrelationPanel
         rows={[...TRAIT_SCALES]}

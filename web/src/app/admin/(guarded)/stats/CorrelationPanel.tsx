@@ -39,14 +39,50 @@ export function CorrelationPanel({
    */
   aside?: React.ReactNode;
 }) {
-  const firstValue = Object.entries(cells).find(([, c]) => c.kind === "value")?.[0];
-  const [sel, setSel] = useState<Selected>(
-    firstValue ? { row: firstValue.split("|")[0], col: firstValue.split("|")[1] } : null,
-  );
+  /*
+    처음에는 **아무것도 안 고른 상태**로 둔다.
+
+    전에는 첫 값 칸을 자동으로 골라 뒀는데, 그러면 표에서 위쪽 왼쪽 칸이
+    별 이유 없이 특별해 보인다. 지금은 고르기 전에 **볼 만한 것 넷**을
+    먼저 보여주고, 고르면 그것 하나로 좁힌다.
+  */
+  const [sel, setSel] = useState<Selected>(null);
+
+  /** 같은 칸을 다시 누르면 선택이 풀려 다시 넷으로 돌아간다 */
+  const toggle = (next: { row: string; col: string }) =>
+    setSel((cur) =>
+      cur && cur.row === next.row && cur.col === next.col ? null : next,
+    );
 
   const k = sel ? `${sel.row}|${sel.col}` : "";
   const cell = sel ? cells[k] : undefined;
   const points = sel ? (scatter[k] ?? []) : [];
+
+  /*
+    고르기 전에 보여줄 넷 — **볼 만한 순서**로 고른다.
+
+    신뢰구간이 0을 벗어난 것(방향이 확정된 것)을 먼저 두고, 그 안에서
+    관련도가 큰 순이다. 확정된 것이 넷이 안 되면 남은 자리는 큰 값으로 채운다.
+    아무 기준 없이 위에서 넷을 자르면 표의 왼쪽 위만 계속 보게 된다.
+  */
+  const featured = Object.entries(cells)
+    .filter(([, c]) => c.kind === "value")
+    .map(([key, c]) => {
+      const v = c as Extract<Cell, { kind: "value" }>;
+      return {
+        key,
+        row: key.split("|")[0],
+        col: key.split("|")[1],
+        cell: v,
+        settled: !(v.ci[0] <= 0 && v.ci[1] >= 0),
+      };
+    })
+    .sort(
+      (a, b) =>
+        Number(b.settled) - Number(a.settled) ||
+        Math.abs(b.cell.r) - Math.abs(a.cell.r),
+    )
+    .slice(0, 4);
 
   return (
     <div className="grid gap-10 xl:grid-cols-[minmax(0,1fr)_minmax(0,1fr)]">
@@ -56,7 +92,7 @@ export function CorrelationPanel({
           cols={cols}
           cell={(r, c) => cells[`${r}|${c}`] ?? { kind: "unstudied" }}
           selected={sel}
-          onSelect={inHouse ? setSel : undefined}
+          onSelect={inHouse ? toggle : undefined}
         />
         <CorrelationLegend inHouse={inHouse} />
       </div>
@@ -64,15 +100,11 @@ export function CorrelationPanel({
       <div>
         {!inHouse ? (
           aside
-        ) : !sel || cell?.kind !== "value" ? (
-          <p className="text-ink-muted py-16 text-center">
-            왼쪽 표에서 칸을 누르면 그 조합의 점 분포가 여기 나옵니다.
-          </p>
-        ) : (
+        ) : sel && cell?.kind === "value" ? (
           <>
-            <div className="mb-3 flex items-baseline gap-3">
-              <h3 className="font-medium">
-                {sel.row} × {sel.col}
+            <div className="mb-3 flex flex-wrap items-baseline gap-x-3 gap-y-1">
+              <h3 className="text-section-title">
+                {sel.row} <span className="text-ink-muted">×</span> {sel.col}
               </h3>
               <span className="text-table">
                 <span className="tabular">{formatR(cell.r)}</span>
@@ -81,16 +113,67 @@ export function CorrelationPanel({
                   n={cell.n} · {formatR(cell.ci[0])}~{formatR(cell.ci[1])}
                 </span>
               </span>
+              <button
+                type="button"
+                onClick={() => setSel(null)}
+                className="text-axis text-ink-muted ml-auto underline"
+              >
+                넷 다 보기
+              </button>
             </div>
+            {/*
+              하나만 볼 때는 **왼쪽 표와 키를 맞춘다.** 표가 7행이라 500px쯤
+              되는데 그래프만 360px이면 오른쪽이 허전하고 점도 뭉친다.
+            */}
             <ScatterPlot
+              height={520}
               points={points}
               trend={trends[k] ?? null}
               xLabel={sel.row}
               yLabel={sel.col}
             />
             <p className="text-axis text-ink-muted mt-2">
-              점 하나가 한 사람입니다. 마우스를 올리면 누구인지 나옵니다.
+              점 하나가 한 사람입니다. 마우스를 올리면 누구인지 나옵니다. 같은
+              칸을 다시 누르면 넷으로 돌아갑니다.
             </p>
+          </>
+        ) : featured.length === 0 ? (
+          <p className="text-ink-muted py-16 text-center">
+            아직 그려 볼 값이 없습니다.
+          </p>
+        ) : (
+          <>
+            <p className="text-axis text-ink-muted mb-4">
+              볼 만한 조합 {featured.length}개입니다 — 방향이 확정된 것부터, 그
+              안에서 관련도가 큰 순. <strong>왼쪽 표에서 칸을 누르면</strong> 그
+              하나만 크게 봅니다.
+            </p>
+            <div className="grid gap-6 sm:grid-cols-2">
+              {featured.map((f) => (
+                <button
+                  key={f.key}
+                  type="button"
+                  onClick={() => setSel({ row: f.row, col: f.col })}
+                  className="rounded-xl p-3 text-left transition hover:brightness-95"
+                  style={{ background: "var(--wash)" }}
+                >
+                  <p className="text-table mb-1 font-medium">
+                    {f.row} <span className="text-ink-muted">×</span> {f.col}
+                    <span className="tabular text-axis text-ink-secondary ml-2">
+                      {formatR(f.cell.r)}
+                    </span>
+                    <GradeTag r={f.cell.r} ci={f.cell.ci} className="ml-1.5" />
+                  </p>
+                  <ScatterPlot
+                    height={210}
+                    points={scatter[f.key] ?? []}
+                    trend={trends[f.key] ?? null}
+                    xLabel={f.row}
+                    yLabel={f.col}
+                  />
+                </button>
+              ))}
+            </div>
           </>
         )}
       </div>
