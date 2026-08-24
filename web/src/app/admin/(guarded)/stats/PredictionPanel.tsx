@@ -49,6 +49,11 @@ export function PredictionPanel({
             }}
           >
             {it.axis}
+            {it.fromEstimates && (
+              <span aria-hidden className="ml-1.5" title="추정 가중치">
+                ⚠
+              </span>
+            )}
           </button>
         ))}
         {/*
@@ -74,12 +79,28 @@ export function PredictionPanel({
       </div>
 
       {cur.fromEstimates && (
-        <p className="text-axis text-ink-secondary mb-6 max-w-[52rem] border-l-2 border-[--axis] py-1 pl-4">
-          <strong>{cur.axis}</strong>은 직접 잰 연구가 없어, 가까운 개념 둘
-          (<strong>조직시민행동</strong> 0.6 + <strong>직무만족</strong> 0.4)을 섞어
-          <strong> 계산한 추정 가중치</strong>로 예측했습니다. 다른 축보다 근거가 한 단
-          약합니다.
-        </p>
+        <div
+          className="mb-8 max-w-[52rem] rounded-xl p-5"
+          style={{ background: "var(--wash)" }}
+        >
+          <p className="text-table mb-2 font-medium">
+            <span aria-hidden className="mr-1.5">
+              ⚠
+            </span>
+            {cur.axis}은 <strong>세 축 중 예측이 가장 어렵습니다</strong>
+          </p>
+          <p className="text-axis text-ink-secondary leading-relaxed">
+            직접 잰 연구가 하나도 없어, 가까운 개념 둘(<strong>조직시민행동</strong> 0.6
+            + <strong>직무만족</strong> 0.4)을 섞어 <strong>계산한 값</strong>을
+            가중치로 썼습니다. 잰 값이 아닙니다. 게다가 그 계수 자체가{" "}
+            <span className="tabular">.08~.10</span>으로 작습니다 — 성격으로는 이 능력을
+            거의 설명하지 못한다는 뜻입니다.
+          </p>
+          <p className="text-axis text-ink-secondary mt-2 leading-relaxed">
+            <strong>여기 나오는 예측은 참고선으로만 보십시오.</strong> 이 축이야말로{" "}
+            <strong>대표님 평가와 맞대 보는 것이 가장 중요합니다.</strong>
+          </p>
+        </div>
       )}
 
       {/* 한 줄 요약 — 이 화면의 답 */}
