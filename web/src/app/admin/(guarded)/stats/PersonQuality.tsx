@@ -147,7 +147,7 @@ export function QualityRanking({ rows }: { rows: PersonQuality[] }) {
                 </button>
               </p>
             )}
-            <div className="grid grid-cols-[2.5rem_9rem_1fr_3.5rem] items-center gap-4 border-b border-[--border] py-2">
+            <div className="grid grid-cols-[2rem_6rem_1fr_3rem] items-center gap-3 border-b border-[--border] py-2 sm:grid-cols-[2.5rem_9rem_1fr_3.5rem] sm:gap-4">
               <span className="tabular text-axis text-ink-muted text-right">{rank}</span>
               <Link
                 href={`/admin/employees/${r.employeeId}`}

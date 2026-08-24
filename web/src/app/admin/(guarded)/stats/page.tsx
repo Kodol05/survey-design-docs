@@ -512,12 +512,12 @@ function ReliabilityTab({
                 const part = rows.filter((r) => g.has(r));
                 if (part.length === 0) return null;
                 return (
-                  <div key={g.label}>
+                  <div key={g.label} className="overflow-x-auto">
                     <p className="text-table text-ink-secondary mb-2">
                       {g.label}
                       <span className="text-axis text-ink-muted ml-2">{g.note}</span>
                     </p>
-                    <table className="text-table w-full">
+                    <table className="text-table w-full min-w-[22rem]">
                       <thead>
                         <tr className="text-axis text-ink-muted border-b border-[--border]">
                           <th className="py-1.5 text-left font-medium">척도</th>

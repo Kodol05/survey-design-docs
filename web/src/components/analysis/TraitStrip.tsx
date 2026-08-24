@@ -17,7 +17,9 @@ import { ABILITY_AXES, TRAIT_SCALES } from "@/lib/items/types";
 // **한 칸 안의 스트립까지 끝없이 늘리면 반대 문제가 생긴다** — 2560 화면에서
 // 7칸이 1,200px로 퍼지면 숫자와 머리글이 멀어져 어느 축인지 못 찾는다.
 // 그래서 셀은 늘어나되 스트립 전체에 상한을 둔다. 남는 폭은 여백으로 둔다.
-const CELL = "min-w-[4rem] flex-1";
+// 19px에서 "67 ■"가 실제로 차지하는 폭은 2.6rem쯤이다. 4rem은 과했다 —
+// 일곱 칸이면 그 여유가 10rem 가까이 쌓여 표 전체가 가로로 밀렸다.
+const CELL = "min-w-[3.5rem] flex-1";
 
 export function TraitStrip({ traits }: { traits: Record<string, number> | null }) {
   if (!traits)
@@ -47,7 +49,7 @@ export function TraitStrip({ traits }: { traits: Record<string, number> | null }
   );
 }
 
-const A_CELL = "min-w-[4.75rem] flex-1";
+const A_CELL = "min-w-[4.25rem] flex-1";
 
 /**
  * 직무능력 3축 한 줄 표시 — 관리자 목록 전용.

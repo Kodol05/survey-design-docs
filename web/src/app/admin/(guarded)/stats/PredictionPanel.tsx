@@ -122,7 +122,7 @@ export function PredictionPanel({
           </p>
           <ul className="flex flex-col gap-2">
             {cur.bins.map((b) => (
-              <li key={b.label} className="grid grid-cols-[9rem_1fr] items-center gap-3">
+              <li key={b.label} className="grid grid-cols-[7rem_1fr] items-center gap-3 sm:grid-cols-[9rem_1fr]">
                 <span className="text-axis text-ink-secondary">{b.label}</span>
                 <span className="text-axis tabular">
                   평균{" "}
@@ -149,7 +149,7 @@ export function PredictionPanel({
               return (
                 <li
                   key={r.employeeId}
-                  className="grid grid-cols-[8rem_1fr_8rem] items-center gap-3 py-1.5"
+                  className="grid grid-cols-[5rem_1fr_6rem] items-center gap-2 py-1.5 sm:grid-cols-[8rem_1fr_8rem] sm:gap-3"
                 >
                   <Link
                     href={`/admin/employees/${r.employeeId}`}

@@ -59,7 +59,7 @@ export function TopRelations({ items }: { items: Relation[] }) {
               0을 가운데 둔 막대를 앞에 놓으면 크기와 방향이 먼저 들어오고
               문장은 그 확인이 된다.
             */}
-            <div className="grid grid-cols-[1.5rem_11rem_1fr_auto] items-center gap-3">
+            <div className="grid grid-cols-[1.5rem_7rem_1fr_auto] items-center gap-2 lg:gap-3 xl:grid-cols-[1.5rem_11rem_1fr_auto]">
               <span className="tabular text-ink-muted text-axis text-right">
                 {from + i + 1}
               </span>

@@ -237,7 +237,7 @@ export default async function AdminHome() {
             {spread.map((x) => (
               <li
                 key={x.scale}
-                className="grid grid-cols-[5rem_1fr_4rem] items-center gap-4 py-2.5"
+                className="grid grid-cols-[4rem_1fr_3rem] items-center gap-3 py-2.5 sm:grid-cols-[5rem_1fr_4rem] sm:gap-4"
               >
                 <span className="text-table">{x.scale}</span>
                 {/* 가장 낮은 사람부터 가장 높은 사람까지의 폭 */}

@@ -64,11 +64,11 @@ export function EmployeeList({ rows }: { rows: Row[] }) {
       <table className="w-full">
         <thead>
           <tr className="text-axis text-ink-muted border-b border-[--border]">
-            <th className="w-44 pb-2 text-left font-medium">이름</th>
-            <th className="w-36 pb-2 text-left font-medium">번호</th>
-            <th className="w-20 pb-2 text-left font-medium">상태</th>
-            <th className="w-24 pb-2 text-left font-medium">신뢰도</th>
-            <th className="w-16 pb-2 text-left font-medium">완료</th>
+            <th className="w-36 pb-2 text-left font-medium">이름</th>
+            <th className="w-32 pb-2 text-left font-medium">번호</th>
+            <th className="w-16 pb-2 text-left font-medium">상태</th>
+            <th className="w-20 pb-2 text-left font-medium">신뢰도</th>
+            <th className="w-14 pb-2 text-left font-medium">완료</th>
             <th className="w-[42%] pb-2 pl-4 text-left font-medium">
               <TraitStripHeader />
             </th>
@@ -226,8 +226,14 @@ function Panel({ row }: { row: Row }) {
         </Link>
       </div>
 
-      {/* 폭을 고정한다. 늘어나게 두면 막대가 화면 끝까지 퍼져서 읽기 나쁘다 */}
-      <div className="flex flex-wrap items-start gap-10">
+      {/*
+        **격자로 둔다. flex-wrap으로 두지 않는다.**
+
+        네 칸을 늘어놓으면 총 90rem이 넘어 어느 노트북에서도 한 줄에 안 들어간다.
+        flex-wrap에 맡기면 화면 폭에 따라 3+1로 접혔다 2+2로 접혔다 해서
+        열 때마다 배치가 달라진다. 2단·4단만 쓰도록 못 박는다.
+      */}
+      <div className="grid items-start gap-x-10 gap-y-8 lg:grid-cols-2 2xl:grid-cols-4">
         <div className="w-full max-w-[23rem]">
           <TraitRadar data={ordered} showValues />
         </div>

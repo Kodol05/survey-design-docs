@@ -69,7 +69,7 @@ export function AxisDetail({ scale, percent, band, facets }: AxisDetailProps) {
             <p className="text-table text-ink-muted mb-3">이 축을 이루는 것</p>
             <div className="flex flex-col gap-2.5">
               {facets.map((f) => (
-                <div key={f.name} className="grid grid-cols-[7.5rem_1fr_2rem] items-center gap-3">
+                <div key={f.name} className="grid grid-cols-[6rem_1fr_2rem] items-center gap-2 sm:grid-cols-[7.5rem_1fr_2rem] sm:gap-3">
                   <span className="text-table text-ink-secondary truncate" title={f.name}>
                     {f.name}
                   </span>

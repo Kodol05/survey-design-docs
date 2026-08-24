@@ -32,7 +32,14 @@ export function RankBars({ items }: { items: RankItem[] }) {
         return (
           <li
             key={it.label}
-            className="grid grid-cols-[14rem_1fr_16rem] items-center gap-4 py-1.5"
+            /*
+              좁은 화면에서 막대가 사라지지 않게 한다.
+
+              14+16rem을 고정으로 두면 이 컴포넌트가 2단 배치 안에 들어갔을 때
+              (1280px에서 한 칸이 35rem쯤) 막대에 3rem밖에 안 남는다. 막대가
+              이 화면의 요점인데 그게 제일 먼저 뭉개진다.
+            */
+            className="grid grid-cols-[7rem_1fr_7rem] items-center gap-3 py-1.5 xl:grid-cols-[11rem_1fr_13rem] xl:gap-4"
           >
             <span className="text-table truncate" title={it.label}>
               {it.label}

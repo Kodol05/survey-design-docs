@@ -58,14 +58,21 @@ export function LikertScale({
     <fieldset className={`transition-opacity ${dimmed ? "opacity-45" : "opacity-100"}`}>
       <legend className="sr-only">7단계 중 하나를 고르세요</legend>
 
-      {/* 넓은 폭 — 양 끝 라벨을 크게 두고 가운데에 원 일곱 개 */}
-      <div className="hidden items-center gap-6 sm:flex">
-        <span className="w-24 shrink-0 text-right font-medium text-ink-secondary">
-          전혀
-          <br />
-          아니다
-        </span>
+      {/*
+        넓은 폭 — 원 일곱 개를 가로로.
 
+        두 가지를 고쳤다 (2026-08-24).
+
+        1. **양 끝 안내 라벨을 뺐다.** 왼쪽에 「전혀 아니다」, 오른쪽에
+           「매우 그렇다」가 따로 있었는데, 첫 원과 마지막 원 밑에 **같은 글자가
+           이미 붙어 있었다.** 같은 말을 두 번 하면서 폭만 15rem을 먹었다.
+           방향은 원 크기와 색이 이미 말해준다.
+
+        2. **가로로 펴는 지점을 `sm`(640px)에서 `lg`(1024px)로 올렸다.**
+           글자를 1.3배로 키우면서 라벨이 19px가 됐다. 좁은 화면에서 억지로
+           펴면 밀려나고, 손으로 누르기도 아래 세로 목록이 낫다.
+      */}
+      <div className="hidden items-center lg:flex">
         <div className="flex flex-1 items-center justify-between">
           {LABELS.map((label, i) => {
             const v = i + 1;
@@ -122,16 +129,10 @@ export function LikertScale({
             );
           })}
         </div>
-
-        <span className="w-24 shrink-0 font-medium text-ink-secondary">
-          매우
-          <br />
-          그렇다
-        </span>
       </div>
 
       {/* 좁은 폭 — 세로 스택 */}
-      <div className="flex flex-col gap-1.5 sm:hidden">
+      <div className="flex flex-col gap-1.5 lg:hidden">
         {LABELS.map((label, i) => {
           const v = i + 1;
           const on = value === v;
