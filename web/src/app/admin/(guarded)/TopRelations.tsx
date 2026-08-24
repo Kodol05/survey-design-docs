@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { formatR } from "@/components/analysis/correlationColor";
+import { correlationFill, formatR } from "@/components/analysis/correlationColor";
 import {
   describeCorrelation,
   gradeOf,
@@ -51,37 +51,41 @@ export function TopRelations({ items }: { items: Relation[] }) {
         {shown.map((it, i) => (
           <li
             key={`${it.scale}-${it.axis}`}
-            className="flex gap-3 border-b border-[--border] py-3 last:border-0"
+            className="border-b border-[--border] py-3 last:border-0"
           >
-            <span className="tabular text-ink-muted text-table w-5 shrink-0 pt-0.5 text-right">
-              {from + i + 1}
-            </span>
-            <div className="flex flex-col gap-1">
-              <p className="leading-snug">
-                {describeCorrelation(it.scale, it.axis, it.r)}
-              </p>
-              <p className="text-axis text-ink-muted flex flex-wrap items-baseline gap-x-3">
-                <span
-                  className={isNotable(it.r) ? "font-medium" : undefined}
-                  style={{ color: isNotable(it.r) ? "var(--ink-secondary)" : undefined }}
-                >
-                  {gradeOf(it.r)}
-                  {isUncertain(it.ci) && (
-                    <span className="text-ink-muted ml-1">아직 확정 아님</span>
-                  )}
-                </span>
-                <span className="tabular">{it.n}명</span>
-                <span className="tabular" title="두 값이 함께 움직인 정도. −1에서 +1 사이">
-                  관련도 {formatR(it.r)}
-                </span>
-                <span
-                  className="tabular"
-                  title="사람이 바뀌어도 이 범위 안에 들어올 것으로 보는 구간"
-                >
-                  95% 구간 {formatR(it.ci[0])}~{formatR(it.ci[1])}
-                </span>
-              </p>
+            {/*
+              **막대를 먼저 둔다.** 전에는 문장과 숫자 넷이 줄줄이 있어서
+              어느 것이 크고 어느 쪽으로 가는지 다 읽어야 알 수 있었다.
+              0을 가운데 둔 막대를 앞에 놓으면 크기와 방향이 먼저 들어오고
+              문장은 그 확인이 된다.
+            */}
+            <div className="grid grid-cols-[1.5rem_11rem_1fr_auto] items-center gap-3">
+              <span className="tabular text-ink-muted text-axis text-right">
+                {from + i + 1}
+              </span>
+              <span className="text-axis truncate" title={`${it.scale} × ${it.axis}`}>
+                {it.scale}
+                <span className="text-ink-muted mx-1">×</span>
+                {it.axis}
+              </span>
+              <MiniBar r={it.r} uncertain={isUncertain(it.ci)} />
+              <span className="text-axis tabular whitespace-nowrap">
+                <strong className={isNotable(it.r) ? "text-table" : undefined}>
+                  {formatR(it.r)}
+                </strong>
+                <span className="text-ink-muted ml-2">{gradeOf(it.r)}</span>
+              </span>
             </div>
+
+            <p className="text-axis text-ink-secondary mt-1.5 pl-[2.25rem] leading-snug">
+              {describeCorrelation(it.scale, it.axis, it.r)}
+              <span className="text-ink-muted ml-2 tabular">
+                {it.n}명 · 95% 구간 {formatR(it.ci[0])}~{formatR(it.ci[1])}
+              </span>
+              {isUncertain(it.ci) && (
+                <span className="text-ink-muted ml-2">아직 확정 아님</span>
+              )}
+            </p>
           </li>
         ))}
       </ul>
@@ -131,5 +135,29 @@ function PageButton({
     >
       {children}
     </button>
+  );
+}
+
+/** 값이 여기까지 가면 막대가 끝까지 찬다. 실제 데이터에서 |r|이 1에 가는 일은 없다 */
+const FULL = 0.7;
+
+/** 0을 가운데 두고 좌우로. 순위 탭 막대와 같은 색 언어를 쓴다 */
+function MiniBar({ r, uncertain }: { r: number; uncertain: boolean }) {
+  const w = Math.min(50, (Math.abs(r) / FULL) * 50);
+  return (
+    <div className="relative h-4" title={`${formatR(r)}`}>
+      <div
+        className="absolute inset-y-0 left-1/2 w-px"
+        style={{ background: "var(--axis)" }}
+      />
+      <div
+        className="absolute inset-y-1 rounded-sm"
+        style={{
+          background: correlationFill(r, uncertain),
+          left: r < 0 ? `${50 - w}%` : "50%",
+          width: `${w}%`,
+        }}
+      />
+    </div>
   );
 }
