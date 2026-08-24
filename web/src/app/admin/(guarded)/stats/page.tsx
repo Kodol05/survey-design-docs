@@ -22,14 +22,15 @@ import { ALPHA } from "@/lib/admin/stats";
 import { ABILITY_AXES, TRAIT_SCALES } from "@/lib/items/types";
 import { getCell, loadResearchTable } from "@/lib/research/correlations";
 import { MIN_N } from "@/components/ui/NBadge";
+import { ResearchCompareTable } from "@/components/analysis/ResearchCompareTable";
+import { compareToResearch } from "@/lib/admin/researchCompare";
 import { CorrelationPanel } from "./CorrelationPanel";
 import { RankPanel } from "./RankPanel";
 
 export const metadata = { title: "분석 — 관리자" };
 
 const TABS = [
-  { key: "research", label: "연구에서 나온 값" },
-  { key: "inhouse", label: "우리 회사 데이터" },
+  { key: "matrix", label: "직무능력과 성향" },
   { key: "rank", label: "순위" },
   { key: "prediction", label: "계산식" },
   { key: "reliability", label: "검사 신뢰도" },
@@ -41,7 +42,7 @@ export default async function StatsPage(props: {
   await requireAdmin();
   const open = await isResultsOpen();
   const sp = await props.searchParams;
-  const tab = TABS.some((t) => t.key === sp.tab) ? sp.tab! : "inhouse";
+  const tab = TABS.some((t) => t.key === sp.tab) ? sp.tab! : "matrix";
 
   if (!open)
     return (
@@ -102,8 +103,7 @@ export default async function StatsPage(props: {
         ))}
       </nav>
 
-      {tab === "research" && <ResearchTab />}
-      {tab === "inhouse" && <InHouseTab people={people} matrix={matrix} />}
+      {tab === "matrix" && <MatrixTab people={people} matrix={matrix} />}
       {tab === "rank" && <RankTab axis={sp.axis} scale={sp.scale} people={people} />}
       {tab === "prediction" && <PredictionTab people={people} />}
       {tab === "reliability" && <ReliabilityTab rows={reliability} />}
@@ -129,55 +129,52 @@ function Tile({
   );
 }
 
-// ── 연구 값 ─────────────────────────────────────────────────────────
-
-function ResearchTab() {
-  const table = loadResearchTable();
-  const cells: Record<string, Cell> = {};
-  for (const scale of TRAIT_SCALES)
-    for (const axis of ABILITY_AXES) {
-      const c = getCell(table, scale, axis);
-      cells[`${scale}|${axis}`] =
-        c.kind === "value"
-          ? { kind: "value", r: c.value, n: 0, ci: [c.value, c.value] }
-          : c.kind === "none"
-            ? { kind: "none" }
-            : { kind: "unstudied" };
-    }
-
-  return (
-    <section>
-      <p className="text-ink-secondary mb-8 max-w-[46rem]">
-        논문에서 나온 값을 그대로 적은 것입니다. 사람이 늘어도 바뀌지 않습니다. 이 값으로
-        점수를 계산하지는 않습니다 — 참고로만 봅니다.
-      </p>
-      <CorrelationPanel
-        rows={[...TRAIT_SCALES]}
-        cols={[...ABILITY_AXES]}
-        cells={cells}
-        scatter={{}}
-        trends={{}}
-        inHouse={false}
-      />
-      <div className="text-axis text-ink-secondary mt-10 max-w-[46rem] border-t border-[--border] pt-6">
-        <p className="mb-2">
-          서로 다른 연구에서 온 값입니다. 표본도 지표도 나라도 다릅니다. 한 표에 놓았다고
-          서로 비교할 수 있는 값이 아닙니다.
-        </p>
-        <p>
-          조직생활은 열이 통째로 비어 있습니다. 이 개념을 정의한 연구 자체를 찾지
-          못했습니다.
-        </p>
-      </div>
-    </section>
-  );
-}
-
-// ── 사내 데이터 ─────────────────────────────────────────────────────
+// ── 직무능력과 성향 ────────────────────────────────────────────────
 
 type People = Awaited<ReturnType<typeof loadPeople>>;
 
-function InHouseTab({
+/**
+ * 한 화면에 세 절을 세로로 쌓는다.
+ *
+ *   1. 우리 회사 데이터   ← 우리 사람들 이야기라 먼저 온다
+ *   2. 연구에서 나온 값   ← 같은 7×3 격자라 모양을 눈으로 맞대 볼 수 있다
+ *   3. 얼마나 맞는가      ← 스크롤을 내리면 나오는 대조표
+ *
+ * ⚠️ **한 표에 섞지는 않는다.** 표본도 지표도 나라도 다른 값이라 한 칸에
+ *    합치면 없는 숫자를 만들어내는 셈이 된다 (11 §3.2). 한 화면에 두되
+ *    표는 끝까지 따로 둔다 — 대조는 3절에서 칸끼리 나란히 놓는 것으로만 한다.
+ */
+function MatrixTab({
+  people,
+  matrix,
+}: {
+  people: People;
+  matrix: ReturnType<typeof traitAbilityMatrix>;
+}) {
+  return (
+    <div className="flex flex-col gap-16">
+      <InHouseSection people={people} matrix={matrix} />
+      <ResearchSection />
+      <section>
+        <h2 className="text-section-title mb-1">얼마나 맞는가</h2>
+        <p className="text-axis text-ink-muted mb-6">
+          위의 두 표에서 양쪽에 값이 다 있는 칸만 골라 나란히 놓았습니다.
+        </p>
+        {matrix.enough ? (
+          <ResearchCompareTable data={compareToResearch(matrix)} />
+        ) : (
+          <p className="text-ink-secondary">
+            우리 회사 값이 아직 없어 맞대 볼 수 없습니다. {MIN_N}명이 넘으면 나옵니다.
+          </p>
+        )}
+      </section>
+    </div>
+  );
+}
+
+// ── 1절 · 우리 회사 데이터 ──────────────────────────────────────────
+
+function InHouseSection({
   people,
   matrix,
 }: {
@@ -187,6 +184,7 @@ function InHouseTab({
   if (!matrix.enough)
     return (
       <section>
+        <h2 className="text-section-title mb-3">우리 회사 데이터</h2>
         <WarningBadge kind="smallSample" />
         <p className="text-ink-secondary mt-4">
           응시 완료 {matrix.n}명입니다. {MIN_N}명이 넘어야 사내 관련도를 보여드립니다.
@@ -214,6 +212,7 @@ function InHouseTab({
 
   return (
     <section>
+      <h2 className="text-section-title mb-1">우리 회사 데이터</h2>
       <p className="text-ink-secondary mb-8 max-w-[46rem]">
         우리 직원 {matrix.n}명의 응답으로 직접 낸 값입니다. 사람이 늘거나 재검사가 쌓이면
         달라집니다. <strong>칸을 누르면 그 조합의 점 분포가 옆에 나옵니다.</strong>
@@ -226,6 +225,51 @@ function InHouseTab({
         trends={trends}
         inHouse
       />
+    </section>
+  );
+}
+
+// ── 2절 · 연구에서 나온 값 ──────────────────────────────────────────
+
+function ResearchSection() {
+  const table = loadResearchTable();
+  const cells: Record<string, Cell> = {};
+  for (const scale of TRAIT_SCALES)
+    for (const axis of ABILITY_AXES) {
+      const c = getCell(table, scale, axis);
+      cells[`${scale}|${axis}`] =
+        c.kind === "value"
+          ? { kind: "value", r: c.value, n: 0, ci: [c.value, c.value] }
+          : c.kind === "none"
+            ? { kind: "none" }
+            : { kind: "unstudied" };
+    }
+
+  return (
+    <section>
+      <h2 className="text-section-title mb-1">연구에서 나온 값</h2>
+      <p className="text-ink-secondary mb-8 max-w-[46rem]">
+        논문에서 나온 값을 그대로 적은 것입니다. 사람이 늘어도 바뀌지 않습니다. 이 값으로
+        점수를 계산하지는 않습니다 — 참고로만 봅니다.
+      </p>
+      <CorrelationPanel
+        rows={[...TRAIT_SCALES]}
+        cols={[...ABILITY_AXES]}
+        cells={cells}
+        scatter={{}}
+        trends={{}}
+        inHouse={false}
+      />
+      <div className="text-axis text-ink-secondary mt-10 max-w-[46rem] border-t border-[--border] pt-6">
+        <p className="mb-2">
+          서로 다른 연구에서 온 값입니다. 표본도 지표도 나라도 다릅니다. 한 표에 놓았다고
+          서로 비교할 수 있는 값이 아닙니다.
+        </p>
+        <p>
+          조직생활은 열이 통째로 비어 있습니다. 이 개념을 정의한 연구 자체를 찾지
+          못했습니다.
+        </p>
+      </div>
     </section>
   );
 }
