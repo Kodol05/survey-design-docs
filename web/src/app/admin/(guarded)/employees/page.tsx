@@ -292,8 +292,8 @@ export default async function EmployeesPage(props: {
         <p className="max-w-[56rem]">
           <strong className="text-ink-secondary">성향</strong> 일곱 칸은 축을
           왼쪽부터 늘어놓은 것입니다.{" "}
-          <span style={{ color: "#44618d" }}>■</span> 낮음{" "}
-          <span style={{ color: "#b3623f" }}>■</span> 높음 — 어느 쪽도 좋고 나쁜
+          <span style={{ color: "var(--diverge-pos)" }}>■</span> 낮음{" "}
+          <span style={{ color: "var(--diverge-neg)" }}>■</span> 높음 — 어느 쪽도 좋고 나쁜
           것이 아닙니다. 색으로 모양을 먼저 보고 숫자로 값을 확인하시면 됩니다.
         </p>
         <p className="max-w-[56rem]">

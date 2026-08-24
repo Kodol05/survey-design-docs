@@ -152,10 +152,11 @@ const FULL = 0.7;
 function CellBar({ r, faded }: { r: number; faded: boolean }) {
   const w = Math.min(50, (Math.abs(r) / FULL) * 50);
   return (
-    <span className="relative my-1 block h-2 w-[72%]">
+    // 배경색을 옅게 내린 만큼 막대는 굵고 넓게 — 이제 크기를 이쪽이 진다
+    <span className="relative my-1 block h-3 w-[82%]">
       <span
         className="absolute inset-y-0 left-1/2 w-px"
-        style={{ background: "var(--ink)", opacity: 0.25 }}
+        style={{ background: "var(--ink)", opacity: 0.3 }}
       />
       <span
         className="absolute inset-y-0 rounded-sm"
@@ -163,7 +164,7 @@ function CellBar({ r, faded }: { r: number; faded: boolean }) {
           left: r < 0 ? `${50 - w}%` : "50%",
           width: `${Math.max(2, w)}%`,
           background: r < 0 ? "var(--diverge-neg)" : "var(--diverge-pos)",
-          opacity: faded ? 0.4 : 1,
+          opacity: faded ? 0.45 : 1,
         }}
       />
     </span>
@@ -241,7 +242,7 @@ export function CorrelationLegend({ inHouse }: { inHouse?: boolean }) {
           className="h-3 w-24 rounded-sm"
           style={{
             background:
-              "linear-gradient(90deg, #b3623f, #eae6de, #44618d)",
+              "linear-gradient(90deg, #b3623f, #eae6de, #3a5fa0)",
           }}
         />
         음의 관계 ← → 양의 관계
@@ -256,7 +257,7 @@ export function CorrelationLegend({ inHouse }: { inHouse?: boolean }) {
         <span className="relative inline-block h-2 w-10">
           <span
             className="absolute inset-y-0 left-1/2 w-px"
-            style={{ background: "var(--ink)", opacity: 0.25 }}
+            style={{ background: "var(--ink)", opacity: 0.3 }}
           />
           <span
             className="absolute inset-y-0 left-1/2 w-[35%] rounded-sm"
