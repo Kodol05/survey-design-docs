@@ -30,7 +30,7 @@ const STEPS = Array.from(
  * 슬라이더를 쓰면 손이 미끄러진 값과 고른 값이 구분되지 않는다. 1~10은
  * 버튼 열 개로 다 보이는 수라 굳이 줄일 이유가 없다.
  */
-export function RatingGrid({ rows, locked }: { rows: RatingRow[]; locked: boolean }) {
+export function RatingGrid({ rows }: { rows: RatingRow[] }) {
   return (
     <ul className="flex flex-col">
       {rows.map((r) => (
@@ -46,7 +46,6 @@ export function RatingGrid({ rows, locked }: { rows: RatingRow[]; locked: boolea
                 employeeId={r.id}
                 axis={axis}
                 initial={r.scores[axis]}
-                locked={locked}
               />
             ))}
           </div>
@@ -60,12 +59,10 @@ function AxisRow({
   employeeId,
   axis,
   initial,
-  locked,
 }: {
   employeeId: string;
   axis: string;
   initial: number | undefined;
-  locked: boolean;
 }) {
   const [score, setScore] = useState(initial);
   const [error, setError] = useState<string>();
@@ -94,16 +91,14 @@ function AxisRow({
             <button
               key={v}
               type="button"
-              disabled={locked}
               onClick={() => pick(v)}
               aria-pressed={on}
               aria-label={`${axis} ${v}점`}
-              className="tabular text-axis size-10 rounded-md disabled:cursor-default"
+              className="tabular text-axis size-10 rounded-md"
               style={{
                 background: on ? "var(--series-1)" : "var(--wash)",
                 color: on ? "#fff" : "var(--ink-secondary)",
                 fontWeight: on ? 600 : 400,
-                opacity: locked ? 0.5 : 1,
               }}
             >
               {v}

@@ -16,8 +16,7 @@
     "db:seed": "tsx scripts/seed.mts",
     "items": "tsx scripts/items-report.mts",
     "demo:seed": "tsx scripts/seed-demo.mts",
-    "demo:clear": "tsx scripts/clear-demo.mts",
-    "demo:open": "tsx scripts/open-results.mts"
+    "demo:clear": "tsx scripts/clear-demo.mts"
   },
   "dependencies": {
     "@prisma/adapter-pg": "^7.9.1",

@@ -43,7 +43,7 @@ const FLAG = {
 
 const STATUS = { COMPLETED: "완료", IN_PROGRESS: "진행 중" } as const;
 
-export function EmployeeList({ rows, open }: { rows: Row[]; open: boolean }) {
+export function EmployeeList({ rows }: { rows: Row[] }) {
   const [openId, setOpenId] = useState<string | null>(null);
 
   return (
@@ -69,17 +69,17 @@ export function EmployeeList({ rows, open }: { rows: Row[]; open: boolean }) {
             <th className="w-24 pb-2 text-left font-medium">품질</th>
             <th className="w-16 pb-2 text-left font-medium">완료</th>
             <th className="w-[42%] pb-2 pl-4 text-left font-medium">
-              {open ? <TraitStripHeader /> : "성향"}
+              <TraitStripHeader />
             </th>
             <th className="w-[18%] pb-2 pl-4 text-left font-medium">
-              {open ? <AbilityStripHeader /> : "직무능력"}
+              <AbilityStripHeader />
             </th>
           </tr>
         </thead>
         <tbody>
           {rows.map((r) => {
             const expanded = openId === r.id;
-            const canExpand = open && Boolean(r.traits);
+            const canExpand = Boolean(r.traits);
             return (
               <Fragment key={r.id}>
                 <tr
@@ -113,18 +113,10 @@ export function EmployeeList({ rows, open }: { rows: Row[]; open: boolean }) {
                     {r.completedLabel ?? "—"}
                   </td>
                   <td className="py-2.5 pl-4 whitespace-nowrap">
-                    {open ? (
-                      <TraitStrip traits={r.traits} />
-                    ) : (
-                      <span className="text-axis text-ink-muted">공개 전</span>
-                    )}
+                    <TraitStrip traits={r.traits} />
                   </td>
                   <td className="py-2.5 pl-4 whitespace-nowrap">
-                    {open ? (
-                      <AbilityStrip abilities={r.abilities} />
-                    ) : (
-                      <span className="text-axis text-ink-muted">공개 전</span>
-                    )}
+                    <AbilityStrip abilities={r.abilities} />
                   </td>
                 </tr>
 

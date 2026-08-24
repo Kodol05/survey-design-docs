@@ -3,7 +3,6 @@ import { EmptyState } from "@/components/ui/Card";
 import { EmployeeList, type Row } from "./EmployeeList";
 import { prisma } from "@/lib/db";
 import { requireAdmin } from "@/lib/auth/guard";
-import { isResultsOpen } from "@/lib/admin/phase";
 import { ABILITY_AXIS_FROM_DB, TRAIT_SCALES } from "@/lib/items/types";
 import { SourcePicker } from "@/components/analysis/SourcePicker";
 import {
@@ -21,7 +20,6 @@ export default async function EmployeesPage(props: {
   searchParams: Promise<{ sort?: string; q?: string; src?: string }>;
 }) {
   await requireAdmin();
-  const open = await isResultsOpen();
   const { sort, q, src } = await props.searchParams;
   const source = parseSource(src);
 
@@ -125,11 +123,9 @@ export default async function EmployeesPage(props: {
       </div>
 
       {/* 필터는 한 줄로 목록 위에 둔다 (차트·표 안에 넣지 않는다) */}
-      {open && (
-        <div className="mb-6">
-          <SourcePicker value={source} bossCount={bossCount} />
-        </div>
-      )}
+      <div className="mb-6">
+        <SourcePicker value={source} bossCount={bossCount} />
+      </div>
 
       <div className="mb-8 flex flex-wrap items-center gap-x-6 gap-y-3">
         <form className="flex items-center gap-2">
@@ -155,8 +151,7 @@ export default async function EmployeesPage(props: {
           >
             이름
           </Link>
-          {open &&
-            TRAIT_SCALES.map((s) => (
+          {TRAIT_SCALES.map((s) => (
               <Link
                 key={s}
                 href={link({ sort: s, q: keyword })}
@@ -165,14 +160,14 @@ export default async function EmployeesPage(props: {
               >
                 {s}
               </Link>
-            ))}
+          ))}
         </div>
       </div>
 
       {rows.length === 0 ? (
         <EmptyState message={keyword ? "찾는 사람이 없습니다." : "아직 가입한 사람이 없습니다."} />
       ) : (
-        <EmployeeList rows={rows} open={open} />
+        <EmployeeList rows={rows} />
       )}
 
       <div className="text-table text-ink-muted mt-6 flex flex-col gap-2">

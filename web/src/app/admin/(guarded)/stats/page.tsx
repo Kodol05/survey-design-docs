@@ -5,7 +5,6 @@ import type { Cell } from "@/components/analysis/CorrelationTable";
 import type { Point } from "@/components/analysis/ScatterPlot";
 import { WarningBadge } from "@/components/ui/WarningBadge";
 import { requireAdmin } from "@/lib/auth/guard";
-import { isResultsOpen } from "@/lib/admin/phase";
 import {
   RANK_LIMIT,
   abilitiesByTraitTercile,
@@ -43,20 +42,9 @@ export default async function StatsPage(props: {
   searchParams: Promise<{ tab?: string; axis?: string; scale?: string; src?: string }>;
 }) {
   await requireAdmin();
-  const open = await isResultsOpen();
   const sp = await props.searchParams;
   const tab = TABS.some((t) => t.key === sp.tab) ? sp.tab! : "matrix";
   const source = parseSource(sp.src);
-
-  if (!open)
-    return (
-      <>
-        <h1 className="text-screen-title mb-6">분석</h1>
-        <p className="text-ink-secondary border-l-2 border-[--axis] py-1 pl-4">
-          평가 수집 중이라 분석 화면을 볼 수 없습니다. 대표님 평가가 끝나면 열립니다.
-        </p>
-      </>
-    );
 
   const [people, reliability, bossCount] = await Promise.all([
     loadPeople(false, source),

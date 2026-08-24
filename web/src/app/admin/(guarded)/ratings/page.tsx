@@ -3,7 +3,6 @@ import { EmptyState } from "@/components/ui/Card";
 import { RatingGrid, type RatingRow } from "./RatingGrid";
 import { prisma } from "@/lib/db";
 import { requireAdmin } from "@/lib/auth/guard";
-import { isResultsOpen } from "@/lib/admin/phase";
 import { RATING } from "@/lib/admin/abilitySource";
 import { ABILITY_AXES, ABILITY_AXIS_FROM_DB } from "@/lib/items/types";
 
@@ -20,7 +19,6 @@ export const metadata = { title: "대표님 평가 — 관리자" };
  */
 export default async function RatingsPage() {
   await requireAdmin();
-  const open = await isResultsOpen();
 
   const employees = await prisma.employee.findMany({
     where: { role: "USER" },
@@ -61,22 +59,16 @@ export default async function RatingsPage() {
         </p>
       </div>
 
-      {open ? (
-        <p className="text-ink-secondary mb-8 border-l-2 border-[--axis] py-2 pl-4">
-          <strong>결과가 이미 열려서 평가를 바꿀 수 없습니다.</strong> 결과를 보고 나서
-          매기면 그 인상이 섞여, 두 값을 맞대 보는 의미가 없어지기 때문입니다. 지금까지
-          매기신 값은 그대로 남아 있습니다.
-        </p>
-      ) : (
-        <p className="text-axis text-ink-muted mb-8 max-w-[56rem]">
-          결과를 여시면 이 화면은 잠깁니다. 먼저 매기고 그다음에 여는 순서입니다.
-        </p>
-      )}
+      <p className="text-axis text-ink-muted mb-8 max-w-[56rem]">
+        언제든 고치실 수 있습니다. 다만 <strong>결과 화면을 보시기 전에 매기는 편이
+        낫습니다</strong> — 결과를 먼저 보면 그 인상이 섞여서, 두 값을 맞대 보는
+        의미가 줄어듭니다.
+      </p>
 
       {rows.length === 0 ? (
         <EmptyState message="아직 가입한 사람이 없습니다." />
       ) : (
-        <RatingGrid rows={rows} locked={open} />
+        <RatingGrid rows={rows} />
       )}
 
       <p className="text-table mt-8">

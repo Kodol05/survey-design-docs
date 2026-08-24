@@ -5,14 +5,6 @@ import { prisma } from "../db";
 import { requireAdmin } from "../auth/guard";
 import { hashPassword } from "../auth/password";
 import { clearFailures } from "../auth/rateLimit";
-import { openResults } from "./phase";
-
-/** 결과 공개로 전환 (D-33). 되돌릴 수 없다. */
-export async function openResultsAction() {
-  const me = await requireAdmin();
-  await openResults(me.loginId ?? me.id);
-  revalidatePath("/admin", "layout");
-}
 
 /**
  * 사원 비밀번호 초기화 (F-43).

@@ -4,7 +4,6 @@ import { revalidatePath } from "next/cache";
 import { unstable_rethrow } from "next/navigation";
 import { prisma } from "@/lib/db";
 import { requireAdmin } from "@/lib/auth/guard";
-import { isResultsOpen } from "@/lib/admin/phase";
 import { isValidRating } from "@/lib/admin/abilitySource";
 import { ABILITY_AXES } from "@/lib/items/types";
 import type { AbilityAxis } from "@/generated/prisma/enums";
@@ -23,9 +22,9 @@ export type RateState = { error?: string; savedAt?: number } | undefined;
 /**
  * 한 사람의 한 축에 점수를 매긴다.
  *
- * ⚠️ **결과가 열린 뒤에는 받지 않는다 (D-33).** 결과를 보고 나서 매기면
- *    그 인상이 섞여서 대조하는 의미가 없어진다. 국면은 되돌릴 수 없으므로
- *    이 문은 한 번 닫히면 다시 열리지 않는다.
+ * 언제든 고칠 수 있다. **잠그지 않는다 (D-41).** 결과를 먼저 보면 인상이
+ * 섞이는 것은 맞지만, 화면을 잠그는 방식은 값을 못 치렀다 — 첫 화면에서
+ * 안내하고 판단은 사람이 한다.
  */
 export async function rate(
   employeeId: string,
@@ -34,9 +33,6 @@ export async function rate(
 ): Promise<RateState> {
   try {
     await requireAdmin();
-
-    if (await isResultsOpen())
-      return { error: "결과가 이미 열려서 평가를 바꿀 수 없습니다." };
 
     const dbAxis = ABILITY_AXES.includes(axis as never) ? TO_DB[axis] : undefined;
     if (!dbAxis) return { error: "없는 항목입니다." };

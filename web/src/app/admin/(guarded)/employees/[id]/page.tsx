@@ -8,7 +8,6 @@ import { formatPhone } from "@/lib/auth/phone";
 import { formatR } from "@/components/analysis/correlationColor";
 import { strengthOf } from "@/components/analysis/correlationWords";
 import { averageOf, bandOf, loadDistribution } from "@/lib/admin/distribution";
-import { isResultsOpen } from "@/lib/admin/phase";
 import { prisma } from "@/lib/db";
 import { loadResearchTable, relatedScales } from "@/lib/research/correlations";
 import { orderedAbilities, orderedTraits, type StoredAbilities, type StoredTraits } from "@/lib/survey/result";
@@ -34,7 +33,6 @@ export default async function EmployeeDetail(props: { params: Promise<{ id: stri
   });
   if (!e || e.role !== "USER") notFound();
 
-  const open = await isResultsOpen();
   const session = e.testSessions[0];
   const result = session?.result;
 
@@ -51,11 +49,7 @@ export default async function EmployeeDetail(props: { params: Promise<{ id: stri
         {session?.completedAt && ` · ${session.completedAt.toLocaleDateString("ko-KR")} 응시`}
       </p>
 
-      {!open ? (
-        <p className="text-ink-secondary mb-14 border-l-2 border-[--axis] py-1 pl-4">
-          평가 수집 중이라 결과를 볼 수 없습니다. 대표님 평가가 끝나면 열립니다.
-        </p>
-      ) : !result ? (
+      {!result ? (
         <div className="mb-14">
           <EmptyState message={session ? "응시가 진행 중입니다." : "아직 응시하지 않았습니다."} />
         </div>
