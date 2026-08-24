@@ -26,18 +26,21 @@ import {
 export type Point = { id: string; name: string; x: number; y: number; quality: string };
 
 export function ScatterPlot({
+  height = 360,
   points,
   trend,
   xLabel,
   yLabel,
 }: {
+  /** 기본 360. 화면이 넓은 자리에서는 키운다 */
+  height?: number;
   points: Point[];
   trend: { x: number; y: number }[] | null;
   xLabel: string;
   yLabel: string;
 }) {
   return (
-    <div className="w-full" style={{ height: 360 }}>
+    <div className="w-full" style={{ height }}>
       <ResponsiveContainer>
         <ComposedChart margin={{ top: 12, right: 16, bottom: 28, left: 8 }}>
           <CartesianGrid stroke="var(--grid)" />

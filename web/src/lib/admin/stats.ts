@@ -182,3 +182,66 @@ export function alphaVerdict(a: number | null): "unknown" | "poor" | "fair" | "g
   if (a < ALPHA.fair) return "fair";
   return "good";
 }
+
+export type GroupDiff = {
+  /** 위 무리 평균 − 아래 무리 평균 */
+  diff: number;
+  /** 차이의 95% 신뢰구간 */
+  ci: [number, number];
+  /** 표준화한 차이 (Cohen's d). 눈금이 달라도 크기를 견줄 수 있다 */
+  d: number;
+  upperMean: number;
+  lowerMean: number;
+  upperN: number;
+  lowerN: number;
+};
+
+/**
+ * 두 무리의 평균 차이 — **차이만 적으면 안 된다.**
+ *
+ * "상위 1/3은 62, 하위 1/3은 48"까지만 쓰면 14점이 큰 건지 우연인지 알 수 없다.
+ * 사람이 12명씩이면 아무 관계가 없어도 10점 안팎은 그냥 나온다.
+ *
+ * 그래서 세 가지를 같이 낸다.
+ *   - 차이의 **95% 신뢰구간** — 0을 걸치면 방향조차 확정이 아니다
+ *   - **Cohen's d** — 퍼진 정도로 나눈 값이라 눈금이 달라도 견줄 수 있다
+ *
+ * 분산이 같다고 가정하지 않는다 (Welch). 무리 크기가 다르거나 한쪽이 더
+ * 퍼져 있을 때 등분산 t는 구간을 실제보다 좁게 잡는다.
+ */
+export function groupDiff(upper: number[], lower: number[]): GroupDiff | null {
+  const n1 = upper.length;
+  const n2 = lower.length;
+  if (n1 < 2 || n2 < 2) return null;
+
+  const m1 = upper.reduce((a, b) => a + b, 0) / n1;
+  const m2 = lower.reduce((a, b) => a + b, 0) / n2;
+  const v1 = upper.reduce((n, x) => n + (x - m1) ** 2, 0) / (n1 - 1);
+  const v2 = lower.reduce((n, x) => n + (x - m2) ** 2, 0) / (n2 - 1);
+
+  const se = Math.sqrt(v1 / n1 + v2 / n2);
+  const diff = m1 - m2;
+  if (se === 0) return null;
+
+  /*
+    Welch-Satterthwaite 자유도. 정확한 t 임곗값 표를 들고 다니는 대신
+    1.96에 작은 표본 보정을 얹는다 — df가 10을 넘으면 오차가 5% 안쪽이라
+    화면에 적는 구간으로는 충분하다.
+  */
+  const df = (v1 / n1 + v2 / n2) ** 2 /
+    ((v1 / n1) ** 2 / (n1 - 1) + (v2 / n2) ** 2 / (n2 - 1));
+  const t = 1.96 + 2.4 / Math.max(1, df);
+
+  // 합동 표준편차로 나눈 표준화 차이
+  const pooled = Math.sqrt(((n1 - 1) * v1 + (n2 - 1) * v2) / (n1 + n2 - 2));
+
+  return {
+    diff,
+    ci: [diff - t * se, diff + t * se],
+    d: pooled === 0 ? 0 : diff / pooled,
+    upperMean: m1,
+    lowerMean: m2,
+    upperN: n1,
+    lowerN: n2,
+  };
+}

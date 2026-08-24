@@ -11,8 +11,10 @@ import {
   alphaVerdict,
   correlate,
   cronbachAlpha,
+  groupDiff,
   loocv,
   type Correlation,
+  type GroupDiff,
   type LoocvResult,
 } from "./stats";
 
@@ -330,6 +332,14 @@ export type TercileCompare = {
   diff: number;
   upperN: number;
   lowerN: number;
+  /**
+   * 차이의 신뢰구간과 효과 크기.
+   *
+   * **이게 없으면 이 표는 아무 말도 못 한다.** "상위 62, 하위 48"만 놓으면
+   * 14점이 큰 건지 12명씩에서 그냥 나온 값인지 구분할 방법이 없다.
+   * 계산이 안 되는 경우(한쪽이 2명 미만 등)에는 null이다.
+   */
+  stat: GroupDiff | null;
 };
 
 /**
@@ -350,6 +360,8 @@ export function abilitiesByTraitTercile(
   const cut = Math.floor(sorted.length / 3);
   const low = sorted.slice(0, cut);
   const high = sorted.slice(-cut);
+  const values = (group: Person[], axis: string) =>
+    group.map((p) => p.abilities[axis]).filter((v): v is number => typeof v === "number");
   const avg = (group: Person[], axis: string) => {
     const vs = group.map((p) => p.abilities[axis]).filter((v) => typeof v === "number");
     return vs.length ? vs.reduce((a, b) => a + b, 0) / vs.length : NaN;
@@ -366,6 +378,7 @@ export function abilitiesByTraitTercile(
         diff: upper - lower,
         upperN: high.length,
         lowerN: low.length,
+        stat: groupDiff(values(high, axis), values(low, axis)),
       };
     },
   );

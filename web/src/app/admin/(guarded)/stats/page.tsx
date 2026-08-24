@@ -24,6 +24,7 @@ import { MIN_N } from "@/components/ui/NBadge";
 import { ResearchCompareTable } from "@/components/analysis/ResearchCompareTable";
 import { compareToResearch } from "@/lib/admin/researchCompare";
 import { SourcePicker } from "@/components/analysis/SourcePicker";
+import { CHARACTER, TEMPERAMENT } from "@/components/charts/scale";
 import {
   SOURCE_NOTE,
   parseSource,
@@ -404,10 +405,18 @@ function PredictionTab({ people }: { people: People }) {
         <strong>이 사람의 직무능력이 얼마쯤일지 계산</strong>하고, 실제로 나온 값과
         나란히 놓았습니다.
       </p>
-      <p className="text-ink-secondary mb-10 max-w-[52rem]">
+      <p className="text-ink-secondary mb-6 max-w-[52rem]">
         어긋난다면 둘 중 하나입니다 — <strong>우리 회사가 논문과 다르거나</strong>,{" "}
         <strong>그 사람이 남다르거나.</strong> 둘 다 볼 만한 이야기입니다.
       </p>
+      {missing.length > 0 && (
+        <p className="text-ink-secondary mb-10 max-w-[52rem] border-l-2 border-[--axis] py-1 pl-4">
+          <strong>{missing.join(" · ")}</strong>은 여기에 없습니다. 이 개념을 정의한 연구를
+          찾지 못해 가중치가 하나도 없습니다. 0으로 채우면 「예측이 맞았다」는 착각이
+          생기므로 빈칸으로 둡니다 — <strong>대표님 평가가 필요한 가장 큰 이유</strong>가
+          이것입니다.
+        </p>
+      )}
 
       {items.length === 0 ? (
         <>
@@ -417,15 +426,7 @@ function PredictionTab({ people }: { people: People }) {
           </p>
         </>
       ) : (
-        <PredictionPanel items={items} />
-      )}
-
-      {missing.length > 0 && (
-        <p className="text-axis text-ink-muted mt-8">
-          <strong>{missing.join(" · ")}</strong>은 예측할 수 없습니다. 이 개념을 정의한
-          연구를 찾지 못해 가중치가 하나도 없습니다. 0으로 채우면 「예측이 맞았다」는
-          착각이 생기므로 빈칸으로 둡니다.
-        </p>
+        <PredictionPanel items={items} missing={missing} />
       )}
 
       <Note label="이 예측을 어디까지 믿을 수 있는지" className="mt-8">
@@ -461,6 +462,33 @@ function ReliabilityTab({
     poor: "var(--status-critical)",
     unknown: "var(--ink-muted)",
   } as const;
+  /*
+    기질 · 성격 · 직무능력을 나눠 놓는다.
+
+    한 표에 열 개를 늘어놓으면 어느 것이 TCI 기질이고 어느 것이 우리가 만든
+    직무능력인지 섞인다. 같은 잣대로 볼 값도 아니다 — 직무능력은 능력당
+    세 문항뿐이라 α가 낮게 나오는 것이 정상이다.
+  */
+  const GROUPS = [
+    {
+      label: "기질",
+      note: "타고나는 쪽 · TCI 4축",
+      has: (r: { scale: string; kind: string }) =>
+        r.kind === "trait" && (TEMPERAMENT as readonly string[]).includes(r.scale),
+    },
+    {
+      label: "성격",
+      note: "살면서 만들어지는 쪽 · TCI 3축",
+      has: (r: { scale: string; kind: string }) =>
+        r.kind === "trait" && (CHARACTER as readonly string[]).includes(r.scale),
+    },
+    {
+      label: "직무능력",
+      note: "우리가 만든 3축 · 능력당 3문항",
+      has: (r: { kind: string }) => r.kind === "ability",
+    },
+  ];
+
   const LABEL = {
     good: "괜찮음",
     fair: "보통",
@@ -479,46 +507,51 @@ function ReliabilityTab({
               그 상관은 볼 필요가 없습니다
             </p>
 
-            <div className="overflow-x-auto">
-              <table className="text-table w-full">
-                <thead>
-                  <tr className="text-ink-secondary border-b border-[--border]">
-                    <th className="py-2 text-left font-medium">척도</th>
-                    <th className="py-2 text-right font-medium">문항</th>
-                    <th className="py-2 text-right font-medium">α</th>
-                    <th className="py-2 pl-6 text-left font-medium">판정</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {rows.map((r) => (
-                    <tr
-                      key={r.scale}
-                      className="border-b border-[--border] last:border-0"
-                    >
-                      <th scope="row" className="py-2.5 text-left font-normal">
-                        {r.scale}
-                        {r.kind === "ability" && (
-                          <span className="text-ink-muted text-axis ml-2">
-                            직무능력
-                          </span>
-                        )}
-                      </th>
-                      <td className="tabular py-2.5 text-right">
-                        {r.itemCount}
-                      </td>
-                      <td className="tabular py-2.5 text-right font-medium">
-                        {r.alpha === null ? "—" : r.alpha.toFixed(2)}
-                      </td>
-                      <td
-                        className="py-2.5 pl-6"
-                        style={{ color: COLOR[r.verdict] }}
-                      >
-                        {LABEL[r.verdict]}
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
+            <div className="flex flex-col gap-8">
+              {GROUPS.map((g) => {
+                const part = rows.filter((r) => g.has(r));
+                if (part.length === 0) return null;
+                return (
+                  <div key={g.label}>
+                    <p className="text-table text-ink-secondary mb-2">
+                      {g.label}
+                      <span className="text-axis text-ink-muted ml-2">{g.note}</span>
+                    </p>
+                    <table className="text-table w-full">
+                      <thead>
+                        <tr className="text-axis text-ink-muted border-b border-[--border]">
+                          <th className="py-1.5 text-left font-medium">척도</th>
+                          <th className="w-16 py-1.5 text-right font-medium">문항</th>
+                          <th className="w-16 py-1.5 text-right font-medium">α</th>
+                          <th className="w-28 py-1.5 pl-6 text-left font-medium">판정</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {part.map((r) => (
+                          <tr
+                            key={r.scale}
+                            className="border-b border-[--border] last:border-0"
+                          >
+                            <th scope="row" className="py-2 text-left font-normal">
+                              {r.scale}
+                            </th>
+                            <td className="tabular py-2 text-right">{r.itemCount}</td>
+                            <td className="tabular py-2 text-right font-medium">
+                              {r.alpha === null ? "—" : r.alpha.toFixed(2)}
+                            </td>
+                            <td
+                              className="text-axis py-2 pl-6"
+                              style={{ color: COLOR[r.verdict] }}
+                            >
+                              {LABEL[r.verdict]}
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                );
+              })}
             </div>
           </div>
           <LowQualityList rows={quality} />

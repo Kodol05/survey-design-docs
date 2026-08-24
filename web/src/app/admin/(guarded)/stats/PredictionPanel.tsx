@@ -17,7 +17,14 @@ import type { ResearchPrediction } from "@/lib/admin/researchPrediction";
  * 축을 누르면 세 축을 오간다. 세 개를 한 화면에 늘어놓으면 각각이 너무
  * 작아져서 점이 뭉개진다.
  */
-export function PredictionPanel({ items }: { items: ResearchPrediction[] }) {
+export function PredictionPanel({
+  items,
+  missing,
+}: {
+  items: ResearchPrediction[];
+  /** 논문 값이 없어 예측할 수 없는 축 */
+  missing: string[];
+}) {
   const [axis, setAxis] = useState(items[0]?.axis ?? "");
   const cur = items.find((x) => x.axis === axis) ?? items[0];
   if (!cur) return null;
@@ -44,6 +51,26 @@ export function PredictionPanel({ items }: { items: ResearchPrediction[] }) {
             {it.axis}
           </button>
         ))}
+        {/*
+          예측할 수 없는 축도 **자리는 남긴다.** 아예 빼 버리면 "협력과
+          자율적실행만 있네, 조직생활은 어디 갔지?"가 된다. 실제로 그 질문이
+          나왔다. 회색으로 눌리지 않게 두고 이유를 붙인다.
+        */}
+        {missing.map((axis) => (
+          <span
+            key={axis}
+            className="rounded-md px-3 py-1.5"
+            style={{
+              background: "transparent",
+              color: "var(--ink-muted)",
+              outline: "1px dashed var(--border)",
+            }}
+            title="논문 값이 하나도 없어 예측할 수 없습니다"
+          >
+            {axis}
+            <span className="ml-1.5">— 논문 값 없음</span>
+          </span>
+        ))}
       </div>
 
       {/* 한 줄 요약 — 이 화면의 답 */}
@@ -65,13 +92,15 @@ export function PredictionPanel({ items }: { items: ResearchPrediction[] }) {
         />
       </div>
 
-      <div className="grid gap-12 xl:grid-cols-[minmax(0,26rem)_minmax(0,1fr)]">
+      <div className="grid gap-12 xl:grid-cols-[minmax(0,38rem)_minmax(0,1fr)]">
         <div>
           <h3 className="text-table mb-1 font-medium">예측 대 실제</h3>
           <p className="text-axis text-ink-muted mb-3">
-            대각선 위면 실제가 예측보다 높은 사람입니다
+            <strong>대각선은 「예측과 실제가 똑같다」는 선</strong>입니다 — 데이터로 그은
+            추세선이 아닙니다. 위에 있으면 실제가 예측보다 높은 사람입니다.
           </p>
           <ScatterPlot
+            height={480}
             points={cur.rows.map((r) => ({
               id: r.employeeId,
               name: `${r.name} · 예측 ${Math.round(r.predicted)} → 실제 ${Math.round(r.actual)}`,

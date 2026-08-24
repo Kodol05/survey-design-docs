@@ -1,3 +1,6 @@
+"use client";
+
+import { useState } from "react";
 import Link from "next/link";
 import type { PersonQuality } from "@/lib/admin/analysis";
 import { QUALITY } from "@/lib/scoring/quality";
@@ -87,16 +90,40 @@ export function LowQualityList({ rows }: { rows: PersonQuality[] }) {
   );
 }
 
-/** 아래 절 — 전원 순위 */
+/** 처음에 보여줄 인원. 37명을 다 늘어놓으면 화면 두 개를 넘어간다 */
+const HEAD = 8;
+
+/**
+ * 아래 절 — 사람별 순위.
+ *
+ * **전원을 펼쳐 두지 않는다.** 이 목록에서 실제로 볼 일이 있는 것은 양 끝이다.
+ * 낮은 쪽 몇 명은 값을 쓸지 정해야 하고, 높은 쪽 몇 명은 기준선이 된다.
+ * 가운데 스무 명은 스크롤만 잡아먹는다.
+ */
 export function QualityRanking({ rows }: { rows: PersonQuality[] }) {
+  const [all, setAll] = useState(false);
+
   if (rows.length === 0)
     return <p className="text-ink-muted">아직 응시를 끝낸 사람이 없습니다.</p>;
 
   const scored = rows.filter((r) => r.agreement !== null);
-  const mean =
-    scored.length
-      ? scored.reduce((n, r) => n + (r.agreement ?? 0), 0) / scored.length
-      : null;
+  const mean = scored.length
+    ? scored.reduce((n, r) => n + (r.agreement ?? 0), 0) / scored.length
+    : null;
+
+  // rows는 낮은 순으로 들어온다. 화면에는 높은 쪽부터 세운다
+  const high = [...rows].reverse();
+  const hidden = high.length - HEAD * 2;
+  const shown = all || hidden <= 0
+    ? high.map((r, i) => ({ r, rank: i + 1, gap: false }))
+    : [
+        ...high.slice(0, HEAD).map((r, i) => ({ r, rank: i + 1, gap: false })),
+        ...high.slice(-HEAD).map((r, i) => ({
+          r,
+          rank: high.length - HEAD + i + 1,
+          gap: i === 0,
+        })),
+      ];
 
   return (
     <div>
@@ -106,34 +133,52 @@ export function QualityRanking({ rows }: { rows: PersonQuality[] }) {
             평균 <strong className="tabular">{Math.round(mean * 100)}</strong>점.{" "}
           </>
         )}
-        아래로 갈수록 앞뒤가 맞게 답한 쪽입니다.
+        위가 앞뒤가 맞게 답한 쪽입니다.
       </p>
 
       <ul className="flex flex-col">
-        {[...rows].reverse().map((r, i) => (
-          <li
-            key={r.employeeId}
-            className="grid grid-cols-[2.5rem_10rem_1fr_4rem] items-center gap-4 border-b border-[--border] py-2.5 last:border-0"
-          >
-            <span className="tabular text-axis text-ink-muted text-right">{i + 1}</span>
-            <Link href={`/admin/employees/${r.employeeId}`} className="text-table truncate">
-              {r.name}
-            </Link>
-            <span className="h-2.5 rounded-full" style={{ background: "var(--grid)" }}>
-              <span
-                className="block h-full rounded-full"
-                style={{
-                  width: `${r.agreement === null ? 0 : widthOf(r.agreement)}%`,
-                  background: toneOf(r.agreement ?? 0),
-                }}
-              />
-            </span>
-            <span className="tabular text-table text-right font-medium">
-              {r.agreement === null ? "—" : Math.round(r.agreement * 100)}
-            </span>
+        {shown.map(({ r, rank, gap }) => (
+          <li key={r.employeeId}>
+            {gap && (
+              <p className="text-axis text-ink-muted border-t border-[--border] py-2 text-center">
+                가운데 {hidden}명 접힘 ·{" "}
+                <button type="button" onClick={() => setAll(true)} className="underline">
+                  전부 보기
+                </button>
+              </p>
+            )}
+            <div className="grid grid-cols-[2.5rem_9rem_1fr_3.5rem] items-center gap-4 border-b border-[--border] py-2">
+              <span className="tabular text-axis text-ink-muted text-right">{rank}</span>
+              <Link
+                href={`/admin/employees/${r.employeeId}`}
+                className="text-axis truncate"
+              >
+                {r.name}
+              </Link>
+              <span className="h-2 rounded-full" style={{ background: "var(--grid)" }}>
+                <span
+                  className="block h-full rounded-full"
+                  style={{
+                    width: `${r.agreement === null ? 0 : widthOf(r.agreement)}%`,
+                    background: toneOf(r.agreement ?? 0),
+                  }}
+                />
+              </span>
+              <span className="tabular text-axis text-right font-medium">
+                {r.agreement === null ? "—" : Math.round(r.agreement * 100)}
+              </span>
+            </div>
           </li>
         ))}
       </ul>
+
+      {all && hidden > 0 && (
+        <p className="text-axis text-ink-muted mt-3 text-center">
+          <button type="button" onClick={() => setAll(false)} className="underline">
+            가운데 접기
+          </button>
+        </p>
+      )}
     </div>
   );
 }

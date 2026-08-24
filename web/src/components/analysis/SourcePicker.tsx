@@ -60,18 +60,35 @@ export function SourcePicker({
 
   return (
     <div ref={box} className={`relative ${className}`}>
+      {/*
+        **바꿀 수 있다는 것이 보여야 한다.** 처음에는 제목 옆에 작은 ▾ 하나만
+        뒀는데, 그게 여닫는 표시인지 그냥 장식인지 알 수 없어 아무도 누르지
+        않았다. 지금은 「지금 보는 값」이라는 딱지와 테두리를 같이 둬서
+        고르는 자리라는 것이 먼저 읽히게 한다.
+      */}
+      <p className="text-axis text-ink-muted mb-1">지금 보는 값</p>
       <button
         type="button"
         onClick={() => ready && setOpen(!open)}
         disabled={!ready}
-        className="text-section-title inline-flex items-baseline gap-2 disabled:cursor-default"
-        title={ready ? undefined : "대표님 평가가 아직 없습니다"}
+        className="text-section-title inline-flex items-center gap-3 rounded-lg px-4 py-2 disabled:cursor-default"
+        style={{
+          background: open ? "var(--wash)" : "transparent",
+          outline: "1px solid var(--border)",
+        }}
+        title={ready ? "눌러서 바꿉니다" : "대표님 평가가 아직 없습니다"}
       >
         {SOURCE_LABEL[value]}
-        {ready && (
-          <span aria-hidden className="text-ink-muted text-axis">
-            {open ? "▴" : "▾"}
+        {ready ? (
+          <span
+            aria-hidden
+            className="text-axis rounded-md px-2 py-0.5"
+            style={{ background: "var(--wash)", color: "var(--ink-secondary)" }}
+          >
+            바꾸기 {open ? "▴" : "▾"}
           </span>
+        ) : (
+          <span className="text-axis text-ink-muted">대표님 평가 없음</span>
         )}
       </button>
 
