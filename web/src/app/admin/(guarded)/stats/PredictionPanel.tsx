@@ -86,9 +86,9 @@ export function PredictionPanel({
           extra={<span className="text-axis text-ink-muted">100점 눈금</span>}
         />
         <Fact
-          label="예측보다 높음 / 낮음"
-          value={`${cur.above} / ${cur.below}`}
-          extra={<span className="text-axis text-ink-muted">{cur.n}명 중</span>}
+          label="크게 어긋난 사람"
+          value={`${cur.farOff}명`}
+          extra={<span className="text-axis text-ink-muted">10점 넘게 · {cur.n}명 중</span>}
         />
       </div>
 
@@ -98,6 +98,11 @@ export function PredictionPanel({
           <p className="text-axis text-ink-muted mb-3">
             <strong>대각선은 「예측과 실제가 똑같다」는 선</strong>입니다 — 데이터로 그은
             추세선이 아닙니다. 위에 있으면 실제가 예측보다 높은 사람입니다.
+          </p>
+          <p className="text-axis text-ink-muted mb-3">
+            두 축 모두 <strong>설문 점수 눈금(0~100)</strong>입니다. 가로축의 가운데와
+            퍼진 정도는 <strong>설문 값에서 빌려온 것</strong>이고, 논문이 정하는 것은
+            <strong> 사람들의 순서</strong>뿐입니다.
           </p>
           <ScatterPlot
             height={480}
@@ -116,25 +121,6 @@ export function PredictionPanel({
             yLabel="실제"
           />
 
-          <h3 className="text-table mt-10 mb-1 font-medium">구간마다 다른가</h3>
-          <p className="text-axis text-ink-muted mb-3">
-            한쪽으로 쏠려 있으면 그 구간에서 예측이 계속 빗나간다는 뜻입니다
-          </p>
-          <ul className="flex flex-col gap-2">
-            {cur.bins.map((b) => (
-              <li key={b.label} className="grid grid-cols-[7rem_1fr] items-center gap-3 sm:grid-cols-[9rem_1fr]">
-                <span className="text-axis text-ink-secondary">{b.label}</span>
-                <span className="text-axis tabular">
-                  평균{" "}
-                  <strong className="text-table">
-                    {b.meanGap >= 0 ? "+" : "−"}
-                    {Math.abs(b.meanGap).toFixed(1)}
-                  </strong>
-                  <span className="text-ink-muted ml-2">{b.count}명</span>
-                </span>
-              </li>
-            ))}
-          </ul>
         </div>
 
         <div>

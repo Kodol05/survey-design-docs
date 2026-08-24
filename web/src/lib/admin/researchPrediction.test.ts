@@ -61,13 +61,22 @@ describe("predictFromResearch", () => {
   it("차이는 실제 − 예측이다", () => {
     const out = predictFromResearch(makePeople(30, 0.8, axis), axis)!;
     for (const r of out.rows) expect(r.gap).toBeCloseTo(r.actual - r.predicted, 10);
-    expect(out.above + out.below).toBeLessThanOrEqual(out.n);
   });
 
-  it("구간을 셋으로 나누고 인원을 다 담는다", () => {
+  it("차이의 합은 0이다 — 예측을 실제 평균에 맞춰 두기 때문", () => {
+    /*
+      이 성질 때문에 「예측보다 높은 사람 / 낮은 사람」 인원수는 언제나
+      반반으로 나온다. 화면에 그 숫자를 두면 안 된다는 근거다.
+    */
     const out = predictFromResearch(makePeople(30, 0.5, axis), axis)!;
-    expect(out.bins).toHaveLength(3);
-    expect(out.bins.reduce((n, b) => n + b.count, 0)).toBe(out.n);
+    const total = out.rows.reduce((n, r) => n + r.gap, 0);
+    expect(Math.abs(total)).toBeLessThan(1e-9);
+  });
+
+  it("크게 어긋난 사람은 10점 기준으로 센다", () => {
+    const out = predictFromResearch(makePeople(30, 0.5, axis), axis)!;
+    const byHand = out.rows.filter((r) => Math.abs(r.gap) >= 10).length;
+    expect(out.farOff).toBe(byHand);
   });
 
   it("가중치는 논문 값 그대로다", () => {

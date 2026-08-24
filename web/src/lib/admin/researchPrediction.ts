@@ -55,10 +55,8 @@ export type ResearchPrediction = {
   corr: number;
   /** 평균 |차이| */
   meanAbsGap: number;
-  above: number;
-  below: number;
-  /** 예측이 낮은 쪽/높은 쪽에서 차이가 달라지는가 */
-  bins: { label: string; count: number; meanGap: number }[];
+  /** 10점 넘게 어긋난 사람 수 */
+  farOff: number;
 };
 
 const mean = (xs: number[]) => xs.reduce((a, b) => a + b, 0) / xs.length;
@@ -132,18 +130,23 @@ export function predictFromResearch(
   }));
 
   /*
-    예측이 낮은 쪽과 높은 쪽에서 차이가 달라지는지 본다.
+    ⚠️ **구간별 평균 차이는 넣지 않는다 — 계산해 보면 늘 기울어진다.**
 
-    한쪽으로 쏠려 있으면 식이 그 구간에서 체계적으로 빗나가고 있다는 뜻이다.
-    평균 차이만 보면 +와 −가 서로 상쇄돼 0으로 보여서 이게 안 잡힌다.
+    3단계에서 예측값을 실제값의 평균·표준편차에 맞춰 되돌린다. 그러면 두 값의
+    퍼진 정도가 같아지는데, 상관이 1보다 작으면 수학적으로
+
+        (예측이 낮은 쪽) 실제가 더 높게  ·  (예측이 높은 쪽) 실제가 더 낮게
+
+    나올 수밖에 없다. 평균으로의 회귀(regression to the mean)다.
+
+    실제로 **상관이 0인 난수로도 `+13.7 / −3.1 / −10.3`이 나왔다.** 데이터에서
+    발견한 것처럼 보이지만 만드는 방식이 만들어낸 모양이다. 화면에 두면
+    없는 것을 봤다고 말하게 된다.
+
+    같은 이유로 「예측보다 높음 / 낮음」 인원수도 뺐다. 두 평균이 정확히 같게
+    맞춰져 있어 **언제나 반반**으로 나온다.
   */
-  const sorted = [...rows].sort((a, b) => a.predicted - b.predicted);
-  const third = Math.floor(sorted.length / 3);
-  const groups: [string, PredictionRow[]][] = [
-    ["예측이 낮은 쪽", sorted.slice(0, third)],
-    ["가운데", sorted.slice(third, sorted.length - third)],
-    ["예측이 높은 쪽", sorted.slice(sorted.length - third)],
-  ];
+  const FAR = 10;
 
   return {
     axis,
@@ -152,14 +155,6 @@ export function predictFromResearch(
     rows,
     corr: corrOf(predicted, actual),
     meanAbsGap: mean(rows.map((r) => Math.abs(r.gap))),
-    above: rows.filter((r) => r.gap > 0).length,
-    below: rows.filter((r) => r.gap < 0).length,
-    bins: groups
-      .filter(([, g]) => g.length > 0)
-      .map(([label, g]) => ({
-        label,
-        count: g.length,
-        meanGap: mean(g.map((r) => r.gap)),
-      })),
+    farOff: rows.filter((r) => Math.abs(r.gap) >= FAR).length,
   };
 }
