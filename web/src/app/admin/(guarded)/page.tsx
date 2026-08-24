@@ -1,7 +1,5 @@
 import Link from "next/link";
 import { WarningBadge } from "@/components/ui/WarningBadge";
-import { formatR } from "@/components/analysis/correlationColor";
-import { describeCorrelation, gradeOf, isNotable } from "@/components/analysis/correlationWords";
 import { colorAt } from "@/components/charts/scale";
 import { CompletionTrend } from "@/components/charts/CompletionTrend";
 import { getAppState } from "@/lib/admin/phase";
@@ -15,6 +13,7 @@ import {
 import { ALPHA } from "@/lib/admin/stats";
 import { ABILITY_AXES, TRAIT_SCALES } from "@/lib/items/types";
 import { MIN_N } from "@/components/ui/NBadge";
+import { TopRelations, type Relation } from "./TopRelations";
 import { OpenResultsButton } from "./OpenResultsButton";
 
 export const metadata = { title: "대시보드 — 관리자" };
@@ -55,13 +54,28 @@ export default async function AdminHome() {
   const needsReview = people.filter((p) => p.quality !== "ok");
   const poorNames = poorScales.map((r) => r.scale);
 
-  // 가장 뚜렷한 관련 세 개 — 자세한 것은 분석 화면에서
-  const top = TRAIT_SCALES.flatMap((scale) =>
+  /*
+    가장 뚜렷한 관련 — **자르지 않고 다 넘긴다.**
+
+    전에는 상위 셋에서 끊었는데, 넷째가 셋째와 거의 같은 값이면 끊긴 자리를
+    모르는 채로 셋만 특별해 보인다. 화면에서 세 개씩 넘겨 보게 하고
+    전체 개수를 같이 보여준다.
+
+    거르는 기준은 그대로다 — **신뢰구간이 0을 벗어난 조합만.** 방향조차
+    확정 안 된 것을 "뚜렷한 관련"이라 부를 수는 없다.
+  */
+  const top: Relation[] = TRAIT_SCALES.flatMap((scale) =>
     ABILITY_AXES.map((axis) => ({ scale, axis, c: cellOf(matrix, scale, axis) })),
   )
     .filter((x) => x.c && !(x.c.ci[0] <= 0 && x.c.ci[1] >= 0))
     .sort((a, b) => Math.abs(b.c!.r) - Math.abs(a.c!.r))
-    .slice(0, 3);
+    .map((x) => ({
+      scale: x.scale,
+      axis: x.axis,
+      r: x.c!.r,
+      n: x.c!.n,
+      ci: x.c!.ci,
+    }));
 
   return (
     <>
@@ -161,51 +175,16 @@ export default async function AdminHome() {
                   응시 완료 {matrix.n}명입니다. {MIN_N}명이 넘어야 사내 관련도를 보여드립니다.
                 </p>
               </>
-            ) : top.length === 0 ? (
-              <p className="text-ink-secondary">
-                신뢰구간이 0을 벗어나는 조합이 아직 없습니다. 사람이 더 모여야 합니다.
-              </p>
             ) : (
               <>
-                <ul className="flex flex-col">
-                  {top.map(({ scale, axis, c }) => (
-                    <li
-                      key={`${scale}-${axis}`}
-                      className="flex flex-col gap-1 border-b border-[--border] py-3 last:border-0"
-                    >
-                      <p className="leading-snug">
-                        {describeCorrelation(scale, axis, c!.r)}
-                      </p>
-                      <p className="text-axis text-ink-muted flex flex-wrap items-baseline gap-x-3">
-                        <span
-                          className={isNotable(c!.r) ? "font-medium" : undefined}
-                          style={{
-                            color: isNotable(c!.r) ? "var(--ink-secondary)" : undefined,
-                          }}
-                        >
-                          {gradeOf(c!.r, c!.ci)}
-                        </span>
-                        <span className="tabular">{c!.n}명</span>
-                        <span className="tabular" title="두 값이 함께 움직인 정도. −1에서 +1 사이">
-                          관련도 {formatR(c!.r)}
-                        </span>
-                        <span
-                          className="tabular"
-                          title="사람이 바뀌어도 이 범위 안에 들어올 것으로 보는 구간"
-                        >
-                          95% 구간 {formatR(c!.ci[0])}~{formatR(c!.ci[1])}
-                        </span>
-                      </p>
-                    </li>
-                  ))}
-                </ul>
+                <TopRelations items={top} />
 
                 <div className="mt-4 flex flex-col gap-2">
                   <WarningBadge kind="multipleComparison" />
                   <p className="text-axis text-ink-muted">
                     <strong className="text-ink-secondary">같이 움직인다는 뜻이지, 한쪽이
                     원인이라는 뜻은 아닙니다.</strong> 21개 조합 중 값이 0을 확실히 벗어난
-                    것만 골라 센 셋이고, 표 전체와 점 분포는 분석 화면에서 봅니다.
+                    것만 센 것이고, 표 전체와 점 분포는 분석 화면에서 봅니다.
                   </p>
                 </div>
               </>

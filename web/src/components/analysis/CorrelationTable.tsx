@@ -44,10 +44,27 @@ export function CorrelationTable({
 }) {
   return (
     <div className="overflow-x-auto">
-      <table className="w-full border-separate" style={{ borderSpacing: 2 }}>
+      {/*
+        `table-fixed`가 핵심이다. 자동 폭으로 두면 열 이름 글자 수대로 폭이
+        갈린다 — `협력`(2자) 칸만 좁고 `자율적실행`(5자) 칸이 넓어졌다.
+        칸 안에 든 값은 다 같은 종류인데 폭이 다르면 크기를 눈으로 비교할 수 없다.
+
+        폭을 지정하지 않은 열은 고정 레이아웃에서 남는 폭을 **똑같이** 나눠 갖는다.
+        그래서 성향 축 이름 열에만 폭을 주고 나머지는 비워 둔다.
+      */}
+      <table
+        className="w-full table-fixed border-separate"
+        style={{ borderSpacing: 2 }}
+      >
+        <colgroup>
+          <col style={{ width: "8rem" }} />
+          {cols.map((c) => (
+            <col key={c} />
+          ))}
+        </colgroup>
         <thead>
           <tr>
-            <th className="text-axis text-ink-muted w-32 pb-2 text-left font-medium">
+            <th className="text-axis text-ink-muted pb-2 text-left font-medium">
               성향 축
             </th>
             {cols.map((c) => (
