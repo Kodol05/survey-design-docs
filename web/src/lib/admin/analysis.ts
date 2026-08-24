@@ -370,3 +370,49 @@ export function abilitiesByTraitTercile(
     },
   );
 }
+
+export type PersonQuality = {
+  employeeId: string;
+  name: string;
+  /** 반대 문항 일치도 0~1. 아무렇게나 찍으면 .60 근처가 나온다 */
+  agreement: number | null;
+  /** 1.5초 안에 넘긴 문항 수 */
+  fastCount: number | null;
+  meanElapsedMs: number | null;
+  flag: string;
+};
+
+/**
+ * 사람별 응답 품질 — **문항 품질(α)과는 다른 이야기다.**
+ *
+ * α는 「문항이 잘 만들어졌는가」를, 이쪽은 「이 사람 답을 믿을 수 있는가」를
+ * 잰다. 척도 α가 아무리 높아도 대충 찍은 사람의 값은 못 쓴다.
+ *
+ * 일치도가 주 지표다. 서로 반대인 문항에 같은 방향으로 답했는지를 재는데,
+ * 무작위로 찍으면 .60 근처가 나온다 (모의로 확인, 00 §2.3).
+ */
+export async function loadPersonQuality(): Promise<PersonQuality[]> {
+  const rows = await prisma.testSession.findMany({
+    where: { status: "COMPLETED" },
+    orderBy: { completedAt: "desc" },
+    include: { qualityFlag: true, employee: true },
+  });
+
+  const seen = new Set<string>();
+  const out: PersonQuality[] = [];
+  for (const s of rows) {
+    if (seen.has(s.employeeId)) continue;
+    seen.add(s.employeeId);
+    out.push({
+      employeeId: s.employeeId,
+      name: s.employee.name,
+      agreement: s.qualityFlag?.antonymAgreement ?? null,
+      fastCount: s.qualityFlag?.fastCount ?? null,
+      meanElapsedMs: s.qualityFlag?.meanElapsedMs ?? null,
+      flag: s.qualityFlag?.flag ?? "ok",
+    });
+  }
+  // 낮은 사람이 위로. 볼 것이 먼저 보여야 한다
+  out.sort((a, b) => (a.agreement ?? 2) - (b.agreement ?? 2));
+  return out;
+}

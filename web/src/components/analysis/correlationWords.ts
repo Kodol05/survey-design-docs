@@ -16,7 +16,6 @@ function subjectParticle(word: string): string {
 }
 
 export type Strength = "매우 뚜렷함" | "뚜렷함" | "어느 정도" | "약함" | "없음";
-export type Grade = Strength | "불확실";
 
 /**
  * 세기 구분 — 기준선을 **Cohen이 아니라 Funder·Ozer로 잡는다.**
@@ -53,19 +52,25 @@ export function isNotable(r: number): boolean {
 }
 
 /**
- * 화면에 붙일 등급.
+ * 화면에 붙일 등급 — **크기와 확실함은 따로 말한다.**
  *
- * **신뢰구간이 0을 걸치면 등급을 주지 않는다.** 세기를 말하려면 먼저 방향이
- * 정해져야 하는데, 구간이 0을 넘나든다는 것은 같이 오르는지 반대로 가는지조차
- * 확정이 안 됐다는 뜻이다. 그 자리에 "뚜렷함"을 적으면 없는 것을 봤다고
- * 말하는 셈이 된다.
+ * 처음에는 신뢰구간이 0을 걸치면 등급 자리에 `불확실`을 대신 넣었다.
+ * 그랬더니 **「어느 정도」가 화면에 아예 안 나왔다.** 사람이 37명일 때
+ * 구간이 0을 벗어나려면 |r|이 .32는 넘어야 하는데, 「어느 정도」는
+ * .20~.29 구간이라 정의상 항상 0을 걸친다. 등급이 하나 죽어 있는 것처럼
+ * 보여서 고장으로 읽혔다.
  *
- * 사람이 44명일 때 0을 안 걸치려면 |r|이 대략 .30은 넘어야 한다. 그래서
- * 사내 표는 상당수 칸이 `불확실`로 나온다 — 감추는 게 아니라 실제로 그렇다.
+ * 둘은 **다른 이야기**다 — 등급은 "얼마나 큰가", 구간은 "믿을 만한가".
+ * 하나로 뭉개면 한쪽 정보가 사라진다. 그래서 등급은 언제나 크기로 적고,
+ * 확실하지 않다는 것은 색과 표시로 따로 알린다.
  */
-export function gradeOf(r: number, ci?: [number, number]): Grade {
-  if (ci && ci[0] <= 0 && ci[1] >= 0) return "불확실";
+export function gradeOf(r: number): Strength {
   return strengthOf(r);
+}
+
+/** 신뢰구간이 0을 걸치는가 — 방향조차 확정되지 않았다는 뜻 */
+export function isUncertain(ci?: [number, number]): boolean {
+  return Boolean(ci && ci[0] <= 0 && ci[1] >= 0);
 }
 
 /**

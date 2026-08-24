@@ -56,3 +56,45 @@ export function Marker({ percent, size = 24 }: { percent: number; size?: number 
     </span>
   );
 }
+
+/*
+  직무능력 색 — **성향과 다른 언어를 쓴다.**
+
+  성향은 낮음도 높음도 틀린 게 아니라 양쪽으로 갈라지는 색을 쓴다. 직무능력은
+  높을수록 좋은 값이라 갈라지면 안 된다 — 낮음이 곱게 보인다.
+
+  그래서 **한 가지 색의 진하기**로만 말한다. 길이만으로도 값은 읽히지만,
+  좁은 칸에서 62와 71을 길이로만 가르기는 어렵다. 진하기를 같이 얹으면
+  훑을 때 눈에 먼저 들어온다.
+
+  옅은 쪽을 배경보다 확실히 아래로 둔다 — 그러지 않으면 낮은 값이 빈 칸처럼
+  보인다. 상관 표에서 겪은 것과 같은 문제다.
+*/
+const ABILITY_STOPS: [number, string][] = [
+  [0, "#d8dee7"],
+  [35, "#a8b6cb"],
+  [65, "#6c85aa"],
+  [100, "#2f4a72"],
+];
+
+export function abilityColorAt(pct: number): string {
+  const v = Math.max(0, Math.min(100, pct));
+  for (let i = 1; i < ABILITY_STOPS.length; i++) {
+    const [p1, c1] = ABILITY_STOPS[i - 1];
+    const [p2, c2] = ABILITY_STOPS[i];
+    if (v > p2) continue;
+    const t = p2 === p1 ? 0 : (v - p1) / (p2 - p1);
+    const mix = [0, 1, 2].map((k) => {
+      const a = parseInt(c1.slice(1 + k * 2, 3 + k * 2), 16);
+      const b = parseInt(c2.slice(1 + k * 2, 3 + k * 2), 16);
+      return Math.round(a + (b - a) * t);
+    });
+    return `rgb(${mix.join(" ")})`;
+  }
+  return ABILITY_STOPS[ABILITY_STOPS.length - 1][1];
+}
+
+/** 범례용 띠 */
+export const ABILITY_GRADIENT = `linear-gradient(90deg, ${ABILITY_STOPS.map(
+  ([p, c]) => `${c} ${p}%`,
+).join(", ")})`;

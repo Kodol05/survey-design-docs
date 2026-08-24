@@ -1,4 +1,4 @@
-import { colorAt } from "../charts/scale";
+import { abilityColorAt, colorAt } from "../charts/scale";
 import { ABILITY_AXES, TRAIT_SCALES } from "@/lib/items/types";
 
 /**
@@ -57,7 +57,8 @@ const A_CELL = "min-w-[4.75rem] flex-1";
  * 대표님 평가와 대조하는 대상이 이것이다). 같은 색 언어를 쓰면 "낮음"이
  * 청회색으로 곱게 보여서 반대로 읽힌다.
  *
- * 그래서 한 가지 색의 **길이**로만 말한다. 계열 1을 쓰고 굵기는 얇게 둔다.
+ * 그래서 한 가지 색의 **길이와 진하기**로 말한다. 좁은 칸에서 62와 71을
+ * 길이만으로 가르기는 어렵다 — 진하기를 같이 얹으면 훑을 때 먼저 들어온다.
  */
 export function AbilityStrip({ abilities }: { abilities: Record<string, number> | null }) {
   if (!abilities || Object.keys(abilities).length === 0)
@@ -73,12 +74,12 @@ export function AbilityStrip({ abilities }: { abilities: Record<string, number> 
             <span className="tabular text-table block text-right leading-none">
               {has ? Math.round(v) : "—"}
             </span>
-            <span aria-hidden className="mt-1 block h-1 rounded-full" style={{ background: "var(--grid)" }}>
+            <span aria-hidden className="mt-1 block h-1.5 rounded-full" style={{ background: "var(--grid)" }}>
               <span
                 className="block h-full rounded-full"
                 style={{
-                  width: `${has ? Math.max(2, Math.min(100, v)) : 0}%`,
-                  background: "var(--series-1)",
+                  width: `${has ? Math.max(4, Math.min(100, v)) : 0}%`,
+                  background: has ? abilityColorAt(v) : "transparent",
                 }}
               />
             </span>

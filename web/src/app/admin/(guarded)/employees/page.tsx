@@ -17,10 +17,10 @@ import type { StoredAbilities, StoredTraits } from "@/lib/survey/result";
 export const metadata = { title: "구성원 — 관리자" };
 
 export default async function EmployeesPage(props: {
-  searchParams: Promise<{ sort?: string; q?: string; src?: string }>;
+  searchParams: Promise<{ sort?: string; q?: string; src?: string; flag?: string; status?: string }>;
 }) {
   await requireAdmin();
-  const { sort, q, src } = await props.searchParams;
+  const { sort, q, src, flag, status } = await props.searchParams;
   const source = parseSource(src);
 
   const [employees, bossCount] = await Promise.all([
@@ -78,6 +78,17 @@ export default async function EmployeesPage(props: {
   const keyword = (q ?? "").trim();
   if (keyword) rows = rows.filter((r) => r.name.includes(keyword));
 
+  /*
+    분석 화면 타일에서 넘어올 때 쓰는 거르개.
+
+    숫자만 보여주고 끝내면 "37명이 했다는데 누구지?"에서 화면을 다시
+    뒤져야 한다. 세는 자리에서 바로 명단으로 넘어오게 한다.
+  */
+  const onlyReview = flag === "review";
+  const pickStatus = STATUS_FILTERS.find((f) => f.key === status);
+  if (onlyReview) rows = rows.filter((r) => r.flag !== "ok");
+  if (pickStatus) rows = rows.filter((r) => pickStatus.match(r.status));
+
   // 축 이름으로 정렬하면 그 성향이 두드러진 사람이 위로 온다 (01 §4.0 Q3)
   const sortAxis = TRAIT_SCALES.includes(sort as never) ? sort! : null;
 
@@ -103,8 +114,12 @@ export default async function EmployeesPage(props: {
     const sp = new URLSearchParams();
     if (params.sort) sp.set("sort", params.sort);
     if (params.q) sp.set("q", params.q);
-    // 고른 출처는 정렬·검색을 바꿔도 따라간다
+    // 고른 출처와 거르개는 정렬·검색을 바꿔도 따라간다
     if (source !== "self") sp.set(SOURCE_PARAM, source);
+    if (!params.clear) {
+      if (onlyReview) sp.set("flag", "review");
+      if (pickStatus) sp.set("status", pickStatus.key);
+    }
     const s = sp.toString();
     return `/admin/employees${s ? `?${s}` : ""}`;
   };
@@ -119,6 +134,20 @@ export default async function EmployeesPage(props: {
       </div>
 
       {/* 필터는 한 줄로 목록 위에 둔다 (차트·표 안에 넣지 않는다) */}
+      {(onlyReview || pickStatus) && (
+        <p className="text-axis text-ink-secondary mb-6 flex flex-wrap items-center gap-3">
+          <span
+            className="rounded-md px-3 py-1"
+            style={{ background: "var(--wash)" }}
+          >
+            {onlyReview ? "검토가 필요한 응답만" : pickStatus!.label}
+          </span>
+          <Link href={link({ sort: sortAxis ?? undefined, q: keyword, clear: "1" })} className="underline">
+            전체 보기
+          </Link>
+        </p>
+      )}
+
       <div className="mb-6">
         <SourcePicker value={source} bossCount={bossCount} />
       </div>
@@ -207,6 +236,13 @@ const dayLabel = (d: Date) =>
     .format(d)
     .replace(/\.\s*$/, "")
     .replace(/\.\s*/g, "/");
+
+/** 타일에서 넘어올 때 쓰는 상태 거르개 */
+const STATUS_FILTERS = [
+  { key: "completed", label: "응시 완료만", match: (s: string | null) => s === "COMPLETED" },
+  { key: "inprogress", label: "진행 중만", match: (s: string | null) => s === "IN_PROGRESS" },
+  { key: "none", label: "미응시만", match: (s: string | null) => s === null },
+] as const;
 
 const sortStyle = (on: boolean) => ({
   background: on ? "var(--ink)" : "var(--wash)",

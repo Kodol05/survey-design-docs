@@ -6,6 +6,7 @@ import {
   describeCorrelation,
   gradeOf,
   isNotable,
+  isUncertain,
 } from "@/components/analysis/correlationWords";
 
 export type Relation = {
@@ -64,7 +65,10 @@ export function TopRelations({ items }: { items: Relation[] }) {
                   className={isNotable(it.r) ? "font-medium" : undefined}
                   style={{ color: isNotable(it.r) ? "var(--ink-secondary)" : undefined }}
                 >
-                  {gradeOf(it.r, it.ci)}
+                  {gradeOf(it.r)}
+                  {isUncertain(it.ci) && (
+                    <span className="text-ink-muted ml-1">아직 확정 아님</span>
+                  )}
                 </span>
                 <span className="tabular">{it.n}명</span>
                 <span className="tabular" title="두 값이 함께 움직인 정도. −1에서 +1 사이">

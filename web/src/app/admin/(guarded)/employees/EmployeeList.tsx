@@ -10,7 +10,7 @@ import {
   TraitStrip,
   TraitStripHeader,
 } from "@/components/analysis/TraitStrip";
-import { CHARACTER, TEMPERAMENT, colorAt } from "@/components/charts/scale";
+import { CHARACTER, TEMPERAMENT, abilityColorAt } from "@/components/charts/scale";
 import { QuickRead } from "@/components/analysis/QuickRead";
 import { ABILITY_AXES } from "@/lib/items/types";
 import { formatPhone } from "@/lib/auth/phone";
@@ -253,7 +253,7 @@ function Panel({ row }: { row: Row }) {
                       className="h-full rounded-full"
                       style={{
                         width: `${Math.max(2, Math.min(100, v))}%`,
-                        background: colorAt(v),
+                        background: abilityColorAt(v),
                       }}
                     />
                   </div>

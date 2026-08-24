@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { EmptyState } from "@/components/ui/Card";
+import { Note } from "@/components/ui/Note";
 import { RatingGrid, type RatingRow } from "./RatingGrid";
 import { prisma } from "@/lib/db";
 import { requireAdmin } from "@/lib/auth/guard";
@@ -53,30 +54,27 @@ export default async function RatingsPage() {
         </p>
       </div>
 
-      <div className="text-ink-secondary mb-8 max-w-[56rem]">
-        <p className="mb-3">
-          한 사람에 세 항목, <strong>{RATING.min}에서 {RATING.max}까지</strong>{" "}
-          매겨 주십시오. 누르면 바로 저장되니 중간에 닫으셔도 됩니다.
-        </p>
-        <p className="text-axis text-ink-muted">
-          이 값은 직원 설문과 <strong>따로</strong> 남습니다. 분석 화면에서 제목을 눌러
-          「직원 설문」 · 「대표님 평가」 · 「두 값 평균」으로 바꿔 보실 수 있습니다.
-        </p>
-      </div>
-
-      {demo > 0 && (
-        <p className="text-axis text-ink-muted mb-4 max-w-[56rem] border-l-2 border-[--axis] py-1 pl-4">
-          이 목록에는 <strong>대표님이 직접 매기신 것만</strong> 나옵니다. 화면 확인용으로
-          심어 둔 값 <span className="tabular">{demo}</span>칸이 따로 있는데, 데모 계정에
-          붙어 있고 여기서는 보이지 않습니다.
-        </p>
-      )}
-
-      <p className="text-axis text-ink-muted mb-8 max-w-[56rem]">
-        언제든 고치실 수 있습니다. 다만 <strong>결과 화면을 보시기 전에 매기는 편이
-        낫습니다</strong> — 결과를 먼저 보면 그 인상이 섞여서, 두 값을 맞대 보는
-        의미가 줄어듭니다.
+      <p className="text-ink-secondary mb-6">
+        한 사람에 세 항목, {RATING.min}~{RATING.max}. 누르면 바로 저장됩니다.
       </p>
+
+      <Note label="이 값이 어디에 쓰이는지" className="mb-8">
+        <p className="mb-2">
+          직원 설문과 <strong>따로</strong> 남습니다. 구성원 목록과 분석 화면에서 제목을
+          눌러 「직원 설문」 · 「대표님 평가」 · 「두 값 평균」으로 바꿔 보실 수 있습니다.
+        </p>
+        <p className="mb-2">
+          <strong>결과 화면을 보시기 전에 매기는 편이 낫습니다.</strong> 결과를 먼저 보면
+          그 인상이 섞여서, 두 값을 맞대 보는 의미가 줄어듭니다. 막아 두지는 않았습니다.
+        </p>
+        {demo > 0 && (
+          <p>
+            여기에는 대표님이 직접 매기신 것만 나옵니다. 화면 확인용으로 심어 둔 값{" "}
+            <span className="tabular">{demo}</span>칸은 데모 계정에 붙어 있어 보이지
+            않습니다.
+          </p>
+        )}
+      </Note>
 
       {rows.length === 0 ? (
         <EmptyState message="아직 가입한 사람이 없습니다." />

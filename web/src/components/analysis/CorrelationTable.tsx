@@ -151,7 +151,7 @@ function describe(row: string, col: string, c: Cell) {
   if (c.kind === "unstudied") return `${row} × ${col}, 연구된 적 없음`;
   if (c.kind === "none") return `${row} × ${col}, 관련 없음`;
   if (c.kind === "tooFew") return `${row} × ${col}, 표본 부족`;
-  return `${row} × ${col}, ${gradeOf(c.r, c.ci)}, 상관 ${formatR(c.r)}, ${c.n}명, 신뢰구간 ${formatR(
+  return `${row} × ${col}, ${gradeOf(c.r) + (crosses(c.ci) ? " 아직 확정 아님" : "")}, 상관 ${formatR(c.r)}, ${c.n}명, 신뢰구간 ${formatR(
     c.ci[0],
   )}에서 ${formatR(c.ci[1])}`;
 }
