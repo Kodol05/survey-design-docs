@@ -4,29 +4,42 @@ import { EmployeeList, type Row } from "./EmployeeList";
 import { prisma } from "@/lib/db";
 import { requireAdmin } from "@/lib/auth/guard";
 import { isResultsOpen } from "@/lib/admin/phase";
-import { TRAIT_SCALES } from "@/lib/items/types";
+import { ABILITY_AXIS_FROM_DB, TRAIT_SCALES } from "@/lib/items/types";
+import { SourcePicker } from "@/components/analysis/SourcePicker";
+import {
+  SOURCE_LABEL,
+  SOURCE_PARAM,
+  parseSource,
+  resolveAbilities,
+} from "@/lib/admin/abilitySource";
+import { countRatedEmployees } from "@/lib/admin/ratings";
 import type { StoredAbilities, StoredTraits } from "@/lib/survey/result";
 
 export const metadata = { title: "구성원 — 관리자" };
 
 export default async function EmployeesPage(props: {
-  searchParams: Promise<{ sort?: string; q?: string }>;
+  searchParams: Promise<{ sort?: string; q?: string; src?: string }>;
 }) {
   await requireAdmin();
   const open = await isResultsOpen();
-  const { sort, q } = await props.searchParams;
+  const { sort, q, src } = await props.searchParams;
+  const source = parseSource(src);
 
-  const employees = await prisma.employee.findMany({
-    where: { role: "USER" },
-    orderBy: { name: "asc" },
-    include: {
-      testSessions: {
-        orderBy: { startedAt: "desc" },
-        take: 1,
-        include: { result: true, qualityFlag: true },
+  const [employees, bossCount] = await Promise.all([
+    prisma.employee.findMany({
+      where: { role: "USER" },
+      orderBy: { name: "asc" },
+      include: {
+        testSessions: {
+          orderBy: { startedAt: "desc" },
+          take: 1,
+          include: { result: true, qualityFlag: true },
+        },
+        ratings: true,
       },
-    },
-  });
+    }),
+    countRatedEmployees(),
+  ]);
 
   let rows: Row[] = employees.map((e) => {
     const s = e.testSessions[0];
@@ -51,9 +64,20 @@ export default async function EmployeesPage(props: {
       traits: stored
         ? Object.fromEntries(Object.entries(stored).map(([k, v]) => [k, v.percent]))
         : null,
-      abilities: ability
-        ? Object.fromEntries(Object.entries(ability).map(([k, v]) => [k, v.percent]))
-        : null,
+      // 고른 소스대로 만든다. 대표님 평가만 보는데 아직 안 매긴 사람이면 빈 값이 된다 —
+      // 그게 맞다. 0으로 채우면 "낮게 평가받은 사람"으로 보인다
+      abilities: (() => {
+        const self = ability
+          ? Object.fromEntries(Object.entries(ability).map(([k, v]) => [k, v.percent]))
+          : {};
+        const boss = Object.fromEntries(
+          e.ratings
+            .map((r) => [ABILITY_AXIS_FROM_DB[r.axis], r.score] as const)
+            .filter(([axis]) => Boolean(axis)),
+        );
+        const out = resolveAbilities(source, self, boss);
+        return Object.keys(out).length ? out : null;
+      })(),
     };
   });
 
@@ -85,6 +109,8 @@ export default async function EmployeesPage(props: {
     const sp = new URLSearchParams();
     if (params.sort) sp.set("sort", params.sort);
     if (params.q) sp.set("q", params.q);
+    // 고른 출처는 정렬·검색을 바꿔도 따라간다
+    if (source !== "self") sp.set(SOURCE_PARAM, source);
     const s = sp.toString();
     return `/admin/employees${s ? `?${s}` : ""}`;
   };
@@ -99,6 +125,12 @@ export default async function EmployeesPage(props: {
       </div>
 
       {/* 필터는 한 줄로 목록 위에 둔다 (차트·표 안에 넣지 않는다) */}
+      {open && (
+        <div className="mb-6">
+          <SourcePicker value={source} bossCount={bossCount} />
+        </div>
+      )}
+
       <div className="mb-8 flex flex-wrap items-center gap-x-6 gap-y-3">
         <form className="flex items-center gap-2">
           <input
@@ -108,6 +140,9 @@ export default async function EmployeesPage(props: {
             className="text-table h-12 w-48 rounded-lg border border-[--border] bg-surface px-3"
           />
           {sortAxis && <input type="hidden" name="sort" value={sortAxis} />}
+          {source !== "self" && (
+            <input type="hidden" name={SOURCE_PARAM} value={source} />
+          )}
           <button className="text-table text-ink-secondary underline">찾기</button>
         </form>
 
@@ -148,8 +183,8 @@ export default async function EmployeesPage(props: {
           아닙니다. 색으로 모양을 먼저 보고 숫자로 값을 확인하시면 됩니다.
         </p>
         <p className="max-w-[56rem]">
-          <strong className="text-ink-secondary">직무능력</strong> 세 칸은 막대 길이가
-          값입니다. 여기는 성향과 달리 <strong>높을수록 좋은 값</strong>이라 갈라지는 색을
+          <strong className="text-ink-secondary">직무능력</strong> 세 칸은{" "}
+          <strong>{SOURCE_LABEL[source]}</strong>이고 막대 길이가 값입니다. 여기는 성향과 달리 <strong>높을수록 좋은 값</strong>이라 갈라지는 색을
           쓰지 않고 한 가지 색의 길이로만 표시합니다.
         </p>
         <p className="max-w-[56rem]">

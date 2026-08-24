@@ -16,6 +16,7 @@ export default async function AdminLayout({ children }: { children: React.ReactN
             <Link href="/admin" className="font-medium">관리자</Link>
             <Link href="/admin/employees" className="text-table text-ink-secondary">구성원</Link>
             <Link href="/admin/stats" className="text-table text-ink-secondary">분석</Link>
+            <Link href="/admin/ratings" className="text-table text-ink-secondary">대표님 평가</Link>
           </nav>
           <div className="text-axis text-ink-secondary flex items-center gap-4">
             <span>{me.name}</span>
@@ -36,7 +37,10 @@ export default async function AdminLayout({ children }: { children: React.ReactN
           <span aria-hidden>🔒</span>{" "}
           <span className="text-ink-secondary">
             평가 수집 중입니다. 대표님 평가가 끝나기 전에는 결과를 볼 수 없습니다.
-          </span>
+          </span>{" "}
+          <Link href="/admin/ratings" className="underline">
+            평가하러 가기
+          </Link>
         </div>
       )}
 

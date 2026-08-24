@@ -63,6 +63,13 @@ const gauss = () => {
  * 직무능력을 만들 가중치. 07 관련도 표의 값을 그대로 쓴다.
  * 조직생활만 연구 값이 없어 우리가 정한다 — 사내에서만 보이는 관계.
  */
+/** 한글 축 이름 → DB enum. `ABILITY_AXIS_FROM_DB`의 반대 방향 */
+const TO_DB_AXIS: Record<string, "COOPERATION" | "ORG_LIFE" | "AUTONOMY"> = {
+  협력: "COOPERATION",
+  조직생활: "ORG_LIFE",
+  자율적실행: "AUTONOMY",
+};
+
 const ABILITY_WEIGHTS: Record<string, Record<string, number>> = {
   협력: { 인내력: 0.28, 사회적민감성: -0.34, 위험회피: -0.25 },
   자율적실행: { 자율성: 0.48, 위험회피: -0.36, 연대감: 0.23, 인내력: 0.14 },
@@ -194,6 +201,33 @@ for (let n = 0; n < N; n++) {
       snapshotJson: { traits: scores.traits, abilities: scores.abilities },
     },
   });
+  /*
+    대표님 평가를 같이 심는다 (D-34).
+
+    **본인 점수를 그대로 베끼지 않는다.** 그러면 두 소스가 완전히 겹쳐
+    「대표님 평가」로 바꿔도 화면이 똑같아 보이고, 무엇을 확인하려고
+    만든 기능인지 알 수 없게 된다.
+
+    실제로 자기보고와 상사 평가의 상관은 대략 .3~.5쯤이다. 여기서는
+    본인 값 60%에 대표님 나름의 인상 40%를 섞어 그 정도로 맞춘다.
+    사람마다 치우침(bias)도 하나씩 준다 — 후하게 보는 사람, 박하게 보는 사람.
+  */
+  const bias = (rnd() - 0.5) * 2.2; // ±1.1점쯤
+  for (const [axis, pct] of Object.entries(scores.abilities)) {
+    const own = ((pct as { percent: number }).percent / 100) * 9 + 1; // 0~100 → 1~10
+    const impression = 1 + rnd() * 9;
+    const mixed = own * 0.6 + impression * 0.4 + bias;
+    const score = Math.max(1, Math.min(10, Math.round(mixed)));
+    await prisma.managerRating.create({
+      data: {
+        employeeId: emp.id,
+        axis: TO_DB_AXIS[axis],
+        score,
+        ratedBy: "대표",
+      },
+    });
+  }
+
   await prisma.qualityFlag.create({
     data: {
       sessionId: session.id,

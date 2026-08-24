@@ -24,6 +24,9 @@ import { getCell, loadResearchTable } from "@/lib/research/correlations";
 import { MIN_N } from "@/components/ui/NBadge";
 import { ResearchCompareTable } from "@/components/analysis/ResearchCompareTable";
 import { compareToResearch } from "@/lib/admin/researchCompare";
+import { SourcePicker } from "@/components/analysis/SourcePicker";
+import { SOURCE_NOTE, parseSource, type AbilitySource } from "@/lib/admin/abilitySource";
+import { countRatedEmployees } from "@/lib/admin/ratings";
 import { CorrelationPanel } from "./CorrelationPanel";
 import { RankPanel } from "./RankPanel";
 
@@ -37,12 +40,13 @@ const TABS = [
 ] as const;
 
 export default async function StatsPage(props: {
-  searchParams: Promise<{ tab?: string; axis?: string; scale?: string }>;
+  searchParams: Promise<{ tab?: string; axis?: string; scale?: string; src?: string }>;
 }) {
   await requireAdmin();
   const open = await isResultsOpen();
   const sp = await props.searchParams;
   const tab = TABS.some((t) => t.key === sp.tab) ? sp.tab! : "matrix";
+  const source = parseSource(sp.src);
 
   if (!open)
     return (
@@ -54,7 +58,11 @@ export default async function StatsPage(props: {
       </>
     );
 
-  const [people, reliability] = await Promise.all([loadPeople(), loadReliability()]);
+  const [people, reliability, bossCount] = await Promise.all([
+    loadPeople(false, source),
+    loadReliability(),
+    countRatedEmployees(),
+  ]);
   const matrix = traitAbilityMatrix(people);
   const alphas = reliability.map((r) => r.alpha).filter((a): a is number => a !== null);
   const meanAlpha = alphas.length
@@ -103,7 +111,14 @@ export default async function StatsPage(props: {
         ))}
       </nav>
 
-      {tab === "matrix" && <MatrixTab people={people} matrix={matrix} />}
+      {tab === "matrix" && (
+        <MatrixTab
+          people={people}
+          matrix={matrix}
+          source={source}
+          bossCount={bossCount}
+        />
+      )}
       {tab === "rank" && <RankTab axis={sp.axis} scale={sp.scale} people={people} />}
       {tab === "prediction" && <PredictionTab people={people} />}
       {tab === "reliability" && <ReliabilityTab rows={reliability} />}
@@ -150,13 +165,22 @@ type People = Awaited<ReturnType<typeof loadPeople>>;
 function MatrixTab({
   people,
   matrix,
+  source,
+  bossCount,
 }: {
   people: People;
   matrix: ReturnType<typeof traitAbilityMatrix>;
+  source: AbilitySource;
+  bossCount: number;
 }) {
   return (
     <div className="flex flex-col gap-16">
-      <InHouseSection people={people} matrix={matrix} />
+      <InHouseSection
+        people={people}
+        matrix={matrix}
+        source={source}
+        bossCount={bossCount}
+      />
       <ResearchSection
         compare={
           matrix.enough ? (
@@ -177,14 +201,18 @@ function MatrixTab({
 function InHouseSection({
   people,
   matrix,
+  source,
+  bossCount,
 }: {
   people: People;
   matrix: ReturnType<typeof traitAbilityMatrix>;
+  source: AbilitySource;
+  bossCount: number;
 }) {
   if (!matrix.enough)
     return (
       <section>
-        <h2 className="text-section-title mb-3">우리 회사 데이터</h2>
+        <SourcePicker value={source} bossCount={bossCount} className="mb-3" />
         <WarningBadge kind="smallSample" />
         <p className="text-ink-secondary mt-4">
           응시 완료 {matrix.n}명입니다. {MIN_N}명이 넘어야 사내 관련도를 보여드립니다.
@@ -212,10 +240,10 @@ function InHouseSection({
 
   return (
     <section>
-      <h2 className="text-section-title mb-1">우리 회사 데이터</h2>
+      <SourcePicker value={source} bossCount={bossCount} className="mb-1" />
       <p className="text-ink-secondary mb-8 max-w-[56rem]">
-        우리 직원 {matrix.n}명의 응답으로 직접 낸 값입니다. 사람이 늘거나 재검사가 쌓이면
-        달라집니다. <strong>칸을 누르면 그 조합의 점 분포가 옆에 나옵니다.</strong>
+        우리 직원 {matrix.n}명 값입니다. {SOURCE_NOTE[source]}{" "}
+        <strong>칸을 누르면 그 조합의 점 분포가 옆에 나옵니다.</strong>
       </p>
       <CorrelationPanel
         rows={[...TRAIT_SCALES]}

@@ -212,7 +212,8 @@ model ManagerRating {
   employeeId String
   employee   Employee    @relation(fields: [employeeId], references: [id], onDelete: Cascade)
   axis       AbilityAxis
-  /// 1~5
+  /// 1~10 (2026-08-24 사용자 결정). 화면에서 0~100으로 옮겨 직원 설문 값과
+  /// 같은 자로 잰다 — `lib/admin/abilitySource.ts`
   score      Int
   ratedBy    String
   ratedAt    DateTime    @default(now())

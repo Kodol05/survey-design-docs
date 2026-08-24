@@ -3,6 +3,10 @@ import { ABILITY_AXES, ABILITY_AXIS_FROM_DB, TRAIT_SCALES } from "../items/types
 import type { StoredAbilities, StoredTraits } from "../survey/result";
 import { MIN_N } from "@/components/ui/NBadge";
 import {
+  resolveAbilities,
+  type AbilitySource,
+} from "./abilitySource";
+import {
   alphaVerdict,
   correlate,
   cronbachAlpha,
@@ -26,12 +30,34 @@ export type Person = {
   quality: string;
 };
 
-export async function loadPeople(excludePoor = false): Promise<Person[]> {
-  const rows = await prisma.testSession.findMany({
-    where: { status: "COMPLETED", result: { isNot: null } },
-    orderBy: { completedAt: "desc" },
-    include: { result: true, qualityFlag: true, employee: true },
-  });
+/**
+ * @param source 직무능력 값을 어디서 가져올지 (`abilitySource.ts`).
+ *   기본은 직원 설문이다 — 대표님 평가가 아직 없어도 화면이 돌아가야 한다.
+ */
+export async function loadPeople(
+  excludePoor = false,
+  source: AbilitySource = "self",
+): Promise<Person[]> {
+  const [rows, ratings] = await Promise.all([
+    prisma.testSession.findMany({
+      where: { status: "COMPLETED", result: { isNot: null } },
+      orderBy: { completedAt: "desc" },
+      include: { result: true, qualityFlag: true, employee: true },
+    }),
+    // 직원 설문만 볼 때는 굳이 읽지 않는다
+    source === "self"
+      ? Promise.resolve([])
+      : prisma.managerRating.findMany(),
+  ]);
+
+  const boss = new Map<string, Record<string, number>>();
+  for (const r of ratings) {
+    const axis = ABILITY_AXIS_FROM_DB[r.axis];
+    if (!axis) continue;
+    const m = boss.get(r.employeeId) ?? {};
+    m[axis] = r.score;
+    boss.set(r.employeeId, m);
+  }
 
   // 같은 사람이 여러 번 응시했으면 가장 최근 것만
   const seen = new Set<string>();
@@ -50,10 +76,14 @@ export async function loadPeople(excludePoor = false): Promise<Person[]> {
           v.percent,
         ]),
       ),
-      abilities: Object.fromEntries(
-        Object.entries((s.result!.abilityScoresJson ?? {}) as StoredAbilities).map(
-          ([k, v]) => [k, v.percent],
+      abilities: resolveAbilities(
+        source,
+        Object.fromEntries(
+          Object.entries((s.result!.abilityScoresJson ?? {}) as StoredAbilities).map(
+            ([k, v]) => [k, v.percent],
+          ),
         ),
+        boss.get(s.employeeId) ?? {},
       ),
       quality: flag,
     });
