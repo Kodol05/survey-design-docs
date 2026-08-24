@@ -24,9 +24,28 @@ describe("연구 관련도 표", () => {
     expect(getCell(t, "자극추구", "협력").kind).toBe("unstudied");
   });
 
-  it("조직생활은 열이 통째로 비어 있다", () => {
+  it("조직생활에는 직접 잰 값이 하나도 없다", () => {
+    /*
+      2026-08-24에 「전부 unstudied」에서 바뀌었다. 07의 정의대로 쪼개서
+      방향(expected)만 세운 칸이 생겼다. **숫자(value)는 여전히 하나도 없다** —
+      이게 깨지면 어디선가 없는 계수를 지어넣은 것이다.
+    */
     for (const s of TRAIT_SCALES)
-      expect(getCell(t, s, "조직생활").kind).toBe("unstudied");
+      expect(getCell(t, s, "조직생활").kind).not.toBe("value");
+  });
+
+  it("방향만 세운 칸에는 부호·비중·근거·출처가 다 있다", () => {
+    let found = 0;
+    for (const cell of t.cells.values()) {
+      if (cell.kind !== "expected") continue;
+      found++;
+      expect([1, -1]).toContain(cell.direction);
+      expect(cell.weight).toBeGreaterThan(0);
+      expect(cell.weight).toBeLessThanOrEqual(1);
+      expect(cell.basis.length).toBeGreaterThan(5);
+      expect(t.sources[cell.source]).toBeTruthy();
+    }
+    expect(found).toBeGreaterThan(0);
   });
 
   it("값이 있는 칸은 출처가 반드시 붙어 있다", () => {

@@ -37,8 +37,33 @@ export type ResearchCompare = {
   sameDirection: boolean;
 };
 
+/** 숫자 없이 방향만 세운 칸 — 조직생활 (연구 표의 `expected`) */
+export type DirectionCheck = {
+  scale: string;
+  axis: string;
+  /** 예상한 방향 */
+  expected: 1 | -1;
+  /** 우리 데이터에서 나온 값 */
+  ours: number;
+  ci: [number, number];
+  n: number;
+  basis: string;
+  /** 부호가 예상과 같은가 */
+  matches: boolean;
+  /** 구간이 0을 걸치면 아직 방향을 못 정한다 */
+  uncertain: boolean;
+};
+
 export type CompareSummary = {
   rows: ResearchCompare[];
+  /**
+   * 방향만 예상한 칸의 대조.
+   *
+   * 숫자가 없으니 「들어맞음/어긋남」을 구간으로 판정할 수 없다. 대신
+   * **부호가 맞았는지**만 본다. 우리 구간이 0을 벗어났는데 부호가 반대면
+   * 그건 진짜 어긋난 것이고, 볼 만한 발견이다.
+   */
+  directions: DirectionCheck[];
   /** 양쪽에 값이 다 있어서 비교할 수 있었던 칸 수 */
   comparable: number;
   /** 그중 어긋나지 않은 칸 수 */
@@ -52,12 +77,30 @@ export function compareToResearch(m: {
 }): CompareSummary {
   const table = loadResearchTable();
   const rows: ResearchCompare[] = [];
+  const directions: DirectionCheck[] = [];
   let noResearch = 0;
 
   for (const scale of TRAIT_SCALES) {
     for (const axis of ABILITY_AXES) {
       const ours = cellOf(m, scale, axis);
       const research = getCell(table, scale, axis);
+
+      // 방향만 세운 칸은 부호만 맞대 본다
+      if (research.kind === "expected" && ours) {
+        const uncertain = ours.ci[0] <= 0 && ours.ci[1] >= 0;
+        directions.push({
+          scale,
+          axis,
+          expected: research.direction,
+          ours: ours.r,
+          ci: ours.ci,
+          n: ours.n,
+          basis: research.basis,
+          matches: Math.sign(ours.r) === research.direction,
+          uncertain,
+        });
+        continue;
+      }
 
       // 연구된 적 없음(`—`)과 관련 없음(`없음`)은 둘 다 맞댈 숫자가 없다.
       // `없음`을 0으로 바꿔 넣지 않는다 — "0이라고 보고했다"와 "안 쟀다"는 다르다.
@@ -83,8 +126,12 @@ export function compareToResearch(m: {
 
   rows.sort((a, b) => Math.abs(b.diff) - Math.abs(a.diff));
 
+  // 확정된 것이 위로. 확정 안 된 것은 아직 할 말이 없다
+  directions.sort((a, b) => Number(a.uncertain) - Number(b.uncertain));
+
   return {
     rows,
+    directions,
     comparable: rows.length,
     compatible: rows.filter((r) => r.compatible).length,
     noResearch,

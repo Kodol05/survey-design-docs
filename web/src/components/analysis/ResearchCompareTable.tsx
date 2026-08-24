@@ -83,6 +83,50 @@ export function ResearchCompareTable({ data }: { data: CompareSummary }) {
         </table>
       </div>
 
+      {data.directions.length > 0 && (
+        <div className="mt-8 border-t border-[--border] pt-6">
+          <h4 className="text-table mb-1 font-medium">방향만 예상한 칸</h4>
+          <p className="text-axis text-ink-muted mb-4">
+            직접 잰 연구가 없어 쪼개서 부호만 세운 것입니다. 숫자가 없으니{" "}
+            <strong>방향이 맞았는지만</strong> 봅니다.
+          </p>
+          <ul className="flex flex-col">
+            {data.directions.map((d) => (
+              <li
+                key={`${d.scale} ${d.axis}`}
+                className="border-b border-[--border] py-2.5 last:border-0"
+              >
+                <div className="flex flex-wrap items-baseline justify-between gap-x-4">
+                  <span className="text-table">
+                    {d.scale} <span className="text-ink-muted">×</span> {d.axis}
+                  </span>
+                  <span className="text-axis tabular">
+                    <span className="text-ink-muted">
+                      예상 {d.expected > 0 ? "+" : "−"}
+                    </span>
+                    <span className="ml-2">우리 {formatR(d.ours)}</span>
+                    <span
+                      className="ml-3"
+                      style={{
+                        color: d.uncertain
+                          ? "var(--ink-muted)"
+                          : d.matches
+                            ? "var(--ink-secondary)"
+                            : "var(--status-warn-ink)",
+                        fontWeight: !d.uncertain && !d.matches ? 600 : 400,
+                      }}
+                    >
+                      {d.uncertain ? "아직 확정 아님" : d.matches ? "방향 맞음" : "방향 반대"}
+                    </span>
+                  </span>
+                </div>
+                <p className="text-axis text-ink-muted mt-0.5 leading-snug">{d.basis}</p>
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
+
       {/*
         판정 기준은 한 줄로만 적는다. 처음에는 두 문단이었는데 표보다 길어져
         읽히지 않았다. 자세한 근거는 코드 주석과 11 §3.2에 있다.

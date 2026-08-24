@@ -24,6 +24,11 @@ export type Cell =
   | { kind: "none"; note?: string }
   /** 아무도 이 조합을 연구하지 않았다 */
   | { kind: "unstudied" }
+  /**
+   * 직접 잰 연구는 없지만 쪼개서 **방향만** 세운 칸 (조직생활).
+   * 숫자가 없으므로 칠하지 않는다 — 칠하면 잰 값처럼 보인다.
+   */
+  | { kind: "expected"; direction: 1 | -1; basis: string }
   /** 사내 데이터가 아직 모자란다 */
   | { kind: "tooFew"; n: number };
 
@@ -130,8 +135,20 @@ export function CorrelationTable({
 const crosses = (ci: [number, number]) => ci[0] <= 0 && ci[1] >= 0;
 
 function Body({ cell }: { cell: Cell }) {
-  if (cell.kind === "unstudied")
-    return <span className="text-ink-muted">—</span>;
+  if (cell.kind === "unstudied") return <span className="text-ink-muted">—</span>;
+  if (cell.kind === "expected")
+    return (
+      <span
+        className="text-axis rounded-md px-2 py-1"
+        style={{
+          color: "var(--ink-secondary)",
+          outline: "1px dashed var(--border)",
+        }}
+        title={cell.basis}
+      >
+        {cell.direction > 0 ? "+" : "−"} 예상
+      </span>
+    );
   if (cell.kind === "none")
     return <span className="text-axis text-ink-muted">없음</span>;
   if (cell.kind === "tooFew")
@@ -149,6 +166,10 @@ function Body({ cell }: { cell: Cell }) {
 
 function describe(row: string, col: string, c: Cell) {
   if (c.kind === "unstudied") return `${row} × ${col}, 연구된 적 없음`;
+  if (c.kind === "expected")
+    return `${row} × ${col}, 직접 잰 연구는 없고 방향만 ${
+      c.direction > 0 ? "같은 쪽" : "반대 쪽"
+    }으로 예상. ${c.basis}`;
   if (c.kind === "none") return `${row} × ${col}, 관련 없음`;
   if (c.kind === "tooFew") return `${row} × ${col}, 표본 부족`;
   return `${row} × ${col}, ${gradeOf(c.r) + (crosses(c.ci) ? " 아직 확정 아님" : "")}, 상관 ${formatR(c.r)}, ${c.n}명, 신뢰구간 ${formatR(
@@ -185,7 +206,14 @@ export function CorrelationLegend({ inHouse }: { inHouse?: boolean }) {
       ) : (
         <span>
           <span className="text-ink-secondary">없음</span> 연구했는데 관련 없음 ·{" "}
-          <span className="text-ink-secondary">—</span> 연구된 적 없음
+          <span className="text-ink-secondary">—</span> 연구된 적 없음 ·{" "}
+          <span
+            className="rounded px-1.5"
+            style={{ outline: "1px dashed var(--border)", color: "var(--ink-secondary)" }}
+          >
+            + 예상
+          </span>{" "}
+          직접 잰 연구는 없고 쪼개서 방향만 세운 것 (숫자 없음)
         </span>
       )}
     </div>

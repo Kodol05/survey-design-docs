@@ -11,15 +11,19 @@
 #      value: <숫자>   연구에서 이만큼의 관련이 나왔다
 #      state: none     연구에서 봤는데 관련이 나오지 않았다
 #      state: unstudied 아무도 이 조합을 연구하지 않았다
+#      state: expected  **직접 잰 연구는 없지만 쪼개서 방향은 세울 수 있다.**
+#                       숫자가 아니라 부호와 비중만 있다. 값 칸과 절대 섞지 말 것
 #    "없음"과 "—"는 완전히 다른 정보다. null 하나로 저장하면
 #    화면에서 되살릴 수 없다.
 #
 # 3. 서로 다른 연구에서 온 값이다. 표본도 지표도 나라도 다르다.
 #    한 표에 놓았다고 서로 비교할 수 있는 값이 아니다 (07 ⚠️).
 #
-# 4. 조직생활은 열이 통째로 비어 있다. 이 개념을 정의한 연구 자체를
-#    찾지 못했다. 세 능력 중 대표님이 가장 궁금해하실 항목인데
-#    근거가 하나도 없다 — 대표님 평가(D-34)가 필요한 가장 큰 이유다.
+# 4. 조직생활은 **직접 잰 연구가 없다.** 2026-08-24에 07의 정의대로 둘로
+#    쪼갠 뒤(대인 융화 + 근속) 각 조각의 연구로 **방향만** 세웠다.
+#    숫자는 없다 — 아래 `state: expected` 설명을 볼 것.
+#    세 능력 중 대표님이 가장 궁금해하실 항목인데 근거가 가장 약하다.
+#    대표님 평가(D-34)가 필요한 가장 큰 이유다.
 
 version: 1
 
@@ -36,6 +40,25 @@ sources:
     measured: 정신적·대인적 업무 수행 제약
     note: 자율적 실행과 정확히 같은 개념은 아니다
     url: https://content.scirp.org/pdf/psych_2015120713370375.pdf
+
+  # ── 아래 둘은 조직생활을 "쪼개서" 방향만 세우는 데 쓴다 (state: expected) ──
+  zimmerman2008:
+    label: Zimmerman (2008), Personnel Psychology 61(2) 309–348
+    sample: 이직 연구 메타분석
+    measured: 5요인 성격 → 이직의도 · 실제 이직
+    note: >-
+      정서적 안정성이 이직의도를 가장 강하게 (−)예측하고, 성실성·우호성이 실제
+      이직을 (−)예측한다. ⚠️ 유료 저널이라 **계수 표를 구하지 못했다.**
+      방향과 순위만 쓴다.
+    url: https://onlinelibrary.wiley.com/doi/10.1111/j.1744-6570.2008.00115.x
+  defruyt2000:
+    label: De Fruyt et al. (2000), Personality and Individual Differences 29(3)
+    sample: TCI ↔ 5요인 대조 연구
+    measured: 클로닌저 7축과 5요인의 상관
+    note: >-
+      연대감↔우호성 .51~.64 · 자율성↔성실성 .40~.45 · 인내력↔성실성 .46~.57 ·
+      위험회피↔신경증 (+). 5요인으로 나온 결과를 TCI 축으로 옮기는 다리다.
+    url: https://www.sciencedirect.com/science/article/abs/pii/S0191886999002044
 
 # 축 이름은 src/lib/items/types.ts 의 TRAIT_SCALES / ABILITY_AXES 와 같아야 한다
 correlations:
@@ -70,25 +93,53 @@ correlations:
     state: unstudied
 
   # ── 조직생활 ──
-  # 전부 unstudied. 이 개념을 정의한 연구를 찾지 못했다 (07).
+  #
+  # 이 개념을 **직접 잰 연구는 여전히 없다.** 대신 07의 정의대로 둘로 쪼갠 뒤,
+  # 각 조각에 대한 연구를 찾아 **방향만** 세웠다 (2026-08-24).
+  #
+  #   조직생활 = 대인 융화 0.5 + 오래 다님(근속) 0.5
+  #
+  # ⚠️ **숫자(계수)는 넣지 않는다.** 두 번을 건너뛰어야 하는데
+  #    (5요인 → 이직) × (5요인 ↔ TCI), 첫 번째 고리의 계수 표를 구하지 못했다.
+  #    Zimmerman(2008)은 유료 저널이고 초록에는 방향만 있다.
+  #    없는 숫자를 지어내면 이 표 전체의 신뢰가 무너진다.
+  #
+  # 그래서 `state: expected` — **방향은 이렇게 예상되고, 크기는 우리 데이터로
+  # 확인한다.** 사내 값이 반대로 나오면 그것이 발견이다.
   - scale: 자극추구
     ability: 조직생활
     state: unstudied
   - scale: 위험회피
     ability: 조직생활
-    state: unstudied
+    state: expected
+    direction: -1
+    weight: 0.5
+    basis: 근속 — 위험회피↔신경증(+), 신경증이 이직의도를 가장 강하게 (+)예측
+    source: zimmerman2008
   - scale: 사회적민감성
     ability: 조직생활
     state: unstudied
   - scale: 인내력
     ability: 조직생활
-    state: unstudied
+    state: expected
+    direction: 1
+    weight: 0.5
+    basis: 근속 — 인내력↔성실성 .46~.57, 성실성이 실제 이직을 (−)예측
+    source: zimmerman2008
   - scale: 자율성
     ability: 조직생활
-    state: unstudied
+    state: expected
+    direction: 1
+    weight: 0.5
+    basis: 근속 — 자율성↔성실성 .40~.45, 성실성이 실제 이직을 (−)예측
+    source: zimmerman2008
   - scale: 연대감
     ability: 조직생활
-    state: unstudied
+    state: expected
+    direction: 1
+    weight: 1.0
+    basis: 대인 융화 + 근속 양쪽 — 연대감↔우호성 .51~.64, 우호성이 실제 이직을 (−)예측
+    source: defruyt2000
   - scale: 자기초월
     ability: 조직생활
     state: unstudied
