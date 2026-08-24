@@ -1,7 +1,6 @@
 "use client";
 
 import { correlationFill, formatR } from "./correlationColor";
-import { GradeTag } from "./GradeTag";
 import { gradeOf } from "./correlationWords";
 
 /**
@@ -134,6 +133,36 @@ export function CorrelationTable({
 
 const crosses = (ci: [number, number]) => ci[0] <= 0 && ci[1] >= 0;
 
+/** 막대가 끝까지 차는 값. 실제 데이터에서 |r|이 1에 가는 일은 없다 */
+const FULL = 0.7;
+
+/**
+ * 칸 안의 작은 막대 — 0을 가운데 두고 좌우로.
+ *
+ * 순위 화면·대시보드의 막대와 **같은 규칙**을 쓴다. 같은 값이 화면마다 다른
+ * 모양으로 나오면 눈이 다시 배워야 한다.
+ */
+function CellBar({ r, faded }: { r: number; faded: boolean }) {
+  const w = Math.min(50, (Math.abs(r) / FULL) * 50);
+  return (
+    <span className="relative my-1 block h-2 w-[72%]">
+      <span
+        className="absolute inset-y-0 left-1/2 w-px"
+        style={{ background: "var(--ink)", opacity: 0.25 }}
+      />
+      <span
+        className="absolute inset-y-0 rounded-sm"
+        style={{
+          left: r < 0 ? `${50 - w}%` : "50%",
+          width: `${Math.max(2, w)}%`,
+          background: r < 0 ? "var(--diverge-neg)" : "var(--diverge-pos)",
+          opacity: faded ? 0.4 : 1,
+        }}
+      />
+    </span>
+  );
+}
+
 function Body({ cell }: { cell: Cell }) {
   if (cell.kind === "unstudied") return <span className="text-ink-muted">—</span>;
   if (cell.kind === "expected")
@@ -165,9 +194,19 @@ function Body({ cell }: { cell: Cell }) {
   return (
     <>
       <span className="tabular font-medium leading-tight">{formatR(cell.r)}</span>
-      <GradeTag r={cell.r} ci={cell.ci} onFill className="mt-0.5 leading-tight" />
-      <span className="text-axis tabular leading-tight" style={{ opacity: 0.7 }}>
-        n={cell.n}
+      {/*
+        **칸을 작은 그래프로 만든다.**
+
+        전에는 색 하나로 방향과 크기를 다 지고 있었다. 색만으로는 `+.31`과
+        `+.44`가 얼마나 다른지 눈으로 안 읽히고, 색을 못 보는 사람에게는
+        아무것도 남지 않는다.
+
+        0을 가운데 둔 막대를 깔면 **길이가 크기, 방향이 좌우**를 맡는다.
+        그만큼 배경색은 옅게 물러난다 (`correlationColor.ts`).
+      */}
+      <CellBar r={cell.r} faded={crosses(cell.ci)} />
+      <span className="text-axis tabular leading-tight" style={{ opacity: 0.75 }}>
+        {gradeOf(cell.r)} · n={cell.n}
       </span>
     </>
   );
@@ -206,10 +245,20 @@ export function CorrelationLegend({ inHouse }: { inHouse?: boolean }) {
         <span className="tabular">.30</span> 뚜렷함 ·{" "}
         <span className="tabular">.50</span> 매우 뚜렷함
       </span>
-      <span>
-        등급 뒤 <strong className="text-ink-secondary">?</strong> = 신뢰구간이 0을 걸쳐
-        방향이 아직 확정되지 않음
+      <span className="flex items-center gap-2">
+        <span className="relative inline-block h-2 w-10">
+          <span
+            className="absolute inset-y-0 left-1/2 w-px"
+            style={{ background: "var(--ink)", opacity: 0.25 }}
+          />
+          <span
+            className="absolute inset-y-0 left-1/2 w-[35%] rounded-sm"
+            style={{ background: "var(--diverge-pos)" }}
+          />
+        </span>
+        막대 길이 = 관련도 크기 · 0이 가운데
       </span>
+      <span>흐린 막대 = 신뢰구간이 0을 걸쳐 방향이 아직 확정되지 않음</span>
       {inHouse ? (
         <span>n 부족 = 30명 미만</span>
       ) : (

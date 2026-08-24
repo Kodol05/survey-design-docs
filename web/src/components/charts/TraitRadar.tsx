@@ -94,6 +94,33 @@ export function TraitRadar({
           />
         </RadarChart>
       </ResponsiveContainer>
+
+      {/*
+        선이 둘이면 **범례가 반드시 있어야 한다.** 색과 점선만으로 어느 쪽이
+        본인이고 어느 쪽이 사내 평균인지 알 수 없다. 색을 못 보는 사람에게는
+        점선/실선만 남는데, 그것도 이름이 있어야 뜻이 생긴다.
+      */}
+      {showAverage && (
+        <div className="text-axis mt-2 flex flex-wrap justify-center gap-x-5 gap-y-1">
+          <span className="flex items-center gap-2">
+            <span
+              className="inline-block h-0.5 w-7"
+              style={{ background: "var(--series-1)" }}
+            />
+            <span className="text-ink-secondary">본인</span>
+          </span>
+          <span className="flex items-center gap-2">
+            <span
+              className="inline-block h-0.5 w-7"
+              style={{
+                background:
+                  "repeating-linear-gradient(90deg, var(--series-2) 0 4px, transparent 4px 7px)",
+              }}
+            />
+            <span className="text-ink-secondary">사내 평균</span>
+          </span>
+        </div>
+      )}
     </div>
   );
 }

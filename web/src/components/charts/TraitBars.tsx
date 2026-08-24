@@ -7,6 +7,7 @@ import {
   LabelList,
   ReferenceLine,
   ResponsiveContainer,
+  Tooltip,
   XAxis,
   YAxis,
 } from "recharts";
@@ -55,6 +56,18 @@ export function TraitBars({ rows, height = 280 }: { rows: BarRow[]; height?: num
               fill: "var(--ink-muted)",
               fontSize: 18,
             }}
+          />
+          {/* 값을 짚어 볼 수단이 막대 위 라벨뿐이었다. 좁은 화면에서 라벨이 겹치면 읽을 방법이 없다 */}
+          <Tooltip
+            cursor={{ fill: "var(--wash)" }}
+            contentStyle={{
+              background: "var(--page)",
+              border: "1px solid var(--border)",
+              borderRadius: 8,
+              fontSize: 17,
+            }}
+            labelStyle={{ color: "var(--ink)", fontWeight: 600 }}
+            formatter={(v) => [String(v), "점수"] as [string, string]}
           />
           <Bar dataKey="value" radius={[4, 4, 0, 0]} maxBarSize={30} isAnimationActive={false}>
             {data.map((d) => (
