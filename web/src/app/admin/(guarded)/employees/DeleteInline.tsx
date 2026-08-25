@@ -25,10 +25,26 @@ export function DeleteInline({ employeeId, name }: { employeeId: string; name: s
 
   if (!asking)
     return (
+      /*
+        **눈에 띄는 버튼으로 둔다** (2026-08-25).
+
+        처음에는 흐린 밑줄 글씨였다 — 실수로 누르는 것을 막으려던 것인데,
+        정작 **찾기가 어려웠다.** 실수는 자리(맨 아래 오른쪽 구석)와 확인
+        단계로 막고, 버튼 자체는 보이게 둔다. 지울 마음으로 온 사람이
+        헤매게 만들 이유가 없다.
+
+        칠하지 않고 **테두리만** 빨간색으로 둔다. 꽉 찬 빨간 버튼은 화면에서
+        가장 강한 것이 되어 그래프보다 먼저 보인다 — 삭제는 그만한 자리가
+        아니다. 누른 뒤 나오는 「지웁니다」가 꽉 찬 빨강이다.
+      */
       <button
         type="button"
         onClick={() => setAsking(true)}
-        className="text-axis text-ink-muted underline"
+        className="text-axis h-10 rounded-lg px-4 font-medium transition-colors"
+        style={{
+          border: "1.5px solid var(--status-critical)",
+          color: "var(--status-critical)",
+        }}
       >
         기록 삭제
       </button>
