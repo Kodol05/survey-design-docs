@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { EmptyState } from "@/components/ui/Card";
-import { EmployeeList, type Row } from "./EmployeeList";
-import { prisma } from "@/lib/db";
+import { EmployeeList } from "./EmployeeList";
+import { ExportLink } from "./ExportLink";
 import { requireAdmin } from "@/lib/auth/guard";
 import { ABILITY_AXES, TRAIT_SCALES } from "@/lib/items/types";
 import { SourcePicker } from "@/components/analysis/SourcePicker";
@@ -9,13 +9,14 @@ import {
   SOURCE_LABEL,
   SOURCE_PARAM,
   parseSource,
-  resolveAbilities,
 } from "@/lib/admin/abilitySource";
-import { countRatedEmployees, pickBossScores } from "@/lib/admin/ratings";
-import type { StoredAbilities, StoredTraits } from "@/lib/survey/result";
-import { quantile } from "@/lib/admin/spread";
-import { abilityMean } from "@/components/analysis/TraitStrip";
-import { ExportLink } from "./ExportLink";
+import {
+  BANDS,
+  MEAN_KEY,
+  loadRoster,
+  type SortDir,
+} from "@/lib/admin/roster";
+
 
 export const metadata = { title: "구성원 — 관리자" };
 
@@ -31,191 +32,25 @@ export default async function EmployeesPage(props: {
   }>;
 }) {
   await requireAdmin();
-  const { sort, dir, q, src, flag, status, pos } = await props.searchParams;
-  const source = parseSource(src);
-
-  const [employees, bossCount] = await Promise.all([
-    prisma.employee.findMany({
-      where: { role: "USER" },
-      orderBy: { name: "asc" },
-      include: {
-        testSessions: {
-          orderBy: { startedAt: "desc" },
-          take: 1,
-          include: { result: true, qualityFlag: true },
-        },
-        ratings: true,
-      },
-    }),
-    countRatedEmployees(),
-  ]);
-
-  let rows: Row[] = employees.map((e) => {
-    const s = e.testSessions[0];
-    const stored = (s?.result?.scoresJson ?? null) as StoredTraits | null;
-    const ability = (s?.result?.abilityScoresJson ??
-      null) as StoredAbilities | null;
-    return {
-      id: e.id,
-      name: e.name,
-      phone: e.phone,
-      status: s?.status ?? null,
-      flag: s?.qualityFlag?.flag ?? "ok",
-      // 품질을 등급(검토/미달)뿐 아니라 숫자로도 보여주기 위한 값.
-      // 일치도는 0~1로 저장돼 있다 — 화면에서 100점으로 환산한다.
-      agreement: s?.qualityFlag?.antonymAgreement ?? null,
-      fastCount: s?.qualityFlag?.fastCount ?? null,
-      // 이미 세션에 있는데 표에서 안 쓰고 있던 값.
-      // 소요시간은 넣지 않는다 — 품질 플래그가 이미 "너무 빨리 넘긴 응답"을 잡는다.
-      //
-      // 날짜는 **서버에서 문자열로 만들어 넘긴다.** 목록이 클라이언트 컴포넌트라
-      // 브라우저에서 다시 포맷하면 서버 시간대와 어긋나 하이드레이션이 깨진다.
-      completedLabel: s?.completedAt ? dayLabel(s.completedAt) : null,
-      traits: stored
-        ? Object.fromEntries(
-            Object.entries(stored).map(([k, v]) => [k, v.percent]),
-          )
-        : null,
-      // 고른 소스대로 만든다. 대표님 평가만 보는데 아직 안 매긴 사람이면 빈 값이 된다 —
-      // 그게 맞다. 0으로 채우면 "낮게 평가받은 사람"으로 보인다
-      abilities: (() => {
-        const self = ability
-          ? Object.fromEntries(
-              Object.entries(ability).map(([k, v]) => [k, v.percent]),
-            )
-          : {};
-        const boss = pickBossScores(e.ratings);
-        const out = resolveAbilities(source, self, boss);
-        return Object.keys(out).length ? out : null;
-      })(),
-    };
-  });
+  const qs = await props.searchParams;
+  const source = parseSource(qs.src);
 
   /*
-    구간을 자르는 기준은 **거르기 전 전체**로 잡는다 (2026-08-25 사용자 결정).
-
-    이미 걸러진 목록에서 다시 상위 4분의 1을 뽑으면 그게 무엇의 상위인지
-    알 수 없다. 「협력 상위 4분의 1」은 늘 **회사 전체 안에서의 위치**여야
-    한다 — 그래야 검색어를 바꿔도 같은 사람들이 남는다.
+    읽고·거르고·줄 세우는 일은 `lib/admin/roster.ts`가 한다 (2026-08-25 분리).
+    여기는 **받은 것을 그리기만** 한다 — 전에는 이 함수 하나가 400줄이었다.
   */
-  const everyone = rows;
-
-  const keyword = (q ?? "").trim();
-  if (keyword) rows = rows.filter((r) => r.name.includes(keyword));
-
-  /*
-    분석 화면 타일에서 넘어올 때 쓰는 거르개.
-
-    숫자만 보여주고 끝내면 "37명이 했다는데 누구지?"에서 화면을 다시
-    뒤져야 한다. 세는 자리에서 바로 명단으로 넘어오게 한다.
-  */
-  const onlyReview = flag === "review";
-  const pickStatus = STATUS_FILTERS.find((f) => f.key === status);
-  if (onlyReview) rows = rows.filter((r) => r.flag !== "ok");
-  if (pickStatus) rows = rows.filter((r) => pickStatus.match(r.status));
-
-  /*
-    정렬 — 이름 · 성향 7축 · 직무능력 3축.
-
-    **같은 것을 다시 누르면 방향이 뒤집힌다.** 「자극추구가 높은 사람」만큼
-    「낮은 사람」도 자주 찾게 되는데, 전에는 목록 끝까지 내려가야 했다.
-    지금 방향은 화살표로 보이고 주소(`?dir=`)에도 남는다.
-
-    기본 방향이 갈래마다 다르다 — 이름은 가나다순(오름), 점수는 높은 순(내림).
-    사람이 기대하는 첫 모습이 서로 다르기 때문이다.
-  */
-  const isTrait = TRAIT_SCALES.includes(sort as never);
-  const isAbility = ABILITY_AXES.includes(sort as never);
-  /*
-    **직무능력 평균으로도 줄 세운다** (2026-08-25 사용자 요청).
-
-    「종합적으로 잘하는 사람이 누구인가」에는 세 축을 따로 봐서 답할 수 없다.
-    분석 화면에 명단을 따로 두는 것보다 **이미 사람을 보는 자리**에 정렬
-    하나를 더하는 쪽이 맞다 — 거기서 바로 펼쳐 볼 수 있다.
-  */
-  const isMean = sort === MEAN_KEY;
-  const sortKey = isTrait || isAbility || isMean ? sort! : null;
-  const fallbackDir: SortDir = sortKey ? "desc" : "asc";
-  const sortDir: SortDir = dir === "asc" || dir === "desc" ? dir : fallbackDir;
-  /*
-    ⚠️ 방향 부호가 **갈래마다 반대다.**
-
-    점수는 `desc`가 큰 값부터라 `b − a`를 그대로 쓴다(+1).
-    이름은 `asc`가 가나다순이라 `localeCompare`를 그대로 쓴다(+1).
-    하나로 묶으면 이름 정렬이 뒤집힌다 — 실제로 그렇게 났다.
-  */
-  const valueFlip = sortDir === "asc" ? -1 : 1;
-  const nameFlip = sortDir === "asc" ? 1 : -1;
-
-  /** 값이 없는 사람은 방향과 무관하게 늘 아래로 */
-  const valueOf = (r: Row) =>
-    !sortKey
-      ? null
-      : isMean
-        ? abilityMean(r.abilities)
-        : isTrait
-          ? (r.traits?.[sortKey] ?? null)
-          : (r.abilities?.[sortKey] ?? null);
-
-  /*
-    **점수로 목록을 좁힌다** (2026-08-25 사용자 결정).
-
-    이름 검색만으로는 「협력이 높은 사람들」을 볼 수 없었다. 정렬해서 위에서
-    세는 수밖에 없는데, 그러면 **어디서 끊어야 할지**를 눈으로 정하게 된다.
-    사분위로 끊으면 기준이 데이터에서 나온다.
-
-    정렬로 고른 축을 그대로 쓴다 — 축을 고르는 자리를 하나 더 만들지 않는다.
-    이미 「무엇을 보고 있나」를 정한 자리가 있는데 둘로 나누면 둘이 어긋난다.
-  */
-
-  const scores = sortKey
-    ? everyone
-        .map(valueOf)
-        .filter((v): v is number => typeof v === "number")
-        .sort((a, b) => a - b)
-    : [];
-  const cut =
-    scores.length >= 4
-      ? { low: quantile(scores, 0.25), high: quantile(scores, 0.75) }
-      : null;
-
-  const band = sortKey && cut && BANDS.some((b) => b.key === pos) ? pos! : null;
-  if (band) {
-    rows = rows.filter((r) => {
-      const v = valueOf(r);
-      if (v === null) return false;
-      if (band === "top") return v >= cut!.high;
-      if (band === "low") return v <= cut!.low;
-      return v > cut!.low && v < cut!.high;
-    });
-  }
-
-  /*
-    무엇으로 정렬하든 **완료한 사람이 먼저**다.
-
-    진행 중·미응시는 값이 아예 없어서, 축으로 정렬하면 값 없는 사람이 맨 위나
-    맨 아래에 뭉쳐 목록을 가로막는다. 그래서 상태를 1차 기준으로 고정하고,
-    고른 정렬은 그 안에서만 적용한다. **방향을 뒤집어도 이 순서는 그대로다** —
-    뒤집으면 미응시가 맨 위로 올라와 버린다.
-  */
-  const statusRank = (s: string | null) =>
-    s === "COMPLETED" ? 0 : s === "IN_PROGRESS" ? 1 : 2;
-
-  rows = [...rows].sort((a, b) => {
-    const byStatus = statusRank(a.status) - statusRank(b.status);
-    if (byStatus) return byStatus;
-
-    if (sortKey) {
-      const va = valueOf(a);
-      const vb = valueOf(b);
-      if (va === null && vb === null) return a.name.localeCompare(b.name, "ko");
-      if (va === null) return 1;
-      if (vb === null) return -1;
-      if (va !== vb) return (vb - va) * valueFlip;
-      return a.name.localeCompare(b.name, "ko");
-    }
-    return a.name.localeCompare(b.name, "ko") * nameFlip;
-  });
+  const {
+    rows,
+    keyword,
+    sortKey,
+    sortDir,
+    fallbackDir,
+    onlyReview,
+    pickStatus,
+    band,
+    cut,
+    bossCount,
+  } = await loadRoster(qs, source);
 
   const link = (params: Record<string, string | undefined>) => {
     const sp = new URLSearchParams();
@@ -421,39 +256,6 @@ export default async function EmployeesPage(props: {
   );
 }
 
-/** "8/23" — 목록에서는 연도가 필요 없다. 전부 같은 해에 몰려 있다 */
-const dayLabel = (d: Date) =>
-  new Intl.DateTimeFormat("ko-KR", {
-    timeZone: "Asia/Seoul",
-    month: "numeric",
-    day: "numeric",
-  })
-    .format(d)
-    .replace(/\.\s*$/, "")
-    .replace(/\.\s*/g, "/");
-
-/** 타일에서 넘어올 때 쓰는 상태 거르개 */
-const STATUS_FILTERS = [
-  {
-    key: "completed",
-    label: "응시 완료만",
-    match: (s: string | null) => s === "COMPLETED",
-  },
-  {
-    key: "inprogress",
-    label: "진행 중만",
-    match: (s: string | null) => s === "IN_PROGRESS",
-  },
-  {
-    key: "none",
-    label: "미응시·중단만",
-    // 중단(14일 정리)도 「아직 결과가 없는 사람」이라 같이 묶는다
-    match: (s: string | null) => s === null || s === "ABANDONED",
-  },
-] as const;
-
-type SortDir = "asc" | "desc";
-
 /** 갈래 한 줄 — 앞에 이름을 달고 칩을 늘어놓는다 */
 function SortRow({
   label,
@@ -523,24 +325,3 @@ function SortChip({
     </Link>
   );
 }
-
-/**
- * 점수 구간 — 사분위로 자른다.
- *
- * 「상위 10명」처럼 **사람 수로** 자르지 않는다. 회사가 44명일 때와 60명일
- * 때 같은 「10명」이 서로 다른 위치를 뜻하게 되기 때문이다. 4분의 1로
- * 자르면 인원이 늘어도 뜻이 그대로다.
- */
-const BANDS = [
-  { key: "top", label: "상위 4분의 1" },
-  { key: "mid", label: "가운데 절반" },
-  { key: "low", label: "하위 4분의 1" },
-] as const;
-
-/**
- * 직무능력 평균으로 정렬할 때 쓰는 열쇠.
- *
- * 축 이름과 같은 자리에 들어가므로 **실제 축 이름과 겹치지 않아야** 한다.
- * 화면에 그대로 보이는 말이라 칩 이름도 이것을 쓴다.
- */
-const MEAN_KEY = "세 능력 평균";
