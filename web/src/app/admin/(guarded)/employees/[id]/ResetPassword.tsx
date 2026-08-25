@@ -50,13 +50,14 @@ export function ResetPassword({ employeeId, name }: { employeeId: string; name: 
             return;
           }
           setError(null);
+          /*
+            액션이 이제 예외 대신 **문장을 돌려준다.** 서버 오류 원문이
+            화면에 그대로 찍히던 것을 막기 위해서다 (로그인 쪽과 같은 규칙).
+          */
           start(async () => {
-            try {
-              await resetPasswordAction(employeeId, temp);
-              setDone(true);
-            } catch (e) {
-              setError((e as Error).message);
-            }
+            const r = await resetPasswordAction(employeeId, temp);
+            if (r?.error) setError(r.error);
+            else setDone(true);
           });
         }}
       >

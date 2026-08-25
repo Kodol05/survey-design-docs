@@ -86,18 +86,41 @@ export function SectionForm({
         elapsedMs: meta.current[i.id]?.elapsedMs ?? 0,
         changedCount: meta.current[i.id]?.changedCount ?? 0,
       }));
+      /*
+        저장이 실패하면 **여기서 멈추고 알린다.**
+
+        전에는 `r.nextSection`만 보고 넘어갔다. 저장이 실패해도 그 값이
+        없으니 곧장 제출로 갔고, 제출도 실패하면 아무 표시 없이 끝났다.
+        답한 내용은 화면에 그대로 있으니 다시 누르면 된다.
+      */
       const r = await saveSectionAction(sessionId, section, drafts);
+      if ("error" in r) {
+        setError(r.error);
+        return;
+      }
       if (r.nextSection) {
         window.location.href = `/survey?section=${r.nextSection}`;
-      } else {
-        const s = await submitAction(sessionId);
-        if (s?.error) setError(s.error);
+        return;
       }
+      const s = await submitAction(sessionId);
+      if (s && "error" in s) setError(s.error);
     });
   }
 
   return (
     <div className="flex flex-col">
+      {/*
+        진행 상황을 **읽어주는 표시**로도 남긴다 (2026-08-25).
+
+        아래 「12 / 24」는 눈으로만 읽힌다. 화면 낭독기를 쓰는 사람에게는
+        지금 어디쯤인지 알 방법이 없었다. `aria-live`로 두면 답할 때마다
+        조용히 읽어준다.
+      */}
+      <p className="sr-only" role="status" aria-live="polite">
+        {sectionCount}개 묶음 중 {section}번째, {items.length}문항 중 {answered}문항
+        답했습니다.
+      </p>
+
       {items.map((item, idx) => {
         const done = answers[item.id] !== undefined;
         const current = item.id === firstUnanswered;
@@ -109,6 +132,10 @@ export function SectionForm({
             }}
             className="scroll-mt-32 border-b border-[--border] py-16 last:border-0"
           >
+            {/* 답한 문항인지 아직인지도 읽어준다. 화면에서는 흐리기로 표시한다 */}
+            <span className="sr-only">
+              {items.length}문항 중 {idx + 1}번째{done ? ", 답함" : ", 아직 답하지 않음"}
+            </span>
             {/* 글자만 읽기 폭으로 제한한다. 한 줄 40~50자를 넘기면 다음 줄
                 첫 글자를 찾느라 눈이 헤맨다 (01 §2.3). 아래 척도 줄은 글이
                 아니므로 이 제한을 받지 않는다. */}
@@ -144,7 +171,7 @@ export function SectionForm({
       )}
 
       <div className="flex flex-col items-center gap-3 py-12">
-        <p className="text-axis text-ink-muted tabular">
+        <p className="text-axis text-ink-muted tabular" aria-hidden>
           {answered} / {items.length}
         </p>
         <Button onClick={next} disabled={pending} className="h-16 min-w-72 text-xl">

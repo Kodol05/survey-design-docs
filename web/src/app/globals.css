@@ -298,6 +298,56 @@ body {
   }
 }
 
+/*
+  ── 인쇄 (2026-08-25) ────────────────────────────────────────────────
+
+  개인 결과를 종이로 갖고 싶어 하는 사람이 있고, 대표님이 회의에 뽑아
+  가실 수 있다. 그런데 규칙이 하나도 없어서 **상단 메뉴와 어두운 배경이
+  그대로 찍혔다.**
+
+  세 가지만 한다.
+   1. 어두운 화면이어도 **종이는 흰 바탕에 검은 글씨**로 되돌린다
+   2. 화면에서만 쓰는 것(메뉴·버튼·링크 줄)은 숨긴다
+   3. 그래프와 표가 **쪽 사이에서 잘리지 않게** 한다
+*/
+@media print {
+  :root,
+  :root[data-theme="dark"] {
+    --page: #fff;
+    --surface: #fff;
+    --wash: #f2f0ec;
+    --ink: #000;
+    --ink-secondary: #333;
+    --ink-muted: #666;
+    --grid: #ddd;
+    --axis: #999;
+    --border: rgb(0 0 0 / 0.25);
+  }
+
+  header,
+  nav,
+  button,
+  [data-print="hide"] {
+    display: none !important;
+  }
+
+  /* 링크 밑줄은 종이에서 뜻이 없다 */
+  a {
+    text-decoration: none !important;
+    color: inherit !important;
+  }
+
+  section,
+  table,
+  figure {
+    break-inside: avoid;
+  }
+
+  body {
+    font-size: 11pt;
+  }
+}
+
 :focus-visible {
   outline: 2px solid var(--series-1);
   outline-offset: 2px;
