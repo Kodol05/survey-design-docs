@@ -81,13 +81,19 @@ export default async function StatsPage(props: {
     loadRatingCompare(),
   ]);
   const matrix = traitAbilityMatrix(people);
-  const alphas = reliability
+  /*
+    α는 **TCI 축만** 센다 (2026-08-25 사용자 결정). 직무능력은 α로 판정할
+    척도가 아니라서 평균에도, 「기준 아래」 세기에도 넣지 않는다 — 넣으면
+    화면마다 다른 수가 나온다.
+  */
+  const traitAlphas = reliability.filter((r) => r.kind === "trait");
+  const alphas = traitAlphas
     .map((r) => r.alpha)
     .filter((a): a is number => a !== null);
   const meanAlpha = alphas.length
     ? alphas.reduce((a, b) => a + b, 0) / alphas.length
     : null;
-  const poorCount = reliability.filter((r) => r.verdict === "poor").length;
+  const poorCount = traitAlphas.filter((r) => r.verdict === "poor").length;
   /*
     척도 이름으로 찾아 쓰는 표. 상관 화면과 순위 화면이 **α를 알아야**
     한다 — 문항이 안 맞물리는 축의 상관은 축소 편향되어 있어 그대로 읽으면
@@ -124,10 +130,10 @@ export default async function StatsPage(props: {
           label="검사 신뢰도"
           value={meanAlpha === null ? "—" : meanAlpha.toFixed(2).replace(/^0/, "")}
           href="/admin/stats?tab=reliability"
-          hint="척도 평균 α"
+          hint="성향 7축 평균 α"
         />
         <Tile
-          label="기준 아래 척도"
+          label="기준 아래 성향 축"
           value={poorCount}
           href="/admin/stats?tab=reliability"
           hint={poorCount ? `α ${ALPHA.poor.toFixed(2).replace(/^0/, "")} 아래` : "전부 기준 안"}
@@ -171,7 +177,7 @@ export default async function StatsPage(props: {
         />
       )}
       {tab === "prediction" && (
-        <PredictionTab people={people} matrix={matrix} reliability={byScale} />
+        <PredictionTab people={people} matrix={matrix} />
       )}
       {tab === "agreement" && <AgreementTab data={agreement} />}
       {tab === "reliability" && (
@@ -458,8 +464,8 @@ function InHouseSection({
               key={axis}
               axis={axis}
               rows={rankingFor(cells, axis)}
-              scatter={byScale(scatter, axis)}
-              trends={byScale(trends, axis)}
+              scatter={forAxis(scatter, axis)}
+              trends={forAxis(trends, axis)}
             />
           ))}
         </div>
@@ -618,11 +624,9 @@ function AgreementTab({ data }: { data: Awaited<ReturnType<typeof loadRatingComp
 function PredictionTab({
   people,
   matrix,
-  reliability,
 }: {
   people: People;
   matrix: ReturnType<typeof traitAbilityMatrix>;
-  reliability: Record<string, ScaleReliability>;
 }) {
   const items = ABILITY_AXES.map((axis) => predictFromResearch(people, axis)).filter(
     (x): x is NonNullable<typeof x> => x !== null,
@@ -679,7 +683,7 @@ function PredictionTab({
         </p>
 
         {matrix.enough ? (
-          <ResearchCompare data={compareToResearch(matrix)} reliability={reliability} />
+          <ResearchCompare data={compareToResearch(matrix)} />
         ) : (
           <>
             <WarningBadge kind="smallSample" />
@@ -723,11 +727,18 @@ function ReliabilityTab({
     unknown: "var(--ink-muted)",
   } as const;
   /*
-    기질 · 성격 · 직무능력을 나눠 놓는다.
+    **직무능력은 이 표에 없다** (2026-08-25 사용자 결정).
 
-    한 표에 열 개를 늘어놓으면 어느 것이 TCI 기질이고 어느 것이 우리가 만든
-    직무능력인지 섞인다. 같은 잣대로 볼 값도 아니다 — 직무능력은 능력당
-    세 문항뿐이라 α가 낮게 나오는 것이 정상이다.
+    α는 「문항들이 **한 가지**를 재는가」를 잰다. TCI 축은 그 구조가 맞아서
+    (잠재 특성이 15개 문항 응답을 일으킨다) α가 제 몫을 한다.
+
+    직무능력 3축은 다르다. 「협력」은 내 몫 하기 + 미리 알리기 + 남 돕기가
+    **모여서 이루는** 것이라 문항끼리 상관이 없어도 정상이다. 거기에 α를
+    대고 「기준 아래」라 적으면 **잣대가 안 맞는 자로 재고 불합격을 주는**
+    셈이다 (D-92에서 데이터로 확인).
+
+    값을 감추는 것이 아니라 **판정을 하지 않는 것**이다 — 무엇으로 재야
+    하는지(재검사)와 함께 표 아래에 적는다.
   */
   const GROUPS = [
     {
@@ -741,11 +752,6 @@ function ReliabilityTab({
       note: "살면서 만들어지는 쪽 · TCI 3축",
       has: (r: { scale: string; kind: string }) =>
         r.kind === "trait" && (CHARACTER as readonly string[]).includes(r.scale),
-    },
-    {
-      label: "직무능력",
-      note: "우리가 만든 3축 · 능력당 3문항",
-      has: (r: { kind: string }) => r.kind === "ability",
     },
   ];
 
@@ -819,11 +825,23 @@ function ReliabilityTab({
           </div>
           <LowQualityList rows={quality} />
         </div>
-        <Note label="α가 낮게 나오는 이유" className="mt-8">
+        <Note label="직무능력이 이 표에 없는 이유" className="mt-8">
+          <p className="mb-2">
+            α는 <strong>「문항들이 한 가지를 재는가」</strong>를 잽니다. TCI
+            축은 그 구조라서(하나의 성향이 문항 15개 답을 일으킴) α가 제 몫을
+            합니다.
+          </p>
+          <p className="mb-2">
+            <strong>직무능력 3축은 구조가 다릅니다.</strong> 「협력」은 내 몫
+            하기 · 미리 알리기 · 남 돕기가 <strong>모여서 이루는</strong>
+            것이라 문항끼리 같이 움직이지 않아도 정상입니다. 소득·학력·직업의
+            α를 재서 「사회경제적 지위 척도가 못 만들어졌다」고 하지 않는 것과
+            같습니다.
+          </p>
           <p>
-            직무능력은 능력당 문항이 세 개뿐이라 α가 낮게 나오기 쉽습니다. 이
-            지표는 <strong>응시 인원과 무관</strong>합니다 — 사람이 늘어도
-            좋아지지 않고, 문항을 고쳐야 좋아집니다.
+            직무능력의 신뢰도는 <strong>같은 사람을 두 번 재서</strong>{" "}
+            확인해야 합니다. 아직 두 번째 응시 데이터가 없어{" "}
+            <strong>지금은 답할 수 없는 상태</strong>입니다.
           </p>
         </Note>
       </section>
@@ -868,11 +886,16 @@ function rankingFor(cells: Record<string, Cell>, axis: string): AxisRow[] {
 /**
  * `"인내력|협력"` 꼴로 든 표를 **한 능력만 뽑아 축 이름으로** 다시 짠다.
  *
+ * ⚠️ 이름을 `byScale`로 두었더니 `StatsPage` 안의 `const byScale`(척도 이름 →
+ *    신뢰도)과 겹쳤다. 동작은 했지만 — 지역 변수가 이 함수를 가리고, 이
+ *    함수는 다른 함수 안에서만 보였다 — **같은 이름이 두 가지를 뜻하는
+ *    상태**라 다음에 읽는 사람이 헷갈린다.
+ *
  * 목록 컴포넌트는 자기가 맡은 능력 하나만 알면 되므로, 열쇠에서 능력을
  * 떼고 넘긴다 — 안에서 다시 조립하게 두면 열쇠 꼴이 두 군데로 흩어진다
  * (그러다 실제로 어긋난 적이 있다, D-61).
  */
-function byScale<T>(all: Record<string, T>, axis: string): Record<string, T> {
+function forAxis<T>(all: Record<string, T>, axis: string): Record<string, T> {
   const out: Record<string, T> = {};
   for (const scale of TRAIT_SCALES) {
     const v = all[`${scale}|${axis}`];

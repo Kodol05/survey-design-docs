@@ -1,7 +1,5 @@
 import { formatR } from "./correlationColor";
 import { DivergingBar } from "./DivergingBar";
-import { AlphaNote } from "./AlphaNote";
-import type { ScaleReliability } from "@/lib/admin/analysis";
 import type { CompareSummary } from "@/lib/admin/researchCompare";
 
 /**
@@ -30,14 +28,7 @@ import type { CompareSummary } from "@/lib/admin/researchCompare";
  * 없는 숫자를 만들어내는 셈이다 (11 §3.2, D-36). 나란히 놓기만 한다.
  */
 
-export function ResearchCompare({
-  data,
-  reliability,
-}: {
-  data: CompareSummary;
-  /** 축별 α. 기준 아래인 축은 「어긋남」 판정 자체가 성립하지 않는다 */
-  reliability?: Record<string, ScaleReliability>;
-}) {
+export function ResearchCompare({ data }: { data: CompareSummary }) {
   if (!data.comparable && !data.directions.length)
     return (
       <p className="text-ink-secondary">
@@ -75,7 +66,6 @@ export function ResearchCompare({
               <Head
                 scale={r.scale}
                 axis={r.axis}
-                alpha={reliability?.[r.axis]}
                 verdict={<Verdict ok={r.compatible} diff={r.diff} />}
               />
               <Bar label="논문" r={r.research} hollow />
@@ -178,38 +168,31 @@ function Bar({
  * 조합 이름 줄 — 판정을 **이름 바로 뒤에** 붙인다.
  *
  * 오른쪽 끝으로 밀어 봤더니 이름이 짧은 줄에서는 판정이 저 멀리 떠서
- * 어느 조합의 판정인지 눈으로 이어야 했다. 아래 숫자 열과도 x가 맞지
- * 않았다 — 막대 줄은 폭에 상한이 있어서 오른쪽 끝까지 가지 않는다.
+ * 어느 조합의 판정인지 눈으로 이어야 했다. 이름과 판정을 한 덩어리로 두면
+ * 그 줄만 읽어도 결론이 난다.
  *
- * 이름 · α · 판정을 한 덩어리로 두면 그 줄만 읽어도 결론이 난다.
+ * ## α로 판정을 막지 않는다 (2026-08-25 사용자와 함께 확인)
+ *
+ * 한때 α가 기준 아래인 축은 판정 자리에 `α .08 · 기준 아래`를 적고
+ * 「어긋남」을 감췄다. **α를 잘못 댄 것이었다** — 직무능력은 여러 요소가
+ * 모여 이루는 값이라 문항끼리 안 맞물려도 정상이고, 상관 자체는 실제
+ * 응답으로 낸 사실이다 (D-92).
  */
 function Head({
   scale,
   axis,
-  alpha,
   verdict,
 }: {
   scale: string;
   axis: string;
-  alpha?: ScaleReliability;
   verdict: React.ReactNode;
 }) {
-  const poor = alpha?.verdict === "poor";
   return (
     <p className="text-table mb-1.5 flex flex-wrap items-baseline gap-x-2">
       <span>
         {scale} <span className="text-ink-muted">×</span> {axis}
       </span>
-      {/*
-        ⚠️ **척도가 안 맞물리면 판정이 성립하지 않는다.** 못 재는 것으로 잰
-           값이 논문과 다른 것은 당연하다 — 「어긋남」이라 적으면 우리 회사가
-           논문과 다르다는 발견처럼 읽힌다. 그 자리에는 이유를 적는다.
-      */}
-      {poor ? (
-        <AlphaNote r={alpha} className="!mt-0 !inline" />
-      ) : (
-        verdict
-      )}
+      {verdict}
     </p>
   );
 }

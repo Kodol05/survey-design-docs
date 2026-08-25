@@ -2,7 +2,6 @@
 
 import { useState } from "react";
 import { DotStrip } from "@/components/analysis/DotStrip";
-import { AlphaNote } from "@/components/analysis/AlphaNote";
 import { Note } from "@/components/ui/Note";
 import type { Spread } from "@/lib/admin/spread";
 import type { ScaleReliability } from "@/lib/admin/analysis";
@@ -66,7 +65,13 @@ export function DistributionPanel({
 
     쓸 만한 축이 하나도 없으면 문장 자체를 내린다.
   */
-  const usable = ranked.filter((s) => reliability[s.scale]?.verdict !== "poor");
+  /*
+    직무능력은 α로 판정하지 않으므로(D-93) 「못 재고 있는 것일 수 있다」는
+    단서도 **성향 축에만** 붙는다.
+  */
+  const usable = ranked.filter(
+    (s) => reliability[s.scale]?.verdict !== "poor" || s.kind === "ability",
+  );
   const widest = usable[0];
   const tightest = usable[usable.length - 1];
 
@@ -147,7 +152,10 @@ export function DistributionPanel({
                   key={s.scale}
                   s={s}
                   r={reliability[s.scale]}
-                  dim={reliability[s.scale]?.verdict === "poor"}
+                  dim={
+                    s.kind !== "ability" &&
+                    reliability[s.scale]?.verdict === "poor"
+                  }
                 />
               ))}
             </div>
@@ -185,12 +193,12 @@ function Row({
     <div className="grid gap-x-6 gap-y-2 xl:grid-cols-[9rem_minmax(0,1fr)] xl:items-end">
       <div className="xl:pb-1">
         <p className="text-table font-medium">{s.scale}</p>
-        {r ? (
-          <AlphaNote r={r} />
-        ) : (
-          // 묶어 만든 값에는 문항 α가 없다. 빈칸으로 두면 왜 없는지 묻게 된다
-          <span className="text-axis text-ink-muted">세 축의 평균</span>
-        )}
+        {/*
+          여기는 「어떻게 퍼져 있나」를 보는 자리다. α는 문항 이야기라
+          곁다리이고, 직무능력에는 애초에 대지 않는 잣대다 (D-93).
+          인원만 적는다.
+        */}
+        <span className="text-axis text-ink-muted tabular">{s.n}명</span>
       </div>
 
       <div>
@@ -215,9 +223,7 @@ function Row({
             퍼진 정도{" "}
             <span className="tabular text-ink-secondary">{s.sd.toFixed(1)}</span>
           </span>
-          <span className="text-ink-muted/70">
-            <span className="tabular">{s.n}</span>명
-          </span>
+
         </p>
       </div>
     </div>

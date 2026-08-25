@@ -27,13 +27,18 @@ export default async function AdminHome() {
   ]);
   const matrix = traitAbilityMatrix(people);
 
-  const alphas = reliability
+  /*
+    α는 **성향 7축만** 센다 (2026-08-25 사용자 결정). 직무능력은 여러 요소가
+    모여 이루는 값이라 α로 판정할 척도가 아니다 (D-92·D-93).
+  */
+  const traitAlphas = reliability.filter((r) => r.kind === "trait");
+  const alphas = traitAlphas
     .map((r) => r.alpha)
     .filter((a): a is number => a !== null);
   const meanAlpha = alphas.length
     ? alphas.reduce((a, b) => a + b, 0) / alphas.length
     : null;
-  const poorScales = reliability.filter((r) => r.verdict === "poor");
+  const poorScales = traitAlphas.filter((r) => r.verdict === "poor");
 
   // 지금 손봐야 할 것
   const needsReview = people.filter((p) => p.quality !== "ok");
@@ -97,8 +102,8 @@ export default async function AdminHome() {
           href="/admin/stats?tab=reliability"
           hint={
             poorScales.length
-              ? `${poorScales.length}개 척도가 ${fmtAlpha(ALPHA.poor)} 아래`
-              : "척도 평균 α"
+              ? `${poorScales.length}개 축이 ${fmtAlpha(ALPHA.poor)} 아래`
+              : "성향 7축 평균 α"
           }
         />
       </div>
@@ -249,7 +254,7 @@ export default async function AdminHome() {
                   >
                     ●
                   </span>
-                  문항이 아직 안 맞물리는 척도 — {poorNames.join(", ")}{" "}
+                  문항이 아직 안 맞물리는 성향 축 — {poorNames.join(", ")}{" "}
                   <Link
                     href="/admin/stats?tab=reliability"
                     className="underline"
@@ -317,10 +322,10 @@ export default async function AdminHome() {
             lines={[
               meanAlpha === null
                 ? "아직 계산할 수 없습니다"
-                : `척도 평균 α ${fmtAlpha(meanAlpha)}`,
+                : `성향 7축 평균 α ${fmtAlpha(meanAlpha)}`,
               poorScales.length
-                ? `기준 아래 척도 ${poorScales.length}개 — ${poorScales.map((r) => r.scale).join(" · ")}`
-                : "기준 아래 척도 없음",
+                ? `기준 아래 축 ${poorScales.length}개 — ${poorScales.map((r) => r.scale).join(" · ")}`
+                : "기준 아래 축 없음",
             ]}
           />
           <Shortcut
