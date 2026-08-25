@@ -32,7 +32,9 @@ export default async function ItemsPage(props: {
   await requireAdmin();
   const { scale } = await props.searchParams;
 
-  const assessment = await prisma.assessment.findFirst({ where: { isActive: true } });
+  const assessment = await prisma.assessment.findFirst({
+    where: { isActive: true },
+  });
   if (!assessment)
     return (
       <>
@@ -77,24 +79,39 @@ export default async function ItemsPage(props: {
       <div className="text-axis mb-8 flex flex-col gap-2">
         {groups.map((g) => (
           <div key={g.label} className="flex flex-wrap items-center gap-1.5">
-            <span className="text-ink-muted w-16 shrink-0">{g.label}</span>
-            {(g.of ?? [...new Set(items.filter((i) => i.kind === "ABILITY").map(named))]).map(
-              (s) => (
-                <Link
-                  key={s}
-                  href={picked === s ? "/admin/items" : `/admin/items?scale=${encodeURIComponent(s)}`}
-                  scroll={false}
-                  className="rounded-md px-3 py-1.5"
-                  style={{
-                    background: picked === s ? "var(--ink)" : "var(--wash)",
-                    color: picked === s ? "var(--page)" : "var(--ink-secondary)",
-                    fontWeight: picked === s ? 600 : 400,
-                  }}
-                >
-                  {s}
-                </Link>
-              ),
-            )}
+            {/*
+              ⚠️ `w-16`(64px)에 「직무능력」 네 글자가 안 들어가 **두 줄로
+              접혔다** — 칩 줄만 아래로 밀려 어긋나 보인다. 구성원 화면에서
+              똑같이 겪은 것이라 거기와 같은 폭으로 맞춘다.
+            */}
+            <span className="text-ink-muted w-20 shrink-0 whitespace-nowrap">
+              {g.label}
+            </span>
+            {(
+              g.of ?? [
+                ...new Set(
+                  items.filter((i) => i.kind === "ABILITY").map(named),
+                ),
+              ]
+            ).map((s) => (
+              <Link
+                key={s}
+                href={
+                  picked === s
+                    ? "/admin/items"
+                    : `/admin/items?scale=${encodeURIComponent(s)}`
+                }
+                scroll={false}
+                className="rounded-md px-3 py-1.5"
+                style={{
+                  background: picked === s ? "var(--ink)" : "var(--wash)",
+                  color: picked === s ? "var(--page)" : "var(--ink-secondary)",
+                  fontWeight: picked === s ? 600 : 400,
+                }}
+              >
+                {s}
+              </Link>
+            ))}
           </div>
         ))}
         {picked && (
@@ -111,7 +128,7 @@ export default async function ItemsPage(props: {
           <thead>
             <tr className="text-axis text-ink-muted border-b border-[--border]">
               <th className="w-14 pb-2 text-right font-medium">순서</th>
-              <th className="w-28 pb-2 pl-4 text-left font-medium">축</th>
+              <th className="w-36 pb-2 pl-4 text-left font-medium">축</th>
               <th className="w-32 pb-2 text-left font-medium">세부 항목</th>
               <th className="pb-2 pl-4 text-left font-medium">문항</th>
               <th className="w-20 pb-2 text-center font-medium">역채점</th>
@@ -120,9 +137,19 @@ export default async function ItemsPage(props: {
           </thead>
           <tbody>
             {shown.map((i) => (
-              <tr key={i.id} className="border-b border-[--border] last:border-0">
-                <td className="tabular text-ink-muted py-3 text-right">{i.orderNo}</td>
-                <td className="py-3 pl-4">
+              <tr
+                key={i.id}
+                className="border-b border-[--border] last:border-0"
+              >
+                <td className="tabular text-ink-muted py-3 text-right">
+                  {i.orderNo}
+                </td>
+                {/*
+                  ⚠️ `w-28`에서는 「조직생활 간접」이 **두 줄로 접혔다.**
+                  같은 열의 「협력 직접」은 한 줄이라, 줄마다 높이가 달라져
+                  훑는 눈이 걸린다. 한 줄로 못 박고 폭을 넉넉히 준다.
+                */}
+                <td className="py-3 pl-4 whitespace-nowrap">
                   {named(i)}
                   {i.kind === "ABILITY" && (
                     <span className="text-axis text-ink-muted ml-2">
@@ -130,13 +157,18 @@ export default async function ItemsPage(props: {
                     </span>
                   )}
                 </td>
-                <td className="text-axis text-ink-secondary py-3">{i.subscale ?? "—"}</td>
+                <td className="text-axis text-ink-secondary py-3">
+                  {i.subscale ?? "—"}
+                </td>
                 <td className="py-3 pl-4">{i.content}</td>
                 <td className="py-3 text-center">
                   {i.isReverse ? (
                     <span
                       className="text-axis rounded-md px-2 py-0.5"
-                      style={{ background: "var(--wash)", color: "var(--ink-secondary)" }}
+                      style={{
+                        background: "var(--wash)",
+                        color: "var(--ink-secondary)",
+                      }}
                     >
                       역
                     </span>
@@ -144,7 +176,9 @@ export default async function ItemsPage(props: {
                     <span className="text-ink-muted">—</span>
                   )}
                 </td>
-                <td className="tabular text-ink-muted py-3 text-right">{i.section}</td>
+                <td className="tabular text-ink-muted py-3 text-right">
+                  {i.section}
+                </td>
               </tr>
             ))}
           </tbody>
@@ -153,25 +187,25 @@ export default async function ItemsPage(props: {
 
       <Note label="이 화면을 어떻게 읽는지" className="mt-8">
         <p className="mb-2">
-          <strong>역채점</strong>은 답을 뒤집어 계산하는 문항입니다. 「나는 쉽게 지친다」에
-          「매우 그렇다」로 답하면 인내력 점수는 낮게 잡힙니다. 전체{" "}
+          <strong>역채점</strong>은 답을 뒤집어 계산하는 문항입니다. 「나는 쉽게
+          지친다」에 「매우 그렇다」로 답하면 인내력 점수는 낮게 잡힙니다. 전체{" "}
           <span className="tabular">{items.length}</span>문항 중{" "}
           <span className="tabular">{reverseCount}</span>개입니다.
         </p>
         <p className="mb-2">
-          한 방향으로만 물으면 <strong>읽지 않고 한쪽으로 쭉 찍는 것</strong>을 걸러낼 수
-          없습니다. 반대 방향 문항을 섞어 두면 그 사람의 답이 서로 어긋나고, 그것이 응답
-          신뢰도 점수가 됩니다.
+          한 방향으로만 물으면 <strong>읽지 않고 한쪽으로 쭉 찍는 것</strong>을
+          걸러낼 수 없습니다. 반대 방향 문항을 섞어 두면 그 사람의 답이 서로
+          어긋나고, 그것이 응답 신뢰도 점수가 됩니다.
         </p>
         <p className="mb-2">
-          <strong>직무능력</strong> 문항의 「직접」은 능력을 바로 묻는 것이고 「간접」은
-          행동을 묻는 것입니다. 직접형만 두면 거의 다 높게 답해서 사람마다 구분이 되지
-          않습니다.
+          <strong>직무능력</strong> 문항의 「직접」은 능력을 바로 묻는 것이고
+          「간접」은 행동을 묻는 것입니다. 직접형만 두면 거의 다 높게 답해서
+          사람마다 구분이 되지 않습니다.
         </p>
         <p>
-          문항을 고치려면 <code>data/items/v1.yaml</code>을 고치고 다시 올립니다. 이
-          화면에서는 고칠 수 없습니다 — 화면에서 고치게 하면 파일과 실제 문항이 갈라져
-          어느 쪽이 진짜인지 알 수 없게 됩니다.
+          문항을 고치려면 <code>data/items/v1.yaml</code>을 고치고 다시
+          올립니다. 이 화면에서는 고칠 수 없습니다 — 화면에서 고치게 하면 파일과
+          실제 문항이 갈라져 어느 쪽이 진짜인지 알 수 없게 됩니다.
         </p>
       </Note>
     </>
