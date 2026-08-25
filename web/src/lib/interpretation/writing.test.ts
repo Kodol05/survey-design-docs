@@ -90,13 +90,27 @@ describe("빠짐없이 있는가", () => {
 });
 
 describe("가운데 구간", () => {
-  it("두드러지지 않는다고 먼저 말한다", () => {
+  it("축 이름을 넣어 말한다", () => {
     /*
       가운데(40~60)는 「이런 사람이다」가 아니라 「이 축으로는 설명하기
-      어렵다」는 뜻이다. 장단점을 붙이면 없는 특징을 만들어내게 된다.
+      어렵다」는 뜻이다. 어느 축 이야기인지가 문장 안에 있어야 한다.
     */
-    for (const s of TRAIT_SCALES)
-      expect(BAND_TEXT[s].middle, s).toContain("두드러지지 않습니다");
+    for (const s of TRAIT_SCALES) expect(BAND_TEXT[s].middle, s).toContain(s);
+  });
+
+  it("일곱 개가 같은 말로 시작하지 않는다", () => {
+    /*
+      한때 전부 「이 축은 두드러지지 않습니다」로 열었다. 여러 축이 가운데인
+      사람은 같은 문장을 예닐곱 번 연달아 읽게 된다 — **기계가 찍어낸 것처럼
+      보이는 순간 나머지 문장까지 안 믿게 된다.**
+
+      축 이름 뒤 첫 대여섯 글자가 서로 겹치는지 본다. 이름은 당연히 다르므로
+      이름을 뺀 나머지로 비교한다.
+    */
+    const openings = TRAIT_SCALES.map((s) =>
+      BAND_TEXT[s].middle.replace(s, "").trim().slice(0, 8),
+    );
+    expect(new Set(openings).size).toBe(TRAIT_SCALES.length);
   });
 
   it("양끝보다 짧다", () => {
