@@ -19,16 +19,15 @@ export const metadata = { title: "7차원 성향 설문" };
  *
  * ## 사진
  *
- * `public/hero.jpg`를 깐다. **파일이 없어도 화면은 멀쩡히 뜬다** — 배경색이
- * 먼저 칠해져 있고 사진은 그 위에 얹힌다. 사진을 바꾸려면 같은 이름으로
- * 덮어쓰면 된다.
+ * `public/hero.jpg`. 바꾸려면 같은 이름으로 덮어쓴다.
  *
- * 사진 위에 글자를 얹으므로 **어두운 겹**을 하나 깐다. 어떤 사진이 올지
- * 모르니 아래로 갈수록 진해지는 방식으로 둬서 밝은 사진이든 어두운 사진이든
- * 글자가 읽히게 한다.
+ * 사진이 밝고 따뜻해서 **어둡게 덮지 않는다.** 왼쪽 3분의 2가 빈 벽이라
+ * 검은 글씨가 그대로 읽힌다. 왼쪽에서만 살짝 밝히는 겹 하나로 충분하다.
+ *
+ * 첫 화면의 글자색은 **토큰을 쓰지 않고 직접 적는다.** 사진 위라서
+ * 다크 모드에서도 밝은 사진이 그대로 깔리기 때문이다 — 토큰을 쓰면
+ * 어두운 화면에서 흰 글씨가 되어 밝은 사진 위에서 안 읽힌다.
  */
-const HERO_IMAGE = "/hero.jpg";
-
 export default async function Home() {
   const me = await currentUser();
   if (me) redirect(me.role === "ADMIN" ? "/admin" : "/me");
@@ -38,46 +37,49 @@ export default async function Home() {
   return (
     <>
       {/* ── 첫 눈 ── */}
-      <section
-        className="relative flex min-h-[100svh] flex-col"
-        style={{ background: "#241f1b" }}
-      >
+      <section className="relative flex min-h-[100svh] flex-col">
+        {/*
+          **사진을 어둡게 덮지 않는다.**
+
+          받은 사진이 밝고 따뜻하다 — 우리 배경색(#f5f4f0)과 거의 같은 계열이다.
+          여기에 검은 겹을 씌우고 흰 글씨를 얹으면 사진의 좋은 점이 다 죽고
+          화면 전체와도 어긋난다.
+
+          사진 **왼쪽 3분의 2가 빈 벽**이라 검은 글씨가 그대로 읽힌다.
+          왼쪽에서만 살짝 밝히는 겹 하나면 어떤 화면 크기에서도 안전해진다.
+        */}
         <div
           aria-hidden
-          className="absolute inset-0 bg-cover bg-center"
-          style={{ backgroundImage: `url(${HERO_IMAGE})` }}
+          className="absolute inset-0 bg-cover"
+          style={{ backgroundImage: "url(/hero.jpg)", backgroundPosition: "72% center" }}
         />
-        {/* 어떤 사진이 올지 모르므로 아래로 갈수록 진해지는 겹을 둔다 */}
         <div
           aria-hidden
           className="absolute inset-0"
           style={{
             background:
-              "linear-gradient(180deg, rgb(20 17 15 / 0.45) 0%, rgb(20 17 15 / 0.6) 55%, rgb(20 17 15 / 0.85) 100%)",
+              "linear-gradient(100deg, rgb(247 244 238 / 0.92) 0%, rgb(247 244 238 / 0.82) 34%, rgb(247 244 238 / 0.25) 62%, rgb(247 244 238 / 0) 82%)",
           }}
         />
 
         <div className="page-column relative flex flex-1 flex-col">
           <header className="flex items-center justify-between py-8">
-            <span className="text-axis" style={{ color: "rgb(255 255 255 / 0.72)" }}>
+            <span className="text-axis" style={{ color: "#5a5249" }}>
               7차원 성향 설문
             </span>
-            <Link
-              href="/login"
-              className="text-axis underline"
-              style={{ color: "rgb(255 255 255 / 0.72)" }}
-            >
+            <Link href="/login" className="text-axis underline" style={{ color: "#5a5249" }}>
               로그인
             </Link>
           </header>
 
-          <div className="flex flex-1 flex-col justify-center pb-24">
+          <div className="flex flex-1 flex-col justify-center pb-28">
             <h1
-              className="mb-6 max-w-[30rem] font-semibold text-white"
+              className="mb-6 max-w-[26rem] font-semibold"
               style={{
-                fontSize: "clamp(2.5rem, 1.8rem + 3vw, 4.5rem)",
-                lineHeight: 1.15,
+                fontSize: "clamp(2.5rem, 1.8rem + 3vw, 4.25rem)",
+                lineHeight: 1.16,
                 letterSpacing: "-0.03em",
+                color: "#241f1a",
               }}
             >
               일하는 방식을
@@ -85,10 +87,7 @@ export default async function Home() {
               일곱 갈래로 봅니다
             </h1>
 
-            <p
-              className="text-item mb-12 max-w-[28rem]"
-              style={{ color: "rgb(255 255 255 / 0.82)" }}
-            >
+            <p className="text-item mb-12 max-w-[26rem]" style={{ color: "#4a433b" }}>
               높고 낮음은 있지만 좋고 나쁨은 없습니다.
             </p>
 
@@ -96,17 +95,16 @@ export default async function Home() {
               <ButtonLink href="/signup" size="lg">
                 시작하기
               </ButtonLink>
-              <p className="text-table" style={{ color: "rgb(255 255 255 / 0.7)" }}>
+              <p className="text-table" style={{ color: "#5a5249" }}>
                 약 17분 · 114문항
               </p>
             </div>
           </div>
 
-          {/* 아래에 더 있다는 표시. 눌러도 내려간다 */}
           <a
             href="#what"
-            className="text-axis pb-8 text-center"
-            style={{ color: "rgb(255 255 255 / 0.6)" }}
+            className="text-axis pb-10 text-center"
+            style={{ color: "#6b6258" }}
           >
             무엇을 재는지 보기
             <span aria-hidden className="mt-1 block">
