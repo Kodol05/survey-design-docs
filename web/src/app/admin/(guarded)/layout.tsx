@@ -34,7 +34,27 @@ export default async function AdminLayout({ children }: { children: React.ReactN
           </nav>
           <div className="text-axis text-ink-secondary flex shrink-0 items-center gap-4">
             <ThemeToggle />
-            <span>{me.name}</span>
+            {/*
+              **누구로 들어와 있는지 눈에 띄게** (2026-08-25 사용자 요청).
+
+              옅은 회색 글자라 메뉴·비밀번호·로그아웃 사이에 묻혀 있었다.
+              관리자 화면은 **남의 응답을 보는 자리**라, 지금 누구 자격으로
+              보고 있는지가 흐릿하면 안 된다.
+
+              붉은색을 쓰는 이유 — 이 시스템에서 붉은색은 「조심할 것」을
+              뜻한다(응답 신뢰도 낮음 등). 권한이 센 자리라는 표시로 맞다.
+            */}
+            <span
+              className="rounded-md px-2.5 py-1 font-medium"
+              style={{
+                background:
+                  "color-mix(in oklab, var(--status-critical) 12%, transparent)",
+                color: "var(--status-critical)",
+              }}
+              title="지금 로그인한 계정"
+            >
+              {me.name}
+            </span>
             <Link href="/admin/password" className="underline">비밀번호</Link>
             <form action={logout}>
               <button className="underline">로그아웃</button>

@@ -436,10 +436,13 @@ function InHouseSection({
         <CleanToggle clean={clean} poorN={poorN} source={source} />
       </div>
       <h2 className="text-section-title mb-2">성향 축과 직무능력 세 가지</h2>
-      <p className="text-ink-secondary mb-8 max-w-[56rem]">
-        우리 직원 {matrix.n}명 값입니다. {SOURCE_NOTE[source]}{" "}
+      <p className="text-ink-secondary mb-2 max-w-[56rem]">
+        우리 직원 {matrix.n}명 값입니다.{" "}
         <strong>칸을 누르면 그 하나만 크게 봅니다.</strong>
       </p>
+      <Note label="지금 보는 값이 무엇인지" className="mb-8">
+        <p>{SOURCE_NOTE[source]}</p>
+      </Note>
       <CorrelationPanel
         rows={[...TRAIT_SCALES]}
         cols={[...ABILITY_AXES]}
@@ -453,11 +456,17 @@ function InHouseSection({
       {/* ── 2절 · 능력마다 어떤 성향이 ── */}
       <div className="mt-20 border-t border-[--border] pt-12">
         <h2 className="text-section-title mb-2">능력마다 어떤 성향이 뚜렷한가</h2>
-        <p className="text-ink-secondary mb-10 max-w-[56rem]">
-          <strong>위 표와 같은 값</strong>을 능력마다 <strong>순위로</strong>{" "}
-          늘어놓은 것입니다. 표는 격자라 세로로 훑어야 하지만 여기는 이미 큰
-          순으로 정렬돼 있습니다.
+        <p className="text-ink-secondary mb-2 max-w-[56rem]">
+          <strong>위 표와 같은 값</strong>을 능력마다 순위로 늘어놓은 것입니다.
         </p>
+        <Note label="표와 무엇이 다른지" className="mb-10">
+          <p>
+            표는 7×3 격자라 「협력 열에서 어느 것이 큰가」를 세로로 훑어야
+            합니다. 여기는 이미 큰 순으로 정렬돼 있고, 줄을 누르면 그 조합의
+            점 분포가 그 자리에서 열립니다. <strong>숫자는 같은 값</strong>이라
+            두 화면이 어긋날 일은 없습니다.
+          </p>
+        </Note>
         <div className="flex flex-col gap-14">
           {ABILITY_AXES.map((axis) => (
             <AxisRanking
@@ -595,12 +604,14 @@ function AgreementTab({ data }: { data: Awaited<ReturnType<typeof loadRatingComp
         <AgreementPanel data={data} />
       )}
 
-      <p className="text-ink-secondary mt-8 max-w-[52rem] leading-relaxed">
-        같은 사람의 직무능력을 <strong>본인이 답한 값</strong>과{" "}
-        <strong>대표님이 매기신 값</strong>으로 나란히 놓았습니다.
-      </p>
+      <Note label="이 화면이 무엇을 보여주는지" className="mt-8">
+        <p>
+          같은 사람의 직무능력을 <strong>본인이 답한 값</strong>과{" "}
+          <strong>대표님이 매기신 값</strong>으로 나란히 놓았습니다.
+        </p>
+      </Note>
 
-      <Note label="이 화면을 어떻게 읽는지" className="mt-6">
+      <Note label="이 화면을 어떻게 읽는지" className="mt-3">
         <p className="mb-2">
           <strong>「누가 맞았나」를 보는 화면이 아닙니다.</strong>{" "}
           <strong>둘이 갈리는 사람이 이야깃거리</strong>라는 뜻입니다 — 본인은
@@ -665,15 +676,17 @@ function PredictionTab({
         <PredictionPanel items={items} missing={missing} />
       )}
 
-      <p className="text-ink-secondary mt-8 max-w-[52rem] leading-relaxed">
-        논문 상관을 가중치로 삼아{" "}
-        <strong>이 사람의 직무능력이 얼마쯤일지 계산</strong>하고 실제 값과
-        나란히 놓았습니다. 어긋난다면{" "}
-        <strong>우리 회사가 논문과 다르거나, 그 사람이 남다르거나</strong>
-        입니다.
-      </p>
+      <Note label="이 화면이 무엇을 보여주는지" className="mt-8">
+        <p>
+          논문 상관을 가중치로 삼아{" "}
+          <strong>이 사람의 직무능력이 얼마쯤일지 계산</strong>하고 실제 값과
+          나란히 놓았습니다. 어긋난다면{" "}
+          <strong>우리 회사가 논문과 다르거나, 그 사람이 남다르거나</strong>
+          입니다.
+        </p>
+      </Note>
 
-      <Note label="이 예측을 어디까지 믿을 수 있는지" className="mt-6 mb-16">
+      <Note label="이 예측을 어디까지 믿을 수 있는지" className="mt-3 mb-16">
         <p className="mb-2">
           <strong>서로 다른 논문에서 온 값을 한 식에 넣습니다.</strong> 표본도
           지표도 나라도 달라서 대략의 눈금이지 정밀한 값이 아닙니다. 그리고 논문이
@@ -690,10 +703,8 @@ function PredictionTab({
       {/* ── 2절 · 상관 하나하나를 맞대 본다 ── */}
       <div className="border-t border-[--border] pt-14">
         <h2 className="text-section-title mb-3">논문 값과 우리 값</h2>
-        <p className="text-item text-ink-secondary mb-8 max-w-[52rem]">
-          위쪽이 <strong>사람</strong>을 맞대 본 것이라면, 여기는{" "}
-          <strong>관계 하나하나</strong>를 맞대 봅니다. 막대 두 개가 한 쌍이고
-          위가 논문, 아래가 우리 회사입니다.{" "}
+        <p className="text-ink-secondary mb-6 max-w-[52rem]">
+          막대 두 개가 한 쌍이고 위가 논문, 아래가 우리 회사입니다.{" "}
           <strong>끝이 비슷하면 맞은 것</strong>입니다.
         </p>
 
