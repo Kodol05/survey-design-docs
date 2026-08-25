@@ -185,7 +185,12 @@ function Row({
     <div className="grid gap-x-6 gap-y-2 xl:grid-cols-[9rem_minmax(0,1fr)] xl:items-end">
       <div className="xl:pb-1">
         <p className="text-table font-medium">{s.scale}</p>
-        <AlphaNote r={r} />
+        {r ? (
+          <AlphaNote r={r} />
+        ) : (
+          // 묶어 만든 값에는 문항 α가 없다. 빈칸으로 두면 왜 없는지 묻게 된다
+          <span className="text-axis text-ink-muted">세 축의 평균</span>
+        )}
       </div>
 
       <div>

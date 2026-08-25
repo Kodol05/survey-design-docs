@@ -11,6 +11,13 @@ import { gradeOf, isUncertain } from "./correlationWords";
  * 덮어쓰면 `.20~.29`짜리 「어느 정도」가 영영 화면에 못 나온다 —
  * 그 구간은 37명에서 항상 0을 걸치기 때문이다.
  *
+ * ## 「없음」에는 `?`를 붙이지 않는다 (2026-08-25 화면에서 확인)
+ *
+ * 값이 0 근처면 구간이 0을 걸치는 것이 **당연하다.** 거기에 `?`를 달면
+ * 「없음?」이 되어 「없는 것이 확실치 않다」로 읽힌다 — 뜻이 뒤집힌다.
+ * `?`가 말하려는 것은 「방향이 아직 확정 안 됨」인데, 방향을 말하지 않는
+ * 등급에는 붙일 것이 없다.
+ *
  * @param onFill 칠해진 칸 위에 얹히는가. 칠 위에서는 본문 잉크로 쓴다.
  *   옅은 회색은 색 있는 배경에서 대비가 무너져 안 보인다.
  */
@@ -25,7 +32,9 @@ export function GradeTag({
   onFill?: boolean;
   className?: string;
 }) {
-  const soft = isUncertain(ci);
+  const grade = gradeOf(r);
+  // 「없음」은 방향을 말하지 않는 등급이라 확실함을 물을 것이 없다
+  const soft = isUncertain(ci) && grade !== "없음";
   return (
     <span
       className={`text-axis whitespace-nowrap ${className}`}
@@ -35,7 +44,7 @@ export function GradeTag({
       }}
       title={soft ? "신뢰구간이 0을 걸칩니다 — 방향이 아직 확정되지 않았습니다" : undefined}
     >
-      {gradeOf(r)}
+      {grade}
       {soft && (
         <span aria-hidden className="ml-0.5">
           ?

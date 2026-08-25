@@ -101,3 +101,38 @@ describe("abilityComposite", () => {
     expect(c.drivers[0].corr.r).toBeLessThan(-0.95);
   });
 });
+
+describe("topGroup", () => {
+  const P2 = (n: number, v: number, traits: Record<string, number>) => ({
+    employeeId: `e${n}`,
+    name: `사람${n}`,
+    traits,
+    abilities: { 협력: v, 조직생활: v, 자율적실행: v },
+    quality: "ok",
+  });
+
+  it("맨 위와 사실상 같은 크기면 같이 묶는다 — .01 차이로 순위를 매기지 않는다", () => {
+    // 인내력과 연대감을 거의 같은 정도로 연관시킨다
+    const vals = [10, 30, 50, 70, 90];
+    const rows = vals.map((v, i) =>
+      P2(i, v, {
+        인내력: v,
+        연대감: [12, 28, 52, 68, 92][i],
+        자극추구: [50, 20, 80, 40, 60][i],
+      }),
+    );
+    const c = abilityComposite(rows)!;
+    expect(c.topGroup.length).toBeGreaterThanOrEqual(2);
+    expect(c.topGroup.map((t) => t.scale)).toContain("연대감");
+  });
+
+  it("확실히 큰 것 하나뿐이면 하나만 묶인다", () => {
+    const vals = [10, 30, 50, 70, 90];
+    const rows = vals.map((v, i) =>
+      P2(i, v, { 인내력: v, 자극추구: [50, 20, 80, 40, 60][i] }),
+    );
+    const c = abilityComposite(rows)!;
+    expect(c.topGroup).toHaveLength(1);
+    expect(c.topGroup[0].scale).toBe("인내력");
+  });
+});

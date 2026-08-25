@@ -1,5 +1,5 @@
 import { formatR } from "./correlationColor";
-import { gradeOf } from "./correlationWords";
+import { GradeTag } from "./GradeTag";
 import { AlphaNote } from "./AlphaNote";
 import { DivergingBar } from "./DivergingBar";
 import type { RankRow, ScaleReliability } from "@/lib/admin/analysis";
@@ -24,8 +24,14 @@ import type { RankRow, ScaleReliability } from "@/lib/admin/analysis";
  *    우연히 높게 나오므로 **상위 몇 개에서 자른다** (11 §3.4).
  */
 
-/** 능력마다 몇 개까지 보여줄지. 화면 폭이 아니라 다중비교가 정하는 수다 */
-const TOP = 6;
+/*
+  능력마다 몇 개까지 보여줄지.
+
+  다중비교가 먼저 정한다 — 84개 상관에서 위쪽 몇 개는 우연히 높다. 그리고
+  **한 줄에 다 들어와야** 한다. 여섯 개를 놓았더니 넓은 화면에서도 가로
+  스크롤바가 생겨서 「오른쪽으로 쭉 늘어놓는다」는 목적이 반쯤 깨졌다.
+*/
+const TOP = 5;
 
 export function AbilityDrivers({
   axes,
@@ -44,6 +50,20 @@ export function AbilityDrivers({
             <AlphaNote r={reliability[axis]} className="!mt-0 !inline" />
           </p>
 
+          {/*
+            **문항이 안 맞물리는 능력은 여기서도 흐리게 둔다** (2026-08-25).
+
+            위 상관표는 그 열을 빗금 치고 흐리게 하는데 여기만 멀쩡하면
+            앞뒤가 안 맞는다. 게다가 세부 항목은 축 전체보다 크게 나오기도
+            해서 **오히려 더 믿을 만해 보인다.**
+          */}
+          {reliability[axis]?.verdict === "poor" && (
+            <p className="text-axis text-ink-secondary mb-3">
+              <span style={{ color: "var(--status-critical)" }}>⚠ </span>
+              문항이 안 맞물려 이 순서를 그대로 믿기 어렵습니다.
+            </p>
+          )}
+
           {rows.length === 0 ? (
             <p className="text-ink-muted text-axis">
               쪼개 볼 세부 항목이 없습니다.
@@ -54,7 +74,10 @@ export function AbilityDrivers({
               화면에서는 옆으로 밀어 볼 수 있게 한다 — 줄을 바꿔 쌓으면
               「몇 번째로 큰가」가 눈으로 안 읽힌다.
             */
-            <ul className="-mx-1 flex gap-3 overflow-x-auto px-1 pb-1">
+            <ul
+              className="-mx-1 flex gap-3 overflow-x-auto px-1 pb-1"
+              style={{ opacity: reliability[axis]?.verdict === "poor" ? 0.6 : 1 }}
+            >
               {rows.slice(0, TOP).map((r, i) => (
                 <Card key={r.label} rank={i + 1} row={r} />
               ))}
@@ -70,7 +93,13 @@ function Card({ rank, row }: { rank: number; row: RankRow }) {
   const settled = !(row.corr.ci[0] <= 0 && row.corr.ci[1] >= 0);
   return (
     <li
-      className="w-[15rem] shrink-0 rounded-xl px-4 py-3"
+      /*
+        **폭에 맞춰 늘고 줄게 둔다.** 고정폭 15rem으로 두었더니 2560 화면에서
+        여유가 16px뿐이라 창을 조금만 좁혀도 가로 스크롤바가 생겼다. 다섯이
+        남는 폭을 나눠 가지면 어떤 창에서도 한 줄에 들어오고, 아주 좁아지면
+        그때만 옆으로 밀린다.
+      */
+      className="min-w-[9rem] flex-1 basis-[13rem] rounded-xl px-4 py-3"
       style={{ background: "var(--wash)" }}
       title={`${row.scale} · ${row.label} — ${formatR(row.corr.r)} (${row.corr.n}명, ${formatR(row.corr.ci[0])}~${formatR(row.corr.ci[1])})`}
     >
@@ -89,13 +118,7 @@ function Card({ rank, row }: { rank: number; row: RankRow }) {
       <DivergingBar r={row.corr.r} faded={!settled} height={12} />
       <p className="text-axis mt-1.5 flex items-baseline justify-between">
         <span className="tabular font-medium">{formatR(row.corr.r)}</span>
-        <span
-          className="text-ink-secondary"
-          style={{ opacity: settled ? 1 : 0.6 }}
-        >
-          {gradeOf(row.corr.r)}
-          {!settled && <span aria-hidden>?</span>}
-        </span>
+        <GradeTag r={row.corr.r} ci={row.corr.ci} />
       </p>
     </li>
   );

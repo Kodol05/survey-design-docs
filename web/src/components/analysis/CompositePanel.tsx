@@ -1,5 +1,6 @@
 import { formatR } from "./correlationColor";
-import { gradeOf, subjectParticle } from "./correlationWords";
+import { subjectParticle } from "./correlationWords";
+import { GradeTag } from "./GradeTag";
 import { DivergingBar } from "./DivergingBar";
 import { CHARACTER } from "../charts/scale";
 import type { Composite } from "@/lib/admin/composite";
@@ -28,17 +29,21 @@ export function CompositePanel({ c }: { c: Composite }) {
   const shaky = c.verdict === "poor";
 
   return (
-    <div className="grid gap-x-14 gap-y-8 xl:grid-cols-[minmax(0,22rem)_minmax(0,1fr)]">
+    <div className="grid gap-x-14 gap-y-8 xl:grid-cols-[minmax(0,26rem)_minmax(0,1fr)]">
       {/* ── 묶어도 되는가 ── */}
       <div>
         <p className="text-axis text-ink-muted mb-2">묶어도 되는가</p>
         <ul className="mb-4 flex flex-col gap-1.5">
           {c.pairs.map((p) => (
             <li key={`${p.a}${p.b}`} className="text-axis flex items-center gap-3">
-              <span className="text-ink-secondary w-[9.5rem] shrink-0 truncate">
+              {/*
+                이름을 자르지 않는다. `truncate`를 걸었더니 「조직생활 ×
+                자율적...」로 끝나 **어느 쌍인지 알 수 없었다.**
+              */}
+              <span className="text-ink-secondary w-[11rem] shrink-0">
                 {p.a} <span className="text-ink-muted">×</span> {p.b}
               </span>
-              <span className="block w-full max-w-[8rem] shrink">
+              <span className="block w-full max-w-[7rem] shrink">
                 <DivergingBar r={p.r} height={11} />
               </span>
               <span className="tabular w-11 shrink-0 text-right">
@@ -106,40 +111,97 @@ export function CompositePanel({ c }: { c: Composite }) {
                 <span className="tabular w-12 shrink-0 text-right font-medium">
                   {formatR(d.corr.r)}
                 </span>
-                <span
-                  className="text-axis text-ink-secondary w-[5rem] shrink-0"
-                  style={{ opacity: settled ? 1 : 0.6 }}
-                >
-                  {gradeOf(d.corr.r)}
-                  {!settled && <span aria-hidden>?</span>}
-                </span>
+                <GradeTag
+                  r={d.corr.r}
+                  ci={d.corr.ci}
+                  className="w-[5rem] shrink-0"
+                />
               </li>
             );
           })}
         </ul>
 
-        {top && (
-          <p className="text-ink-secondary mt-5 max-w-[46rem] leading-relaxed">
-            가장 크게 연관된 것은 <strong className="text-ink">{top.scale}</strong>
-            입니다 (<span className="tabular">{formatR(top.corr.r)}</span>).{" "}
-            {top.scale}
-            {subjectParticle(top.scale)}{" "}
-            {top.corr.r > 0 ? (
-              <>
-                높은 사람일수록 세 능력이 <strong>고르게 높게</strong> 나옵니다.
-              </>
-            ) : (
-              <>
-                <strong>낮은</strong> 사람일수록 세 능력이 고르게 높게 나옵니다.
-              </>
-            )}{" "}
-            <span className="text-ink-muted">
-              가는 선은 95% 구간입니다 — 0을 지나가면 방향이 아직 확정된 것이
-              아닙니다.
-            </span>
-          </p>
-        )}
+        {top && <Conclusion c={c} />}
       </div>
     </div>
+  );
+}
+
+/**
+ * 한 줄 결론.
+ *
+ * ## 붙어 있으면 하나로 단정하지 않는다 (2026-08-25 화면에서 확인)
+ *
+ * 실제 데이터가 `−.32 / +.32 / +.31`로 나왔는데 「가장 크게 연관된 것은
+ * 위험회피」라고 적혀 있었다. **`.01` 차이로 순위를 매긴 셈**이다 —
+ * 40명 남짓에서 그 차이는 다시 재면 뒤집힌다.
+ *
+ * 그래서 맨 위와 사실상 같은 것들을 묶어 **여럿이면 여럿으로** 말한다.
+ *
+ * ## 기질인가 성격인가도 같이 말한다
+ *
+ * 위 표를 기질·성격으로 나눠 둔 이유가 「타고나는 쪽인가 만들어지는 쪽인가」
+ * 였다. 총합에서도 그 답이 나오므로 한 마디로 적는다.
+ */
+/** 「3개가」보다 「셋이」가 읽힌다. 일곱 축뿐이라 표로 두면 충분하다 */
+const COUNT: Record<number, string> = {
+  2: "둘",
+  3: "셋",
+  4: "넷",
+  5: "다섯",
+  6: "여섯",
+  7: "일곱",
+};
+
+function Conclusion({ c }: { c: Composite }) {
+  const g = c.topGroup;
+  const kindOf = (s: string) =>
+    (CHARACTER as readonly string[]).includes(s) ? "성격" : "기질";
+  const kinds = new Set(g.map((d) => kindOf(d.scale)));
+
+  return (
+    <p className="text-ink-secondary mt-5 max-w-[46rem] leading-relaxed">
+      {g.length === 1 ? (
+        <>
+          가장 크게 연관된 것은{" "}
+          <strong className="text-ink">{g[0].scale}</strong>입니다 (
+          <span className="tabular">{formatR(g[0].corr.r)}</span>).{" "}
+          {g[0].scale}
+          {subjectParticle(g[0].scale)}{" "}
+          {g[0].corr.r > 0 ? "높은" : <strong>낮은</strong>} 사람일수록 세 능력이{" "}
+          <strong>고르게 높게</strong> 나옵니다.
+        </>
+      ) : (
+        <>
+          <strong className="text-ink">
+            {g.map((d) => d.scale).join(" · ")}
+          </strong>{" "}
+          {COUNT[g.length] ?? `${g.length}개`}가{" "}
+          <strong>비슷하게 큽니다</strong> (
+          <span className="tabular">
+            {g.map((d) => formatR(d.corr.r)).join(" / ")}
+          </span>
+          ). 이만한 차이로는 순위를 가릴 수 없으니{" "}
+          <strong>셋 다 관련이 있다</strong>고 읽으시면 됩니다 —{" "}
+          {g
+            .map((d) => `${d.scale}${d.corr.r > 0 ? "은 높을수록" : "는 낮을수록"}`)
+            .join(", ")}{" "}
+          세 능력이 고르게 높습니다.
+        </>
+      )}{" "}
+      {kinds.size === 2 ? (
+        <span className="text-ink-muted">
+          타고나는 쪽(기질)과 만들어지는 쪽(성격)이 <strong>섞여</strong>{" "}
+          있습니다 — 어느 한쪽만으로 갈리지 않습니다.
+        </span>
+      ) : (
+        <span className="text-ink-muted">
+          전부 <strong>{[...kinds][0]}</strong> 쪽입니다.
+        </span>
+      )}{" "}
+      <span className="text-ink-muted">
+        가는 선은 95% 구간입니다 — 0을 지나가면 방향이 아직 확정된 것이 아닙니다.
+      </span>
+    </p>
   );
 }

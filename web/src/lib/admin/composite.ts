@@ -42,7 +42,18 @@ export type Composite = {
   pairs: { a: string; b: string; r: number }[];
   /** 성향 7축과 총합의 상관, 큰 순 */
   drivers: { scale: string; corr: Correlation }[];
+  /**
+   * 맨 위와 **사실상 같은 크기**인 축들 (자기 자신 포함).
+   *
+   * `−.32 / +.32 / +.31` 처럼 셋이 붙어 있는데 「가장 크게 연관된 것은
+   * 위험회피」라고 단정하면 **`.01` 차이로 순위를 매기는 셈**이다.
+   * 40명 남짓에서 그 차이는 다시 재면 뒤집힌다.
+   */
+  topGroup: { scale: string; corr: Correlation }[];
 };
+
+/** 이 안에 들면 순위를 따지지 않는다. 40명 규모에서 이 정도는 그냥 흔들림이다 */
+export const TIE = 0.05;
 
 export function abilityComposite(people: Person[]): Composite | null {
   const rows = people
@@ -92,7 +103,10 @@ export function abilityComposite(people: Person[]): Composite | null {
     .filter((d) => d.corr.n >= 4)
     .sort((a, b) => Math.abs(b.corr.r) - Math.abs(a.corr.r));
 
-  return { values, alpha, verdict: alphaVerdict(alpha), pairs, drivers };
+  const best = drivers[0] ? Math.abs(drivers[0].corr.r) : 0;
+  const topGroup = drivers.filter((d) => best - Math.abs(d.corr.r) < TIE);
+
+  return { values, alpha, verdict: alphaVerdict(alpha), pairs, drivers, topGroup };
 }
 
 /**

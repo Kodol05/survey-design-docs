@@ -437,7 +437,7 @@ function InHouseSection({
         />
         <p className="text-axis text-ink-muted mt-6 max-w-[52rem]">
           세부 항목 28개 × 능력 3개면 84개 상관입니다. 관계가 없어도 네댓 개는
-          우연히 높게 나오므로 능력마다 위에서 여섯 개까지만 봅니다.
+          우연히 높게 나오므로 능력마다 위에서 다섯 개까지만 봅니다.
         </p>
       </div>
 
@@ -465,6 +465,9 @@ function InHouseSection({
  * 관계를 보기 전에 먼저 궁금한 것이라 **분석 안의 별도 탭**으로 둔다.
  * 직무능력은 고른 출처를 따른다 — 대표님 평가로 보면 그 값의 분포가 나온다.
  */
+/** 분포 화면에서 묶음 값을 부르는 이름. 실제 척도가 아니라 만든 값이다 */
+const COMPOSITE_LABEL = "세 능력 묶음";
+
 function SpreadTab({
   people,
   source,
@@ -489,10 +492,24 @@ function SpreadTab({
         .filter((x) => typeof x.value === "number"),
     );
 
+  /*
+    맨 아래에 **세 능력을 묶은 값**도 한 줄 둔다 (2026-08-25).
+
+    「전반적으로 일이 되는 사람은 어떤 사람인가」를 「직무능력과 기질·성격」
+    탭에서 물었으면, 그 값이 **우리 회사 안에서 어떻게 퍼져 있는지**는
+    여기가 답할 자리다. 축 셋을 따로 보는 것과 묶어서 보는 것은 다른 모양이
+    나온다 — 각 축의 잡음이 상쇄되어 대개 더 좁게 모인다.
+  */
+  const composite = abilityComposite(people);
+  const byId = new Map(
+    (composite?.values ?? []).map((v) => [v.employeeId, v.value]),
+  );
+
   const spreads = [
     ...TEMPERAMENT.map((s) => of(s, "temperament", (p) => p.traits[s])),
     ...CHARACTER.map((s) => of(s, "character", (p) => p.traits[s])),
     ...ABILITY_AXES.map((a) => of(a, "ability", (p) => p.abilities[a])),
+    composite ? of(COMPOSITE_LABEL, "ability", (p) => byId.get(p.employeeId)!) : null,
   ].filter((x): x is Spread => x !== null);
 
   return (
