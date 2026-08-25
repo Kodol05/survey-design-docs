@@ -1,5 +1,5 @@
 import { prisma } from "../db";
-import { ABILITY_AXES, TRAIT_SCALES } from "@/lib/items/types";
+import { ABILITY_AXES, COMPOSITE_AXIS, TRAIT_SCALES } from "@/lib/items/types";
 import { abilityMean } from "@/components/analysis/TraitStrip";
 import { quantile } from "./spread";
 import { pickBossScores, countRatedEmployees } from "./ratings";
@@ -21,7 +21,7 @@ import type { Row } from "@/app/admin/(guarded)/employees/EmployeeList";
 export type SortDir = "asc" | "desc";
 
 /** 정렬 축 이름 자리에 들어가는 특별한 열쇠 — 실제 축 이름과 겹치면 안 된다 */
-export const MEAN_KEY = "세 능력 평균";
+export const MEAN_KEY = COMPOSITE_AXIS;
 
 /**
  * 점수 구간 — **사분위로 자른다.**

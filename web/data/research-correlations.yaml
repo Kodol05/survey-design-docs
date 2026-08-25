@@ -69,6 +69,17 @@ sources:
       이직을 (−)예측한다. ⚠️ 유료 저널이라 **계수 표를 구하지 못했다.**
       방향과 순위만 쓴다.
     url: https://onlinelibrary.wiley.com/doi/10.1111/j.1744-6570.2008.00115.x
+  aluja2011:
+    label: Blanch & Aluja (2011), The Spanish Journal of Psychology 14(2) 659-666
+    sample: 일반인 928명 (17~28세)
+    measured: TCI-R 7축 ↔ NEO-FFI-R 5요인 전체 상관표
+    note: >-
+      2026-08-26에 전문 PDF에서 표를 직접 읽었다. 위험회피↔신경증 .67 ·
+      인내력↔성실성 .53 · 자율성↔성실성 .58 · 연대감↔우호성 .63 ·
+      사회적민감성↔외향성 .52 · 자기초월↔개방성 .44.
+      ⚠️ De Fruyt(2000)보다 **표본이 크고 표를 실제로 확인했다.** 그래서
+      TCI↔5요인 다리는 이 값을 쓴다. 다만 대학생 나이대라 직장인 표본은 아니다.
+    url: https://repositori.udl.cat/handle/10459.1/47942
   defruyt2000:
     label: De Fruyt et al. (2000), Personality and Individual Differences 29(3)
     sample: TCI ↔ 5요인 대조 연구
@@ -132,9 +143,14 @@ correlations:
     state: expected
     direction: -1
     weight: 0.5
-    basis: 위험회피↔신경증(+), 신경증→직무만족 -.29
-    chain: 방향만 - 위험회피↔신경증 계수를 구하지 못했다
-    source: zimmerman2008
+    estimate: -0.08
+    basis: 위험회피↔신경증 .67 -> 직무만족 -.29
+    chain: >-
+      .67 x (0.4 x -.29) = -.08.
+      ⚠️ **조직시민행동 쪽 몫은 0으로 뒀다** - 신경증→조직시민행동 계수를
+      구하지 못했다(Chiaburu 2011은 유료). 모르는 것을 0으로 치면 값이
+      작게 나온다. 즉 이 -.08은 **바닥값**이고 실제로는 더 클 수 있다.
+    source: aluja2011
   - scale: 사회적민감성
     ability: 조직생활
     state: unstudied
@@ -144,27 +160,27 @@ correlations:
     direction: 1
     weight: 0.5
     estimate: 0.10
-    basis: 인내력↔성실성 .51 -> 조직시민행동 .15 / 직무만족 .26
-    chain: .51 x (0.6 x .15 + 0.4 x .26) = .10
-    source: judge2002
+    basis: 인내력↔성실성 .53 -> 조직시민행동 .15 / 직무만족 .26
+    chain: .53 x (0.6 x .15 + 0.4 x .26) = .10
+    source: aluja2011
   - scale: 자율성
     ability: 조직생활
     state: expected
     direction: 1
     weight: 0.5
-    estimate: 0.08
-    basis: 자율성↔성실성 .43 -> 조직시민행동 .15 / 직무만족 .26
-    chain: .43 x (0.6 x .15 + 0.4 x .26) = .08
-    source: judge2002
+    estimate: 0.11
+    basis: 자율성↔성실성 .58 -> 조직시민행동 .15 / 직무만족 .26
+    chain: .58 x (0.6 x .15 + 0.4 x .26) = .11
+    source: aluja2011
   - scale: 연대감
     ability: 조직생활
     state: expected
     direction: 1
     weight: 1.0
-    estimate: 0.08
-    basis: 연대감↔우호성 .57 -> 조직시민행동 .12 / 직무만족 .17
-    chain: .57 x (0.6 x .12 + 0.4 x .17) = .08
-    source: organ1995
+    estimate: 0.09
+    basis: 연대감↔우호성 .63 -> 조직시민행동 .12 / 직무만족 .17
+    chain: .63 x (0.6 x .12 + 0.4 x .17) = .09
+    source: aluja2011
   - scale: 자기초월
     ability: 조직생활
     state: unstudied

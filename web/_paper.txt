@@ -1,0 +1,631 @@
+The present study tests the relationships between the three frequently used personality models evaluated by the Temperament 
+Character Inventory-Revised (TCI-R), Neuroticism Extraversion Openness Five Factor Inventory – Revised (NEO-FFI-R) 
+and Zuckerman-Kuhlman Personality Questionnaire-50- Cross-Cultural (ZKPQ-50-CC).  The results were obtained with a 
+sample of 928 volunteer subjects from the general population aged between 17 and 28 years old. Frequency distributions 
+and alpha reliabilities with the three instruments were acceptable. Correlational and factorial analyses showed that several 
+scales in the three instruments share an appreciable amount of common variance. Five factors emerged from principal 
+components analysis. The first factor was integrated by A (Agreeableness), Co (Cooperativeness) and Agg-Host (Aggressiveness- 
+Hostility), with secondary loadings in C (Conscientiousness) and SD (Self-directiveness) from other factors. The second 
+factor was composed by N (Neuroticism), N-Anx (Neuroticism-Anxiety), HA (Harm Avoidance) and SD (Self-directiveness).
+The third factor was integrated by Sy (Sociability), E (Extraversion), RD (Reward Dependence), ImpSS (Impulsive 
+Sensation Seeking) and NS (novelty Seeking). The fourth factor was integrated by Ps (Persistence), Act (Activity), and C,
+whereas the fifth and last factor was composed by O (Openness) and ST (Self- Transcendence).  Confirmatory factor 
+analyses indicate that the scales in each model are highly interrelated and define the specified latent dimension well.
+Similarities and differences between these three instruments are further discussed.
+Keywords : personality, TCI-R, NEO-FFI-R, ZKPQ-50-CC.
+Este estudio explora las relaciones entre los tres m odelos de personalidad m ás frecuentem ente utilizados evaluados 
+por el Inventario de C arácter y Tem peram ento revisado (TC I-R ), el Inventario de N euroticism o, Extraversión y Apertura 
+R evisado de C inco Factores R evisado (N EO -FFI-R ) y el C uestionario de Personalidad de Zuckerm an-Kuhlm an de 50 
+ítem s (el ZKPQ -50-C C ). Los resultados se obtuvieron con una m uestra de 928 sujetos voluntarios provenientes de la 
+población general entre 1 7 y 28 años. Las distribuciones de frecuencias de las m edias y fiabilidades alfa de los tres 
+instrum entos fueron aceptables. Los análisis correlacionales y factoriales m ostraron que los tres cuestionarios com partían 
+una apreciable cantidad de varianza com ún. D e los análisis de com ponente principales em ergieron cinco factores. El 
+prim er factor quedó integrado por A (Am abilidad), C o (C ooperación) y Agg-H ost (Agresividad-hostilidad), con las cargas 
+secundarias en el factor C  (Responsabilidad) y SD  (Auto-D irección) de otros factores. El segundo factor estaba com puesto 
+por N  (N euroticism o), N -Anx (N euroticism -ansiedad), H A (Evitación del D año) y SD  (Auto-D irección). El tercer factor 
+quedo integrado por Sy (la Sociabilidad), E (Extraversión), R D  (D ependencia de la R ecom pensa), Im pSS (Búsqueda 
+de Sensaciones Im pulsiva) y N S (Búsqueda de N ovedad). El cuarto factor quedó integrado por P (Persistencia), Act 
+(Actividad), y C, el quinto y el últim o factor estaba com puesto por O  (Apertura) y ST (Auto-Transcendencia). U n análisis 
+factorial confirm atorio indicó que las escalas de cada m odelo están m uy interrelacionadas y definen bien la dim ensión 
+latente especificada. Se discuten las sim ilitudes y diferencias entre estos tres instrum entos. 
+Palabras clave: personalidad, TC I-R , N EO -FFI-R , ZKPQ -50-C C . 
+The Five and Seven Factors Personality Models: Differences and 
+Similitude between the TCI-R, NEO-FFI-R and ZKPQ-50-CC 
+Anton Aluja and Angel Blanch  
+Universitat de Lleida (Spain) 
+The Spanish Journal of Psychology Copyright 2011 by The Spanish Journal of Psychology 
+2011, Vol. 14, No. 2, 659-666 ISSN 1138-7416 
+http://dx.doi.org/10.5209/rev_SJOP.2011.v14.n2.14 
+Correspondence concerning this article should be addressed to Anton Aluja. Institut de Recerca Biomèdica (IRBLleida). Área de 
+Personalidad, Evaluación y Tratamiento psicológico. Universitat de Lleida. Avda de l’Estudi General, 4. 25001 Lleida (Spain). E-mail: 
+aluja@pip.udl.cat 
+659 
+In the present research on personality there are three 
+frequently used models: the Five Factor model (FFM) (Tupes 
+& Christal, 1961) measured by the NEO-PI-R (Costa & 
+McCrae, 1992), Cloninger Temperament and Character model 
+(Cloninger, 1987) measured by the TCI-R (Cloninger, Svrakic,
+& Przybeck, 1993), and Zuckerman Big Five alternative model 
+measured by the ZKPQ (Aluja, García, & García, 2002; 
+Zuckerman, Kuhlman, Joreiman, Teta, & Kraft, 1993,
+Zuckerman, Kuhlman, Thornquist, & Kiers, 1991).
+The FFM clearly predominates in accordance with the 
+high amount of works dealing with this theory. This model 
+originated in the lexical tradition based in the description 
+of psychological traits represented by natural language and 
+adjectives (Digman, 1990; Goldberg, 1981; Norman, 1967).
+In addition, this model pretends to provide a descriptive 
+taxonomy of personality with no mention to causal or 
+biological aspects. There is a generalized agreement 
+regarding the labeling of the big five factors as Neuroticism 
+(N), Extraversion (E), Conscientiousness (C), Agreeableness 
+(A) and Openness to Experience (O), despite particular 
+nomenclatures may change slightly (Goldberg, 1981, 1990).
+These five factors are theoretically independent or 
+orthogonal, although E and O are highly intercorrelated,
+whereas A and C appear to share a common construct which 
+might be named as ‘socialization’ that some authors have 
+interpreted as the inverse the Eysenck’s Psychoticism 
+dimension (Eysenck, 1991, 1992a, 1992b; McCrae, & Costa,
+1985). This model has been widely replicated in different 
+cultural contexts (McCrae, Terracciano, & 78 Members of 
+the Personality Profiles of Cultures Project, 2005).
+Cloninger’s personality model is based in two historical 
+components of personality, Temperament and Character.
+Temperament is defined by four factors: Novelty Seeking 
+(NS), Harm Advoidance (HA), Reward Dependency (RD),
+and Persistence (Ps), whereas Character has been defined 
+by three factors: Self-Directiveness (SD), Cooperation (Co),
+and Self-Trancendency (ST). The temperament traits have 
+been hypothesized to be related with neural monominergic 
+systems (Cloninger, 1986). The temperament traits are 
+supposed to be associated with the biology, whereas character 
+traits would be more related to learning and culture.
+However, the evidence about the independence between 
+temperament and character factors is inconclusive. In a 
+recent study Farmer and Goldberg (2008) showed 
+psychometric hindrances and an insufficient factor structure 
+validation for the TCI-R and the TCI. Moreover,
+Temperament and Character dimensions tend to correlate,
+for example, RD is positively correlated with Co, whereas 
+HA is negatively correlated with Co although several studies 
+also suggest more substantial correlations (negative) with 
+PS and SD than with Co. NS, has also been related with 
+RD, which is also within the Extraversion construct (De 
+Fruyt, Van de Wiele, & Heeringen, 2000). Further, when 
+factorizing the facets in seven factors a non-stable structure 
+is usually obtained, with facets from different factors loading 
+in a single factor. In a recent study, Maitland, Nyberg,
+Bäckman, Nilson, and Adolfsson (2009) analyze several 
+temperament-character models with Structural Equation 
+Modelling techniques. The results provide no support for 
+distinguishing Temperament and Character dimensions.
+The Zuckerman Big Five alternative model is based in 
+the biological-factorial tradition and is closely related with 
+the Eysenck model. The five factors are Neuroticism-Anxiety 
+(N-Anx), Sociability (Sy), Aggression-Hostility (Agg-Host),
+Impulsive Sensation Seeking (ImpSS), and Activity (Act).
+A full description of this questionnaire and its psychometric 
+properties may be reviewed in Zuckerman (2002, 2008) 
+and Joireman and Kuhlman (2004). N-Anx tends to correlate 
+with Agg-Host, and Sy with ImpSS and Agg-Host. Unlike 
+the TCI-R or the NEO-PI-R, the factor structure of this 
+questionnaire is obtained directly from the items, is generally 
+robust and has been also replicated in different cultures 
+(Aluja, et al. 2006; 2008).
+De Fruyt et al. (2000) investigated the relationships of 
+Cloninger’s model as measured by the TCI, with the FFM 
+model as measured by the NEO-PI-R. N obtained a high 
+positive correlation with HA, and a negative correlation 
+with SD. Further, E was negatively correlated with HA,
+and positively correlated with RD and NS. In addition, O 
+was positively correlated with ST, and in a lesser extent 
+negatively correlated with RD and HA. Finally, A was 
+positively correlated with Co, whereas C was positively 
+correlated with Ps and SD.
+Zuckerman et al. (1993) and Aluja, García, and García 
+(2002) have studied the relationships between the NEO- 
+PI-R, the EPQ and the ZKPQ in different cultures, indicating 
+essentially equivalent results. Psychoticism was negatively 
+associated with C and A, and also with ImpSS and Agg- 
+Host from the ZKPQ. Openness was located in the 
+Extraversion factor . The Psychoticism factor scales are 
+split into two factors: Agreeableness and Conscientiousness.
+The first one is formed by A, Agg--Host, and O. The second 
+one is formed by C, P, and ImpSS. Finally, in the 5-factor 
+solution, when adding the 30 NEO PI-R facets, the six facets 
+of Openness formed an independent factor. In this model,
+Psychoticism was grouped with ImpSS, Impulsivity (N5) 
+and the six Conscientiousness facets (negative loadings). 
+The relationships between the Cloninger, Zuckerman 
+and Eysenck models were studied by Zuckerman and 
+Cloninger (1996). NS obtained high inter-correlations with 
+ImpSS, Psychoticim and Extraversion (EPQ). HA was 
+positively related with N-Anx, N, and negatively related 
+with E. On the other hand, RD was negatively related with 
+Psychoticism, Ps was correlated with Act, Co was negatively 
+correlated with Agg-Host and Psychoticism, SD was 
+negatively correlated with N-Anx and N, and finally, ST 
+was only slightly related with ImpSS.
+As far as we know, there are no studies comparing 
+simultaneously these three personality models, although in 
+the light of past research it is expected to find a high amount 
+BLANCH AND ALUJA 660 
+of common variance shared by Neuroticism scales and HA.
+Further, it is also expected a high degree of covariation 
+among the scales tapping Extraversion (Sy, ImpSS, NS,
+and RD). On the other hand, it seems plausible that A, Agg- 
+Host and Co should be highly correlated, and that C, Co,
+Act and Ps should also share a noticeable amount of shared 
+variance. In regard to O and ST, these two scales should 
+also be highly correlated.
+Therefore, the aim of the current study was to compare 
+the TCI-R, NEO-FFI-R and ZKPQ-50-CC dimensions and 
+to analyze their empirical relationships. The above associations 
+were expected, although we were also interested in knowing 
+about the multivariate relationships amongst the three 
+questionnaires in an attempt to better understand its links.
+Method 
+Participants 
+Participants were 928 voluntary students and friends 
+and relatives (396 males and 532 women). Thirty trained 
+students collected the data and received course credit for it.
+The average age was 30.69 ( SD: 11.62; range: 18-77), for 
+males 31.28 ( SD : 11.84; range: 18-77) and for females 30.11 
+(SD : 11.32; range 18-75). Age frequencies for the whole 
+sample were: 18-24 ( M = 19.98 (1.84); n = 316, 34.1%); 
+25-30 ( M= 26.87 (1.70); n= 292, 31.5%); 31-45 ( M= 38.24 
+(4.01); n= 168, 18.1%); and > 45 ( M= 51.42 (4.90); n=152,
+16.4%). There were no significant age differences between 
+male and female. The computed effect size was small ( d =
+0.10; Cohen, 1988; t-test: 1.52, p < 0.13). A total of 19 
+participants were not included in the study because of missing 
+data (over 5 blank responses) and/or at least one poor validity 
+item in accordance with the TCI-R 5-item validity scale 
+that allows for the screening of random or vague responses.
+Measures 
+TCI-R. The TCI-R is a 240-item self-administered 
+questionnaire designed to measure 4 temperaments, Novelty 
+Seeking (NS), Harm Avoidance (HA), Reward Dependence 
+(RD), and Persistence (Ps), and three characters, Self- 
+directedness (SD), Cooperativeness (Co), and Self- 
+transcendence (ST) (Cloninger & Svrakic, 1997). The TCI- 
+R items are listed in random order, with approximately half 
+reversed-scored items. Items of each dimension are grouped 
+into facets, but in this study only wthe 7 dimensions were 
+analyzed. For this study was used a validated Spanish 
+translation of the Temperament and Character Inventory- 
+Revised (TCI-R; Gutierrez-Zotes et al., 2004).
+NEO-FFI-R. The NEO-FFI-R is a revised version of the 
+NEO-FFI. Like the latter, the NEO-FFI-R is a shortened 60- 
+item version (12 per scale) of the NEO-PI-R (Costa & McCrae,
+1992), distributed in five scales: Neuroticism (N), Extraversion 
+(E), Openness (O), Agreeableness (A), and Conscientiousness 
+(C). McCrae and Costa (2004) proposed this revised short 
+version after the best items from a factor analysis. They replaced 
+14 items from the NEO-FFI with items taken from the NEO- 
+PI-R. These new items were selected on the basis of four 
+criteria: 1) to minimize the effects of acquiescence, 2) to increase 
+the correlations with NEO-PI-R factor scores, 3) to diversify 
+item content by selecting items from underrepresented facets,
+and 4) to increase the intelligibility of the items. Internal 
+reliability coefficients of the NEO-FFI-R scales range from 
+0.75 to 0.82. The NEO-FFI-R psychometric properties were 
+replicated in Spanish samples by Aluja, García, Rossier and 
+García (2005), with a good item structure and alpha reliabilities 
+ranging between 0.71 and 0.82.
+ZKPQ-50-CC. This instrument is a 50-item version of 
+the Zuckerman-Kuhlman Personality Questionnaire (Aluja 
+et al., 2006; Zuckerman et al., 1993). This reduced version 
+was obtained from the original 89-items through different 
+procedures of item analysis carried out simultaneously in 
+American, German, Spanish, and Swiss samples. This 
+questionnaire includes only 10 items per scale: Impulsive 
+Sensation Seeking (ImpSS), Neuroticism-Anxiety (N-Anx),
+Aggressiveness-Hostility (Agg-Host), Activity (Act),
+Sociability (Sy). In the present study, the Infrequency ( Inf)
+scale was not further analyzed. The validation study of the 
+ZKPQ-50-CC shows similar psychometric properties to 
+the original ZKPQ in the four countries (Aluja et al., 2006). 
+Statistical analysis 
+Descriptive statistics, frequency distribution values and 
+alpha internal consistency coefficients are shown for each 
+scale from the TCI-R, NEO-FFI-R and ZKPQ-50-CC.
+Pearson product-moment correlations for the different scales 
+of the three instruments were also computed, together with 
+principal components analysis. Additional principal 
+components analysis were also performed including the 
+dimensions of the TCI-R, NEO-FFI-R and el ZKPQ-50- 
+CC and extracting different factor solutions. One factor 
+confirmatory factor analyses were also estimated considering 
+the scales that shared common variance in the 5-factor 
+solution obtained in the principal components analysis.
+Results 
+Descriptive results 
+Table 1 shows means, standard deviations, distribution 
+values and alphas for the analyzed questionnaires. Skewness 
+and Kurtosis values for all questionnaires were close to 
+zero suggesting that normality assumptions were fairly met.
+Alpha internal consistencies in the questionnaire dimensions 
+ranged between 0.63 and 0.89, indicating a fair to good 
+reliability in the three instruments.
+THE FIVE AND SEVEN FACTORS PERSONALITY MODELS 661 
+Correlational and factorial analyses 
+Table 2 shows a correlation matrix amongst the 
+dimensions and facets of the three questionnaires. High 
+correlations above .50 were found between the scales of 
+the different questionnaires. For the TCI-R and ZKPQ-50- 
+CC: NS and ImpSS (0.50), HA and N-Anx 0.58), RD and 
+Sy (0.55), Ps and Act (0.52), SD and N-Anx (-0.52), Co 
+and Agg-Host (-0.44), and in a lesser extent ST and ImpSS 
+(0.30). For the TCI-R and NEO-FFI-R: HA and N (0.67),
+HA and E (-0.50), RD and E (0.52), Ps and C (0.53), SD 
+and N (-0.55), A (0.40) and C (0.58), Co and A (0.63), Co 
+and C (0.40), and ST and O (0.44). Finally, for the ZKPQ- 
+50-CC and NEO-FFI-R: ImpSS and E (0.41), N-Anx and 
+N (0.68), and Agg-Host (-0.43) and A, and Sy and E (0.64).
+The principal component analysis (PCA) with varimax 
+rotation was performed between the TCI-R, NEO-FFI-R, and 
+ZKPQ-50-CC scales. The Kaiser-Meyer-Olkin measure of 
+sample adequacy was .80. With the eigenvalue-one factor 
+extraction criteria, a 5-factor solution was obtained (Kaiser,
+1961). The total explained variance by the five factors in 
+each sample was 71.85%. Table 3 shows the factorial matrix 
+of the 17 scales with the loadings ordered in descending order.
+The first factor was integrated by A, Co and Agg-Host, with 
+secondary loadings in C and SD from other factors. The second 
+factor was composed by N, N-Anx, HA and SD. The third 
+factor was integrated by Sy, E, RD, ImpSS and NS. The fourth 
+factor was integrated by Ps, Act, and C, whereas the fifth 
+and last factor was composed by O and ST (Table 3).
+In order to evaluate the common variance of the five 
+BLANCH AND ALUJA 662 
+Table 1 
+Descriptive and internal consistency of TCI-R, NEO-FFI-R and ZKPQ-50-CC 
+Min           Max        Mean SD Skewness Kurtosis        Alpha 
+NS. Novelty Seeking 60 142 101.95 12.43 .10 .22 .77 
+HA. Harm Avoidance 43 157 97.52 16.44 .10 .16 .86 
+RD. Reward Dependence 53 144 107.72 15.34 –.33 –.06 .85 
+Ps. Persistence 57 168 112.29 18.15 .00 .03 .89 
+SD. Self-directiveness 58 188 143.23 17.89 –.25 .34 .86 
+Co. Cooperativeness 54 179 138.97 16.88 –.77 .59 .88 
+ST. Self-transcendence 31 127 72.71 15.15 .30 .23 .85 
+N. Neuroticism 0 43 20.36 8.15 .23 –.36 .77 
+E. Extraversion 6 47 29.53 7.63 –.35 –.12 .77 
+O. Openness 8 48 28.07 6.97 .19 –.19 .66 
+A. Agreaebleness 6 44 33.82 6.12 –.89 .91 .71 
+C. Conscientiousness 3 48 34.52 7.69 –.53 .00 .81 
+ImpSS. Impulsive Sensation Seeking 0 10 5.61 2.54 –.15 –.81 .72 
+N-Anx. Neuroticism-Anxiety 0 10 3.23 2.63 .64 –.50 .79 
+Agg-Host. Aggressiveness-Hostility 0 10 4.44 2.32 .14 –.59 .63 
+Act. Activity 0 10 4.48 2.59 .06 –.86 .74 
+Sy. Sociability 0 10 6.14 2.47 –.52 –.44 .72 
+Table 2 
+Intercorrelations between TCI-R, NEO-FFI-R and ZKPQ-50-CC 
+ImpSS    N-Anx  Agg-Host    Act        Sy          N           E OA C
+NS. Novelty Seeking .50 .00 .23 –.02 .29 –.04 .30 .20 –.24 –.39 
+HA. Harm Avoidance –.30 .58 .12 –.24 –.29 .67 –.50 –.11 .06 –.16 
+RD. Reward Dependence .18 .02 –.10 .05 .55 –.02 .52 .22 .39 .18 
+Ps. Persistence .15 –.13 –.06 .52 .10 –.16 .39 .19 .02 .53 
+SD. Self-directiveness –.14 –.52 –.31 .10 .11 –.55 .24 .07 .40 .58 
+Co. Cooperativeness –.04 –.19 –.44 –.02 .23 –.24 .30 .29 .63 .40 
+ST. Self-transcendence .30 .17 –.04 .18 .04 .13 .20 .44 –.05 –.04 
+ImpSS. Impulsive Sensation Seeking ————— –.02 .41 .25 –.17 –.22 
+N-Anx. Neuroticism-Anxiety ————— .68 –.24 .01 –.13 –.29 
+Agg-Host. Aggressiveness-Hostility ————— .23 –.02 –.06 –.43 –.23 
+Act. Activity ————— –.10 .30 .02 –.08 .25 
+Sy. Sociability ————— –.18 .64 .10 .11 .00 
+factors obtained in the PCA, five single factor models were 
+analyzed through confirmatory factor analyses including 
+the scales with loadings higher or equal than .50 as observed 
+variables. In the case of the F-IV model with only three 
+observed variables with loadings above .50, this factor was 
+under-identified, therefore, the scale with the highest loading 
+in the same factor found in the EFA (E which had a .33 
+loading in Table 3), was included in the CFA factor analysis.
+Model fit criteria were: the Tucker-Lewis index (TLI) 
+(Bentler & Bonett, 1980; Tucker & Lewis, 1973); the 
+Expected Cross- Validation Index (ECVI) (Bollen, & Long,
+1993; Browne & Cudeck, 1993); the comparative fit index 
+(CFI) (Bentler, 1990); and the Root Mean Square Error of 
+Approximation (RMSEA) (Steiger, 1990). A well-fitting 
+model should ideally have a non-significant χ2 statistic, CFI 
+and TLI values close to 0.95 or greater. Browne and Cudeck 
+(1993) suggest that a value of 0.05 of the RMSEA indicates 
+a close fit and values of up to 0.08 represent reasonable 
+errors of approximation in the population. Table 4 shows 
+model fit indicators for each model, together with the 
+variables included in each model. These outcomes suggest 
+an acceptable fit, indicating that the scales in each model 
+are highly interrelated and define well the specified latent 
+dimension. Notice that some personality variables were 
+integrated in two models, because they had high secondary 
+loadings in other factors in the exploratory factor analysis. 
+THE FIVE AND SEVEN FACTORS PERSONALITY MODELS 663 
+Table 3 
+Five factor Principal Component Analysis of TCI-R, NEO-FFI-R and ZKPQ-50-CC 
+I II                        III IV V
+A. Agreaebleness .83 .01 .14 –.05 –.05 
+Co. Cooperativeness .82 –.13 .27 .01 .17 
+Agg-Host. Aggressiveness-Hostility –.61 .21 .16 .03 –.14 
+N. Neuroticism. –.16 .87 –.07 –.06 .07 
+N-Anx. Neuroticism-Anxiety –.15 .84 –.01 –.03 .11 
+HA. Harm Avoidance .10 .82 –.26 –.19 –.17 
+SD. Self-directiveness .57 –.58 .03 .23 –.11 
+Sy. Sociability .06 –.12 .85 .02 –.05 
+E. Extraversion .07 –.28 .75 .33 .15 
+RD. Reward Dependency .45 .16 .74 .06 .10 
+ImpSS. Impulsive-Sensation Seeking –.38 –.10 .52 .03 .43 
+NS. Novelty Seeking –.44 –.17 .50 –.30 .33 
+Ps. Persistence .08 –.14 .09 .85 .22 
+Act. Activity –.14 –.06 .11 .77 .06 
+C. Conscientiousness .56 –.20 –.06 .60 –.13 
+O. Openness .19 –.03 .10 .00 .80 
+ST. Self-Transcendence –.03 .16 .05 .23 .79 
+Eigenvalue. 4.33 2.40 2.09 1.71 1.19 
+% Variance. 25.45 17.05 12.27 10.06 7.02 
+Note . Factorial loadings equal or higher to .50 in boldface.
+Table 4 
+Goodness of fit indices for each independent factors (One-factor model) of TCI-R, NEO-FFI-R and ZKPQ-50-CC five 
+factor solutioN 
+χ2*                df ECVI              TLI                CFI      RMSEA (90% CI) 
+F-I A, Co, Agg-Host, SD, C 32.26 4 .04 .96 .99 .09 (.05-.13)  
+F-II HA, N-Anx, N, SD 14 2 .03 .98 .99 .08 (.04-.12)  
+F-III Sy, E, RD, ImpSS, NS 35.38 4 .06 .94 .98 .09 (.06-.12)  
+F-IV Ps, Act, C, E 15.54 2 .03 .95 .98 .08 (.04-.12) 
+F-V O, ST, NS, ImpSS 9.16 2 .03 .91 .99 .09 (.04-.15) 
+Note . *The associated p values were always lower than .001. d.f. Degree of freedom; ECVI: Expected 
+Cross-Validation Index. TLI: Tucker-Lewis index; CFI: Comparative Fit Index; RMSEA: root mean square error of approximation 
+and its 90% confidence interval.
+Discussion 
+The relationships amongst the personality models of 
+Cloninger, Costa, and McCrae, and Zuckerman have been 
+reported in different works and cross-cultural context. The 
+current research was designed for check the relationship 
+between the three models simultaneously. 
+The study was done with a sample with a wide age range,
+and with an equivalent proportion of males and females.
+The high inter-correlations amongst the three questionnaires 
+indicate that they might be measuring equivalent constructs.
+Nevertheless, the principal components analyses allow for 
+a better understanding of the associations of the 17 scales,
+which with a high degree of covariation might be explicated 
+in accordance with five personality constructs. 
+The first factor was formed by Agreeableness,
+Cooperativeness, and Aggression-Hostility, and Self-Direction 
+in a lesser extent. This construct might be considered a 
+Socialization dimension. A Neuroticism dimension emerged 
+as the second factor, composed by N from the NEO-FFI-R,
+N-Anx from the ZKPQ-50-CC, and Harm Avoidance from 
+the TCI-R. This dimension could also include Self-Direction 
+from TCI-R. It should be noted though that this last factor 
+load positively in the previous Socialization factor, and in 
+negative in the present Neuroticism factor. The third group 
+of variables which were highly correlated included 
+Extraversion and Sensation Seeking variables, thus, this 
+factor might be named as Extraversion-Sensation Seeking ,
+which was integrated by the ImpSS and Novelty Seeking 
+from the ZKPQ-50-CC and TCI-R, respectively, which have 
+been found to be highly correlated also in past research 
+(Zuckerman & Cloninger, 1996). Besides, the Extraversion 
+(NEO-FFI-R), Sy (ZKPQ-50-CC), and Reward Dependency 
+(TCI-R) scales also loaded into this factor. The fourth factor 
+was integrated by the Persistence scales from the TCI-R,
+Act from the ZKPQ-50-CC, and Conscientiousness from 
+the NEO-FF-R providing a construct that might be labeled 
+as Determination – Activity , although Conscientiousness is 
+also loading in the Socialization factor. The fifth factor was 
+basically integrated by Openness (NEO-FFI-R) and Self- 
+Transcendence (TCI-R) which were highly intercorrelated.
+Besides, the Sensation Seeking, Openness and Extraversion 
+scales were highly intercorrelated in precedent studies (Aluja,
+García, & García, 2003; García, Aluja, García, & Cuevas,
+2005). Furthermore, the one-factor confirmatory factor 
+analyses indicated that the scales forming the five factors 
+shared a relevant amount of variance, suggesting its high 
+intertwining and that they could be measuring in fact 
+equivalent constructs. A potential limitation of the present 
+study is the use of the same sample for both, EFA and CFA.
+An alternative procedure would be to perform an EFA on 
+half of a randomly selected sample, and then, perform the 
+CFA on the other half (Aluja, Kuhlman, & Zuckerman, 2010; 
+Blanch & Aluja, 2009). Nevertheless, the outcomes would 
+be unlikely to differ from the present ones.
+Another limitation of the study is that the sample used 
+in this research is a convenience consisting of students,
+their friends, and their family members, therefore the 
+outcomes of the present study may not be generalized to 
+the population as it has been not contrasted with the census.
+However, sex and age range have been adequately 
+represented in the studied sample.
+The three personality models analyzed in the present 
+study might therefore be measuring very similar personality 
+constructs with different scales. It is clear that the 
+Neuroticism scales, N, N-Anx and HA, are very similar 
+indeed. Extraversion was also defined in the three models 
+(E, Sy, RD), including Sensation Seeking and Novelty 
+Seeking, all of them being traits related with a general 
+Extraversion construct as suggested by Eysenck and 
+Eysenck (1985). In addition, Agreeableness and 
+Conscientiousness from the NEO-FFI-R and in combination 
+with the ZKPQ-50-CC and TCI-R gave rise to two factors 
+which may be named Social Integration . The first is related 
+to friendliness (A and Agg-Host) and cooperation with 
+others, and the other to determination and/or activity. Both 
+were also related with Conscientiousness from the NEO- 
+FFI-R. In addition, both factors resemble the Psychoticism 
+Eysenck factor which included low sociability, lack of 
+empathy, egoism, antisocial behavior or psychopathy 
+(Eysenck, 1991, 1992a, 1992b). The Openness and Self- 
+Transcendence scales were highly related and distinct from 
+the rest of scales groups analyzed, although they would 
+also be close to Extraversion and Sensation Seeking. The 
+present study is the first one to provide a direct comparison 
+of the three instruments measuring the three most important 
+personality models.
+References 
+Aluja, A., García, O., & García, L. F. (2002). A comparative study 
+of Zuckerman’s three structural models for personality throught 
+the NEO-PI-R, ZKPQ-III, EPQ-RS and Goldberg’s 50-bipolar 
+adjectives. Personality and Individual Differences , 33 , 713- 
+725. doi:10.1016/S0191-8869(01)00186-6 
+Aluja, A., García, O., & García, L. F. (2003). Relationships among 
+extraversion, openness to experience, and sensation seeking.
+Personality and Individual Differences, 35, 671-680.
+doi:10.1016/S0191-8869(02)00244-1 
+Aluja, A., García, O., Rossier, J., & García, L. F. (2005).
+Comparison of the NEO-FFI, the NEO-FFI-R and an alternative 
+short version of the NEO-PI-R (NEO-60) in Swiss and Spanish 
+samples. Personality and Individual Differences, 38, 591-604.
+doi:10.1016/j.paid.2004.05.014 
+Aluja, A., Kuhlman, M., & Zuckerman, M. (2010). Development 
+of the Zuckerman-Kuhlman-Aluja Personality Questionnaire 
+(ZKA-P): A factor/facet version of the Zuckerman-Kuhlman 
+Personality Questionnaire (ZKPQ). Journal of Personality 
+Assessment, 92, 416-431. doi:10.1080/00223891.2010.497406 
+BLANCH AND ALUJA 664 
+Aluja, A., Rossier, J., García, L. F., Angleitner, A., Kuhlman, M.,
+& Zuckerman, M. (2006). A cross-cultural shortened form of 
+the ZKPQ (ZKPQ-50-CC) adapted to English, French, German,
+and Spanish languages. Personality and Individual Differences,
+41, 619-628. doi:10.1016/j.paid.2006.03.001 
+Bentler, P. M. (1990). Comparative fit indexes in structural models.
+Psychological Bulletin, 107 , 238-246. doi:10.1037//0033- 
+2909.107.2.238 
+Bentler, P. M., & Bonett, D. G. (1980). Significance tests and 
+goodness of fit in the analysis of covariance structures.
+Psychological Bulletin, 88 , 588-606. doi:10.1037/0033- 
+2909.88.3.588 
+Blanch, A., & Aluja, A. (2009). Validation study of the Spanish 
+Version of the Work-Family Conflict Questionnaire (CCTF).
+Spanish Journal of Psychology . 12 (2), 746-755.
+Bollen, K. A., & Long, J. S. (1993). Testing structural equation 
+models . New York, NY: Sage.
+Browne, M. W., & Cudeck, R. (1993). Alternative ways of assessing 
+model fit. In K. Bollen and J. S. Long (eds.). Testing structural
+equation models (pp. 136-162). London: SAGE.
+Cloninger, C. R. (1986). A unified biosocial theory of personality 
+and its role in the development of anxiety states. Psychiatric 
+Developments, 3 , 167-226.
+Cloninger, C. R. (1987). A systematic method for clinical description 
+and classification of personality variants. Archives of General
+Psychiatry, 44 , 573-588.
+Cloninger, C. R., & Svrakic, D. M. (1997). Integrative 
+psychobiological approach to psychiatric assessment and 
+treatment. Psychiatry, 60, 120-141.
+Cloninger, C. R., Svrakic, D. M., & Przybeck, T. R. (1993). A 
+psychobiological model of temperament and character. Archives 
+of General Psychiatry, 50 , 975-990.
+Cohen, J. (1988). Statistical power analysis for the behavioural
+sciences . New Jersey, NJ: Lawerence Erlbaum Associates,
+Inc.
+Costa Jr., P. T., & McCrae, R. R. (1992). Professional manual:
+Revised NEO personality inventory (NEO-PI-R) and NEO 
+five-factor-inventory (NEO-FFI). Odessa, FL: Psychological 
+Assessment Resources.
+De Fruyt, F., Van De Wiele, L., & Van Heeringen, C. (2000).
+Cloninger’spsychobiological model of Temperament and 
+Character and the Five-Factor model of personality. Personality 
+and Individual Differences, 29, 441-452.
+Digman, J. M. (1990). Personality structure: emergence of the 
+Five-Factor Model. Annual Review of Psychology, 41 , 417- 
+440. doi:10.1146/annurev.ps.41.020190.002221 
+Eysenck, H. J. (1991). Dimensions of personality, 16, 5 or 3?- 
+Criteria for a taxonomic paradigm. Personality and Individual
+Differences, 12, 773-790 . 
+Eysenck, H. J. (1992a). Four ways five factor are not basic.
+Personality and Individual Differences, 13, 667-673.
+doi:10.1016/0191-8869(92)90237-J 
+Eysenck, H. J. (1992b). A replay to Costa and McCrae. P or A 
+and C-the role of theory. Personality and Individual Differences,
+13, 867-868. doi:10.1016/0191-8869(92)90003-8 
+Eysenck, H. J., & Eysenck, M. W. (1985) Personality and 
+Individual Differences. New York, NY: Plenum Press.
+Farmer, F., & Goldberg, L. R. (2008). A psychometric evaluation 
+of the revised temperament and character inventory (TCI-R) 
+and de TCI-140. Psychological Assessment, 20, 281-291.
+doi:10.1037/a0012934 
+García, L. F., Aluja, A., García, O., & Cuevas, L. (2005). Is 
+openness to experience an independent personality dimension? 
+convergent and discriminant validity of the openness domain 
+and its NEO-PI-R facets. Journal of Individual Differences,
+26, 132-138. doi:10.1027/1614-0001.26.3.132 
+Goldberg, L. R. (1981). Language and individual differences: the 
+search for universals in personality lexicons. In L. Wheeler,
+Review of Personality and Social Psychology (Vol. 2, pp. 141- 
+165). Beverly Hills, CA: Sage.
+Goldberg, L. R. (1990). An alternative “description of personality”: 
+the Big Five factor structure. Journal of Personality and Social
+Psychology, 59 , 1216-1229. doi:10.1037//0022-3514.59.6.1216 
+Gutierrez-Zotes, J. A., Bayón, C., Montserrat, C., Valero, J., Labad,
+A., Cloninger, C. R., & Fernandez-Aranda, F. (2004).
+Temperament and Character Inventory Revised (TCI-R).
+Standardization and normative data in a general population 
+sample. Actas Españolas de Psiquiatría, 32 , 8-15.
+Joireman, J., & Kuhlman, D. M. (2004). The Zuckerman-Kuhlman 
+Personality Questionnaire: Origin, development, and validity 
+of a measure to assess an alternative Five-Factor Model of 
+personality. In R. M. Stelmack (Ed.),On the psychobiology 
+of personality: Essays in honor of Marvin Zuckerman (pp.
+49-64). New York, NY: Elsevier Science. doi:10.1016/B978- 
+008044209-9/50005-1 
+Kaiser, H. F. (1961). A note on Guttman’s lower bound for the 
+number of common factors’. British Journal of Statistical
+Psychology, 14 , 1-2.
+Maitland, S. B., Nyberg, L., Bäckman, L., Nilson, L. G., & Adolfsson,
+R. (2009).On the structure of personality: Are there separate 
+temperament and character factors? Personality and Individual
+Differences, 47, 180-184. doi:10.1016/j.paid.2009.02.023 
+McCrae, R. R., Terracciano, A., & 78 Members of the Personality 
+Profiles of Cultures Project (2005). Universal features of 
+personality traits from observer’s perspective: Data from 50 
+cultures. Journal of Personality and Social Psychology, 88,
+547-561. doi:10.1037/0022-3514.88.3.547 
+McCrae, R. R., & Costa, P. T. (1985). Comparison of EPI and 
+psychoticism scales with measures of the five-factor model 
+of personality. Personality and Individual Differences, 6, 587- 
+597. doi:10.1016/0191-8869(85)90008-X 
+McCrae, R. R., & Costa, P. T. (2004). A contemplated revision of 
+the NEO Five-Factor Inventory. Personality and Individual
+Differences, 36 , 587-596. doi:10.1016/S0191-8869(03)00118-1 
+Norman, W. T. (1967). 2800 personality trait descriptors: normative 
+operating characteristics for a university population . Michigan,
+MI: University of Michigan, Department of Psychology.
+Steiger, J. H. (1990). Structural model evaluation and modification: 
+An interval estimation approach. Multivariate Behavioral
+Research, 25 , 173-180. doi:10.1207/s15327906mbr2502_4 
+THE FIVE AND SEVEN FACTORS PERSONALITY MODELS 665 
+Tucker, L. R., & Lewis, C. (1973). A reliability coefficient for 
+maximum likelihood factor analysis. Psychometrika, 38 , 1- 
+10. doi:10.1007/BF02291170 
+Tupes, E. C., & Christal, R. C. (1961).Recurrentpersonality factors 
+based on trait ratings (Tech. Rep. No. ASD-TR-61-97).
+Lackland Air Force Base, TX: US Air Force.
+Zuckerman, M. (2002). Zuckerman-Kuhlman Personality 
+Questionnaire (ZKPQ): An alternative five-factorial model.
+In B. de Raad & M. Perugini (Eds.), Big Five assessment (pp.
+377-396). Göttingen: Hogrefe & Huber Publishers.
+Zuckerman, M. (2008). Zuckerman-Kuhlman Personality 
+Questionnaire (ZKPQ): An operational definition of the 
+Alternative Five Factorial Model of Personality. In G. J.
+Boyle, G. Matthews, & D. H. Saklofske (Eds). The SAGE 
+handbook of personality theory and assessment (Vol. 2,
+pp. 219-238). Thousand Oaks, CA: Sage Publications,
+Inc. 
+Zuckerman, M., & Cloninger, C. R. (1996). Relationships between 
+Cloninger’s, Zuckerman’s, and Eysenck’s dimensions of 
+personality. Personality and Individual Differences, 21, 283- 
+285. doi:10.1016/0191-8869(96)00042-6 
+Zuckerman, M., Kuhlman, D. M., Teta, P., Joireman, J., & Kraft,
+M. (1993). A comparison of three structural models of 
+personality: The big three, the big five, and the alternative 
+five. Journal of Personality and Social Psychology, 65 , 757- 
+768. doi:10.1037/0022-3514.65.4.757 
+Zuckerman, M., Kuhlman, D. M., Thornquist, M., & Kiers, H.
+(1991). Five (or three) robust questionnaire scale factors of 
+personality without culture. Personality and Individual
+Differences, 12, 929-941. doi:10.1016/0191-8869(91)90182-B 
+Received July 12, 2010 
+Revision received December 13, 2010 
+Accepted January 17, 2011 
+BLANCH AND ALUJA 666 

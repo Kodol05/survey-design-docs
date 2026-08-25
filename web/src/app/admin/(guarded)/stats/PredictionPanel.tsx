@@ -7,10 +7,8 @@ import { Note } from "@/components/ui/Note";
 import { formatR, formatRatio } from "@/components/analysis/correlationColor";
 import { GradeTag } from "@/components/analysis/GradeTag";
 import { PeekGap, PeekToggle, usePeek } from "@/components/analysis/PeekList";
-import {
-  COMPOSITE_AXIS,
-  type ResearchPrediction,
-} from "@/lib/admin/researchPrediction";
+import { COMPOSITE_AXIS } from "@/lib/items/types";
+import type { ResearchPrediction } from "@/lib/admin/researchPrediction";
 
 /**
  * 논문 예측 ↔ 실제 대조.
@@ -66,7 +64,8 @@ export function PredictionPanel({
             }}
           >
             {it.axis}
-            {it.fromEstimates && (
+            {/* 묶은 값에는 달지 않는다 — 부실한 것은 조직생활 축이지 평균이 아니다 */}
+            {it.fromEstimates && it.axis !== COMPOSITE_AXIS && (
               <span aria-hidden className="ml-1.5" title="추정 가중치">
                 ⚠
               </span>
@@ -98,58 +97,31 @@ export function PredictionPanel({
       {/*
         접어 둔다 (2026-08-26 사용자 요청). 늘 펼쳐 두면 이 축을 볼 때마다
         같은 문단을 지나쳐야 하는데, **한 번 읽으면 되는 이야기**다.
-        접힌 채로도 제목이 「예측이 가장 어렵다」는 요점을 말한다.
-      */}
-      {/*
-        접어 둔다 (2026-08-26 사용자 요청). 늘 펼쳐 두면 이 축을 볼 때마다
-        같은 문단을 지나쳐야 하는데, **한 번 읽으면 되는 이야기**다.
         접힌 채로도 제목이 요점을 말한다.
 
-        ⚠️ **축마다 사연이 다르다.** 처음에는 조직생활용 문장을 그대로 띄웠는데,
-        「세 능력 평균」을 고르면 「세 능력 평균은 조직시민행동 0.6 + 직무만족
-        0.4를 섞어…」가 되었다. 묶은 값에 추정치가 섞인 이유는 **그 안에
-        조직생활이 들어 있어서**지, 묶은 값을 그렇게 계산해서가 아니다.
+        ⚠️ **묶은 값에는 띄우지 않는다** (2026-08-26 사용자 결정). 셋 중 하나가
+        부실하다는 이야기는 **그 축을 볼 때 할 말**이다. 평균 화면에 같은 경고를
+        또 띄우면 묶은 값 자체가 못 믿을 것처럼 읽히는데, 실제로는 묶으면 축
+        하나하나보다 잘 맞는다.
       */}
-      {cur.fromEstimates && (
+      {cur.fromEstimates && !isComposite && (
         <Note
-          label={
-            isComposite
-              ? `⚠ ${cur.axis}에는 잰 값이 아닌 수치가 섞여 있습니다 — 왜 그런지`
-              : `⚠ ${cur.axis}은 세 축 중 예측이 가장 어렵습니다 — 왜 그런지`
-          }
+          label={`⚠ ${cur.axis}은 예측을 제대로 못 하고 있습니다 — 왜 그런지`}
           className="mb-8"
         >
-          {isComposite ? (
-            <>
-              <p>
-                묶은 값 안에 <strong>조직생활</strong>이 들어 있습니다. 그 축은
-                직접 잰 연구가 하나도 없어 가까운 개념 둘을 섞어{" "}
-                <strong>계산한 값</strong>을 가중치로 쓰고 있고, 그것이 평균에도
-                따라 들어옵니다.
-              </p>
-              <p className="mt-2">
-                대신 셋을 묶으면 축 하나하나의 잡음이 상쇄됩니다. 실제로 크게
-                어긋난 사람이 줄고 평균 어긋남도 작아집니다 — 위 숫자를 축별
-                값과 견줘 보십시오.
-              </p>
-            </>
-          ) : (
-            <>
-              <p>
-                직접 잰 연구가 하나도 없어, 가까운 개념 둘(
-                <strong>조직시민행동</strong> 0.6 + <strong>직무만족</strong>{" "}
-                0.4)을 섞어 <strong>계산한 값</strong>을 가중치로 썼습니다. 잰
-                값이 아닙니다. 게다가 그 계수 자체가{" "}
-                <span className="tabular">0.08~0.10</span>으로 작습니다 —
-                성격으로는 이 능력을 거의 설명하지 못한다는 뜻입니다.
-              </p>
-              <p className="mt-2">
-                <strong>여기 나오는 예측은 참고선으로만 보십시오.</strong> 이
-                축이야말로{" "}
-                <strong>대표님 평가와 맞대 보는 것이 가장 중요합니다.</strong>
-              </p>
-            </>
-          )}
+          <p>
+            <strong>{cur.axis}만 직접 잰 연구가 하나도 없습니다.</strong> 가까운
+            개념 둘(<strong>조직시민행동</strong> 0.6 +{" "}
+            <strong>직무만족</strong> 0.4)을 섞어 <strong>계산한 값</strong>을
+            가중치로 쓰고 있습니다. 잰 값이 아닙니다. 게다가 그 계수 자체가{" "}
+            <span className="tabular">0.08~0.10</span>으로 작습니다 — 성격으로는
+            이 능력을 거의 설명하지 못한다는 뜻입니다.
+          </p>
+          <p className="mt-2">
+            그래서 <strong>이 축의 예측은 틀릴 수 있습니다.</strong>{" "}
+            참고선으로만 보시고, 이 축이야말로{" "}
+            <strong>대표님 평가와 맞대 보는 것이 가장 중요합니다.</strong>
+          </p>
         </Note>
       )}
 

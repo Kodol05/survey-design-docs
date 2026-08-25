@@ -1,4 +1,4 @@
-import { ABILITY_AXES, TRAIT_SCALES } from "@/lib/items/types";
+import { ABILITY_AXES, COMPOSITE_AXIS, TRAIT_SCALES } from "@/lib/items/types";
 import { getCell, loadResearchTable } from "@/lib/research/correlations";
 import { MIN_N } from "@/components/ui/NBadge";
 import type { Person } from "./analysis";
@@ -94,9 +94,6 @@ function corrOf(xs: number[], ys: number[]): number {
   }
   return dx && dy ? num / Math.sqrt(dx * dy) : 0;
 }
-
-/** 세 능력을 묶은 값의 이름. 실제 축이 아니라 만든 값이다 */
-export const COMPOSITE_AXIS = "세 능력 평균";
 
 /**
  * 세 능력을 묶은 값도 같은 방식으로 예측해 본다 (2026-08-26 사용자 요청).

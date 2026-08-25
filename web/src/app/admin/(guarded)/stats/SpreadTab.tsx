@@ -1,7 +1,7 @@
 import { SourcePicker } from "@/components/analysis/SourcePicker";
 import type { AbilitySource } from "@/lib/admin/abilitySource";
 import { CHARACTER, TEMPERAMENT } from "@/components/charts/scale";
-import { ABILITY_AXES } from "@/lib/items/types";
+import { ABILITY_AXES, COMPOSITE_AXIS } from "@/lib/items/types";
 import type { loadPeople, ScaleReliability } from "@/lib/admin/analysis";
 import { abilityComposite } from "@/lib/admin/composite";
 import { spreadOf, type Spread } from "@/lib/admin/spread";
@@ -18,7 +18,7 @@ type People = Awaited<ReturnType<typeof loadPeople>>;
  * 직무능력은 고른 출처를 따른다 — 대표님 평가로 보면 그 값의 분포가 나온다.
  */
 /** 분포 화면에서 묶음 값을 부르는 이름. 실제 척도가 아니라 만든 값이다 */
-const COMPOSITE_LABEL = "세 능력 묶음";
+const COMPOSITE_LABEL = COMPOSITE_AXIS;
 
 export function SpreadTab({
   people,
@@ -40,7 +40,11 @@ export function SpreadTab({
       scale,
       kind,
       people
-        .map((p) => ({ employeeId: p.employeeId, name: p.name, value: pick(p)! }))
+        .map((p) => ({
+          employeeId: p.employeeId,
+          name: p.name,
+          value: pick(p)!,
+        }))
         .filter((x) => typeof x.value === "number"),
     );
 
@@ -61,7 +65,9 @@ export function SpreadTab({
     ...TEMPERAMENT.map((s) => of(s, "temperament", (p) => p.traits[s])),
     ...CHARACTER.map((s) => of(s, "character", (p) => p.traits[s])),
     ...ABILITY_AXES.map((a) => of(a, "ability", (p) => p.abilities[a])),
-    composite ? of(COMPOSITE_LABEL, "ability", (p) => byId.get(p.employeeId)!) : null,
+    composite
+      ? of(COMPOSITE_LABEL, "ability", (p) => byId.get(p.employeeId)!)
+      : null,
   ].filter((x): x is Spread => x !== null);
 
   return (

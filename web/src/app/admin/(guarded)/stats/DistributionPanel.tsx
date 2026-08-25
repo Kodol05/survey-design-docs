@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { DotStrip } from "@/components/analysis/DotStrip";
 import { Note } from "@/components/ui/Note";
+import { COMPOSITE_AXIS } from "@/lib/items/types";
 import type { Spread } from "@/lib/admin/spread";
 import type { ScaleReliability } from "@/lib/admin/analysis";
 
@@ -33,7 +34,7 @@ import type { ScaleReliability } from "@/lib/admin/analysis";
  */
 
 /** 묶어 만든 값의 이름. 요약 문장에서 뺄 때 쓴다 */
-const COMPOSITE = "세 능력 묶음";
+const COMPOSITE = COMPOSITE_AXIS;
 
 const GROUP = {
   temperament: { label: "기질", note: "타고나는 쪽 · TCI 4축" },
