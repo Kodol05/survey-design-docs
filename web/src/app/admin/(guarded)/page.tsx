@@ -5,6 +5,7 @@ import { ButtonLink } from "@/components/ui/Button";
 import { MIN_N } from "@/components/ui/NBadge";
 import { Attendance } from "@/components/charts/Attendance";
 import { ALPHA } from "@/lib/admin/stats";
+import { requireAdmin } from "@/lib/auth/guard";
 import { loadDashboard } from "@/lib/admin/dashboard";
 import { INTERVAL_HOURS, KEEP_COUNT, type Backup } from "@/lib/admin/backup";
 import { TopRelations } from "./TopRelations";
@@ -12,6 +13,19 @@ import { TopRelations } from "./TopRelations";
 export const metadata = { title: "대시보드 — 관리자" };
 
 export default async function AdminHome() {
+  /*
+    ⚠️ **레이아웃의 `requireAdmin`만 믿으면 안 된다** (2026-08-26 발견).
+
+    App Router는 레이아웃과 화면을 **동시에** 그린다. 레이아웃이 로그인
+    화면으로 보내기로 정하는 동안 이 화면은 이미 DB를 읽고 결과를 흘려보낸다.
+    브라우저는 로그인 화면으로 넘어가지만 **데이터는 이미 나간 뒤**다 —
+    `curl http://…/admin` 한 번에 사람 이름과 사원 ID가 그대로 나왔다.
+
+    관리자 화면 여덟 곳 중 여기만 스스로 부르지 않고 있었다. 화면마다
+    자기 자물쇠를 건다.
+  */
+  await requireAdmin();
+
   /*
     읽고 세는 일은 `lib/admin/dashboard.ts`가 한다 (2026-08-25 분리).
     여기는 **받은 것을 그리기만** 한다.
