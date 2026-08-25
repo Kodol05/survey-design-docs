@@ -15,18 +15,24 @@ export const metadata: Metadata = {
  * 저장된 것이 없으면 **관리자 화면만 어둡게** 시작한다 — 숫자와 그래프를
  * 오래 보는 자리라 밝은 바탕이 눈에 부담이 된다. 사원 화면은 밝게 둔다.
  *
+ * **고른 것도 영역별로 따로 기억한다** (2026-08-25). 전에는 한 곳에 저장해서
+ * 관리자에서 어둡게 바꾸면 사원 화면까지 어두워졌다. 두 화면은 하는 일이
+ * 다르므로 취향도 따로 두는 것이 맞다.
+ *
  * `try`로 감싸는 이유는 사생활 보호 모드에서 `localStorage` 접근 자체가
  * 예외를 던지기 때문이다. 그때는 기본값으로 간다.
  */
 const THEME_SCRIPT = `
-try {
-  var saved = localStorage.getItem("survey-theme");
-  var t = saved || (location.pathname.indexOf("/admin") === 0 ? "dark" : "light");
-  document.documentElement.dataset.theme = t;
-} catch (e) {
-  document.documentElement.dataset.theme =
-    location.pathname.indexOf("/admin") === 0 ? "dark" : "light";
-}
+(function () {
+  var admin = location.pathname.indexOf("/admin") === 0;
+  var fallback = admin ? "dark" : "light";
+  try {
+    var saved = localStorage.getItem("survey-theme:" + (admin ? "admin" : "app"));
+    document.documentElement.dataset.theme = saved || fallback;
+  } catch (e) {
+    document.documentElement.dataset.theme = fallback;
+  }
+})();
 `;
 
 export default function RootLayout({

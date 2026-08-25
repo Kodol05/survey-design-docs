@@ -4,8 +4,15 @@ import { useEffect, useState } from "react";
 
 export type Theme = "light" | "dark";
 
-/** 저장 키 — 화면을 옮겨도 고른 것이 따라온다 */
-export const THEME_KEY = "survey-theme";
+/**
+ * 저장 키 — **영역별로 따로 기억한다.**
+ *
+ * 한 곳에 저장하면 관리자에서 어둡게 바꾼 것이 사원 화면까지 따라간다.
+ * 관리자는 숫자를 오래 보는 자리고 사원은 결과를 한 번 읽는 자리라
+ * 편한 밝기가 다르다.
+ */
+const scopeOf = (path: string) => (path.indexOf("/admin") === 0 ? "admin" : "app");
+export const themeKey = (path: string) => `survey-theme:${scopeOf(path)}`;
 
 /**
  * 밝게/어둡게 전환.
@@ -32,7 +39,7 @@ export function ThemeToggle({ className = "" }: { className?: string }) {
     const next: Theme = theme === "dark" ? "light" : "dark";
     document.documentElement.dataset.theme = next;
     try {
-      localStorage.setItem(THEME_KEY, next);
+      localStorage.setItem(themeKey(window.location.pathname), next);
     } catch {
       // 사생활 보호 모드 등에서 막힐 수 있다. 이번 방문에만 적용되고 끝난다
     }

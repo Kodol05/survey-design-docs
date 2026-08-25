@@ -348,6 +348,43 @@ body {
   }
 }
 
+/*
+  ── 첫 화면의 눈금이 그려지는 동작 ──────────────────────────────────
+
+  일곱 개가 위에서부터 차례로, 눈금은 왼쪽에서 오른쪽으로 늘어난다.
+  「자를 긋는」 동작이라 그 화면이 말하려는 것과 맞는다.
+
+  움직임은 여기서만 쓴다. 곳곳에 흩뿌리면 만든 티가 나고, 데이터를 읽는
+  화면에서는 방해가 된다.
+*/
+.reveal {
+  animation: reveal-up 0.5s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+.reveal .rule {
+  transform-origin: left center;
+  animation: draw-rule 0.7s cubic-bezier(0.22, 1, 0.36, 1) both;
+  animation-delay: inherit;
+}
+
+@keyframes reveal-up {
+  from {
+    opacity: 0;
+    transform: translateY(0.5rem);
+  }
+}
+@keyframes draw-rule {
+  from {
+    transform: scaleX(0);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .reveal,
+  .reveal .rule {
+    animation: none;
+  }
+}
+
 :focus-visible {
   outline: 2px solid var(--series-1);
   outline-offset: 2px;
