@@ -40,26 +40,6 @@ export default async function Home() {
 
   return (
     <>
-      {/*
-        밝기 초기화 — **첫 화면이 실제로 그려질 때만.**
-
-        한 번 어둡게 바꾼 사람이 영영 어두운 화면만 보지 않도록 되돌아갈 곳이
-        하나 필요하다. 처음 오는 사람이 보는 자리가 여기다. 사무실 공용 PC라면
-        앞사람이 바꿔 둔 것을 물려받지 않는다는 뜻이기도 하다.
-
-        ⚠️ 전에는 이 일을 최상위 레이아웃이 **주소만 보고** 했다. 그런데
-        로그인한 사람도 `/`에 들르면 이 문서를 받은 뒤 튕겨 나가므로, 보이지도
-        않는 화면을 지나가며 설정이 지워졌다. 위 `redirect`를 지난 자리에서만
-        하면 그 일이 없다.
-
-        `<body>` 맨 앞이라 눈에 보이는 것이 그려지기 전에 끝난다.
-      */}
-      <script
-        dangerouslySetInnerHTML={{
-          __html: `try{localStorage.removeItem("survey-theme:app");document.documentElement.dataset.theme="light"}catch(e){}`,
-        }}
-      />
-
       {/* ── 첫 눈 ── */}
       <section className="relative flex min-h-[100svh] flex-col">
         {/*
