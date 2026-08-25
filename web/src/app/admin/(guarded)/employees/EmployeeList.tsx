@@ -133,7 +133,7 @@ export function EmployeeList({ rows }: { rows: Row[] }) {
 
                 {expanded && r.traits && (
                   <tr className="border-b border-[--border]">
-                    <td colSpan={7} className="bg-[--wash] px-4 py-6">
+                    <td colSpan={7} className="bg-[--wash] px-6 py-8">
                       <Panel row={r} />
                     </td>
                   </tr>
@@ -225,7 +225,7 @@ function Panel({ row }: { row: Row }) {
 
   return (
     <div>
-      <div className="mb-6 flex flex-wrap items-center justify-between gap-4">
+      <div className="mb-10 flex flex-wrap items-center justify-between gap-4">
         <h3 className="text-section-title">{row.name}</h3>
         <ButtonLink href={`/admin/employees/${row.id}`} size="lg">
           상세 보기 →
