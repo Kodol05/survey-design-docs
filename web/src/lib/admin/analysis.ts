@@ -1,21 +1,20 @@
 import { prisma } from "../db";
-import { ABILITY_AXES, ABILITY_AXIS_FROM_DB, TRAIT_SCALES } from "../items/types";
+import {
+  ABILITY_AXES,
+  ABILITY_AXIS_FROM_DB,
+  TRAIT_SCALES,
+} from "../items/types";
 import type { StoredAbilities, StoredTraits } from "../survey/result";
 import { MIN_N } from "@/components/ui/NBadge";
 import { pickBossScores } from "./ratings";
-import {
-  resolveAbilities,
-  type AbilitySource,
-} from "./abilitySource";
+import { resolveAbilities, type AbilitySource } from "./abilitySource";
 import {
   alphaVerdict,
   correlate,
   cronbachAlpha,
   groupDiff,
-  loocv,
   type Correlation,
   type GroupDiff,
-  type LoocvResult,
 } from "./stats";
 
 /**
@@ -48,9 +47,7 @@ export async function loadPeople(
       include: { result: true, qualityFlag: true, employee: true },
     }),
     // 직원 설문만 볼 때는 굳이 읽지 않는다
-    source === "self"
-      ? Promise.resolve([])
-      : prisma.managerRating.findMany(),
+    source === "self" ? Promise.resolve([]) : prisma.managerRating.findMany(),
   ]);
 
   const byPerson = new Map<string, typeof ratings>();
@@ -74,17 +71,16 @@ export async function loadPeople(
       employeeId: s.employeeId,
       name: s.employee.name,
       traits: Object.fromEntries(
-        Object.entries((s.result!.scoresJson ?? {}) as StoredTraits).map(([k, v]) => [
-          k,
-          v.percent,
-        ]),
+        Object.entries((s.result!.scoresJson ?? {}) as StoredTraits).map(
+          ([k, v]) => [k, v.percent],
+        ),
       ),
       abilities: resolveAbilities(
         source,
         Object.fromEntries(
-          Object.entries((s.result!.abilityScoresJson ?? {}) as StoredAbilities).map(
-            ([k, v]) => [k, v.percent],
-          ),
+          Object.entries(
+            (s.result!.abilityScoresJson ?? {}) as StoredAbilities,
+          ).map(([k, v]) => [k, v.percent]),
         ),
         boss.get(s.employeeId) ?? {},
       ),
@@ -126,7 +122,11 @@ export const cellOf = (
 /** 산점도용 좌표. 이름을 같이 주어 점에 올렸을 때 누구인지 보이게 한다. */
 export function scatterPoints(people: Person[], scale: string, axis: string) {
   return people
-    .filter((p) => typeof p.traits[scale] === "number" && typeof p.abilities[axis] === "number")
+    .filter(
+      (p) =>
+        typeof p.traits[scale] === "number" &&
+        typeof p.abilities[axis] === "number",
+    )
     .map((p) => ({
       id: p.employeeId,
       name: p.name,
@@ -174,12 +174,20 @@ export type ScaleReliability = {
  * 못 만들어진 척도의 상관을 열심히 해석하게 된다.
  */
 export async function loadReliability(): Promise<ScaleReliability[]> {
-  const assessment = await prisma.assessment.findFirst({ where: { isActive: true } });
+  const assessment = await prisma.assessment.findFirst({
+    where: { isActive: true },
+  });
   if (!assessment) return [];
 
   const items = await prisma.item.findMany({
     where: { assessmentId: assessment.id, status: "ACTIVE" },
-    select: { id: true, kind: true, scale: true, abilityAxis: true, isReverse: true },
+    select: {
+      id: true,
+      kind: true,
+      scale: true,
+      abilityAxis: true,
+      isReverse: true,
+    },
   });
   const responses = await prisma.response.findMany({
     where: { session: { status: "COMPLETED" } },
@@ -192,7 +200,10 @@ export async function loadReliability(): Promise<ScaleReliability[]> {
     bySession.get(r.sessionId)!.set(r.itemId, r.value);
   }
 
-  const groups = new Map<string, { kind: "trait" | "ability"; itemIds: string[] }>();
+  const groups = new Map<
+    string,
+    { kind: "trait" | "ability"; itemIds: string[] }
+  >();
   for (const it of items) {
     const name =
       it.kind === "TRAIT" ? it.scale! : ABILITY_AXIS_FROM_DB[it.abilityAxis!];
@@ -272,27 +283,31 @@ export function abilitiesByTraitTercile(
   const low = sorted.slice(0, cut);
   const high = sorted.slice(-cut);
   const values = (group: Person[], axis: string) =>
-    group.map((p) => p.abilities[axis]).filter((v): v is number => typeof v === "number");
+    group
+      .map((p) => p.abilities[axis])
+      .filter((v): v is number => typeof v === "number");
   const avg = (group: Person[], axis: string) => {
-    const vs = group.map((p) => p.abilities[axis]).filter((v) => typeof v === "number");
+    const vs = group
+      .map((p) => p.abilities[axis])
+      .filter((v) => typeof v === "number");
     return vs.length ? vs.reduce((a, b) => a + b, 0) / vs.length : NaN;
   };
 
-  return ABILITY_AXES.filter((axis) => people.some((p) => axis in p.abilities)).map(
-    (axis) => {
-      const upper = avg(high, axis);
-      const lower = avg(low, axis);
-      return {
-        axis,
-        upper,
-        lower,
-        diff: upper - lower,
-        upperN: high.length,
-        lowerN: low.length,
-        stat: groupDiff(values(high, axis), values(low, axis)),
-      };
-    },
-  );
+  return ABILITY_AXES.filter((axis) =>
+    people.some((p) => axis in p.abilities),
+  ).map((axis) => {
+    const upper = avg(high, axis);
+    const lower = avg(low, axis);
+    return {
+      axis,
+      upper,
+      lower,
+      diff: upper - lower,
+      upperN: high.length,
+      lowerN: low.length,
+      stat: groupDiff(values(high, axis), values(low, axis)),
+    };
+  });
 }
 
 export type PersonQuality = {

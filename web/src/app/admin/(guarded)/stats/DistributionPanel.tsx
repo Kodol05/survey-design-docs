@@ -158,7 +158,6 @@ export function DistributionPanel({
                 <Row
                   key={s.scale}
                   s={s}
-                  r={reliability[s.scale]}
                   dim={
                     s.kind !== "ability" &&
                     reliability[s.scale]?.verdict === "poor"
@@ -186,7 +185,7 @@ export function DistributionPanel({
   );
 }
 
-function Row({ s, r, dim }: { s: Spread; r?: ScaleReliability; dim: boolean }) {
+function Row({ s, dim }: { s: Spread; dim: boolean }) {
   return (
     <div className="grid gap-x-6 gap-y-2 xl:grid-cols-[9rem_minmax(0,1fr)] xl:items-end">
       <div className="xl:pb-1">

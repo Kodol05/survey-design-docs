@@ -8,7 +8,6 @@ import {
   type Selected,
 } from "@/components/analysis/CorrelationTable";
 import { ScatterPlot, type Point } from "@/components/analysis/ScatterPlot";
-import { WarningBadge } from "@/components/ui/WarningBadge";
 import { formatR } from "@/components/analysis/correlationColor";
 import { GradeTag } from "@/components/analysis/GradeTag";
 

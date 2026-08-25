@@ -17,11 +17,7 @@ import {
   traitAbilityMatrix,
   trendLine,
 } from "@/lib/admin/analysis";
-import type { ScaleReliability } from "@/lib/admin/analysis";
-import {
-  SOURCE_NOTE,
-  type AbilitySource,
-} from "@/lib/admin/abilitySource";
+import { SOURCE_NOTE, type AbilitySource } from "@/lib/admin/abilitySource";
 import { abilityComposite } from "@/lib/admin/composite";
 import { splitsFor } from "@/lib/admin/split";
 import { CorrelationPanel } from "./CorrelationPanel";
@@ -59,7 +55,6 @@ export function MatrixTab({
   matrix,
   source,
   bossCount,
-  reliability,
   clean,
   poorN,
 }: {
@@ -67,7 +62,6 @@ export function MatrixTab({
   matrix: ReturnType<typeof traitAbilityMatrix>;
   source: AbilitySource;
   bossCount: number;
-  reliability: Record<string, ScaleReliability>;
   clean: boolean;
   poorN: number;
 }) {
@@ -77,7 +71,6 @@ export function MatrixTab({
       matrix={matrix}
       source={source}
       bossCount={bossCount}
-      reliability={reliability}
       clean={clean}
       poorN={poorN}
     />
@@ -147,7 +140,6 @@ function InHouseSection({
   matrix,
   source,
   bossCount,
-  reliability,
   clean,
   poorN,
 }: {
@@ -155,7 +147,6 @@ function InHouseSection({
   matrix: ReturnType<typeof traitAbilityMatrix>;
   source: AbilitySource;
   bossCount: number;
-  reliability: Record<string, ScaleReliability>;
   clean: boolean;
   poorN: number;
 }) {
@@ -247,7 +238,9 @@ function InHouseSection({
 
       {/* ── 2절 · 능력마다 어떤 성향이 ── */}
       <div className="mt-20 border-t border-[--border] pt-12">
-        <h2 className="text-section-title mb-2">능력마다 어떤 성향이 뚜렷한가</h2>
+        <h2 className="text-section-title mb-2">
+          능력마다 어떤 성향이 뚜렷한가
+        </h2>
         <p className="text-ink-secondary mb-2 max-w-[56rem]">
           위 표와 같은 값을 능력마다 순위로 늘어놓은 것입니다. 줄을 누르면 점
           분포를 봅니다.
@@ -255,9 +248,9 @@ function InHouseSection({
         <Note label="표와 무엇이 다른지" className="mb-10">
           <p>
             표는 7×3 격자라 「협력 열에서 어느 것이 큰가」를 세로로 훑어야
-            합니다. 여기는 이미 큰 순으로 정렬돼 있고, 줄을 누르면 그 조합의
-            점 분포가 그 자리에서 열립니다. <strong>숫자는 같은 값</strong>이라
-            두 화면이 어긋날 일은 없습니다.
+            합니다. 여기는 이미 큰 순으로 정렬돼 있고, 줄을 누르면 그 조합의 점
+            분포가 그 자리에서 열립니다. <strong>숫자는 같은 값</strong>이라 두
+            화면이 어긋날 일은 없습니다.
           </p>
         </Note>
         <div className="flex flex-col gap-14">
@@ -289,7 +282,6 @@ function InHouseSection({
       )}
 
       <Cautions />
-
     </section>
   );
 }

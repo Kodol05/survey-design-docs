@@ -39,6 +39,7 @@ export default async function AdminHome() {
     relations: top,
     needsReview,
     backups,
+    backupAgeHours,
   } = await loadDashboard();
   const { mean: meanAlpha, poor: poorScales } = alpha;
   const poorNames = poorScales.map((r) => r.scale);
@@ -335,7 +336,7 @@ export default async function AdminHome() {
         <h2 className="text-section-title mb-4 border-b border-[--border] pb-2">
           데이터 백업
         </h2>
-        <BackupCard backups={backups} />
+        <BackupCard backups={backups} hours={backupAgeHours} />
       </section>
     </>
   );
@@ -350,11 +351,15 @@ export default async function AdminHome() {
  * 그게 가장 흔한 사고다. 실질적인 방어는 파일을 서버 밖에 두는 것뿐이라
  * 버튼이 주인공이고 자동 덤프는 그 옆의 참고 사항이다.
  */
-function BackupCard({ backups }: { backups: Backup[] }) {
+function BackupCard({
+  backups,
+  hours,
+}: {
+  backups: Backup[];
+  /** 마지막 백업이 몇 시간 전인지. 한 벌도 없으면 `null` */
+  hours: number | null;
+}) {
   const [latest] = backups;
-  const hours = latest
-    ? (Date.now() - new Date(latest.at).getTime()) / 3_600_000
-    : null;
   const stale = hours === null || hours >= INTERVAL_HOURS * 2;
 
   return (

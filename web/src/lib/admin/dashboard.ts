@@ -70,6 +70,16 @@ export async function loadDashboard() {
     ensureBackup(),
   ]);
   const backups = await listBackups();
+  /*
+    「몇 시간 전인가」는 **여기서 잰다.**
+
+    화면 쪽에서 `Date.now()`를 부르면 그릴 때마다 답이 달라지는 함수를 렌더
+    안에서 쓰는 셈이라, React가 「그리는 도중에 밖의 것을 읽지 말라」고
+    막는다. 읽는 일은 읽는 자리에서 한다.
+  */
+  const backupAgeHours = backups[0]
+    ? (Date.now() - backups[0].at.getTime()) / 3_600_000
+    : null;
 
   const matrix = traitAbilityMatrix(people);
   const alpha = traitAlpha(reliability);
@@ -109,6 +119,7 @@ export async function loadDashboard() {
     alpha,
     relations,
     backups,
+    backupAgeHours,
     /** 응답 신뢰도를 확인해 볼 사람 */
     needsReview: people.filter((p) => p.quality !== "ok"),
   };

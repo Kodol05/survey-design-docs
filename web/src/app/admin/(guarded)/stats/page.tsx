@@ -60,13 +60,14 @@ export default async function StatsPage(props: {
   */
   const clean = sp.clean === "1";
 
-  const [people, reliability, bossCount, personQuality, agreement] = await Promise.all([
-    loadPeople(clean, source),
-    loadReliability(),
-    countRatedEmployees(),
-    loadPersonQuality(),
-    loadRatingCompare(),
-  ]);
+  const [people, reliability, bossCount, personQuality, agreement] =
+    await Promise.all([
+      loadPeople(clean, source),
+      loadReliability(),
+      countRatedEmployees(),
+      loadPersonQuality(),
+      loadRatingCompare(),
+    ]);
   const matrix = traitAbilityMatrix(people);
   // α는 성향 축만 센다 — 대시보드와 같은 함수를 쓴다 (D-93)
   const { mean: meanAlpha, poor } = traitAlpha(reliability);
@@ -105,7 +106,9 @@ export default async function StatsPage(props: {
         />
         <Tile
           label="검사 신뢰도"
-          value={meanAlpha === null ? "—" : meanAlpha.toFixed(2).replace(/^0/, "")}
+          value={
+            meanAlpha === null ? "—" : meanAlpha.toFixed(2).replace(/^0/, "")
+          }
           href="/admin/stats?tab=reliability"
           hint="성향 7축 평균 α"
         />
@@ -113,7 +116,11 @@ export default async function StatsPage(props: {
           label="기준 아래 성향 축"
           value={poorCount}
           href="/admin/stats?tab=reliability"
-          hint={poorCount ? `α ${ALPHA.poor.toFixed(2).replace(/^0/, "")} 아래` : "전부 기준 안"}
+          hint={
+            poorCount
+              ? `α ${ALPHA.poor.toFixed(2).replace(/^0/, "")} 아래`
+              : "전부 기준 안"
+          }
         />
       </div>
 
@@ -140,8 +147,7 @@ export default async function StatsPage(props: {
           matrix={matrix}
           source={source}
           bossCount={bossCount}
-          reliability={byScale}
-            clean={clean}
+          clean={clean}
           poorN={poorN}
         />
       )}

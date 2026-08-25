@@ -5,11 +5,7 @@ import Link from "next/link";
 import { ScatterPlot } from "@/components/analysis/ScatterPlot";
 import { formatR } from "@/components/analysis/correlationColor";
 import { GradeTag } from "@/components/analysis/GradeTag";
-import {
-  PeekGap,
-  PeekToggle,
-  usePeek,
-} from "@/components/analysis/PeekList";
+import { PeekGap, PeekToggle, usePeek } from "@/components/analysis/PeekList";
 import type { ResearchPrediction } from "@/lib/admin/researchPrediction";
 
 /**
@@ -32,11 +28,20 @@ export function PredictionPanel({
 }) {
   const [axis, setAxis] = useState(items[0]?.axis ?? "");
   const cur = items.find((x) => x.axis === axis) ?? items[0];
+
+  /*
+    ⚠️ **훅보다 먼저 빠져나가면 안 된다.**
+
+    전에는 `if (!cur) return null`이 `usePeek` 위에 있었다. 그러면 볼 것이
+    없을 때는 훅이 하나 적게 불린다. 값 출처를 바꿔 `items`가 있다가 없어지면
+    React는 **「지난번보다 훅이 많다」며 화면을 통째로 떨어뜨린다.**
+    훅은 늘 같은 순서로 다 부르고, 빠져나가는 것은 그 뒤에 한다.
+  */
+  const sorted = cur ? [...cur.rows].sort((a, b) => b.gap - a.gap) : [];
+  const peek = usePeek(sorted);
   if (!cur) return null;
 
-  const sorted = [...cur.rows].sort((a, b) => b.gap - a.gap);
   const widest = Math.max(...sorted.map((r) => Math.abs(r.gap)), 1);
-  const peek = usePeek(sorted);
 
   return (
     <div>
@@ -50,7 +55,8 @@ export function PredictionPanel({
             className="rounded-md px-3 py-1.5"
             style={{
               background: it.axis === cur.axis ? "var(--ink)" : "var(--wash)",
-              color: it.axis === cur.axis ? "var(--page)" : "var(--ink-secondary)",
+              color:
+                it.axis === cur.axis ? "var(--page)" : "var(--ink-secondary)",
               fontWeight: it.axis === cur.axis ? 600 : 400,
             }}
           >
@@ -96,14 +102,16 @@ export function PredictionPanel({
             {cur.axis}은 <strong>세 축 중 예측이 가장 어렵습니다</strong>
           </p>
           <p className="text-axis text-ink-secondary leading-relaxed">
-            직접 잰 연구가 하나도 없어, 가까운 개념 둘(<strong>조직시민행동</strong> 0.6
-            + <strong>직무만족</strong> 0.4)을 섞어 <strong>계산한 값</strong>을
-            가중치로 썼습니다. 잰 값이 아닙니다. 게다가 그 계수 자체가{" "}
-            <span className="tabular">.08~.10</span>으로 작습니다 — 성격으로는 이 능력을
-            거의 설명하지 못한다는 뜻입니다.
+            직접 잰 연구가 하나도 없어, 가까운 개념 둘(
+            <strong>조직시민행동</strong> 0.6 + <strong>직무만족</strong> 0.4)을
+            섞어 <strong>계산한 값</strong>을 가중치로 썼습니다. 잰 값이
+            아닙니다. 게다가 그 계수 자체가{" "}
+            <span className="tabular">.08~.10</span>으로 작습니다 — 성격으로는
+            이 능력을 거의 설명하지 못한다는 뜻입니다.
           </p>
           <p className="text-axis text-ink-secondary mt-2 leading-relaxed">
-            <strong>여기 나오는 예측은 참고선으로만 보십시오.</strong> 이 축이야말로{" "}
+            <strong>여기 나오는 예측은 참고선으로만 보십시오.</strong> 이
+            축이야말로{" "}
             <strong>대표님 평가와 맞대 보는 것이 가장 중요합니다.</strong>
           </p>
         </div>
@@ -144,7 +152,8 @@ export function PredictionPanel({
           </p>
           <ul className="flex flex-col">
             {peek.items.map((it) => {
-              if (it.kind === "gap") return <PeekGap key={`g${it.n}`} n={it.n} />;
+              if (it.kind === "gap")
+                return <PeekGap key={`g${it.n}`} n={it.n} />;
               const r = it.row;
               const w = (Math.abs(r.gap) / widest) * 50;
               const up = r.gap >= 0;
@@ -253,9 +262,7 @@ export function PredictionPanel({
             xLabel="논문으로 본 예측"
             yLabel="실제"
           />
-
         </div>
-
       </div>
 
       <p className="text-axis text-ink-muted mt-10">
