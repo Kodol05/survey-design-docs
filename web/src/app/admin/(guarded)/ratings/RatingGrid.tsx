@@ -74,11 +74,22 @@ export function RatingGrid({ rows }: { rows: RatingRow[] }) {
         </div>
       )}
 
-      <ul className="flex flex-col">
+      {/*
+        한 사람이 한 칸 — **구성원 목록과 같은 모양** (2026-08-26 사용자 요청).
+
+        전에는 가는 선 하나로만 나눴다. 한 사람이 세 줄(협력·조직생활·자율적실행)을
+        차지하는데, 그 셋이 한 사람 것인지 어디서 끊기는지가 선 하나로는 잘
+        안 보였다. 테두리로 감싸면 **눈이 사람 단위로 끊어 읽는다.**
+
+        테두리 색·모서리·칸 사이 간격을 구성원 목록과 똑같이 둔다 — 두 화면이
+        같은 것(사람 한 명)을 보여주는데 모양이 다르면 낯설다.
+      */}
+      <ul className="flex flex-col gap-2.5">
         {shown.map((r) => (
           <li
             key={r.id}
-            className="grid items-center gap-x-8 gap-y-4 border-b border-[--border] py-6 lg:grid-cols-[12rem_1fr]"
+            className="grid items-center gap-x-8 gap-y-4 rounded-xl border px-5 py-5 lg:grid-cols-[12rem_1fr]"
+            style={{ borderColor: "var(--border)" }}
           >
             <span className="text-table font-medium">{r.name}</span>
             <div className="flex flex-col gap-3">
