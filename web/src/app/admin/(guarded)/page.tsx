@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { Tile } from "@/components/ui/Tile";
 import { WarningBadge } from "@/components/ui/WarningBadge";
 import { Attendance } from "@/components/charts/Attendance";
 import { ratingProgress } from "@/lib/admin/ratings";
@@ -404,51 +405,6 @@ function Shortcut({
   );
 }
 
-/**
- * 숫자 타일 — `href`를 주면 누를 수 있다.
- *
- * 숫자만 보여주고 끝내면 "37명이 했다는데 누구지?"에서 화면을 다시 뒤져야
- * 한다. 세는 자리에서 바로 명단으로 넘어가는 것이 자연스럽다.
- * 분석 화면의 타일과 같은 규칙을 쓴다.
- */
-function Tile({
-  label,
-  value,
-  hint,
-  href,
-}: {
-  label: string;
-  value: number | string;
-  hint?: string;
-  href?: string;
-}) {
-  const body = (
-    <>
-      <p className="text-axis text-ink-secondary">{label}</p>
-      <p className="mt-1 text-5xl font-semibold">{value}</p>
-      {hint && (
-        <p className="text-axis text-ink-muted mt-2">
-          {hint}
-          {href && <span aria-hidden> →</span>}
-        </p>
-      )}
-    </>
-  );
-  const style = { background: "var(--wash)" };
-  return href ? (
-    <Link
-      href={href}
-      className="block rounded-xl p-6 transition hover:brightness-95"
-      style={style}
-    >
-      {body}
-    </Link>
-  ) : (
-    <div className="rounded-xl p-6" style={style}>
-      {body}
-    </div>
-  );
-}
 
 /**
  * α 표기 — **앞의 0을 뗀다.**
