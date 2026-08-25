@@ -19,13 +19,20 @@ export default async function AdminLayout({ children }: { children: React.ReactN
   return (
     <>
       <header className="border-b border-[--border]">
-        <div className="page-column flex h-16 items-center justify-between">
-          <nav className="flex items-center gap-2">
+        {/*
+          좁은 화면에서 **메뉴가 화면 밖으로 밀려났다** (2026-08-25).
+          다섯 칸에 사용자 영역까지 하면 40rem이 필요한데 폰은 24rem이다.
+
+          두 줄로 쌓고, 메뉴 줄만 가로로 넘길 수 있게 둔다 — 메뉴를 접어
+          숨기면 지금 어느 화면인지 표시(잉크 바탕)가 같이 사라진다.
+        */}
+        <div className="page-column flex min-h-16 flex-col gap-2 py-3 lg:flex-row lg:items-center lg:justify-between lg:gap-4 lg:py-0">
+          <nav className="-mx-1 flex items-center gap-2 overflow-x-auto px-1">
             {NAV.map((n) => (
               <NavItem key={n.href} {...n} />
             ))}
           </nav>
-          <div className="text-axis text-ink-secondary flex items-center gap-4">
+          <div className="text-axis text-ink-secondary flex shrink-0 items-center gap-4">
             <ThemeToggle />
             <span>{me.name}</span>
             <Link href="/admin/password" className="underline">비밀번호</Link>

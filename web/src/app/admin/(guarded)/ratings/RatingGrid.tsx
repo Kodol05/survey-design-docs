@@ -89,7 +89,8 @@ function AxisRow({
         40px짜리가 다닥다닥 붙어 있었다. **누르기 쉬워야 하는 화면**이다 —
         한 사람에 세 번씩 132번을 누른다.
       */}
-      <div className="flex gap-2" style={{ opacity: pending ? 0.6 : 1 }}>
+      {/* 열 칸이 폰 폭을 넘는다. 줄바꿈을 허용하고 칸도 조금 줄인다 */}
+      <div className="flex flex-wrap gap-1.5 sm:gap-2" style={{ opacity: pending ? 0.6 : 1 }}>
         {STEPS.map((v) => {
           const on = score === v;
           return (
@@ -99,7 +100,7 @@ function AxisRow({
               onClick={() => pick(v)}
               aria-pressed={on}
               aria-label={`${axis} ${v}점`}
-              className="tabular text-table size-14 rounded-lg"
+              className="tabular text-table size-12 rounded-lg sm:size-14"
               style={{
                 background: on ? "var(--series-1)" : "var(--wash)",
                 color: on ? "#fff" : "var(--ink-secondary)",

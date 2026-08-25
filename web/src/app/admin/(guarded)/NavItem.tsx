@@ -28,7 +28,7 @@ export function NavItem({
     <Link
       href={href}
       aria-current={on ? "page" : undefined}
-      className="text-table rounded-lg px-4 py-2"
+      className="text-table shrink-0 rounded-lg px-4 py-2 whitespace-nowrap"
       style={{
         background: on ? "var(--ink)" : "transparent",
         color: on ? "var(--page)" : "var(--ink-secondary)",
