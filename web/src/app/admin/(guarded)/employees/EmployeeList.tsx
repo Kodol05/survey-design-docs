@@ -13,6 +13,7 @@ import {
 import { CHARACTER, TEMPERAMENT, abilityColorAt } from "@/components/charts/scale";
 import { QuickRead } from "@/components/analysis/QuickRead";
 import { ButtonLink } from "@/components/ui/Button";
+import { DeleteInline } from "./DeleteInline";
 import { ABILITY_AXES } from "@/lib/items/types";
 import { formatPhone } from "@/lib/auth/phone";
 
@@ -281,6 +282,14 @@ function Panel({ row }: { row: Row }) {
             사내 위치와 관련 성향 축은 상세 보기에 있습니다.
           </p>
         </div>
+      </div>
+
+      {/*
+        삭제는 **맨 아래 오른쪽 구석**에 둔다. 「상세 보기」 버튼은 위쪽에
+        있으니 되돌릴 수 있는 것과 없는 것이 서로 멀리 떨어진다.
+      */}
+      <div className="mt-8 flex justify-end border-t border-[--border] pt-5">
+        <DeleteInline employeeId={row.id} name={row.name} />
       </div>
     </div>
   );
