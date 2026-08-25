@@ -159,12 +159,12 @@ describe("잘못된 입력은 채점하지 않는다", () => {
   });
 });
 
-// ── 실제 문항 114개로 한 번 돌려본다 ────────────────────────────────
+// ── 실제 문항 120개로 한 번 돌려본다 ────────────────────────────────
 // 단위 테스트가 다 통과해도 실제 문항 구성과 안 맞을 수 있다.
 import { loadItemFile } from "../items/load";
 import { ABILITY_AXIS_DB } from "../items/types";
 
-describe("실제 문항 114개", () => {
+describe("실제 문항 120개", () => {
   const file = loadItemFile("data/items/v1.yaml", { strictCount: true });
   const items: ScorableItem[] = file.items.map((i) =>
     i.kind === "trait"
@@ -189,10 +189,10 @@ describe("실제 문항 114개", () => {
     }
   });
 
-  it("성향은 축당 15문항, 직무능력은 축당 3문항", () => {
+  it("성향은 축당 15문항, 직무능력은 축당 5문항", () => {
     const r = scoreAssessment(items, answerAll(items, 4));
     for (const [, s] of Object.entries(r.traits)) expect(s.itemCount).toBe(15);
-    for (const [, s] of Object.entries(r.abilities)) expect(s.itemCount).toBe(3);
+    for (const [, s] of Object.entries(r.abilities)) expect(s.itemCount).toBe(5);
   });
 
   it("전 문항 최고점으로 답해도 역채점 문항 때문에 100%가 되지 않는다", () => {

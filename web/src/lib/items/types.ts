@@ -63,13 +63,19 @@ export type ItemFile = {
   items: Item[];
 };
 
-/** 기대 문항 수 — 00 D-07 */
+/**
+ * 기대 문항 수 — 00 D-07.
+ *
+ * 직무능력을 축당 셋에서 **다섯으로 늘렸다** (2026-08-25). 이 축들은
+ * 형성적 지표라 **구성 요소를 빠짐없이 담는 것**이 중요한데, 셋으로는
+ * 조율·약속·회복 같은 조각이 빠져 있었다 (`data/items/v1.yaml` 참고).
+ */
 export const EXPECTED = {
   trait: 105,
-  ability: 9,
-  total: 114,
+  ability: 15,
+  total: 120,
   /** 능력 하나당 문항 수 */
-  perAbility: 3,
+  perAbility: 5,
   /** 역방향 비율 상·하한. 성격검사의 표준 관행 30~40% (00 §2.3) */
   reverseRatio: [0.25, 0.45] as [number, number],
 } as const;

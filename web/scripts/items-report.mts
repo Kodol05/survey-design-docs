@@ -15,7 +15,7 @@ console.log("");
 for (const a of ABILITY_AXES) {
   const n = items.filter((i) => i.kind === "ability" && i.axis === a).length;
   const mark = n === EXPECTED.perAbility ? "OK " : "   ";
-  console.log(`${mark}${a.padEnd(7)} ${String(n).padStart(2)} / 3`);
+  console.log(`${mark}${a.padEnd(7)} ${String(n).padStart(2)} / ${EXPECTED.perAbility}`);
 }
 const rev = items.filter((i) => i.reverse).length;
 const pairs = items.filter((i) => i.antonymOf).length / 2;

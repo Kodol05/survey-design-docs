@@ -71,7 +71,7 @@ describe("문항 파일 검사", () => {
 
   it("strictCount에서 문항 수가 틀리면 걸린다", () => {
     const p = validateItemFile(base(), { strictCount: true }).map((x) => x.message).join();
-    expect(p).toContain("114개여야 합니다");
+    expect(p).toContain("120개여야 합니다");
   });
 });
 
