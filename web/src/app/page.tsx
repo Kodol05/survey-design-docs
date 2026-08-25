@@ -3,6 +3,14 @@ import { redirect } from "next/navigation";
 import { currentUser } from "@/lib/auth/session";
 import { ButtonLink } from "@/components/ui/Button";
 import { ThemeToggle } from "@/components/ui/ThemeToggle";
+/*
+  ⚠️ 문항 수를 **글자로 박지 않는다.**
+
+  능력 문항을 축당 3→5로 늘려 105+15=120이 되었는데, 첫 화면에는 「114문항」이
+  그대로 남아 있었다 (2026-08-26 발견). 사원이 처음 보는 숫자가 실제와 달랐다.
+  세는 곳은 한 곳이어야 한다.
+*/
+import { EXPECTED } from "@/lib/items/types";
 
 export const metadata = { title: "7차원 성향 설문" };
 
@@ -32,6 +40,26 @@ export default async function Home() {
 
   return (
     <>
+      {/*
+        밝기 초기화 — **첫 화면이 실제로 그려질 때만.**
+
+        한 번 어둡게 바꾼 사람이 영영 어두운 화면만 보지 않도록 되돌아갈 곳이
+        하나 필요하다. 처음 오는 사람이 보는 자리가 여기다. 사무실 공용 PC라면
+        앞사람이 바꿔 둔 것을 물려받지 않는다는 뜻이기도 하다.
+
+        ⚠️ 전에는 이 일을 최상위 레이아웃이 **주소만 보고** 했다. 그런데
+        로그인한 사람도 `/`에 들르면 이 문서를 받은 뒤 튕겨 나가므로, 보이지도
+        않는 화면을 지나가며 설정이 지워졌다. 위 `redirect`를 지난 자리에서만
+        하면 그 일이 없다.
+
+        `<body>` 맨 앞이라 눈에 보이는 것이 그려지기 전에 끝난다.
+      */}
+      <script
+        dangerouslySetInnerHTML={{
+          __html: `try{localStorage.removeItem("survey-theme:app");document.documentElement.dataset.theme="light"}catch(e){}`,
+        }}
+      />
+
       {/* ── 첫 눈 ── */}
       <section className="relative flex min-h-[100svh] flex-col">
         {/*
@@ -47,7 +75,10 @@ export default async function Home() {
         <div
           aria-hidden
           className="absolute inset-0 bg-cover"
-          style={{ backgroundImage: "url(/hero.jpg)", backgroundPosition: "72% center" }}
+          style={{
+            backgroundImage: "url(/hero.jpg)",
+            backgroundPosition: "72% center",
+          }}
         />
         <div
           aria-hidden
@@ -63,7 +94,11 @@ export default async function Home() {
             <span className="text-axis" style={{ color: "#5a5249" }}>
               7차원 성향 설문
             </span>
-            <Link href="/login" className="text-axis underline" style={{ color: "#5a5249" }}>
+            <Link
+              href="/login"
+              className="text-axis underline"
+              style={{ color: "#5a5249" }}
+            >
               로그인
             </Link>
           </header>
@@ -83,7 +118,10 @@ export default async function Home() {
               일곱 갈래로 봅니다
             </h1>
 
-            <p className="text-item mb-12 max-w-[26rem]" style={{ color: "#4a433b" }}>
+            <p
+              className="text-item mb-12 max-w-[26rem]"
+              style={{ color: "#4a433b" }}
+            >
               높고 낮음은 있지만 좋고 나쁨은 없습니다.
             </p>
 
@@ -92,7 +130,7 @@ export default async function Home() {
                 시작하기
               </ButtonLink>
               <p className="text-table" style={{ color: "#5a5249" }}>
-                약 17분 · 114문항
+                약 18분 · {EXPECTED.total}문항
               </p>
             </div>
           </div>
@@ -102,7 +140,9 @@ export default async function Home() {
             className="text-axis pb-10 text-center"
             style={{ color: "#6b6258" }}
           >
-            <span aria-hidden className="block">↓</span>
+            <span aria-hidden className="block">
+              ↓
+            </span>
           </a>
         </div>
       </section>
@@ -140,7 +180,9 @@ export default async function Home() {
           </div>
 
           <div className="mt-12 flex flex-wrap items-center justify-between gap-4 border-t border-[--border] pt-6">
-            <p className="text-axis text-ink-muted">약 17분 · 114문항</p>
+            <p className="text-axis text-ink-muted">
+              약 18분 · {EXPECTED.total}문항
+            </p>
             <ThemeToggle />
           </div>
         </div>

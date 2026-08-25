@@ -6,6 +6,7 @@ import { MIN_N } from "@/components/ui/NBadge";
 import { Attendance } from "@/components/charts/Attendance";
 import { ALPHA } from "@/lib/admin/stats";
 import { requireAdmin } from "@/lib/auth/guard";
+import { EXPECTED } from "@/lib/items/types";
 import { loadDashboard } from "@/lib/admin/dashboard";
 import { INTERVAL_HOURS, KEEP_COUNT, type Backup } from "@/lib/admin/backup";
 import { TopRelations } from "./TopRelations";
@@ -308,7 +309,7 @@ export default async function AdminHome() {
             href="/admin/items"
             title="문항 목록"
             lines={[
-              "실제로 나가는 114문항을 그대로 봅니다",
+              `실제로 나가는 ${EXPECTED.total}문항을 그대로 봅니다`,
               "역채점 여부와 묶음 순서까지",
             ]}
           />

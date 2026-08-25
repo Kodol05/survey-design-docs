@@ -16,7 +16,7 @@ import { deleteEmployeeAction } from "@/lib/admin/actions";
  * 지우는지 헷갈릴 수가 없다.
  *
  * 그래도 **무엇이 사라지는지는 반드시 적는다.** 「정말 지울까요?」만으로는
- * 설문 응답 114개가 같이 간다는 것이 보이지 않는다.
+ * 설문 응답 120개가 같이 간다는 것이 보이지 않는다.
  */
 export function DeleteInline({ employeeId, name }: { employeeId: string; name: string }) {
   const [asking, setAsking] = useState(false);

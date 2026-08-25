@@ -11,7 +11,7 @@ import { deleteEmployeeAction } from "@/lib/admin/actions";
  *
  *  1. 평소에는 접혀 있다 — 다른 버튼 옆에 나란히 두지 않는다
  *  2. 무엇이 지워지는지 이름을 붙여 적는다 — "정말 지울까요?"만으로는
- *     응답 114개가 같이 간다는 것이 안 보인다
+ *     응답 120개가 같이 간다는 것이 안 보인다
  *  3. 이름을 그대로 입력해야 눌린다 — 확인 버튼 한 번은 손이 미끄러진다
  */
 export function DeleteEmployee({ employeeId, name }: { employeeId: string; name: string }) {

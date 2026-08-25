@@ -103,7 +103,7 @@ export type DraftResponse = {
   changedCount: number;
 };
 
-/** 섹션 단위로 저장한다. 문항마다 서버로 보내면 114번 왕복이 된다 (01 §2.6). */
+/** 섹션 단위로 저장한다. 문항마다 서버로 보내면 120번 왕복이 된다 (01 §2.6). */
 export async function saveSection(sessionId: string, drafts: DraftResponse[]) {
   for (const d of drafts) {
     if (!Number.isInteger(d.value) || d.value < 1 || d.value > 7)

@@ -112,7 +112,7 @@ describe("반대 문항", () => {
   });
 });
 
-describe("실제 문항 114개", () => {
+describe("실제 문항 120개", () => {
   const file = loadItemFile("data/items/v1.yaml", { strictCount: true });
   const pairs: AntonymPair[] = file.items
     .filter((i) => i.antonymOf && !i.reverse)

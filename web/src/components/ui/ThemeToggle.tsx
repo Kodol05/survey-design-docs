@@ -1,6 +1,6 @@
 "use client";
 
-import { useSyncExternalStore } from "react";
+import { useEffect, useState } from "react";
 
 export type Theme = "light" | "dark";
 
@@ -31,31 +31,29 @@ export const themeKey = (path: string) => `survey-theme:${scopeOf(path)}`;
  * 밝은 바탕이 눈에 부담이 된다. 사원 화면은 기본이 밝다.
  */
 /*
-  지금 걸린 테마가 어디에 있나 — **`<html>`의 속성**이다.
+  ── `useSyncExternalStore`를 써 봤다가 두고 왔다 (2026-08-26) ──
 
-  깜빡임을 막으려고 `<head>`의 인라인 스크립트가 리액트보다 먼저 걸어 둔다.
-  그래서 이 값은 리액트가 들고 있는 상태가 아니라 **바깥에 있는 값**이다.
+  지금 걸린 테마는 리액트 상태가 아니라 `<html>`의 속성이다. 그러니 「바깥 값을
+  그냥 읽는」 도구가 맞아 보였고, 붙고 나서 한 번 더 그리는 것도 없앨 수 있었다.
+  lint도 그걸 원한다.
 
-  ⚠️ 전에는 `useState(null)` + `useEffect`로 붙고 나서 읽어 왔다. 그러면
-  붙자마자 한 번 더 그리게 되고, 리액트도 「그리는 도중에 상태를 바꾸지
-  말라」고 막는다. `useSyncExternalStore`는 **바깥 값을 그냥 읽는** 도구라
-  이 자리에 맞다 — 효과도, 두 번째 그림도 없다.
+  바꿔 놓고 확인하니 스위치가 안 보였다. **그런데 원래 것으로 되돌려도 똑같이
+  안 보였다** — 시험하던 탭이 배경에 있어서 리액트가 아예 안 붙은 것이었다.
+  즉 **두 방식을 가른 증거가 아니었다.**
+
+  그래서 새 방식이 나쁘다는 근거도, 좋다는 근거도 없다. 근거 없이 바꾸느니
+  **오래 돌아간 쪽을 둔다.** 붙고 나서 한 번 더 그리는 비용은 작은 스위치
+  하나의 렌더 한 번이다. 아래에서 lint를 끄는 것은 그 판단이다.
 */
-const listeners = new Set<() => void>();
-
-const subscribe = (fn: () => void) => {
-  listeners.add(fn);
-  return () => listeners.delete(fn);
-};
-
-const readTheme = (): Theme =>
-  document.documentElement.dataset.theme === "dark" ? "dark" : "light";
-
-/** 서버에서는 무엇이 걸렸는지 알 수 없다. 값을 읽기 전에는 자리만 잡아 둔다 */
-const unknownOnServer = () => null;
-
 export function ThemeToggle({ className = "" }: { className?: string }) {
-  const theme = useSyncExternalStore(subscribe, readTheme, unknownOnServer);
+  const [theme, setTheme] = useState<Theme | null>(null);
+
+  // 서버에서는 무엇이 걸렸는지 알 수 없다. 붙고 나서 실제 값을 읽는다
+  useEffect(() => {
+    const now = document.documentElement.dataset.theme;
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- 위 주석 참고
+    setTheme(now === "dark" ? "dark" : "light");
+  }, []);
 
   const flip = () => {
     const next: Theme = theme === "dark" ? "light" : "dark";
@@ -65,8 +63,7 @@ export function ThemeToggle({ className = "" }: { className?: string }) {
     } catch {
       // 사생활 보호 모드 등에서 막힐 수 있다. 이번 방문에만 적용되고 끝난다
     }
-    // 한 화면에 스위치가 둘 이상 있어도 같이 움직이게 한다
-    for (const fn of listeners) fn();
+    setTheme(next);
   };
 
   const dark = theme === "dark";

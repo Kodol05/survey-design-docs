@@ -9,7 +9,7 @@ import { EmptyState } from "@/components/ui/Card";
 import { requireUser } from "@/lib/auth/guard";
 import { readPairs, type AxisInput } from "@/lib/interpretation/pairs";
 import { TRAIT_SCALES } from "@/lib/items/types";
-import { latestResult, orderedTraits } from "@/lib/survey/result";
+import { inProgress, latestResult, orderedTraits } from "@/lib/survey/result";
 
 export const metadata = { title: "내 결과 — 7차원 성향 설문" };
 
@@ -18,13 +18,36 @@ export default async function MePage() {
   const result = await latestResult(me.id);
 
   if (!result) {
+    /*
+      ⚠️ **하다 만 사람에게 「시작하지 않았다」고 하면 안 된다** (2026-08-26).
+
+      `latestResult`는 끝낸 것만 찾는다. 그래서 105문항 중 여든까지 답한
+      사람이 여기 오면 「아직 응시하지 않으셨습니다 · 설문 시작하기」를 봤다.
+      **답이 날아간 줄 안다.** 실제로는 그대로 있고 이어서 하면 된다.
+
+      누르면 가는 곳은 그대로 `/survey`다 — 원래도 답한 데까지 건너뛴다.
+      바뀌는 것은 **무슨 일이 있었는지 사실대로 말하는 것**뿐이다.
+    */
+    const doing = await inProgress(me.id);
     return (
       <main className="page-column py-20">
         <h1 className="text-screen-title mb-6">내 결과</h1>
-        <EmptyState message="아직 응시하지 않으셨습니다." />
+        {doing ? (
+          <>
+            <EmptyState
+              message={`아직 응시 중입니다 — ${doing.total}문항 중 ${doing.answered}문항 답하셨습니다.`}
+            />
+            <p className="text-ink-muted text-axis mb-8 text-center">
+              답하신 것은 그대로 저장돼 있습니다. 끝내시면 여기에 결과가
+              나옵니다.
+            </p>
+          </>
+        ) : (
+          <EmptyState message="아직 응시하지 않으셨습니다." />
+        )}
         <div className="flex justify-center">
           <ButtonLink href="/survey" size="lg">
-            설문 시작하기
+            {doing ? "이어서 하기" : "설문 시작하기"}
           </ButtonLink>
         </div>
       </main>
@@ -92,7 +115,9 @@ export default async function MePage() {
         className="mb-16 rounded-2xl px-8 py-10 sm:px-10"
         style={{ background: "var(--wash)" }}
       >
-        <p className="text-axis text-ink-secondary mb-1">7차원 성향 설문 결과</p>
+        <p className="text-axis text-ink-secondary mb-1">
+          7차원 성향 설문 결과
+        </p>
         <h1 className="text-screen-title mb-3">{me.name} 님</h1>
         <p className="text-table text-ink-secondary mb-8">
           {result.completedAt?.toLocaleDateString("ko-KR")} 응시
@@ -107,7 +132,10 @@ export default async function MePage() {
             <ul className="flex flex-wrap gap-x-8 gap-y-4">
               {standout.map((t) => (
                 <li key={t.scale}>
-                  <a href={`#${anchor(t.scale)}`} className="flex items-baseline gap-2">
+                  <a
+                    href={`#${anchor(t.scale)}`}
+                    className="flex items-baseline gap-2"
+                  >
                     <span
                       aria-hidden
                       className="size-2.5 translate-y-px rounded-[2px]"
