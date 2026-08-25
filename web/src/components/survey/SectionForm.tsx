@@ -20,25 +20,47 @@ export function SectionForm({
   sectionCount,
   items,
   initialAnswers,
+  savedElsewhere,
+  totalItems,
 }: {
   sessionId: string;
   section: number;
   sectionCount: number;
   items: PublicItem[];
   initialAnswers: Record<string, number>;
+  /** 다른 묶음에 저장된 답 수. 지금 묶음은 빠져 있다 */
+  savedElsewhere: number;
+  /** 설문 전체 문항 수 */
+  totalItems: number;
 }) {
-  const [answers, setAnswers] = useState<Record<string, number>>(initialAnswers);
+  const [answers, setAnswers] =
+    useState<Record<string, number>>(initialAnswers);
   const [error, setError] = useState<string | null>(null);
   const [pending, start] = useTransition();
 
   // 응답시간·수정횟수는 품질 지표의 원자료다. 응시자에게는 알리지 않는다.
   const shownAt = useRef<Record<string, number>>({});
-  const meta = useRef<Record<string, { elapsedMs: number; changedCount: number }>>({});
+  const meta = useRef<
+    Record<string, { elapsedMs: number; changedCount: number }>
+  >({});
   const nodes = useRef<Record<string, HTMLDivElement | null>>({});
 
   for (const it of items) shownAt.current[it.id] ??= Date.now();
 
   const answered = items.filter((i) => answers[i.id] !== undefined).length;
+
+  /*
+    막대는 **문항 단위**로 움직인다 (2026-08-26 사용자 요청).
+
+    전에는 묶음 단위였다. 일곱 묶음이라 한 번 움직이는 데 열일곱 문항이
+    걸리고, 그동안 막대는 꼼짝도 안 한다. **답을 열 개 골라도 화면이
+    「아무 일도 없었다」고 말하는 셈**이었다.
+
+    지금 고르는 중인 것은 아직 서버에 없으므로, 다른 묶음의 저장분에
+    이 화면이 세는 수를 더한다.
+  */
+  const doneAll = savedElsewhere + answered;
+  const pct = totalItems ? Math.round((doneAll / totalItems) * 100) : 0;
   const firstUnanswered = items.find((i) => answers[i.id] === undefined)?.id;
 
   const pick = useCallback(
@@ -47,7 +69,10 @@ export function SectionForm({
       const prev = meta.current[itemId];
       meta.current[itemId] = prev
         ? { elapsedMs: prev.elapsedMs, changedCount: prev.changedCount + 1 }
-        : { elapsedMs: Math.max(0, now - (shownAt.current[itemId] ?? now)), changedCount: 0 };
+        : {
+            elapsedMs: Math.max(0, now - (shownAt.current[itemId] ?? now)),
+            changedCount: 0,
+          };
 
       setAnswers((a) => {
         const next = { ...a, [itemId]: value };
@@ -76,7 +101,10 @@ export function SectionForm({
   function next() {
     if (missing.length) {
       setError(`${missing.length}개 문항이 비어 있습니다`);
-      nodes.current[missing[0].id]?.scrollIntoView({ behavior: "smooth", block: "center" });
+      nodes.current[missing[0].id]?.scrollIntoView({
+        behavior: "smooth",
+        block: "center",
+      });
       return;
     }
     start(async () => {
@@ -110,6 +138,35 @@ export function SectionForm({
 
   return (
     <div className="flex flex-col">
+      {/* 진행률 — 바 + "묶음 N / 7". 퍼센트 숫자와 타이머는 두지 않는다 (01 §2.5) */}
+      <div className="bg-page/95 sticky top-0 z-10 -mx-6 px-6 pt-4 pb-4 backdrop-blur">
+        <div className="mb-2 flex items-baseline justify-between">
+          <h1 className="text-section-title">7차원 성향 설문</h1>
+          <span className="text-axis text-ink-secondary tabular">
+            묶음 {section} / {sectionCount}
+          </span>
+        </div>
+        <div
+          className="h-2 w-full overflow-hidden rounded-full"
+          style={{ background: "var(--grid)" }}
+          role="progressbar"
+          aria-valuenow={doneAll}
+          aria-valuemin={0}
+          aria-valuemax={totalItems}
+          aria-label={`전체 ${totalItems}문항 중 ${doneAll}문항 답함`}
+        >
+          <div
+            className="h-full transition-[width] duration-300"
+            style={{ width: `${pct}%`, background: "var(--series-1)" }}
+          />
+        </div>
+      </div>
+
+      <p className="text-ink-secondary my-12 text-center text-xl">
+        정답이 없습니다. 오래 고민하지 마시고 평소 모습에 가까운 쪽을 골라
+        주세요.
+      </p>
+
       {/*
         진행 상황을 **읽어주는 표시**로도 남긴다 (2026-08-25).
 
@@ -118,8 +175,8 @@ export function SectionForm({
         조용히 읽어준다.
       */}
       <p className="sr-only" role="status" aria-live="polite">
-        {sectionCount}개 묶음 중 {section}번째, {items.length}문항 중 {answered}문항
-        답했습니다.
+        {sectionCount}개 묶음 중 {section}번째, {items.length}문항 중 {answered}
+        문항 답했습니다.
       </p>
 
       {items.map((item, idx) => {
@@ -135,7 +192,8 @@ export function SectionForm({
           >
             {/* 답한 문항인지 아직인지도 읽어준다. 화면에서는 흐리기로 표시한다 */}
             <span className="sr-only">
-              {items.length}문항 중 {idx + 1}번째{done ? ", 답함" : ", 아직 답하지 않음"}
+              {items.length}문항 중 {idx + 1}번째
+              {done ? ", 답함" : ", 아직 답하지 않음"}
             </span>
             {/* 글자만 읽기 폭으로 제한한다. 한 줄 40~50자를 넘기면 다음 줄
                 첫 글자를 찾느라 눈이 헤맨다 (01 §2.3). 아래 척도 줄은 글이
@@ -174,7 +232,11 @@ export function SectionForm({
       })}
 
       {error && (
-        <p role="alert" className="mt-6 text-center" style={{ color: "var(--status-critical)" }}>
+        <p
+          role="alert"
+          className="mt-6 text-center"
+          style={{ color: "var(--status-critical)" }}
+        >
           {error}
         </p>
       )}
@@ -184,7 +246,12 @@ export function SectionForm({
           {answered} / {items.length}
         </p>
         {/* 이 화면의 유일한 동작이라 크기를 한 단 더 준다 */}
-        <Button size="lg" onClick={next} disabled={pending} className="min-w-72">
+        <Button
+          size="lg"
+          onClick={next}
+          disabled={pending}
+          className="min-w-72"
+        >
           {pending ? "저장 중…" : isLast ? "제출하고 결과 보기" : "다음 묶음"}
         </Button>
       </div>

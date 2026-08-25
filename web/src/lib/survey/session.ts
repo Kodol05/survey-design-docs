@@ -49,7 +49,10 @@ export async function activeAssessment() {
     where: { isActive: true },
     orderBy: { version: "desc" },
   });
-  if (!a) throw new Error("활성 문항 세트가 없습니다. npm run db:seed 를 먼저 실행하세요");
+  if (!a)
+    throw new Error(
+      "활성 문항 세트가 없습니다. npm run db:seed 를 먼저 실행하세요",
+    );
   return a;
 }
 
@@ -79,7 +82,9 @@ export async function getOrCreateSession(employeeId: string) {
 
 /** 한 섹션의 문항. 응답한 값도 같이 준다 (이어하기). */
 export async function getSection(sessionId: string, section: number) {
-  const s = await prisma.testSession.findUniqueOrThrow({ where: { id: sessionId } });
+  const s = await prisma.testSession.findUniqueOrThrow({
+    where: { id: sessionId },
+  });
   const items = await prisma.item.findMany({
     where: { assessmentId: s.assessmentId, section, status: "ACTIVE" },
     orderBy: { orderNo: "asc" },
@@ -102,6 +107,30 @@ export type DraftResponse = {
   elapsedMs: number;
   changedCount: number;
 };
+
+/**
+ * 이 응시가 **전체에서 어디까지 왔는지** (2026-08-26 사용자 요청).
+ *
+ * 전에는 막대가 묶음 단위로만 움직였다. 일곱 묶음이라 **한 번 움직이는 데
+ * 열일곱 문항**이 걸리고, 그동안 막대는 꼼짝도 안 한다. 답을 열 개 골라도
+ * 화면이 「아무 일도 없었다」고 말하는 셈이다.
+ *
+ * ⚠️ `saved`는 **저장된 것만** 센다. 지금 묶음에서 고르는 중인 것은 아직
+ * 서버에 없다 — 그건 화면이 자기 상태로 세서 더한다. 그래서 이 값은
+ * **지금 묶음을 뺀 나머지**를 세도록 화면 쪽에서 빼고 쓴다.
+ */
+export async function sessionProgress(sessionId: string) {
+  const s = await prisma.testSession.findUnique({
+    where: { id: sessionId },
+    select: { assessmentId: true, _count: { select: { responses: true } } },
+  });
+  if (!s) return { saved: 0, total: 0 };
+
+  const total = await prisma.item.count({
+    where: { assessmentId: s.assessmentId, status: "ACTIVE" },
+  });
+  return { saved: s._count.responses, total };
+}
 
 /** 섹션 단위로 저장한다. 문항마다 서버로 보내면 120번 왕복이 된다 (01 §2.6). */
 export async function saveSection(sessionId: string, drafts: DraftResponse[]) {
@@ -126,7 +155,9 @@ export async function saveSection(sessionId: string, drafts: DraftResponse[]) {
 
 /** 아직 답하지 않은 문항이 있는 첫 섹션. 전부 답했으면 null. */
 export async function firstUnansweredSection(sessionId: string) {
-  const s = await prisma.testSession.findUniqueOrThrow({ where: { id: sessionId } });
+  const s = await prisma.testSession.findUniqueOrThrow({
+    where: { id: sessionId },
+  });
   for (let section = 1; section <= SECTION_COUNT; section++) {
     const total = await prisma.item.count({
       where: { assessmentId: s.assessmentId, section, status: "ACTIVE" },

@@ -3,7 +3,11 @@ import { EmptyState } from "@/components/ui/Card";
 import { Note } from "@/components/ui/Note";
 import { prisma } from "@/lib/db";
 import { requireAdmin } from "@/lib/auth/guard";
-import { ABILITY_AXIS_FROM_DB, TRAIT_SCALES } from "@/lib/items/types";
+import {
+  ABILITY_AXES,
+  ABILITY_AXIS_FROM_DB,
+  TRAIT_SCALES,
+} from "@/lib/items/types";
 import { CHARACTER, TEMPERAMENT } from "@/components/charts/scale";
 
 export const metadata = { title: "문항 목록 — 관리자" };
@@ -57,7 +61,20 @@ export default async function ItemsPage(props: {
     { label: "직무능력", note: "우리가 만든 3축", of: null },
   ];
 
-  const picked = TRAIT_SCALES.includes(scale as never) ? scale! : null;
+  /*
+    ⚠️ **직무능력 칩이 눌려도 아무 일이 없었다** (2026-08-26 사용자 발견).
+
+    받아들이는 이름을 `TRAIT_SCALES`로만 봤는데, 거기에는 성향 7축밖에 없다.
+    직무능력 세 축은 `ABILITY_AXES`에 있어서 `?scale=협력`이 통째로 버려졌고,
+    **칩은 멀쩡히 그려지는데 눌러도 목록이 그대로**였다. 고르개가 있으면
+    눌린다고 믿는다 — 안 되면 화면이 고장 난 것으로 보인다.
+
+    거르는 쪽(`named`)은 처음부터 두 갈래를 다 다루고 있었다. 받는 문턱만
+    한쪽을 몰랐던 것이다.
+  */
+  const known = (n: string) =>
+    TRAIT_SCALES.includes(n as never) || ABILITY_AXES.includes(n as never);
+  const picked = scale && known(scale) ? scale : null;
   const shown = picked ? items.filter((i) => named(i) === picked) : items;
 
   const reverseCount = items.filter((i) => i.isReverse).length;

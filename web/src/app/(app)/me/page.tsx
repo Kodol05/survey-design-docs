@@ -86,7 +86,7 @@ export default async function MePage() {
     머리 영역에 올릴 두드러진 축.
 
     가운데 범위(40~60)는 뺀다 — 「이런 사람이다」가 아니라 「이 축으로는
-    설명하기 어렵다」는 뜻이라, 요약에 올리면 없는 특징을 만들어낸다.
+    양쪽을 다 가지고 있다」는 뜻이라, 순위를 매기는 요약에는 올리지 않는다.
     관리자 화면의 「한눈에」와 같은 규칙이다.
   */
   const standout = traits
@@ -152,7 +152,8 @@ export default async function MePage() {
           </div>
         ) : (
           <p className="text-table text-ink-secondary">
-            일곱 축이 모두 가운데 범위입니다. 특별히 두드러지는 쪽이 없습니다.
+            일곱 축이 모두 가운데 범위입니다. 어느 축에서도 한쪽으로 크게 기울지
+            않아, 상황에 따라 양쪽을 골라 쓰는 편입니다.
           </p>
         )}
       </header>

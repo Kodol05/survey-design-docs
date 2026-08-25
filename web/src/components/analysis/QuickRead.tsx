@@ -15,13 +15,18 @@ const LIMIT = 3;
  * **근거 없는 인물평이 된다.** 축별 양극 서술은 점수와 무관하게 늘 같은
  * 문장이라, 여기서 하는 일은 "어느 쪽 문장을 고를지"뿐이다.
  *
- * ## 가운데는 말하지 않는다
+ * ## 가운데 축은 여기 올리지 않는다
  *
- * 40~60(D-26) 안에 든 축은 아예 빼고 **몇 개가 가운데인지만** 적는다.
- * 이 구간은 "이 사람은 중간이다"가 아니라 **두드러지지 않는다**는 뜻이고,
- * 거기에 서술을 붙이면 없는 특징을 만들어내게 된다.
+ * 40~60(D-26) 안에 든 축은 빼고 **몇 개가 가운데인지만** 적는다. 이 칸은
+ * **가장 두드러지는 것부터** 보여주는 자리라, 기운 축과 안 기운 축을 같이
+ * 올리면 무엇이 이 사람을 가르는지가 흐려진다.
  *
- * 일곱 축이 다 가운데면 그렇다고 적는다. 그것도 정보다.
+ * ⚠️ 「가운데는 말할 것이 없다」는 뜻이 **아니다** (2026-08-26 바로잡음).
+ * 가운데는 양쪽을 다 가지고 있다는 뜻이고, 그 이야기는 아래 축별 서술이
+ * 한다 (`lib/interpretation/bands.ts`). 여기서 빼는 이유는 **순위를 매기는
+ * 자리**이기 때문이지 내용이 없어서가 아니다.
+ *
+ * 일곱 축이 다 가운데면 그것도 하나의 모습이므로 그렇게 적는다.
  */
 export function QuickRead({ traits }: { traits: Record<string, number> }) {
   const standout = TRAIT_SCALES.filter((s) => typeof traits[s] === "number")
@@ -39,7 +44,8 @@ export function QuickRead({ traits }: { traits: Record<string, number> }) {
 
       {shown.length === 0 ? (
         <p className="text-ink-secondary leading-relaxed">
-          일곱 축이 모두 가운데 범위입니다. 특별히 두드러지는 쪽이 없습니다.
+          일곱 축이 모두 가운데 범위입니다. 어느 축에서도 한쪽으로 크게 기울지
+          않아, 상황에 따라 양쪽을 골라 쓰는 편입니다.
         </p>
       ) : (
         <ul className="flex flex-col gap-3">
@@ -67,7 +73,9 @@ export function QuickRead({ traits }: { traits: Record<string, number> }) {
       {shown.length > 0 && (
         <p className="text-axis text-ink-muted mt-4 leading-snug">
           {standout.length > LIMIT && (
-            <>두드러지는 축 {standout.length}개 중 위 {LIMIT}개입니다. </>
+            <>
+              두드러지는 축 {standout.length}개 중 위 {LIMIT}개입니다.{" "}
+            </>
           )}
           {middle > 0 && <>나머지 {middle}개 축은 가운데 범위입니다.</>}
         </p>

@@ -7,6 +7,7 @@ import {
   firstUnansweredSection,
   getOrCreateSession,
   getSection,
+  sessionProgress,
 } from "@/lib/survey/session";
 
 export const metadata = { title: "응시 — 7차원 성향 설문" };
@@ -21,7 +22,9 @@ export default async function SurveyPage(props: {
   const asked = Number(raw);
   const resume = (await firstUnansweredSection(session.id)) ?? SECTION_COUNT;
   const section =
-    Number.isInteger(asked) && asked >= 1 && asked <= SECTION_COUNT ? asked : resume;
+    Number.isInteger(asked) && asked >= 1 && asked <= SECTION_COUNT
+      ? asked
+      : resume;
 
   /*
     ⚠️ **중간에 화면을 끊지 않는다** (2026-08-25 사용자 결정).
@@ -37,34 +40,19 @@ export default async function SurveyPage(props: {
   const { items, answers } = await getSection(session.id, section);
   if (!items.length) redirect("/me");
 
-  const pct = Math.round(((section - 1) / SECTION_COUNT) * 100);
+  /*
+    막대는 **문항 단위로** 움직인다 (2026-08-26 사용자 요청). 그래서 답 상태를
+    쥐고 있는 `SectionForm`이 머리말째로 그린다 — 서버에서 그리면 묶음을
+    넘길 때만 움직인다.
+
+    지금 묶음에 저장된 답은 빼고 넘긴다. 화면이 자기 상태로 다시 세서
+    더하므로, 안 빼면 두 번 세게 된다.
+  */
+  const { saved, total } = await sessionProgress(session.id);
+  const savedElsewhere = saved - Object.keys(answers).length;
 
   return (
     <main className="mx-auto w-full max-w-[92rem] px-6">
-      {/* 진행률 — 바 + "묶음 N / 7". 퍼센트 숫자와 타이머는 두지 않는다 (01 §2.5) */}
-      <div className="sticky top-0 z-10 -mx-6 bg-page/95 px-6 pt-4 pb-4 backdrop-blur">
-        <div className="mb-2 flex items-baseline justify-between">
-          <h1 className="text-section-title">7차원 성향 설문</h1>
-          <span className="text-axis text-ink-secondary tabular">
-            묶음 {section} / {SECTION_COUNT}
-          </span>
-        </div>
-        <div
-          className="h-2 w-full overflow-hidden rounded-full"
-          style={{ background: "var(--grid)" }}
-          role="progressbar"
-          aria-valuenow={section}
-          aria-valuemin={1}
-          aria-valuemax={SECTION_COUNT}
-          aria-label={`전체 ${SECTION_COUNT}묶음 중 ${section}번째`}
-        >
-          <div
-            className="h-full transition-[width] duration-300"
-            style={{ width: `${pct}%`, background: "var(--series-1)" }}
-          />
-        </div>
-      </div>
-
       {/*
         묶음을 넘겨 왔으면 남은 개수를 **화면 가운데 잠깐** 띄운다.
         화면 위에 떠 있는 것이라 이 자리가 본문 흐름을 밀지 않는다.
@@ -77,10 +65,6 @@ export default async function SurveyPage(props: {
         />
       )}
 
-      <p className="text-ink-secondary my-12 text-center text-xl">
-        정답이 없습니다. 오래 고민하지 마시고 평소 모습에 가까운 쪽을 골라 주세요.
-      </p>
-
       <SectionForm
         key={section}
         sessionId={session.id}
@@ -88,6 +72,8 @@ export default async function SurveyPage(props: {
         sectionCount={SECTION_COUNT}
         items={items}
         initialAnswers={answers}
+        savedElsewhere={savedElsewhere}
+        totalItems={total}
       />
     </main>
   );
