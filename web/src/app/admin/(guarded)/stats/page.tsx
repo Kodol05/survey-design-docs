@@ -45,10 +45,22 @@ import { spreadOf, type Spread } from "@/lib/admin/spread";
 
 export const metadata = { title: "분석 — 관리자" };
 
+/*
+  탭 순서 — **우리 데이터 → 바깥과 맞대기 → 사람** (2026-08-25 사용자 결정).
+
+    직무능력과 기질·성격   우리 데이터 안의 관계. 이 화면의 뼈대
+    예측 대 실제          논문 값과 맞대 본다
+    분포                  우리 사람들이 어떻게 퍼져 있나
+    평가 대조             대표님이 보시는 것과 맞대 본다
+    검사 신뢰도           문항이 제대로 만들어졌나
+
+  「예측 대 실제」를 「분포」 앞으로 올렸다 — 앞의 두 탭이 **바깥 기준과
+  맞대는 이야기**로 이어지고, 분포부터는 우리 안을 들여다보는 이야기다.
+*/
 const TABS = [
   { key: "matrix", label: "직무능력과 기질·성격" },
-  { key: "spread", label: "분포" },
   { key: "prediction", label: "예측 대 실제" },
+  { key: "spread", label: "분포" },
   { key: "agreement", label: "평가 대조" },
   { key: "reliability", label: "검사 신뢰도" },
 ] as const;

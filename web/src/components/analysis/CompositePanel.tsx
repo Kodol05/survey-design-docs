@@ -1,4 +1,5 @@
 import { formatR } from "./correlationColor";
+import { Note } from "../ui/Note";
 import { SplitHeadline, SplitList } from "./SplitPanel";
 import type { Point } from "./ScatterPlot";
 import type { Split } from "@/lib/admin/split";
@@ -52,29 +53,39 @@ export function CompositePanel({
         <SplitList splits={splits} scatter={scatter} trends={trends} />
       </div>
 
-      {/* ── 해설은 표 아래 ── */}
-      <div className="mt-8 grid gap-x-14 gap-y-6 xl:grid-cols-[minmax(0,1fr)_minmax(0,26rem)] xl:items-start">
-        <div className="text-axis text-ink-secondary flex flex-col gap-2 leading-relaxed">
-          <p>
-            <strong>어떻게 잰 것인지</strong> — 협력·조직생활·자율적 실행{" "}
-            <strong>세 값의 평균</strong>을 낸 다음, 성향 축마다{" "}
-            <strong>높은 3분의 1</strong>과 <strong>낮은 3분의 1</strong>로
-            갈라 그 평균을 견줍니다. 절반으로 자르면 가운데 애매한 사람들이
-            섞여 차이가 흐려집니다.
+      {/*
+        **해설은 접어 둔다** (2026-08-25 사용자 요청).
+
+        어떻게 잰 것인지·왜 물음표가 붙는지·묶어도 되는지 — 셋 다 필요한
+        말인데 **늘 펴 두면 표보다 설명이 길어진다.** 처음 한 번 읽으면
+        되는 것들이라 접고, 궁금할 때 누른다.
+
+        접힌 줄에 무엇에 대한 설명인지는 남는다 — 「설명 보기」처럼 내용
+        없는 말은 쓰지 않는다.
+      */}
+      <div className="mt-6 flex flex-col gap-2">
+        <Note label="어떻게 잰 것인지">
+          <p className="mb-2">
+            협력·조직생활·자율적 실행 <strong>세 값의 평균</strong>을 낸 다음,
+            성향 축마다 <strong>높은 3분의 1</strong>과{" "}
+            <strong>낮은 3분의 1</strong>로 갈라 그 평균을 견줍니다. 절반으로
+            자르면 가운데 애매한 사람들이 섞여 차이가 흐려집니다.
           </p>
           <p>
             <strong>「높을수록 ?」는 아직 확정이 아니라는 뜻</strong>입니다.
             무리마다 <span className="tabular">{splits[0]?.groupN ?? 0}</span>
             명뿐이라 관계가 없어도 몇 점 차이는 그냥 납니다.
           </p>
-        </div>
+        </Note>
 
-        <div>
-          <p className="text-axis text-ink-muted mb-2">평균을 낼 만한가</p>
+        <Note label="평균을 낼 만한가">
           <ul className="mb-3 flex flex-col gap-1.5">
             {c.pairs.map((p) => (
-              <li key={`${p.a}${p.b}`} className="text-axis flex items-center gap-3">
-                <span className="text-ink-secondary w-[11rem] shrink-0">
+              <li
+                key={`${p.a}${p.b}`}
+                className="flex items-center gap-3"
+              >
+                <span className="w-[11rem] shrink-0">
                   {p.a} <span className="text-ink-muted">×</span> {p.b}
                 </span>
                 <span className="block w-full max-w-[7rem] shrink">
@@ -86,7 +97,7 @@ export function CompositePanel({
               </li>
             ))}
           </ul>
-          <p className="text-axis text-ink-secondary leading-relaxed">
+          <p>
             세 능력이 서로 같이 움직여야 평균이 뜻을 갖습니다. 묶으면{" "}
             {c.alpha !== null && (
               <strong
@@ -113,7 +124,7 @@ export function CompositePanel({
               명만 셉니다.
             </span>
           </p>
-        </div>
+        </Note>
       </div>
     </div>
   );
