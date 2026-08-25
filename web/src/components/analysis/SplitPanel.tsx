@@ -1,6 +1,10 @@
+"use client";
+
+import { useState } from "react";
 import { CHARACTER } from "../charts/scale";
 import { subjectParticle } from "./correlationWords";
 import { DivergingBar } from "./DivergingBar";
+import { ScatterPlot, type Point } from "./ScatterPlot";
 import type { Split } from "@/lib/admin/split";
 
 /**
@@ -29,11 +33,19 @@ const MIN_FULL = 10;
 
 export function SplitList({
   splits,
-  dim = false,
+  scatter,
+  trends,
+  target = "직무능력 평균",
 }: {
   splits: Split[];
-  dim?: boolean;
+  /** `축이름` → 점. 줄을 눌렀을 때 그린다 */
+  scatter?: Record<string, Point[]>;
+  trends?: Record<string, { x: number; y: number }[] | null>;
+  /** 세로축 이름 */
+  target?: string;
 }) {
+  const [open, setOpen] = useState<string | null>(null);
+
   if (splits.length === 0)
     return (
       <p className="text-ink-muted text-axis">
@@ -44,11 +56,23 @@ export function SplitList({
   const full = Math.max(MIN_FULL, ...splits.map((s) => Math.abs(s.diff)));
 
   return (
-    <ul className="flex flex-col" style={{ opacity: dim ? 0.55 : 1 }}>
-      {splits.map((s, i) => (
-          <li
-            key={s.scale}
-            className="grid grid-cols-[minmax(0,12rem)_minmax(0,1fr)_4rem_7rem] items-center gap-x-5 border-b border-[--border] py-2.5 last:border-0"
+    <ul className="flex flex-col">
+      {splits.map((s, i) => {
+        const expanded = open === s.scale;
+        return (
+          <li key={s.scale} className="border-b border-[--border] last:border-0">
+          <div
+            role="button"
+            tabIndex={0}
+            aria-expanded={expanded}
+            onClick={() => setOpen(expanded ? null : s.scale)}
+            onKeyDown={(e) => {
+              if (e.key === "Enter" || e.key === " ") {
+                e.preventDefault();
+                setOpen(expanded ? null : s.scale);
+              }
+            }}
+            className="-mx-2 grid cursor-pointer grid-cols-[minmax(0,12rem)_minmax(0,1fr)_4rem_7rem_1.25rem] items-center gap-x-5 rounded-lg px-2 py-2.5 hover:bg-[--wash]"
           >
             <span className="flex items-baseline gap-2">
               <span
@@ -96,9 +120,98 @@ export function SplitList({
                 </>
               )}
             </span>
+
+            <span aria-hidden className="text-ink-muted text-right">
+              {expanded ? "▾" : "▸"}
+            </span>
+          </div>
+
+          {expanded && (
+            <SplitDetail
+              s={s}
+              target={target}
+              points={scatter?.[s.scale] ?? []}
+              trend={trends?.[s.scale] ?? null}
+            />
+          )}
           </li>
-        ))}
+        );
+      })}
     </ul>
+  );
+}
+
+/**
+ * 한 줄을 펼쳤을 때 — **점 분포와 짧은 해설.**
+ *
+ * 위 절과 같은 방식이다. 다만 세로축이 능력 하나가 아니라 **세 능력의
+ * 평균**이라, 점 하나가 「그 사람의 평균」이다.
+ *
+ * 무리를 갈라 본 값(위 막대)과 점 전체(이 그림)는 **같은 데이터를 다르게
+ * 본 것**이다. 막대는 양끝 3분의 1만 쓰고, 점은 다 쓴다.
+ */
+function SplitDetail({
+  s,
+  target,
+  points,
+  trend,
+}: {
+  s: Split;
+  target: string;
+  points: Point[];
+  trend: { x: number; y: number }[] | null;
+}) {
+  return (
+    <div className="grid gap-x-8 gap-y-4 px-2 pb-6 lg:grid-cols-[minmax(0,26rem)_minmax(0,1fr)] lg:items-center">
+      <div>
+        {points.length > 0 ? (
+          <ScatterPlot
+            height={260}
+            points={points}
+            trend={trend}
+            xLabel={s.scale}
+            yLabel={target}
+          />
+        ) : (
+          <p className="text-axis text-ink-muted">그려 볼 점이 없습니다.</p>
+        )}
+      </div>
+
+      <div className="text-axis text-ink-secondary flex flex-col gap-2 leading-relaxed">
+        <p className="text-table text-ink">
+          {s.scale}
+          {subjectParticle(s.scale)} {s.diff >= 0 ? "높은" : "낮은"} 쪽{" "}
+          <span className="tabular">
+            {Math.round(s.diff >= 0 ? s.upperMean : s.lowerMean)}점
+          </span>
+          , 반대쪽{" "}
+          <span className="tabular">
+            {Math.round(s.diff >= 0 ? s.lowerMean : s.upperMean)}점
+          </span>
+        </p>
+        <p>
+          점 하나가 한 사람의 <strong>{target}</strong>입니다. 막대는 양끝{" "}
+          <span className="tabular">{s.groupN}</span>명씩만 견준 것이고, 이
+          그림은 <strong>전부</strong>를 그립니다.
+        </p>
+        <p className="text-ink-muted">
+          차이의 95% 구간{" "}
+          <span className="tabular">
+            {s.ci[0] >= 0 ? "+" : "−"}
+            {Math.abs(s.ci[0]).toFixed(1)}
+          </span>
+          ~
+          <span className="tabular">
+            {s.ci[1] >= 0 ? "+" : "−"}
+            {Math.abs(s.ci[1]).toFixed(1)}
+          </span>
+          점
+          {s.settled
+            ? " — 0을 벗어나므로 방향은 확정입니다."
+            : " — 0을 지나가므로 방향이 아직 확정된 것이 아닙니다."}
+        </p>
+      </div>
+    </div>
   );
 }
 

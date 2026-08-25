@@ -410,6 +410,31 @@ function InHouseSection({
     ? splitsFor(people, (p) => byComposite.get(p.employeeId))
     : [];
 
+  /*
+    총합에 대한 점 분포 — 세로축이 능력 하나가 아니라 **세 능력의 평균**이다.
+    위 상관표용 `scatterPoints`와 같은 꼴로 만들어 같은 그림 부품에 넘긴다.
+  */
+  const cScatter: Record<string, Point[]> = {};
+  const cTrends: Record<string, { x: number; y: number }[] | null> = {};
+  if (composite)
+    for (const scale of TRAIT_SCALES) {
+      const pts = people
+        .filter(
+          (p) =>
+            typeof p.traits[scale] === "number" &&
+            byComposite.has(p.employeeId),
+        )
+        .map((p) => ({
+          id: p.employeeId,
+          name: p.name,
+          x: p.traits[scale],
+          y: byComposite.get(p.employeeId)!,
+          quality: p.quality,
+        }));
+      cScatter[scale] = pts;
+      cTrends[scale] = trendLine(pts);
+    }
+
   return (
     <section>
       <div className="mb-1 flex flex-wrap items-center gap-x-6 gap-y-3">
@@ -449,6 +474,8 @@ function InHouseSection({
               axis={axis}
               rows={rankingFor(cells, axis)}
               reliability={reliability[axis]}
+              scatter={byScale(scatter, axis)}
+              trends={byScale(trends, axis)}
             />
           ))}
         </div>
@@ -460,7 +487,12 @@ function InHouseSection({
           <h2 className="text-section-title mb-6">
             직무능력이 높으려면 — 무엇이 가장 크게 가르나
           </h2>
-          <CompositePanel c={composite} splits={splits} />
+          <CompositePanel
+            c={composite}
+            splits={splits}
+            scatter={cScatter}
+            trends={cTrends}
+          />
         </div>
       )}
 
@@ -849,4 +881,20 @@ function rankingFor(cells: Record<string, Cell>, axis: string): AxisRow[] {
     if (c?.kind === "value") out.push({ scale, r: c.r, n: c.n, ci: c.ci });
   }
   return out.sort((a, b) => Math.abs(b.r) - Math.abs(a.r));
+}
+
+/**
+ * `"인내력|협력"` 꼴로 든 표를 **한 능력만 뽑아 축 이름으로** 다시 짠다.
+ *
+ * 목록 컴포넌트는 자기가 맡은 능력 하나만 알면 되므로, 열쇠에서 능력을
+ * 떼고 넘긴다 — 안에서 다시 조립하게 두면 열쇠 꼴이 두 군데로 흩어진다
+ * (그러다 실제로 어긋난 적이 있다, D-61).
+ */
+function byScale<T>(all: Record<string, T>, axis: string): Record<string, T> {
+  const out: Record<string, T> = {};
+  for (const scale of TRAIT_SCALES) {
+    const v = all[`${scale}|${axis}`];
+    if (v !== undefined) out[scale] = v;
+  }
+  return out;
 }

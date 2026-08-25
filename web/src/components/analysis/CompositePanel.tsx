@@ -1,5 +1,6 @@
 import { formatR } from "./correlationColor";
 import { SplitHeadline, SplitList } from "./SplitPanel";
+import type { Point } from "./ScatterPlot";
 import type { Split } from "@/lib/admin/split";
 import { DivergingBar } from "./DivergingBar";
 import type { Composite } from "@/lib/admin/composite";
@@ -26,9 +27,14 @@ import type { Composite } from "@/lib/admin/composite";
 export function CompositePanel({
   c,
   splits,
+  scatter,
+  trends,
 }: {
   c: Composite;
   splits: Split[];
+  /** `축이름` → 점(가로 성향, 세로 세 능력 평균). 줄을 눌렀을 때 그린다 */
+  scatter?: Record<string, Point[]>;
+  trends?: Record<string, { x: number; y: number }[] | null>;
 }) {
   const shaky = c.verdict === "poor";
 
@@ -43,7 +49,7 @@ export function CompositePanel({
           일곱 축 전부 — 차이가 큰 순 · 무리마다{" "}
           <span className="tabular">{splits[0]?.groupN ?? 0}</span>명
         </p>
-        <SplitList splits={splits} dim={shaky} />
+        <SplitList splits={splits} scatter={scatter} trends={trends} />
       </div>
 
       {/* ── 해설은 표 아래 ── */}
