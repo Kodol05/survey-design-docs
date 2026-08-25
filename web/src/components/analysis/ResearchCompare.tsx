@@ -79,9 +79,9 @@ export function ResearchCompare({ data }: { data: CompareSummary }) {
         <div className="mt-14">
           <h3 className="text-section-title mb-1">방향만 세운 칸</h3>
           <p className="text-ink-secondary mb-6 max-w-[52rem]">
-            직접 잰 연구를 못 찾아 <strong>가까운 개념으로 방향만</strong> 세운
-            칸입니다 (조직생활, D-46). 숫자가 없으니 「들어맞음」을 구간으로
-            판정할 수 없고, <strong>부호가 맞았는지만</strong> 봅니다.
+            {/* D-46 같은 설계 기록 번호는 화면에 내보내지 않는다 (2026-08-25) */}
+            직접 잰 연구가 없어 가까운 개념으로 <strong>방향만</strong> 세운
+            칸입니다. 숫자가 없으니 부호가 맞았는지만 봅니다.
           </p>
           <ul className="grid gap-x-12 gap-y-5 xl:grid-cols-2">
             {data.directions.map((d) => (

@@ -1,6 +1,5 @@
 import { Note } from "@/components/ui/Note";
 import { CHARACTER, TEMPERAMENT } from "@/components/charts/scale";
-import { ALPHA } from "@/lib/admin/stats";
 import type { loadPersonQuality, loadReliability } from "@/lib/admin/analysis";
 import { LowQualityList, QualityRanking } from "./PersonQuality";
 
@@ -60,9 +59,11 @@ export function ReliabilityTab({
           <div>
             <h2 className="text-section-title mb-1">문항이 맞물리는가</h2>
             <p className="text-axis text-ink-muted mb-6">
-              한 척도의 문항들이 같은 것을 재고 있는지 — α가{" "}
-              {ALPHA.poor.toFixed(2).replace(/^0/, "")} 아래면
-              그 상관은 볼 필요가 없습니다
+              {/*
+                「α가 낮으면 그 상관은 볼 필요가 없다」고 적혀 있었다.
+                D-92에서 뒤집은 결론인데 이 줄만 남아 있었다 (2026-08-25).
+              */}
+              한 척도의 문항들이 같은 것을 재고 있는지
             </p>
 
             <div className="flex flex-col gap-8">

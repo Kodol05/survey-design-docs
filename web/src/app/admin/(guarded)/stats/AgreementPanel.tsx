@@ -165,8 +165,8 @@ export function AgreementPanel({ data }: { data: RatingCompare }) {
               {cur.meanShift >= 0 ? "+" : "−"}
               {Math.abs(cur.meanShift).toFixed(1)}점
             </strong>{" "}
-            {cur.meanShift >= 0 ? "높습니다" : "낮습니다"}. 이건 누가 맞았는지가 아니라{" "}
-            <strong>두 자의 눈금이 다르다</strong>는 뜻에 가깝습니다.
+            {cur.meanShift >= 0 ? "높습니다" : "낮습니다"}. 누가 맞았는지가
+            아니라 <strong>두 자의 눈금이 다르다</strong>는 뜻입니다.
           </p>
         </div>
 

@@ -87,8 +87,7 @@ export function AxisRanking({
               </span>
             ))}
             입니다
-            {settled.length > 3 && ` (그 밖에 ${settled.length - 3}개 더)`}.{" "}
-            <span className="text-ink-muted">줄을 누르면 점 분포를 봅니다.</span>
+            {settled.length > 3 && ` (그 밖에 ${settled.length - 3}개 더)`}.
           </>
         )}
       </p>

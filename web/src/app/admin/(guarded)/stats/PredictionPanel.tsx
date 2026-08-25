@@ -140,7 +140,7 @@ export function PredictionPanel({
         <div>
           <h3 className="text-table mb-1 font-medium">사람별 차이</h3>
           <p className="text-axis text-ink-muted mb-4">
-            실제 − 예측. 위로 갈수록 논문이 본 것보다 실제가 높은 사람입니다
+            실제 − 예측. 위쪽이 논문이 본 것보다 높게 나온 사람입니다
           </p>
           <ul className="flex flex-col">
             {peek.items.map((it) => {
@@ -218,9 +218,7 @@ export function PredictionPanel({
             </span>
           </div>
           <p className="text-axis text-ink-muted mb-3">
-            두 축 모두 <strong>설문 점수 눈금(0~100)</strong>입니다. 논문이 정하는 것은{" "}
-            <strong>사람들의 순서</strong>뿐이고, 가로축의 가운데와 퍼진 정도는{" "}
-            <strong>설문 값에서 빌려온 것</strong>입니다.
+            두 축 모두 설문 점수 눈금(0~100)입니다.
           </p>
           <ScatterPlot
             height={480}

@@ -162,9 +162,7 @@ export function CorrelationPanel({
         ) : (
           <>
             <p className="text-axis text-ink-muted mb-4">
-              볼 만한 조합 {featured.length}개입니다 — 방향이 확정된 것부터, 그
-              안에서 관련도가 큰 순. <strong>왼쪽 표에서 칸을 누르면</strong> 그
-              하나만 크게 봅니다.
+              방향이 확정된 것부터 {featured.length}개입니다.
             </p>
             <div className="grid gap-6 sm:grid-cols-2">
               {featured.map((f) => (

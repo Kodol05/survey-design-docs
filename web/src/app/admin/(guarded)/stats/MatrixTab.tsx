@@ -230,8 +230,7 @@ function InHouseSection({
       </div>
       <h2 className="text-section-title mb-2">성향 축과 직무능력 세 가지</h2>
       <p className="text-ink-secondary mb-2 max-w-[56rem]">
-        우리 직원 {matrix.n}명 값입니다.{" "}
-        <strong>칸을 누르면 그 하나만 크게 봅니다.</strong>
+        우리 직원 {matrix.n}명 값입니다. 칸을 누르면 그 하나만 크게 봅니다.
       </p>
       <Note label="지금 보는 값이 무엇인지" className="mb-8">
         <p>{SOURCE_NOTE[source]}</p>
@@ -250,7 +249,8 @@ function InHouseSection({
       <div className="mt-20 border-t border-[--border] pt-12">
         <h2 className="text-section-title mb-2">능력마다 어떤 성향이 뚜렷한가</h2>
         <p className="text-ink-secondary mb-2 max-w-[56rem]">
-          <strong>위 표와 같은 값</strong>을 능력마다 순위로 늘어놓은 것입니다.
+          위 표와 같은 값을 능력마다 순위로 늘어놓은 것입니다. 줄을 누르면 점
+          분포를 봅니다.
         </p>
         <Note label="표와 무엇이 다른지" className="mb-10">
           <p>
