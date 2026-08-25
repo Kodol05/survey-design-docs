@@ -11,28 +11,24 @@ export const metadata = { title: "7차원 성향 설문" };
 /**
  * 첫 화면.
  *
- * ## 화면이 곧 도구다
+ * ## 첫 눈에는 한 줄만
  *
- * 설문 소개 화면의 흔한 모양은 「큰 제목 + 좋은 점 세 칸 + 시작 버튼」이다.
- * 그건 어느 설문에나 붙는 껍데기라 **이 검사가 무엇인지는 하나도 말하지
- * 않는다.**
+ * 처음에 일곱 축을 다 펼쳐 뒀더니 **읽을 것이 너무 많았다.** 링크를 받은
+ * 사람이 처음 보는 화면에서 필요한 것은 「무슨 사이트인가」 한 줄과
+ * 「시작하기」뿐이다. 나머지는 궁금한 사람만 내려 보면 된다.
  *
- * 여기서는 **일곱 개의 자를 그대로 펼쳐 놓는다.** 결과지에 나오는 바로 그
- * 눈금이고, 양 끝 문구도 결과지와 같은 파일(`interpretation/poles.ts`)에서
- * 가져온다. 소개와 결과가 같은 말을 쓰게 된다.
+ * ## 사진
  *
- * ## 왜 이게 이 검사에 맞는가
+ * `public/hero.jpg`를 깐다. **파일이 없어도 화면은 멀쩡히 뜬다** — 배경색이
+ * 먼저 칠해져 있고 사진은 그 위에 얹힌다. 사진을 바꾸려면 같은 이름으로
+ * 덮어쓰면 된다.
  *
- * 링크를 받은 사람이 가장 먼저 하는 걱정은 **「이거 평가인가」**다. 좋은 점을
- * 나열하면 그 걱정이 더 커진다. 대신 자를 보여주면 **양 끝이 둘 다 그냥
- * 설명**이라는 것이 한눈에 보인다 — 말로 안심시키는 것보다 빠르다.
- *
- * ## 절제
- *
- * 움직임은 **한 번만** 쓴다. 눈금이 왼쪽에서 오른쪽으로 그려지며 나타난다 —
- * 「자를 긋는」 동작이라 내용과 맞는다. 그 밖에는 아무것도 움직이지 않는다.
- * 움직임을 줄이도록 설정한 사람에게는 걸지 않는다.
+ * 사진 위에 글자를 얹으므로 **어두운 겹**을 하나 깐다. 어떤 사진이 올지
+ * 모르니 아래로 갈수록 진해지는 방식으로 둬서 밝은 사진이든 어두운 사진이든
+ * 글자가 읽히게 한다.
  */
+const HERO_IMAGE = "/hero.jpg";
+
 export default async function Home() {
   const me = await currentUser();
   if (me) redirect(me.role === "ADMIN" ? "/admin" : "/me");
@@ -40,79 +36,164 @@ export default async function Home() {
   const axes = [...TEMPERAMENT, ...CHARACTER];
 
   return (
-    <main className="page-column flex flex-1 flex-col py-8">
-      <header className="mb-20 flex items-center justify-between">
-        <span className="text-axis text-ink-muted">7차원 성향 설문</span>
-        <div className="flex items-center gap-4">
-          <Link href="/login" className="text-axis text-ink-secondary underline">
-            로그인
-          </Link>
-          <ThemeToggle />
+    <>
+      {/* ── 첫 눈 ── */}
+      <section
+        className="relative flex min-h-[100svh] flex-col"
+        style={{ background: "#241f1b" }}
+      >
+        <div
+          aria-hidden
+          className="absolute inset-0 bg-cover bg-center"
+          style={{ backgroundImage: `url(${HERO_IMAGE})` }}
+        />
+        {/* 어떤 사진이 올지 모르므로 아래로 갈수록 진해지는 겹을 둔다 */}
+        <div
+          aria-hidden
+          className="absolute inset-0"
+          style={{
+            background:
+              "linear-gradient(180deg, rgb(20 17 15 / 0.45) 0%, rgb(20 17 15 / 0.6) 55%, rgb(20 17 15 / 0.85) 100%)",
+          }}
+        />
+
+        <div className="page-column relative flex flex-1 flex-col">
+          <header className="flex items-center justify-between py-8">
+            <span className="text-axis" style={{ color: "rgb(255 255 255 / 0.72)" }}>
+              7차원 성향 설문
+            </span>
+            <Link
+              href="/login"
+              className="text-axis underline"
+              style={{ color: "rgb(255 255 255 / 0.72)" }}
+            >
+              로그인
+            </Link>
+          </header>
+
+          <div className="flex flex-1 flex-col justify-center pb-24">
+            <h1
+              className="mb-6 max-w-[30rem] font-semibold text-white"
+              style={{
+                fontSize: "clamp(2.5rem, 1.8rem + 3vw, 4.5rem)",
+                lineHeight: 1.15,
+                letterSpacing: "-0.03em",
+              }}
+            >
+              일하는 방식을
+              <br />
+              일곱 갈래로 봅니다
+            </h1>
+
+            <p
+              className="text-item mb-12 max-w-[28rem]"
+              style={{ color: "rgb(255 255 255 / 0.82)" }}
+            >
+              높고 낮음은 있지만 좋고 나쁨은 없습니다.
+            </p>
+
+            <div className="flex flex-wrap items-center gap-x-8 gap-y-4">
+              <ButtonLink href="/signup" size="lg">
+                시작하기
+              </ButtonLink>
+              <p className="text-table" style={{ color: "rgb(255 255 255 / 0.7)" }}>
+                약 17분 · 114문항
+              </p>
+            </div>
+          </div>
+
+          {/* 아래에 더 있다는 표시. 눌러도 내려간다 */}
+          <a
+            href="#what"
+            className="text-axis pb-8 text-center"
+            style={{ color: "rgb(255 255 255 / 0.6)" }}
+          >
+            무엇을 재는지 보기
+            <span aria-hidden className="mt-1 block">
+              ↓
+            </span>
+          </a>
         </div>
-      </header>
+      </section>
 
-      <div className="mx-auto w-full max-w-[62rem]">
-        <h1 className="text-screen-title mb-3" style={{ letterSpacing: "-0.02em" }}>
-          일하는 방식을 일곱 갈래로 봅니다
-        </h1>
-        <p className="text-item text-ink-secondary mb-16 max-w-[40rem]">
-          높고 낮음은 있지만 좋고 나쁨은 없습니다. 아래 일곱 개가 그 자입니다.
-        </p>
+      {/* ── 내려야 나오는 것 ── */}
+      <section id="what" className="page-column scroll-mt-0 py-24">
+        <div className="mx-auto w-full max-w-[62rem]">
+          <div className="mb-16 flex items-baseline justify-between gap-4">
+            <h2 className="text-screen-title">일곱 개의 자</h2>
+            <ThemeToggle />
+          </div>
 
-        {/*
-          ── 서명 요소 ──
-          일곱 축을 자 모양 그대로. 축 이름은 눈금 아래 가운데에 작게 —
-          계측기에 새긴 이름처럼 둔다. 자간을 벌려 눈금과 구분한다.
-        */}
-        <ul className="mb-20 flex flex-col gap-9">
-          {axes.map((axis, i) => (
-            <li key={axis} className="reveal" style={{ animationDelay: `${i * 70}ms` }}>
-              <div className="grid items-center gap-x-5 gap-y-2 sm:grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)]">
-                <span className="text-axis text-ink-secondary sm:text-right">
-                  {POLES[axis].low}
-                </span>
+          <p className="text-item text-ink-secondary mb-16 max-w-[40rem]">
+            결과지에 나오는 눈금이 이것입니다. 양 끝은 둘 다 그냥 설명입니다 — 어느
+            쪽이 맞고 틀린 것이 아닙니다.
+          </p>
 
-                <span className="order-last flex flex-col items-center gap-1.5 sm:order-none">
-                  <span
-                    className="rule block h-2.5 w-full rounded-full sm:w-[13rem]"
-                    style={{ background: GRADIENT }}
-                    aria-hidden
-                  />
-                  <span
-                    className="text-axis text-ink-muted"
-                    style={{ letterSpacing: "0.18em", fontSize: "0.8125rem" }}
-                  >
-                    {axis}
+          <ul className="mb-24 flex flex-col gap-9">
+            {axes.map((axis) => (
+              <li key={axis}>
+                <div className="grid items-center gap-x-5 gap-y-2 sm:grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)]">
+                  <span className="text-axis text-ink-secondary sm:text-right">
+                    {POLES[axis].low}
                   </span>
-                </span>
 
-                <span className="text-axis text-ink-secondary">{POLES[axis].high}</span>
-              </div>
-            </li>
-          ))}
-        </ul>
+                  <span className="order-last flex flex-col items-center gap-1.5 sm:order-none">
+                    <span
+                      className="block h-2.5 w-full rounded-full sm:w-[13rem]"
+                      style={{ background: GRADIENT }}
+                      aria-hidden
+                    />
+                    <span
+                      className="text-ink-muted"
+                      style={{ letterSpacing: "0.18em", fontSize: "0.8125rem" }}
+                    >
+                      {axis}
+                    </span>
+                  </span>
 
-        <div className="flex flex-wrap items-center gap-x-8 gap-y-4">
-          <ButtonLink href="/signup" size="lg">
-            시작하기
-          </ButtonLink>
-          <p className="text-table text-ink-secondary">
-            약 17분 · 114문항 · 중간에 그만두어도 이어서 하실 수 있습니다
+                  <span className="text-axis text-ink-secondary">{POLES[axis].high}</span>
+                </div>
+              </li>
+            ))}
+          </ul>
+
+          <dl className="mb-20 grid gap-8 sm:grid-cols-3">
+            <Fact term="걸리는 시간" desc="약 17분 · 114문항" />
+            <Fact term="중간에 그만두면" desc="묶음마다 저장됩니다. 다음에 이어서 하시면 됩니다" />
+            <Fact term="결과는" desc="끝내면 바로 본인 화면에서 보실 수 있습니다" />
+          </dl>
+
+          <div className="flex flex-wrap items-center gap-x-8 gap-y-4 border-t border-[--border] pt-12">
+            <ButtonLink href="/signup" size="lg">
+              시작하기
+            </ButtonLink>
+            <Link href="/login" className="text-table text-ink-secondary underline">
+              이미 계정이 있습니다
+            </Link>
+          </div>
+
+          <p className="text-axis text-ink-muted mt-20 max-w-[46rem]">
+            클로닝거의 기질·성격 이론을 참고해 사내에서 만든 설문입니다. 공개된 검사를
+            그대로 쓴 것이 아니라 문항을 직접 썼고, <strong>아직 다듬는 중입니다.</strong>{" "}
+            자기 이해를 돕는 참고 자료로 봐 주시면 됩니다.
+          </p>
+
+          <p className="text-axis text-ink-muted mt-6">
+            <Link href="/admin/login" className="underline">
+              관리자 로그인
+            </Link>
           </p>
         </div>
+      </section>
+    </>
+  );
+}
 
-        <p className="text-axis text-ink-muted mt-20 max-w-[46rem] border-t border-[--border] pt-6">
-          클로닝거의 기질·성격 이론을 참고해 사내에서 만든 설문입니다. 공개된 검사를
-          그대로 쓴 것이 아니라 문항을 직접 썼고, <strong>아직 다듬는 중입니다.</strong>{" "}
-          자기 이해를 돕는 참고 자료로 봐 주시면 됩니다.
-        </p>
-
-        <p className="text-axis text-ink-muted mt-6">
-          <Link href="/admin/login" className="underline">
-            관리자 로그인
-          </Link>
-        </p>
-      </div>
-    </main>
+function Fact({ term, desc }: { term: string; desc: string }) {
+  return (
+    <div>
+      <dt className="text-axis text-ink-muted mb-1">{term}</dt>
+      <dd className="text-table">{desc}</dd>
+    </div>
   );
 }
