@@ -389,11 +389,27 @@ export default async function AdminHome() {
             ]}
           />
           <Shortcut
+            href="/admin/stats?tab=agreement"
+            title="평가 대조"
+            lines={[
+              "본인 답과 대표님이 보시는 것을 맞대 봅니다",
+              "크게 갈리는 사람이 이름으로 나옵니다",
+            ]}
+          />
+          <Shortcut
             href="/admin/stats?tab=prediction"
             title="예측 대 실제"
             lines={[
               "논문 값으로 본 예측과 실제를 맞대 봅니다",
               "누가 예측보다 높고 낮은지 이름으로 나옵니다",
+            ]}
+          />
+          <Shortcut
+            href="/admin/items"
+            title="문항 목록"
+            lines={[
+              "실제로 나가는 114문항을 그대로 봅니다",
+              "역채점 여부와 묶음 순서까지",
             ]}
           />
           <Shortcut

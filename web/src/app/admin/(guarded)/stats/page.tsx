@@ -32,6 +32,8 @@ import {
 } from "@/lib/admin/abilitySource";
 import { countRatedEmployees } from "@/lib/admin/ratings";
 import { Note } from "@/components/ui/Note";
+import { AgreementPanel } from "./AgreementPanel";
+import { loadRatingCompare } from "@/lib/admin/ratingCompare";
 import { PredictionPanel } from "./PredictionPanel";
 import { predictFromResearch } from "@/lib/admin/researchPrediction";
 import { LowQualityList, QualityRanking } from "./PersonQuality";
@@ -44,6 +46,7 @@ const TABS = [
   { key: "matrix", label: "직무능력과 성향" },
   { key: "rank", label: "순위" },
   { key: "prediction", label: "예측 대 실제" },
+  { key: "agreement", label: "평가 대조" },
   { key: "reliability", label: "검사 신뢰도" },
 ] as const;
 
@@ -60,11 +63,12 @@ export default async function StatsPage(props: {
   const tab = TABS.some((t) => t.key === sp.tab) ? sp.tab! : "matrix";
   const source = parseSource(sp.src);
 
-  const [people, reliability, bossCount, personQuality] = await Promise.all([
+  const [people, reliability, bossCount, personQuality, agreement] = await Promise.all([
     loadPeople(false, source),
     loadReliability(),
     countRatedEmployees(),
     loadPersonQuality(),
+    loadRatingCompare(),
   ]);
   const matrix = traitAbilityMatrix(people);
   const alphas = reliability
@@ -143,6 +147,7 @@ export default async function StatsPage(props: {
         />
       )}
       {tab === "prediction" && <PredictionTab people={people} />}
+      {tab === "agreement" && <AgreementTab data={agreement} />}
       {tab === "reliability" && (
         <ReliabilityTab rows={reliability} quality={personQuality} />
       )}
@@ -400,6 +405,56 @@ async function RankTab({
       source={source}
       bossCount={bossCount}
     />
+  );
+}
+
+// ── 평가 대조 ──────────────────────────────────────────────────────
+
+/**
+ * 본인 답 ↔ 대표님 평가 (Task 31).
+ *
+ * **이 시스템에서 유일하게 「실제와 맞나」에 답하는 화면이다.** 나머지는
+ * 전부 설문 안에서 앞뒤가 맞는지를 본다 — 성향도 직무능력도 같은 사람이
+ * 이어서 답하므로, 잘 맞는다고 실제와 맞는 것은 아니다.
+ */
+function AgreementTab({ data }: { data: Awaited<ReturnType<typeof loadRatingCompare>> }) {
+  return (
+    <section>
+      <h2 className="text-section-title mb-3">본인 답과 대표님이 보시는 것</h2>
+      <p className="text-item text-ink-secondary mb-8 max-w-[52rem]">
+        같은 사람의 직무능력을 <strong>본인이 답한 값</strong>과{" "}
+        <strong>대표님이 매기신 값</strong>으로 나란히 놓았습니다.
+      </p>
+
+      {data.axes.length === 0 ? (
+        <>
+          <WarningBadge kind="smallSample" />
+          <p className="text-ink-secondary mt-4">
+            두 값이 다 있는 사람이 아직 없습니다. 대표님 평가를 먼저 매기셔야 합니다.
+          </p>
+        </>
+      ) : (
+        <AgreementPanel data={data} />
+      )}
+
+      <Note label="이 화면을 어떻게 읽는지" className="mt-10">
+        <p className="mb-2">
+          <strong>「누가 맞았나」를 보는 화면이 아닙니다.</strong> 대표님이 맞고 본인이
+          틀렸다는 뜻이 아닙니다. <strong>둘이 갈리는 사람이 이야깃거리</strong>라는
+          뜻입니다 — 본인은 협력을 높게 보는데 대표님은 낮게 보신다면, 그 사이에 무슨
+          일이 있는지가 볼 것입니다.
+        </p>
+        <p className="mb-2">
+          두 값 다 오차가 있습니다. 자기보고는 좋게 보이려는 쪽으로 기울고, 상사 평가는
+          최근 일이나 눈에 띄는 몇 장면에 끌립니다. <strong>어느 쪽도 정답이 아닙니다.</strong>
+        </p>
+        <p>
+          그래도 이 화면이 중요한 이유는, 다른 모든 화면이 <strong>설문 안에서 앞뒤가
+          맞는지</strong>만 보기 때문입니다. 성향도 직무능력도 같은 사람이 이어서 답하니
+          잘 맞는 것이 당연합니다. 여기만 <strong>바깥에서 온 눈</strong>과 맞댑니다.
+        </p>
+      </Note>
+    </section>
   );
 }
 
