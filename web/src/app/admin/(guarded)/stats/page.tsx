@@ -8,6 +8,7 @@ import {
   traitAbilityMatrix,
 } from "@/lib/admin/analysis";
 import { ALPHA } from "@/lib/admin/stats";
+import { traitAlpha } from "@/lib/admin/dashboard";
 import { parseSource } from "@/lib/admin/abilitySource";
 import { countRatedEmployees } from "@/lib/admin/ratings";
 import { loadRatingCompare } from "@/lib/admin/ratingCompare";
@@ -67,19 +68,9 @@ export default async function StatsPage(props: {
     loadRatingCompare(),
   ]);
   const matrix = traitAbilityMatrix(people);
-  /*
-    α는 **TCI 축만** 센다 (2026-08-25 사용자 결정). 직무능력은 α로 판정할
-    척도가 아니라서 평균에도, 「기준 아래」 세기에도 넣지 않는다 — 넣으면
-    화면마다 다른 수가 나온다.
-  */
-  const traitAlphas = reliability.filter((r) => r.kind === "trait");
-  const alphas = traitAlphas
-    .map((r) => r.alpha)
-    .filter((a): a is number => a !== null);
-  const meanAlpha = alphas.length
-    ? alphas.reduce((a, b) => a + b, 0) / alphas.length
-    : null;
-  const poorCount = traitAlphas.filter((r) => r.verdict === "poor").length;
+  // α는 성향 축만 센다 — 대시보드와 같은 함수를 쓴다 (D-93)
+  const { mean: meanAlpha, poor } = traitAlpha(reliability);
+  const poorCount = poor.length;
   /*
     척도 이름으로 찾아 쓰는 표. 상관 화면과 순위 화면이 **α를 알아야**
     한다 — 문항이 안 맞물리는 축의 상관은 축소 편향되어 있어 그대로 읽으면

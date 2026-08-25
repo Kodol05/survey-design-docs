@@ -1,76 +1,24 @@
 import Link from "next/link";
 import { Tile } from "@/components/ui/Tile";
 import { WarningBadge } from "@/components/ui/WarningBadge";
-import { Attendance } from "@/components/charts/Attendance";
-import { ratingProgress } from "@/lib/admin/ratings";
 import { ButtonLink } from "@/components/ui/Button";
-import { loadAttendance, loadSummary } from "@/lib/admin/summary";
-import {
-  cellOf,
-  loadPeople,
-  loadReliability,
-  traitAbilityMatrix,
-} from "@/lib/admin/analysis";
-import { ALPHA } from "@/lib/admin/stats";
-import { ABILITY_AXES, TRAIT_SCALES } from "@/lib/items/types";
 import { MIN_N } from "@/components/ui/NBadge";
-import { TopRelations, type Relation } from "./TopRelations";
+import { Attendance } from "@/components/charts/Attendance";
+import { ALPHA } from "@/lib/admin/stats";
+import { loadDashboard } from "@/lib/admin/dashboard";
+import { TopRelations } from "./TopRelations";
 
 export const metadata = { title: "대시보드 — 관리자" };
 
 export default async function AdminHome() {
-  const [rating, s, people, reliability, attendance] = await Promise.all([
-    ratingProgress(),
-    loadSummary(),
-    loadPeople(),
-    loadReliability(),
-    loadAttendance(),
-  ]);
-  const matrix = traitAbilityMatrix(people);
-
   /*
-    α는 **성향 7축만** 센다 (2026-08-25 사용자 결정). 직무능력은 여러 요소가
-    모여 이루는 값이라 α로 판정할 척도가 아니다 (D-92·D-93).
+    읽고 세는 일은 `lib/admin/dashboard.ts`가 한다 (2026-08-25 분리).
+    여기는 **받은 것을 그리기만** 한다.
   */
-  const traitAlphas = reliability.filter((r) => r.kind === "trait");
-  const alphas = traitAlphas
-    .map((r) => r.alpha)
-    .filter((a): a is number => a !== null);
-  const meanAlpha = alphas.length
-    ? alphas.reduce((a, b) => a + b, 0) / alphas.length
-    : null;
-  const poorScales = traitAlphas.filter((r) => r.verdict === "poor");
-
-  // 지금 손봐야 할 것
-  const needsReview = people.filter((p) => p.quality !== "ok");
+  const { rating, summary: s, attendance, matrix, alpha, relations: top, needsReview } =
+    await loadDashboard();
+  const { mean: meanAlpha, poor: poorScales } = alpha;
   const poorNames = poorScales.map((r) => r.scale);
-
-  /*
-    가장 뚜렷한 관련 — **자르지 않고 다 넘긴다.**
-
-    전에는 상위 셋에서 끊었는데, 넷째가 셋째와 거의 같은 값이면 끊긴 자리를
-    모르는 채로 셋만 특별해 보인다. 화면에서 세 개씩 넘겨 보게 하고
-    전체 개수를 같이 보여준다.
-
-    거르는 기준은 그대로다 — **신뢰구간이 0을 벗어난 조합만.** 방향조차
-    확정 안 된 것을 "뚜렷한 관련"이라 부를 수는 없다.
-  */
-  const top: Relation[] = TRAIT_SCALES.flatMap((scale) =>
-    ABILITY_AXES.map((axis) => ({
-      scale,
-      axis,
-      c: cellOf(matrix, scale, axis),
-    })),
-  )
-    .filter((x) => x.c && !(x.c.ci[0] <= 0 && x.c.ci[1] >= 0))
-    .sort((a, b) => Math.abs(b.c!.r) - Math.abs(a.c!.r))
-    .map((x) => ({
-      scale: x.scale,
-      axis: x.axis,
-      r: x.c!.r,
-      n: x.c!.n,
-      ci: x.c!.ci,
-    }));
 
   return (
     <>
