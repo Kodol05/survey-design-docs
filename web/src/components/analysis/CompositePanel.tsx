@@ -37,82 +37,77 @@ export function CompositePanel({
       {/* ── 결론부터 ── */}
       <SplitHeadline splits={splits} />
 
-      {/* ── 일곱 축 전부 ── */}
-      <div className="mt-10">
-        <div className="text-axis text-ink-muted mb-3 flex flex-wrap items-baseline justify-between gap-x-6 gap-y-1">
-          <span>일곱 축 전부 — 차이가 큰 순</span>
-          <span className="flex items-center gap-3">
-            <span className="flex items-center gap-1.5">
-              <span
-                aria-hidden
-                className="block size-2.5 rounded-full"
-                style={{ background: "var(--ink-muted)" }}
-              />
-              높은 무리
-            </span>
-            <span className="flex items-center gap-1.5">
-              <span
-                aria-hidden
-                className="block size-2.5 rounded-full"
-                style={{ outline: "2px solid var(--ink-muted)", outlineOffset: -2 }}
-              />
-              낮은 무리
-            </span>
-            <span>
-              무리마다 <span className="tabular">{splits[0]?.groupN ?? 0}</span>명
-            </span>
-            <span>눈금 40·60·80점</span>
-          </span>
-        </div>
+      {/* ── 일곱 축 전부 — 위 절과 같은 줄 모양 ── */}
+      <div className="mt-8">
+        <p className="text-axis text-ink-muted mb-3">
+          일곱 축 전부 — 차이가 큰 순 · 무리마다{" "}
+          <span className="tabular">{splits[0]?.groupN ?? 0}</span>명
+        </p>
         <SplitList splits={splits} dim={shaky} />
       </div>
 
-      {/* ── 묶어도 되는가 ── */}
-      <div className="mt-10 grid gap-x-14 gap-y-4 xl:grid-cols-[minmax(0,26rem)_minmax(0,1fr)] xl:items-start">
-        <ul className="flex flex-col gap-1.5">
-          {c.pairs.map((p) => (
-            <li key={`${p.a}${p.b}`} className="text-axis flex items-center gap-3">
-              <span className="text-ink-secondary w-[11rem] shrink-0">
-                {p.a} <span className="text-ink-muted">×</span> {p.b}
-              </span>
-              <span className="block w-full max-w-[7rem] shrink">
-                <DivergingBar r={p.r} height={11} />
-              </span>
-              <span className="tabular w-11 shrink-0 text-right">
-                {formatR(p.r)}
-              </span>
-            </li>
-          ))}
-        </ul>
+      {/* ── 해설은 표 아래 ── */}
+      <div className="mt-8 grid gap-x-14 gap-y-6 xl:grid-cols-[minmax(0,1fr)_minmax(0,26rem)] xl:items-start">
+        <div className="text-axis text-ink-secondary flex flex-col gap-2 leading-relaxed">
+          <p>
+            <strong>어떻게 잰 것인지</strong> — 협력·조직생활·자율적 실행{" "}
+            <strong>세 값의 평균</strong>을 낸 다음, 성향 축마다{" "}
+            <strong>높은 3분의 1</strong>과 <strong>낮은 3분의 1</strong>로
+            갈라 그 평균을 견줍니다. 절반으로 자르면 가운데 애매한 사람들이
+            섞여 차이가 흐려집니다.
+          </p>
+          <p>
+            <strong>「높을수록 ?」는 아직 확정이 아니라는 뜻</strong>입니다.
+            무리마다 <span className="tabular">{splits[0]?.groupN ?? 0}</span>
+            명뿐이라 관계가 없어도 몇 점 차이는 그냥 납니다.
+          </p>
+        </div>
 
-        <p className="text-axis text-ink-secondary max-w-[44rem] leading-relaxed">
-          <strong>평균을 낼 만한가</strong> — 세 능력이 서로 같이 움직여야
-          평균이 뜻을 갖습니다. 셋을 묶으면{" "}
-          {c.alpha !== null && (
-            <strong
-              className="tabular"
-              style={{ color: shaky ? "var(--status-critical)" : undefined }}
-            >
-              α {c.alpha.toFixed(2).replace(/^0/, "")}
-            </strong>
-          )}
-          {shaky ? (
-            <>
-              {" "}
-              — <strong>아직 묶을 만하지 않습니다.</strong>
-            </>
-          ) : (
-            <>
-              {" "}
-              입니다. 뜻밖에도 <strong>개별 축보다 안정적입니다</strong> — 평균을
-              내면 각 축의 잡음이 서로 상쇄되기 때문입니다.
-            </>
-          )}{" "}
-          <span className="text-ink-muted">
-            세 축이 다 있는 <span className="tabular">{c.values.length}</span>
-            명의 평균이고, 눈금은 그대로 0~100입니다.
-          </span>
-        </p>
+        <div>
+          <p className="text-axis text-ink-muted mb-2">평균을 낼 만한가</p>
+          <ul className="mb-3 flex flex-col gap-1.5">
+            {c.pairs.map((p) => (
+              <li key={`${p.a}${p.b}`} className="text-axis flex items-center gap-3">
+                <span className="text-ink-secondary w-[11rem] shrink-0">
+                  {p.a} <span className="text-ink-muted">×</span> {p.b}
+                </span>
+                <span className="block w-full max-w-[7rem] shrink">
+                  <DivergingBar r={p.r} height={11} />
+                </span>
+                <span className="tabular w-11 shrink-0 text-right">
+                  {formatR(p.r)}
+                </span>
+              </li>
+            ))}
+          </ul>
+          <p className="text-axis text-ink-secondary leading-relaxed">
+            세 능력이 서로 같이 움직여야 평균이 뜻을 갖습니다. 묶으면{" "}
+            {c.alpha !== null && (
+              <strong
+                className="tabular"
+                style={{ color: shaky ? "var(--status-critical)" : undefined }}
+              >
+                α {c.alpha.toFixed(2).replace(/^0/, "")}
+              </strong>
+            )}
+            {shaky ? (
+              <>
+                {" "}
+                — <strong>아직 묶을 만하지 않습니다.</strong>
+              </>
+            ) : (
+              <>
+                {" "}
+                입니다. 뜻밖에도 <strong>개별 축보다 안정적입니다</strong> —
+                평균을 내면 각 축의 잡음이 서로 상쇄되기 때문입니다.
+              </>
+            )}{" "}
+            <span className="text-ink-muted">
+              세 축이 다 있는 <span className="tabular">{c.values.length}</span>
+              명만 셉니다.
+            </span>
+          </p>
+        </div>
       </div>
     </div>
   );

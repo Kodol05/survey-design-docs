@@ -457,14 +457,9 @@ function InHouseSection({
       {/* ── 3절 · 셋을 합쳐서 ── */}
       {composite && (
         <div className="mt-20 border-t border-[--border] pt-12">
-          <h2 className="text-section-title mb-2">
+          <h2 className="text-section-title mb-6">
             직무능력이 높으려면 — 무엇이 가장 크게 가르나
           </h2>
-          <p className="text-ink-secondary mb-8 max-w-[56rem]">
-            협력·조직생활·자율적 실행 <strong>세 값의 평균</strong>을 놓고, 성향
-            축마다 <strong>높은 3분의 1</strong>과 <strong>낮은 3분의 1</strong>의
-            평균을 견줍니다. 상관 숫자 대신 <strong>점수 차이</strong>로 말합니다.
-          </p>
           <CompositePanel c={composite} splits={splits} />
         </div>
       )}
