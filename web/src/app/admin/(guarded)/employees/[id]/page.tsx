@@ -147,7 +147,13 @@ async function ResultBlocks({
   return (
     <>
       <Card title="일곱 가지 성향" className="mb-14">
-        <div className="max-w-3xl">
+        {/*
+          ⚠️ `mx-auto`가 없으면 **왼쪽에 붙고 오른쪽 절반이 빈다.**
+
+          이 그림을 쓰는 다른 두 곳(개인 결과·목록에서 펼치기)은 옆에 막대가
+          나란히 서서 폭이 채워지는데, 여기만 혼자 놓인다. 칸 가운데에 둔다.
+        */}
+        <div className="mx-auto max-w-3xl">
           <TraitRadar
             data={t.map((x) => ({
               scale: x.scale,
