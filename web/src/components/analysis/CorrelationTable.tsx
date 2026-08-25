@@ -46,6 +46,16 @@ export type Selected = { row: string; col: string } | null;
  *
  * 숨기지는 않는다. 흐리게 하고 열 머리에 이유를 적는다 — 가려 버리면
  * 왜 없는지 묻게 되고, 그대로 두면 잘못 읽는다.
+ *
+ * ## 색만 옅게 해서는 전달되지 않는다 (2026-08-25 화면에서 확인)
+ *
+ * 처음에는 칠을 옅게 하는 것으로만 했다. **전혀 흐려 보이지 않았다** —
+ * 협력 열에 `+.44` 같은 큰 값이 있어서 옅게 해도 여전히 진했고, 값이 작은
+ * 옆 열보다 오히려 더 눈에 띄었다. 옅기는 **값의 크기와 섞여** 있어서
+ * 「이 열은 다르다」를 말할 수단이 못 된다.
+ *
+ * 그래서 **값과 무관한 표시**를 얹는다 — 사선 빗금. 어떤 값이 들어 있든
+ * 그 열만 결이 다르게 보이고, 색을 못 보는 사람에게도 남는다.
  */
 
 export function CorrelationTable({
@@ -82,6 +92,25 @@ export function CorrelationTable({
    */
   groups?: { label: string; note?: string; rows: string[] }[];
 }) {
+  /*
+    **`n=38`을 스물한 번 적지 않는다** (2026-08-25 화면에서 확인).
+
+    칸마다 n을 적는 것은 「같은 .30이라도 n=500과 n=37은 다르다」를 말하려는
+    것이었다(11 §3.2). 그런데 우리 표는 **모든 칸이 같은 사람들에서 나온다** —
+    같은 숫자가 스물한 번 반복되면서 칸마다 한 줄씩 잡아먹고, 정작 다를 때
+    눈에 띄어야 할 정보가 늘 있는 배경이 되어 버린다.
+
+    다를 때만 칸에 적고, 다 같으면 표 아래 한 줄로 옮긴다.
+  */
+  const ns = new Set<number>();
+  for (const r of rows)
+    for (const c of cols) {
+      const v = cell(r, c);
+      if (v.kind === "value") ns.add(v.n);
+    }
+  const showN = ns.size > 1;
+  const sharedN = ns.size === 1 ? [...ns][0] : null;
+
   return (
     <div className="overflow-x-auto">
       {/*
@@ -179,10 +208,18 @@ export function CorrelationTable({
                           방향이 확정 안 된 칸은 투명도가 아니라 색으로 옅게 만든다 —
                           투명도를 걸면 안에 든 숫자까지 흐려져 안 읽힌다.
                         */
-                        background:
+                        backgroundColor:
                           v.kind === "value"
                             ? correlationFill(v.r, dim || crosses(v.ci))
                             : "transparent",
+                        /*
+                          흐린 열은 **빗금으로** 말한다. 칠만 옅게 하면 값이
+                          큰 칸에서는 아무 표시도 안 된다 (위 설명 참고).
+                          바탕과 같은 색으로 줄을 그어 결만 다르게 만든다.
+                        */
+                        backgroundImage: dim
+                          ? "repeating-linear-gradient(45deg, transparent 0 5px, var(--page) 5px 6.5px)"
+                          : undefined,
                         color: v.kind === "value" ? "var(--ink)" : undefined,
                         /*
                           **고른 칸에 테두리를 두르지 않는다** (2026-08-25).
@@ -199,7 +236,7 @@ export function CorrelationTable({
                         filter: on ? "saturate(1.45) brightness(0.97)" : undefined,
                       }}
                     >
-                      <Body cell={v} dim={dim} />
+                      <Body cell={v} dim={dim} showN={showN} />
                     </button>
                   </td>
                 );
@@ -209,6 +246,12 @@ export function CorrelationTable({
         </tbody>
         ))}
       </table>
+      {sharedN !== null && (
+        <p className="text-axis text-ink-muted mt-2">
+          모든 칸이 같은 <span className="tabular">{sharedN}</span>명에서 나온
+          값입니다.
+        </p>
+      )}
     </div>
   );
 }
@@ -262,7 +305,15 @@ function CellBar({ r, faded }: { r: number; faded: boolean }) {
   );
 }
 
-function Body({ cell, dim = false }: { cell: Cell; dim?: boolean }) {
+function Body({
+  cell,
+  dim = false,
+  showN = true,
+}: {
+  cell: Cell;
+  dim?: boolean;
+  showN?: boolean;
+}) {
   if (cell.kind === "unstudied") return <span className="text-ink-muted">—</span>;
   if (cell.kind === "expected")
     return (
@@ -317,9 +368,11 @@ function Body({ cell, dim = false }: { cell: Cell; dim?: boolean }) {
       >
         {formatR(cell.r)}
       </span>
-      <span className="text-axis tabular leading-tight" style={{ opacity: 0.6 }}>
-        n={cell.n}
-      </span>
+      {showN && (
+        <span className="text-axis tabular leading-tight" style={{ opacity: 0.6 }}>
+          n={cell.n}
+        </span>
+      )}
     </>
   );
 }

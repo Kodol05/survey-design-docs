@@ -75,9 +75,26 @@ const STATUS = {
   왼쪽 글자 블록은 **고정폭**이다 — 이름 길이에 따라 오른쪽 스트립이 밀리면
   칸끼리 축이 안 맞아서 세로로 훑을 수가 없다. 성향만 남는 폭을 가져간다.
 */
-const LAYOUT =
-  "grid grid-cols-1 gap-x-6 gap-y-4 " +
+const COLUMNS =
+  "gap-x-6 gap-y-4 " +
   "xl:grid-cols-[minmax(11rem,13rem)_5rem_minmax(0,1fr)_auto] xl:items-center";
+/*
+  칸마다 **키를 같게 잡는다** (2026-08-25 화면에서 확인).
+
+  결과가 있는 사람은 성향 스트립이 높이를 만들어 주는데, 미응시인 사람은
+  글자 두 줄뿐이라 칸이 눈에 띄게 낮았다. 「비슷한 사이즈 박스」가 목적인데
+  거기서 어긋난다. 안쪽에 최소 높이를 걸어 둔다.
+*/
+const MIN_H = "xl:min-h-[4.5rem]";
+/** 칸 안 — 좁으면 한 줄에 하나씩 쌓는다 */
+const LAYOUT = `grid grid-cols-1 ${COLUMNS}`;
+/*
+  머리글 줄 — **`grid`를 붙이지 않는다.** `hidden`과 `grid`를 같이 주면
+  어느 쪽이 이기는지가 Tailwind가 규칙을 찍어내는 순서에 달린다. 지금은
+  `.hidden`이 뒤에 있어 우연히 맞게 동작하지만, 기댈 것이 못 된다.
+  `xl:grid`만 주면 좁은 화면에서는 `hidden`만 남는다.
+*/
+const HEAD = `hidden px-5 pr-6 xl:grid ${COLUMNS}`;
 
 export function EmployeeList({ rows }: { rows: Row[] }) {
   const [openId, setOpenId] = useState<string | null>(null);
@@ -90,7 +107,7 @@ export function EmployeeList({ rows }: { rows: Row[] }) {
         격자를 써서 맞춘다 (좌우 여백 `px-5`까지 같이).
       */}
       <div
-        className={`text-axis text-ink-muted mb-2 hidden px-5 xl:grid ${LAYOUT.replace("grid-cols-1 ", "")}`}
+        className={`text-axis text-ink-muted mb-2 ${HEAD}`}
         aria-hidden
       >
         <span>이름</span>
@@ -99,7 +116,7 @@ export function EmployeeList({ rows }: { rows: Row[] }) {
         <AbilityStripHeader />
       </div>
 
-      <ul className="flex flex-col gap-2">
+      <ul className="flex flex-col gap-2.5">
         {rows.map((r) => {
           const expanded = openId === r.id;
           const canExpand = Boolean(r.traits);
@@ -128,7 +145,7 @@ export function EmployeeList({ rows }: { rows: Row[] }) {
                     setOpenId(expanded ? null : r.id);
                   }
                 }}
-                className={`${LAYOUT} px-5 py-4 ${
+                className={`${LAYOUT} ${MIN_H} px-5 py-4 pr-6 ${
                   canExpand ? "cursor-pointer hover:bg-[--wash]" : ""
                 } ${expanded ? "rounded-t-xl" : "rounded-xl"}`}
               >
@@ -143,8 +160,13 @@ export function EmployeeList({ rows }: { rows: Row[] }) {
                         ? STATUS[r.status as keyof typeof STATUS]
                         : "미응시"}
                     </span>
+                    {/*
+                      화살표는 **이름 바로 옆**에 둔다. `ml-auto`로 칸 오른쪽
+                      끝에 붙였더니 이름과 멀어져서 옆 열(신뢰도)에 딸린
+                      것처럼 보였다.
+                    */}
                     {canExpand && (
-                      <span aria-hidden className="text-ink-muted ml-auto">
+                      <span aria-hidden className="text-ink-muted -ml-0.5">
                         {expanded ? "▾" : "▸"}
                       </span>
                     )}
@@ -172,16 +194,20 @@ export function EmployeeList({ rows }: { rows: Row[] }) {
 
                 {/* ── 어떤 사람인가 ── */}
                 <div className="min-w-0">
-                  <span className="text-axis text-ink-muted mb-1 block xl:hidden">
-                    성향
-                  </span>
+                  {r.traits && (
+                    <span className="text-axis text-ink-muted mb-1 block xl:hidden">
+                      성향
+                    </span>
+                  )}
                   <TraitStrip traits={r.traits} />
                 </div>
 
                 <div className="min-w-0">
-                  <span className="text-axis text-ink-muted mb-1 block xl:hidden">
-                    직무능력
-                  </span>
+                  {r.abilities && (
+                    <span className="text-axis text-ink-muted mb-1 block xl:hidden">
+                      직무능력
+                    </span>
+                  )}
                   <AbilityStrip abilities={r.abilities} />
                 </div>
               </div>

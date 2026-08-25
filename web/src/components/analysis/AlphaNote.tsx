@@ -41,7 +41,8 @@ export function AlphaNote({
       }}
       title={`문항 ${r.itemCount}개의 Cronbach's α — 문항끼리 얼마나 맞물리는지`}
     >
-      <span className="tabular">α {r.alpha.toFixed(2)}</span>
+      {/* 앞의 0을 뗀다 — 화면 다른 곳의 상관 표기(`+.44`)와 같은 규칙 */}
+      <span className="tabular">α {r.alpha.toFixed(2).replace(/^0/, "")}</span>
       {poor && <> · 기준 아래</>}
     </span>
   );

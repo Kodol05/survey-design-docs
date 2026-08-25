@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { formatR } from "./correlationColor";
+import { DivergingBar } from "./DivergingBar";
 import { FRAGILE, fragility, type Influence } from "@/lib/admin/influence";
 import type { RankRow } from "@/lib/admin/analysis";
 
@@ -120,7 +121,13 @@ function Robustness({ influence }: { influence: Influence | null }) {
   );
 }
 
-/** 0을 가운데 둔 작은 막대 — 표 안의 칸막대와 같은 규칙 */
+/**
+ * 이름 · 막대 · 숫자 한 줄.
+ *
+ * 막대 칸에 **상한을 둔다.** 0이 가운데라 폭의 절반은 늘 비는데, 값이 다
+ * 양수인 줄에서는 왼쪽이 통째로 빈 채 화면 폭만큼 늘어난다. 2560 화면에서
+ * 실제로 그랬다 — 막대는 오른쪽 끝에, 숫자는 저 멀리 떨어져 있었다.
+ */
 function Pair({
   label,
   r,
@@ -130,27 +137,18 @@ function Pair({
   r: number;
   strong: boolean;
 }) {
-  const FULL = 0.7;
-  const w = Math.max(1.6, Math.min(50, (Math.abs(r) / FULL) * 50));
   return (
-    <div className="text-axis grid grid-cols-[8.5rem_minmax(0,1fr)_3rem] items-center gap-3">
-      <span className="text-ink-secondary truncate">{label}</span>
-      <span className="relative block h-3.5">
-        <span
-          className="absolute inset-y-0 left-1/2 w-px"
-          style={{ background: "var(--ink)", opacity: 0.14 }}
-        />
-        <span
-          className="absolute inset-y-0 rounded-sm"
-          style={{
-            left: r < 0 ? `${50 - w}%` : "50%",
-            width: `${w}%`,
-            background: r < 0 ? "var(--diverge-neg)" : "var(--diverge-pos)",
-            opacity: strong ? 1 : 0.55,
-          }}
-        />
+    <div className="text-axis flex items-center gap-3">
+      <span className="text-ink-secondary w-[8.5rem] shrink-0 truncate">
+        {label}
       </span>
-      <span className="tabular text-right" style={{ opacity: strong ? 1 : 0.7 }}>
+      <span className="block w-full max-w-[20rem] shrink">
+        <DivergingBar r={r} faded={!strong} />
+      </span>
+      <span
+        className="tabular w-12 shrink-0 text-right"
+        style={{ opacity: strong ? 1 : 0.7 }}
+      >
         {formatR(r)}
       </span>
     </div>

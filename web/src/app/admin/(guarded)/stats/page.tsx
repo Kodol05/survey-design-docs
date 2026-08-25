@@ -187,7 +187,7 @@ export default async function StatsPage(props: {
         />
       )}
       {tab === "prediction" && (
-        <PredictionTab people={people} matrix={matrix} />
+        <PredictionTab people={people} matrix={matrix} reliability={byScale} />
       )}
       {tab === "agreement" && <AgreementTab data={agreement} />}
       {tab === "reliability" && (
@@ -606,9 +606,11 @@ function AgreementTab({ data }: { data: Awaited<ReturnType<typeof loadRatingComp
 function PredictionTab({
   people,
   matrix,
+  reliability,
 }: {
   people: People;
   matrix: ReturnType<typeof traitAbilityMatrix>;
+  reliability: Record<string, ScaleReliability>;
 }) {
   const items = ABILITY_AXES.map((axis) => predictFromResearch(people, axis)).filter(
     (x): x is NonNullable<typeof x> => x !== null,
@@ -668,7 +670,7 @@ function PredictionTab({
         </p>
 
         {matrix.enough ? (
-          <ResearchCompare data={compareToResearch(matrix)} />
+          <ResearchCompare data={compareToResearch(matrix)} reliability={reliability} />
         ) : (
           <>
             <WarningBadge kind="smallSample" />

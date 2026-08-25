@@ -56,8 +56,19 @@ export function DistributionPanel({
     );
 
   const ranked = [...spreads].sort((a, b) => b.sd - a.sd);
-  const widest = ranked[0];
-  const tightest = ranked[ranked.length - 1];
+
+  /*
+    **요약 문장에서 α가 기준 아래인 축을 뺀다** (2026-08-25 화면에서 확인).
+
+    「가장 다들 비슷한 축은 협력입니다」라고 나왔는데, 협력은 문항이 안
+    맞물려서(α .08) 점수가 거의 가운데로 몰린 것이다. **다들 비슷한 게
+    아니라 못 재고 있는 것**인데 문장은 발견처럼 말한다.
+
+    쓸 만한 축이 하나도 없으면 문장 자체를 내린다.
+  */
+  const usable = ranked.filter((s) => reliability[s.scale]?.verdict !== "poor");
+  const widest = usable[0];
+  const tightest = usable[usable.length - 1];
 
   const groups = bySpread
     ? [{ key: "all" as const, rows: ranked }]
@@ -100,13 +111,24 @@ export function DistributionPanel({
       </div>
 
       {/* 한 줄 요약 — 훑기 전에 결론부터 */}
-      <p className="text-ink-secondary mb-10 max-w-[52rem] leading-relaxed">
-        가장 크게 갈리는 축은 <strong className="text-ink">{widest.scale}</strong>
-        입니다 (<span className="tabular">{Math.round(widest.min)}</span>부터{" "}
-        <span className="tabular">{Math.round(widest.max)}</span>까지). 가장 다들
-        비슷한 축은 <strong className="text-ink">{tightest.scale}</strong>이고, 이
-        축으로는 사람을 구분하기 어렵습니다.
-      </p>
+      {widest && tightest && widest !== tightest && (
+        <p className="text-ink-secondary mb-10 max-w-[52rem] leading-relaxed">
+          가장 크게 갈리는 축은{" "}
+          <strong className="text-ink">{widest.scale}</strong>입니다 (
+          <span className="tabular">{Math.round(widest.min)}</span>부터{" "}
+          <span className="tabular">{Math.round(widest.max)}</span>까지). 가장
+          다들 비슷한 축은{" "}
+          <strong className="text-ink">{tightest.scale}</strong>이고, 이 축으로는
+          사람을 구분하기 어렵습니다.
+          {usable.length < ranked.length && (
+            <span className="text-ink-muted">
+              {" "}
+              문항이 아직 안 맞물리는 축은 이 문장에서 뺐습니다 — 좁게 모인
+              것이 아니라 못 재고 있는 것일 수 있습니다.
+            </span>
+          )}
+        </p>
+      )}
 
       <div className="flex flex-col gap-12">
         {groups.map((g) => (
@@ -168,11 +190,7 @@ function Row({
     <div className="grid gap-x-6 gap-y-2 xl:grid-cols-[9rem_minmax(0,1fr)] xl:items-end">
       <div className="xl:pb-1">
         <p className="text-table font-medium">{s.scale}</p>
-        {r ? (
-          <AlphaNote r={r} />
-        ) : (
-          <span className="text-axis text-ink-muted">n={s.n}</span>
-        )}
+        <AlphaNote r={r} />
       </div>
 
       <div>
@@ -193,9 +211,12 @@ function Row({
               {Math.round(s.min)}–{Math.round(s.max)}
             </span>
           </span>
-          <span>
+          <span title="표준편차 — 클수록 사람마다 많이 다릅니다">
             퍼진 정도{" "}
             <span className="tabular text-ink-secondary">{s.sd.toFixed(1)}</span>
+          </span>
+          <span className="text-ink-muted/70">
+            <span className="tabular">{s.n}</span>명
           </span>
         </p>
       </div>

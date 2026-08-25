@@ -238,7 +238,15 @@ export async function facetPairs(
             !Number.isNaN(b),
         );
       if (pairs.length < 4) continue;
-      const k = key(scale, axis);
+      /*
+        ⚠️ **화면이 쓰는 열쇠 꼴을 그대로 쓴다.**
+
+        이 파일 안쪽의 `key()`는 `"인내력 협력"`(공백)인데, 상관 화면의
+        칸·산점도·추세선은 전부 `"인내력|협력"`(막대)로 찾는다. 여기서
+        `key()`를 쓰면 **찾는 열쇠와 넣은 열쇠가 달라서** 세부 항목이
+        영원히 비어 보인다 — 실제로 그렇게 넣었다가 잡았다.
+      */
+      const k = `${scale}|${axis}`;
       (out[k] ??= []).push({
         label: facet ?? label,
         scale,

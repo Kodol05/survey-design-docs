@@ -1,4 +1,7 @@
 import { formatR } from "./correlationColor";
+import { DivergingBar } from "./DivergingBar";
+import { AlphaNote } from "./AlphaNote";
+import type { ScaleReliability } from "@/lib/admin/analysis";
 import type { CompareSummary } from "@/lib/admin/researchCompare";
 
 /**
@@ -27,10 +30,14 @@ import type { CompareSummary } from "@/lib/admin/researchCompare";
  * 없는 숫자를 만들어내는 셈이다 (11 §3.2, D-36). 나란히 놓기만 한다.
  */
 
-/** 막대가 끝까지 차는 값. 표 안의 칸막대와 같은 규칙 */
-const FULL = 0.7;
-
-export function ResearchCompare({ data }: { data: CompareSummary }) {
+export function ResearchCompare({
+  data,
+  reliability,
+}: {
+  data: CompareSummary;
+  /** 축별 α. 기준 아래인 축은 「어긋남」 판정 자체가 성립하지 않는다 */
+  reliability?: Record<string, ScaleReliability>;
+}) {
   if (!data.comparable && !data.directions.length)
     return (
       <p className="text-ink-secondary">
@@ -56,7 +63,7 @@ export function ResearchCompare({ data }: { data: CompareSummary }) {
             <span className="tabular">{data.comparable}</span>칸 가운데{" "}
             <strong className="text-ink tabular">{off}</strong>칸이 우리
             신뢰구간을 벗어납니다 — <strong>우리 회사가 논문과 다르거나</strong>,
-            아직 사람이 적어 흔들리는 것이거나입니다.
+            아직 사람이 적어 흔들리는 것입니다.
           </>
         )}
       </p>
@@ -65,14 +72,14 @@ export function ResearchCompare({ data }: { data: CompareSummary }) {
         <ul className="grid gap-x-12 gap-y-7 xl:grid-cols-2">
           {data.rows.map((r) => (
             <li key={`${r.scale} ${r.axis}`}>
-              <div className="mb-2 flex flex-wrap items-baseline justify-between gap-x-3">
-                <p className="text-table">
-                  {r.scale} <span className="text-ink-muted">×</span> {r.axis}
-                </p>
-                <Verdict ok={r.compatible} diff={r.diff} />
-              </div>
-              <Bar label="논문" r={r.research} kind="research" />
-              <Bar label="우리 회사" r={r.ours} kind="ours" n={r.n} ci={r.ci} />
+              <Head
+                scale={r.scale}
+                axis={r.axis}
+                alpha={reliability?.[r.axis]}
+                verdict={<Verdict ok={r.compatible} diff={r.diff} />}
+              />
+              <Bar label="논문" r={r.research} hollow />
+              <Bar label="우리 회사" r={r.ours} n={r.n} ci={r.ci} />
             </li>
           ))}
         </ul>
@@ -99,7 +106,7 @@ export function ResearchCompare({ data }: { data: CompareSummary }) {
                       논문 쪽 예상 {d.expected > 0 ? "+" : "−"}
                     </span>
                   </p>
-                  <Bar label="우리 회사" r={d.ours} kind="ours" n={d.n} ci={d.ci} />
+                  <Bar label="우리 회사" r={d.ours} n={d.n} ci={d.ci} />
                 </div>
                 <span
                   className="text-axis"
@@ -123,68 +130,87 @@ export function ResearchCompare({ data }: { data: CompareSummary }) {
 }
 
 /**
- * 막대 한 줄 — 0을 가운데 두고 좌우로.
+ * 막대 한 줄 — 이름 · 막대 · 숫자.
  *
- * 논문 값과 우리 값을 **다른 색으로 칠하지 않는다.** 색은 이 표 전체에서
- * 이미 「방향」을 뜻하고 있어서(파랑 +, 주황 −) 출처까지 색으로 말하면
- * 두 뜻이 겹친다. 출처는 **왼쪽 이름과 채움 방식**으로 가른다 — 논문은
- * 테두리만, 우리 값은 꽉 채운다.
+ * 논문 값과 우리 값을 **다른 색으로 칠하지 않는다.** 색은 이 화면에서 이미
+ * 「방향」을 뜻하고 있어서(파랑 +, 주황 −) 출처까지 색으로 말하면 두 뜻이
+ * 겹친다. 출처는 **왼쪽 이름과 채움 방식**으로 가른다 — 논문은 테두리만,
+ * 우리 값은 꽉 채운다.
+ *
+ * 우리 값에는 **신뢰구간을 막대 아래 가는 선으로** 깐다. 막대만 있으면
+ * `+.38`이 얼마나 흔들리는 값인지 안 보이는데, 논문과 맞대는 자리에서는
+ * 그게 바로 판정 근거다 — 논문 값이 이 선 안에 들어오면 「맞은 것」이다.
+ * 선을 막대 **가운데**에 두면 막대의 일부처럼 보여서 아래로 내렸다.
  */
 function Bar({
   label,
   r,
-  kind,
+  hollow = false,
   n,
   ci,
 }: {
   label: string;
   r: number;
-  kind: "research" | "ours";
+  hollow?: boolean;
   n?: number;
   ci?: [number, number];
 }) {
-  const w = Math.max(1.6, Math.min(50, (Math.abs(r) / FULL) * 50));
-  const color = r < 0 ? "var(--diverge-neg)" : "var(--diverge-pos)";
-  const ours = kind === "ours";
-
   return (
-    <div className="text-axis grid grid-cols-[4.75rem_minmax(0,1fr)_3rem] items-center gap-3 py-[3px]">
-      <span className="text-ink-muted truncate">{label}</span>
-      <span className="relative block h-4">
-        <span
-          className="absolute inset-y-0 left-1/2 w-px"
-          style={{ background: "var(--ink)", opacity: 0.14 }}
-        />
-        {/*
-          우리 값에는 **신뢰구간을 가는 선으로** 깐다. 막대만 있으면 `+.38`이
-          얼마나 흔들리는 값인지 안 보이는데, 논문과 맞대는 자리에서는 그게
-          바로 판정 근거다 — 논문 값이 이 선 안에 들어오면 「맞은 것」이다.
-        */}
-        {ours && ci && (
-          <span
-            className="absolute top-1/2 h-px -translate-y-1/2"
-            style={{
-              left: `${50 + (Math.max(-FULL, ci[0]) / FULL) * 50}%`,
-              width: `${((Math.min(FULL, ci[1]) - Math.max(-FULL, ci[0])) / FULL) * 50}%`,
-              background: "var(--ink-muted)",
-            }}
-          />
-        )}
-        <span
-          className="absolute inset-y-[3px] rounded-sm"
-          style={{
-            left: r < 0 ? `${50 - w}%` : "50%",
-            width: `${w}%`,
-            background: ours ? color : "transparent",
-            outline: ours ? undefined : `1.5px solid ${color}`,
-            outlineOffset: -1.5,
-          }}
+    <div className="text-axis flex items-center gap-3 py-[3px]">
+      <span className="text-ink-muted w-[4.75rem] shrink-0 truncate">
+        {label}
+      </span>
+      <span className="block w-full max-w-[19rem] shrink">
+        <DivergingBar
+          r={r}
+          hollow={hollow}
+          ci={ci}
+          height={16}
+          title={n ? `${n}명` : undefined}
         />
       </span>
-      <span className="tabular text-right" title={n ? `${n}명` : undefined}>
-        {formatR(r)}
-      </span>
+      <span className="tabular w-[4.5rem] shrink-0 text-right">{formatR(r)}</span>
     </div>
+  );
+}
+
+/**
+ * 조합 이름 줄 — 판정을 **이름 바로 뒤에** 붙인다.
+ *
+ * 오른쪽 끝으로 밀어 봤더니 이름이 짧은 줄에서는 판정이 저 멀리 떠서
+ * 어느 조합의 판정인지 눈으로 이어야 했다. 아래 숫자 열과도 x가 맞지
+ * 않았다 — 막대 줄은 폭에 상한이 있어서 오른쪽 끝까지 가지 않는다.
+ *
+ * 이름 · α · 판정을 한 덩어리로 두면 그 줄만 읽어도 결론이 난다.
+ */
+function Head({
+  scale,
+  axis,
+  alpha,
+  verdict,
+}: {
+  scale: string;
+  axis: string;
+  alpha?: ScaleReliability;
+  verdict: React.ReactNode;
+}) {
+  const poor = alpha?.verdict === "poor";
+  return (
+    <p className="text-table mb-1.5 flex flex-wrap items-baseline gap-x-2">
+      <span>
+        {scale} <span className="text-ink-muted">×</span> {axis}
+      </span>
+      {/*
+        ⚠️ **척도가 안 맞물리면 판정이 성립하지 않는다.** 못 재는 것으로 잰
+           값이 논문과 다른 것은 당연하다 — 「어긋남」이라 적으면 우리 회사가
+           논문과 다르다는 발견처럼 읽힌다. 그 자리에는 이유를 적는다.
+      */}
+      {poor ? (
+        <AlphaNote r={alpha} className="!mt-0 !inline" />
+      ) : (
+        verdict
+      )}
+    </p>
   );
 }
 
