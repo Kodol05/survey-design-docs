@@ -1,4 +1,3 @@
-import Link from "next/link";
 import { formatR } from "./correlationColor";
 import { DivergingBar } from "./DivergingBar";
 import { FRAGILE, fragility, type Influence } from "@/lib/admin/influence";
@@ -112,10 +111,9 @@ function Robustness({ influence }: { influence: Influence | null }) {
         )}
       </p>
 
-      <p className="text-axis text-ink-muted mt-2 leading-relaxed">
+      <p className="text-axis text-ink-muted mt-2">
         <strong>「이분이 이상하다」가 아닙니다.</strong> 뺀 값을 진짜 값으로
-        삼지도 않습니다 — 마음에 안 드는 점을 빼고 다시 재면 무엇이든 원하는
-        답이 나옵니다. 이건 <strong>얼마나 위태로운지</strong>를 재는 값입니다.
+        삼지도 않습니다 — 얼마나 위태로운지를 재는 값입니다.
       </p>
     </div>
   );
@@ -223,12 +221,8 @@ function Facets({
         )}
       </p>
 
-      <p className="text-axis text-ink-muted mt-2 leading-relaxed">
-        진한 막대는 방향이 확정된 것입니다.{" "}
-        <Link href="/admin/stats?tab=rank" className="underline" scroll={false}>
-          순위 탭
-        </Link>
-        에서는 28개 항목을 능력별로 통째로 줄 세워 봅니다.
+      <p className="text-axis text-ink-muted mt-2">
+        진한 막대는 방향이 확정된 것입니다.
       </p>
     </div>
   );

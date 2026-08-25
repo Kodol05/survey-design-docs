@@ -1,6 +1,5 @@
 import Link from "next/link";
 import { WarningBadge } from "@/components/ui/WarningBadge";
-import { colorAt } from "@/components/charts/scale";
 import { Attendance } from "@/components/charts/Attendance";
 import { ratingProgress } from "@/lib/admin/ratings";
 import { ButtonLink } from "@/components/ui/Button";
@@ -35,27 +34,6 @@ export default async function AdminHome() {
     ? alphas.reduce((a, b) => a + b, 0) / alphas.length
     : null;
   const poorScales = reliability.filter((r) => r.verdict === "poor");
-
-  // 어느 축에서 사람이 갈리는가.
-  //
-  // 평균은 쓰지 않는다 — 눈금 자체가 문항 가운데를 50으로 잡은 것이라
-  // 비교할 바깥 기준이 없고, 어느 축이든 거의 50 근처로 나온다.
-  // 반면 **퍼진 정도**는 우리 회사 사람들을 실제로 가르는 축이 무엇인지 말해준다.
-  type Spread = { scale: string; sd: number; lo: number; hi: number };
-  const spread: Spread[] = [];
-  for (const scale of TRAIT_SCALES) {
-    const vs = people
-      .map((p) => p.traits[scale])
-      .filter((v) => typeof v === "number");
-    if (vs.length < 2) continue;
-    const m = vs.reduce((a, b) => a + b, 0) / vs.length;
-    const sd = Math.sqrt(
-      vs.reduce((acc, v) => acc + (v - m) ** 2, 0) / (vs.length - 1),
-    );
-    spread.push({ scale, sd, lo: Math.min(...vs), hi: Math.max(...vs) });
-  }
-  spread.sort((a, b) => b.sd - a.sd);
-  const maxSd = spread[0]?.sd ?? 1;
 
   // 지금 손봐야 할 것
   const needsReview = people.filter((p) => p.quality !== "ok");
@@ -126,61 +104,69 @@ export default async function AdminHome() {
       </div>
 
       {/*
-        대표님 평가 안내 — **잠그지 않고 알리기만 한다 (D-41).**
+        **네 칸만 둔다** (2026-08-25 사용자 결정).
 
-        전에는 여기가 국면 전환 자리였다. 평가가 끝나기 전에는 결과 화면을
-        아예 막았고 되돌릴 수도 없었다. 걱정은 맞지만 방식이 값을 못 치렀다 —
-        화면 절반이 잠긴 채로 운영해야 했고, 한 번 열면 끝이었다.
+          왼쪽 위   대표님 평가      오른쪽 위   응시 현황
+          왼쪽 아래 가장 뚜렷한 관련  오른쪽 아래 지금 볼 것
 
-        지금은 남은 인원만 알리고 왜 먼저 매기는 게 나은지 한 줄 적는다.
-        다 매겼으면 이 자리는 아예 사라진다 — 할 일이 없는데 자리를
-        차지하고 있으면 그것도 소음이다.
-      */}
-      {rating.done < rating.total && (
-        <section className="mb-14">
-          <h2 className="text-section-title mb-4 border-b border-[--border] pb-2">
-            대표님 평가
-          </h2>
-          <p className="text-ink-secondary mb-3 max-w-[56rem]">
-            <strong className="text-ink tabular">
-              {rating.total - rating.done}명
-            </strong>
-            이 아직 남았습니다.{" "}
-            <span className="tabular text-ink-muted">
-              {rating.done} / {rating.total}명 · {rating.cells} /{" "}
-              {rating.cellTotal}칸
-            </span>
-          </p>
-          <p className="text-axis text-ink-muted mb-5 max-w-[56rem]">
-            <strong>결과를 보시기 전에 매기는 편이 낫습니다.</strong> 결과를
-            먼저 보면 그 인상이 섞여서, 본인 답과 맞대 보는 의미가 줄어듭니다.
-            막아 두지는 않았으니 순서는 알아서 정하시면 됩니다.
-          </p>
-          <ButtonLink href="/admin/ratings" size="lg">
-            평가하러 가기 →
-          </ButtonLink>
-        </section>
-      )}
+        전에는 격자 **위에 대표님 평가가 통째로 한 줄**을 차지하고 있었고,
+        격자 안에는 「사람이 갈리는 축」이 있었다.
 
-      {/*
-        네 자리로 나눈다.
+        위 한 줄을 뺀 이유 — 그 자리는 **다 매기고 나면 사라지는 자리**라
+        화면이 두 가지 모양을 갖게 된다. 격자 안으로 넣으면 채워지든 비든
+        배치가 그대로다.
 
-          왼쪽 위   응시 흐름          오른쪽 위   가장 뚜렷한 관련
-          왼쪽 아래 사람이 갈리는 축   오른쪽 아래 지금 볼 것
+        「사람이 갈리는 축」을 뺀 이유 — 최소~최대 폭만 그려서 **폭이 같아도
+        모양이 다른 축을 구분하지 못했다.** 그 물음의 제대로 된 답은
+        분석의 「분포」 탭에 있다(D-54).
 
-        **결과 해석을 위로 올려 뒀다.** 처음에는 오른쪽 위가 「지금 볼 것」이었는데,
-        그건 손볼 거리(품질 검토·미완료)라 화면을 열자마자 잡일부터 보게 됐다.
-        이 화면을 여는 이유는 사람을 아는 것이므로 관련이 먼저 온다. 할 일 목록은
-        짧고 링크로 넘어가는 것이라 아래에 있어도 놓치지 않는다.
+        위 두 칸이 **지금 할 일**, 아래 두 칸이 **읽을 것**이다.
 
-        오른쪽 두 칸은 결과가 열렸을 때만 찬다. 아직 수집 중이면 오른쪽 위가
-        비므로 「지금 볼 것」이 자연스럽게 위로 올라온다 — 그때는 그게 맞다.
-
-        테두리를 두르지 않는다 (11 §2 — 감싸는 테두리는 쓰지 않음).
-        구분은 열 간격(64px)과 제목 아래 가는 선으로만 한다.
+        테두리를 두르지 않는다 (11 §2). 구분은 열 간격과 제목 아래 선으로만.
       */}
       <div className="mb-14 grid gap-x-16 gap-y-14 lg:grid-cols-2">
-        {/* ── 좌상 · 흐름 ── */}
+        {/* ── 좌상 · 대표님 평가 ── */}
+        <section>
+          <div className="mb-4 flex items-baseline justify-between border-b border-[--border] pb-2">
+            <h2 className="text-section-title">대표님 평가</h2>
+            <span className="text-axis text-ink-muted tabular">
+              {rating.done} / {rating.total}명
+            </span>
+          </div>
+
+          {rating.done >= rating.total ? (
+            <>
+              <p className="text-ink-secondary mb-4">
+                <strong className="text-ink">다 매기셨습니다.</strong> 본인 답과
+                맞대 본 결과는 분석의 「평가 대조」에 있습니다.
+              </p>
+              <ButtonLink href="/admin/stats?tab=agreement" variant="secondary">
+                평가 대조 보기 →
+              </ButtonLink>
+            </>
+          ) : (
+            <>
+              <p className="text-ink-secondary mb-3">
+                <strong className="text-ink tabular">
+                  {rating.total - rating.done}명
+                </strong>
+                이 아직 남았습니다.{" "}
+                <span className="tabular text-ink-muted">
+                  {rating.cells} / {rating.cellTotal}칸
+                </span>
+              </p>
+              <p className="text-axis text-ink-muted mb-5 max-w-[34rem]">
+                <strong>결과를 보시기 전에 매기는 편이 낫습니다.</strong> 결과를
+                먼저 보면 그 인상이 섞입니다. 막아 두지는 않았습니다.
+              </p>
+              <ButtonLink href="/admin/ratings" size="lg">
+                평가하러 가기 →
+              </ButtonLink>
+            </>
+          )}
+        </section>
+
+        {/* ── 우상 · 응시 현황 ── */}
         <section>
           <div className="mb-4 flex items-baseline justify-between border-b border-[--border] pb-2">
             <h2 className="text-section-title">응시 현황</h2>
@@ -189,7 +175,7 @@ export default async function AdminHome() {
           <Attendance people={attendance} />
         </section>
 
-        {/* ── 우상 · 관련 ── */}
+        {/* ── 좌하 · 관련 ── */}
         <section>
           <div className="mb-4 flex items-baseline justify-between border-b border-[--border] pb-2">
             <h2 className="text-section-title">가장 뚜렷한 관련</h2>
@@ -217,58 +203,6 @@ export default async function AdminHome() {
             */
             <TopRelations items={top} />
           )}
-        </section>
-
-        {/* ── 좌하 · 분포 ── */}
-        <section>
-          <div className="mb-4 flex items-baseline justify-between border-b border-[--border] pb-2">
-            <h2 className="text-section-title">사람이 갈리는 축</h2>
-            <span className="text-axis text-ink-muted">{people.length}명</span>
-          </div>
-
-          <ul>
-            {spread.map((x) => (
-              <li
-                key={x.scale}
-                className="grid grid-cols-[4rem_1fr_3rem] items-center gap-3 py-2.5 sm:grid-cols-[5rem_1fr_4rem] sm:gap-4"
-              >
-                <span className="text-table">{x.scale}</span>
-                {/* 가장 낮은 사람부터 가장 높은 사람까지의 폭 */}
-                <div className="relative h-3">
-                  <div
-                    className="absolute inset-y-1 left-0 right-0 rounded-full"
-                    style={{ background: "var(--grid)" }}
-                  />
-                  <div
-                    className="absolute inset-y-0 rounded-full"
-                    style={{
-                      left: `${x.lo}%`,
-                      width: `${Math.max(2, x.hi - x.lo)}%`,
-                      background: `linear-gradient(90deg, ${colorAt(x.lo)}, ${colorAt(x.hi)})`,
-                      opacity: 0.35 + 0.65 * (x.sd / maxSd),
-                    }}
-                  />
-                  <div
-                    className="absolute inset-y-[-2px] w-px"
-                    style={{ left: "50%", background: "var(--axis)" }}
-                  />
-                </div>
-                <span className="tabular text-axis text-ink-secondary text-right">
-                  {Math.round(x.lo)}–{Math.round(x.hi)}
-                </span>
-              </li>
-            ))}
-          </ul>
-
-          <p className="text-table text-ink-muted mt-4">
-            가장 낮은 사람부터 가장 높은 사람까지의 폭입니다. 넓게 퍼진 축일수록
-            우리 회사 사람들을 실제로 가릅니다. 좁은 축은 다들 비슷해서 그
-            축으로는 사람을 구분하기 어렵습니다.
-          </p>
-          <p className="text-axis text-ink-muted mt-2">
-            평균은 두지 않았습니다. 눈금 자체가 문항 가운데를 50으로 잡은 것이라
-            비교할 바깥 기준이 없고, 어느 축이든 거의 50 근처로 나옵니다.
-          </p>
         </section>
 
         {/* ── 우하 · 지금 할 일 ── */}
@@ -374,9 +308,7 @@ export default async function AdminHome() {
             title="분포"
             lines={[
               "각 축에서 사람들이 어떻게 퍼져 있는지 봅니다",
-              spread.length
-                ? `가장 갈리는 축은 ${spread[0].scale} (${Math.round(spread[0].lo)}–${Math.round(spread[0].hi)})`
-                : "아직 그려 볼 값이 없습니다",
+              "점 하나가 한 사람 · 몰린 축과 갈린 축을 가릅니다",
             ]}
           />
           <Shortcut

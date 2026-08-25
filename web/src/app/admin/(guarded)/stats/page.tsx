@@ -1,5 +1,4 @@
 import Link from "next/link";
-import { RankBars } from "@/components/analysis/RankBars";
 import { ScatterPlot } from "@/components/analysis/ScatterPlot";
 import type { Cell } from "@/components/analysis/CorrelationTable";
 import type { Point } from "@/components/analysis/ScatterPlot";
@@ -9,13 +8,11 @@ import type { RankRow, ScaleReliability } from "@/lib/admin/analysis";
 import { influenceOf, type Influence } from "@/lib/admin/influence";
 import {
   facetPairs,
-  RANK_LIMIT,
-  abilitiesByTraitTercile,
+
   cellOf,
   loadPeople,
   loadPersonQuality,
   loadReliability,
-  rankForAbility,
   scatterPoints,
   traitAbilityMatrix,
   trendLine,
@@ -40,15 +37,16 @@ import { PredictionPanel } from "./PredictionPanel";
 import { predictFromResearch } from "@/lib/admin/researchPrediction";
 import { LowQualityList, QualityRanking } from "./PersonQuality";
 import { CorrelationPanel } from "./CorrelationPanel";
-import { RankPanel } from "./RankPanel";
 import { DistributionPanel } from "./DistributionPanel";
+import { AbilityDrivers } from "@/components/analysis/AbilityDrivers";
+import { CompositePanel } from "@/components/analysis/CompositePanel";
+import { abilityComposite } from "@/lib/admin/composite";
 import { spreadOf, type Spread } from "@/lib/admin/spread";
 
 export const metadata = { title: "분석 — 관리자" };
 
 const TABS = [
   { key: "matrix", label: "직무능력과 기질·성격" },
-  { key: "rank", label: "순위" },
   { key: "spread", label: "분포" },
   { key: "prediction", label: "예측 대 실제" },
   { key: "agreement", label: "평가 대조" },
@@ -58,8 +56,6 @@ const TABS = [
 export default async function StatsPage(props: {
   searchParams: Promise<{
     tab?: string;
-    axis?: string;
-    scale?: string;
     src?: string;
     clean?: string;
   }>;
@@ -166,16 +162,6 @@ export default async function StatsPage(props: {
           facets={facets}
           clean={clean}
           poorN={poorN}
-        />
-      )}
-      {tab === "rank" && (
-        <RankTab
-          axis={sp.axis}
-          scale={sp.scale}
-          people={people}
-          source={source}
-          bossCount={bossCount}
-          reliability={byScale}
         />
       )}
       {tab === "spread" && (
@@ -397,6 +383,7 @@ function InHouseSection({
   const scatter: Record<string, Point[]> = {};
   const trends: Record<string, { x: number; y: number }[] | null> = {};
   const influence: Record<string, Influence | null> = {};
+  const composite = abilityComposite(people);
 
   for (const scale of TRAIT_SCALES)
     for (const axis of ABILITY_AXES) {
@@ -422,7 +409,7 @@ function InHouseSection({
       </div>
       <p className="text-ink-secondary mb-8 max-w-[56rem]">
         우리 직원 {matrix.n}명 값입니다. {SOURCE_NOTE[source]}{" "}
-        <strong>칸을 누르면 그 조합만 크게 보고, 다시 누르면 돌아옵니다.</strong>
+        <strong>칸을 누르면 그 하나만 크게 봅니다.</strong>
       </p>
       <CorrelationPanel
         rows={[...TRAIT_SCALES]}
@@ -436,56 +423,37 @@ function InHouseSection({
         influence={influence}
         facets={facets}
       />
+
+      {/* ── 능력마다 무엇과 관련이 깊은가 ── */}
+      <div className="mt-20 border-t border-[--border] pt-12">
+        <h2 className="text-section-title mb-1">능력마다 무엇과 관련이 깊은가</h2>
+        <p className="text-ink-secondary mb-8 max-w-[52rem]">
+          위 표가 축 일곱 개로 말한 것을 <strong>세부 항목까지 쪼갠 것</strong>
+          입니다. 관련이 큰 것부터 왼쪽에 둡니다.
+        </p>
+        <AbilityDrivers
+          axes={ABILITY_AXES.map((a) => ({ axis: a, rows: driversFor(facets, a) }))}
+          reliability={reliability}
+        />
+        <p className="text-axis text-ink-muted mt-6 max-w-[52rem]">
+          세부 항목 28개 × 능력 3개면 84개 상관입니다. 관계가 없어도 네댓 개는
+          우연히 높게 나오므로 능력마다 위에서 여섯 개까지만 봅니다.
+        </p>
+      </div>
+
+      {/* ── 셋을 묶으면 ── */}
+      {composite && (
+        <div className="mt-20 border-t border-[--border] pt-12">
+          <h2 className="text-section-title mb-1">셋을 묶으면</h2>
+          <p className="text-ink-secondary mb-8 max-w-[52rem]">
+            협력·조직생활·자율적 실행을 <strong>하나의 값</strong>으로 놓고 어떤
+            기질·성격과 연관이 큰지 봅니다 —{" "}
+            <strong>전반적으로 일이 되는 사람은 어떤 사람인가</strong>.
+          </p>
+          <CompositePanel c={composite} />
+        </div>
+      )}
     </section>
-  );
-}
-
-// ── 순위 ────────────────────────────────────────────────────────────
-
-async function RankTab({
-  axis,
-  scale,
-  people,
-  source,
-  bossCount,
-  reliability,
-}: {
-  axis?: string;
-  scale?: string;
-  people: People;
-  source: AbilitySource;
-  bossCount: number;
-  reliability: Record<string, ScaleReliability>;
-}) {
-  const pickedAxis = ABILITY_AXES.includes(axis as never)
-    ? axis!
-    : ABILITY_AXES[0];
-  const pickedScale = TRAIT_SCALES.includes(scale as never)
-    ? scale!
-    : TRAIT_SCALES[0];
-
-  const ranks = await rankForAbility(pickedAxis, false, source);
-  const tercile = abilitiesByTraitTercile(people, pickedScale);
-
-  return (
-    <RankPanel
-      abilities={[...ABILITY_AXES]}
-      scales={[...TRAIT_SCALES]}
-      pickedAxis={pickedAxis}
-      pickedScale={pickedScale}
-      limit={RANK_LIMIT}
-      items={ranks.map((r) => ({
-        label: r.label,
-        r: r.corr.r,
-        n: r.corr.n,
-        ci: r.corr.ci,
-      }))}
-      tercile={tercile}
-      source={source}
-      bossCount={bossCount}
-      axisAlpha={reliability[pickedAxis]}
-      scaleAlpha={reliability[pickedScale]}
-    />
   );
 }
 
@@ -571,19 +539,17 @@ function AgreementTab({ data }: { data: Awaited<ReturnType<typeof loadRatingComp
 
       <Note label="이 화면을 어떻게 읽는지" className="mt-10">
         <p className="mb-2">
-          <strong>「누가 맞았나」를 보는 화면이 아닙니다.</strong> 대표님이 맞고 본인이
-          틀렸다는 뜻이 아닙니다. <strong>둘이 갈리는 사람이 이야깃거리</strong>라는
-          뜻입니다 — 본인은 협력을 높게 보는데 대표님은 낮게 보신다면, 그 사이에 무슨
-          일이 있는지가 볼 것입니다.
-        </p>
-        <p className="mb-2">
-          두 값 다 오차가 있습니다. 자기보고는 좋게 보이려는 쪽으로 기울고, 상사 평가는
-          최근 일이나 눈에 띄는 몇 장면에 끌립니다. <strong>어느 쪽도 정답이 아닙니다.</strong>
+          <strong>「누가 맞았나」를 보는 화면이 아닙니다.</strong>{" "}
+          <strong>둘이 갈리는 사람이 이야깃거리</strong>라는 뜻입니다 — 본인은
+          협력을 높게 보는데 대표님은 낮게 보신다면, 그 사이에 무슨 일이 있는지가
+          볼 것입니다. 자기보고는 좋게 보이려는 쪽으로, 상사 평가는 최근 일이나
+          눈에 띄는 장면 쪽으로 기웁니다.
         </p>
         <p>
-          그래도 이 화면이 중요한 이유는, 다른 모든 화면이 <strong>설문 안에서 앞뒤가
-          맞는지</strong>만 보기 때문입니다. 성향도 직무능력도 같은 사람이 이어서 답하니
-          잘 맞는 것이 당연합니다. 여기만 <strong>바깥에서 온 눈</strong>과 맞댑니다.
+          그래도 이 화면이 중요한 이유는, 다른 모든 화면이{" "}
+          <strong>설문 안에서 앞뒤가 맞는지</strong>만 보기 때문입니다. 성향도
+          직무능력도 같은 사람이 이어서 답하니 잘 맞는 것이 당연합니다. 여기만{" "}
+          <strong>바깥에서 온 눈</strong>과 맞댑니다.
         </p>
       </Note>
     </section>
@@ -644,18 +610,15 @@ function PredictionTab({
 
       <Note label="이 예측을 어디까지 믿을 수 있는지" className="mt-8 mb-16">
         <p className="mb-2">
-          <strong>서로 다른 논문에서 온 값을 한 식에 넣습니다.</strong> 표본도 지표도
-          나라도 다릅니다. 이렇게 만든 예측은 대략의 눈금이지 정밀한 값이 아닙니다.
-        </p>
-        <p className="mb-2">
-          논문이 주는 것은 <strong>모양이지 눈금이 아닙니다.</strong> 상관만으로는
-          「이 사람이 62점」이라고 말할 수 없어서, 우리 데이터의 퍼진 정도를 빌려
-          점수로 되돌립니다.
+          <strong>서로 다른 논문에서 온 값을 한 식에 넣습니다.</strong> 표본도
+          지표도 나라도 달라서 대략의 눈금이지 정밀한 값이 아닙니다. 그리고 논문이
+          주는 것은 <strong>모양이지 눈금이 아니라서</strong>, 점수로 되돌릴 때
+          우리 데이터의 퍼진 정도를 빌립니다.
         </p>
         <p>
-          전에 있던 「계산식」 화면은 <strong>우리 데이터로 만든 식이 우리 데이터를</strong>{" "}
-          맞추는지를 봤습니다. 자기 답으로 자기 답을 맞추는 셈이라 답이 거의 늘
-          「맞는다」였습니다. 여기서는 바깥에서 온 값을 씁니다.
+          그래도 <strong>바깥에서 온 값</strong>이라는 것이 요점입니다. 우리
+          데이터로 만든 식으로 우리 데이터를 맞추면 답이 거의 늘 「맞는다」가
+          됩니다.
         </p>
       </Note>
 
@@ -683,19 +646,16 @@ function PredictionTab({
 
         <Note label="논문 값을 어떻게 읽는지" className="mt-10">
           <p className="mb-2">
-            <strong>서로 다른 연구에서 온 값입니다.</strong> 표본도 지표도
-            나라도 달라서 칸끼리 견줄 수 있는 값이 아닙니다. 각 칸을 우리
-            값과만 맞대 보십시오.
-          </p>
-          <p className="mb-2">
-            판정 기준은 <strong>논문 값이 우리 95% 신뢰구간 안에 들어오는가</strong>
-            입니다. 두 숫자를 빼서 크면 다르다고 하지 않습니다 — 우리 값은
-            40명 남짓에서 나온 것이라 원래 흔들립니다. 사람이 늘어 구간이
-            좁아질수록 이 판정이 날카로워집니다.
+            판정 기준은{" "}
+            <strong>논문 값이 우리 95% 신뢰구간 안에 들어오는가</strong>입니다. 두
+            숫자를 빼서 크면 다르다고 하지 않습니다 — 우리 값은 40명 남짓에서 나온
+            것이라 원래 흔들립니다. 사람이 늘어 구간이 좁아질수록 판정이
+            날카로워집니다.
           </p>
           <p>
-            논문 값은 <strong>사람이 늘어도 바뀌지 않고</strong>, 점수 계산에도
-            쓰지 않습니다. 우리 값을 견줄 바깥 기준으로만 둡니다.
+            <strong>서로 다른 연구에서 온 값</strong>이라 칸끼리 견줄 수는
+            없습니다. 각 칸을 우리 값과만 맞대 보십시오. 논문 값은 사람이 늘어도
+            바뀌지 않고 점수 계산에도 쓰지 않습니다.
           </p>
         </Note>
       </div>
@@ -815,10 +775,9 @@ function ReliabilityTab({
         </div>
         <Note label="α가 낮게 나오는 이유" className="mt-8">
           <p>
-            직무능력은 능력당 문항이 세 개뿐이라 α가 낮게 나오기 쉽습니다. 값을
-            보고 문항을 늘릴지 판단합니다. 이 지표는{" "}
-            <strong>응시 인원과 무관</strong>하게 문항 품질만 말해줍니다 —
-            사람이 늘어도 좋아지지 않습니다.
+            직무능력은 능력당 문항이 세 개뿐이라 α가 낮게 나오기 쉽습니다. 이
+            지표는 <strong>응시 인원과 무관</strong>합니다 — 사람이 늘어도
+            좋아지지 않고, 문항을 고쳐야 좋아집니다.
           </p>
         </Note>
       </section>
@@ -831,18 +790,30 @@ function ReliabilityTab({
         </p>
         <QualityRanking rows={quality} />
         <Note label="이 점수를 어떻게 읽는지" className="mt-8">
-          <p className="mb-2">
-            <strong>성격에 대한 판정이 아닙니다.</strong> 「이 응답을 믿을 수
-            있는가」에 대한 값입니다. 낮다고 해서 그 사람이 문제라는 뜻이
-            아니라, 그 사람의 점수를 해석에 쓸 수 있는지를 말합니다.
-          </p>
           <p>
-            위 α와는 다른 이야기입니다. α는 문항이 잘 만들어졌는지를, 이쪽은 그
-            문항에 답한 방식이 앞뒤가 맞는지를 봅니다. α가 아무리 높아도 서둘러
-            넘긴 응답의 값은 쓰기 어렵습니다.
+            <strong>성격에 대한 판정이 아닙니다.</strong> 그 사람의 점수를 해석에
+            쓸 수 있는지를 말합니다. 위 α와는 다른 이야기입니다 — α는 문항이 잘
+            만들어졌는지를, 이쪽은 그 문항에 <strong>답한 방식</strong>이 앞뒤가
+            맞는지를 봅니다.
           </p>
         </Note>
       </section>
     </div>
+  );
+}
+
+/**
+ * 한 능력에 관련이 큰 세부 항목을 **큰 순으로** 모은다.
+ *
+ * `facetPairs`는 「축 안의 어느 항목인가」를 위해 **축 순서**로 준다 —
+ * 거기서는 순서가 검사 구조라 바뀌면 안 된다. 여기는 반대로 「무엇과 관련이
+ * 깊은가」라 크기가 순서다. 같은 데이터를 다르게 정렬해 쓴다.
+ */
+function driversFor(
+  facets: Record<string, RankRow[]>,
+  axis: string,
+): RankRow[] {
+  return TRAIT_SCALES.flatMap((s) => facets[`${s}|${axis}`] ?? []).sort(
+    (a, b) => Math.abs(b.corr.r) - Math.abs(a.corr.r),
   );
 }

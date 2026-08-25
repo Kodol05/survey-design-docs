@@ -1,0 +1,145 @@
+import { formatR } from "./correlationColor";
+import { gradeOf, subjectParticle } from "./correlationWords";
+import { DivergingBar } from "./DivergingBar";
+import { CHARACTER } from "../charts/scale";
+import type { Composite } from "@/lib/admin/composite";
+
+/**
+ * 세 능력을 묶은 값이 **무엇과 가장 연관되는가** (2026-08-25 사용자 요청).
+ *
+ * ## 이 화면이 답하는 것
+ *
+ * 위쪽 표는 「협력은 무엇과」, 「조직생활은 무엇과」를 따로 말한다. 그런데
+ * 실제로 궁금한 것은 그다음이다 — **「전반적으로 일이 되는 사람은 어떤
+ * 사람인가」.** 축 하나하나로는 그 답이 안 나온다.
+ *
+ * ## 묶어도 된다는 근거를 먼저 보여준다
+ *
+ * 서로 다른 것을 재는 축을 더하면 총합은 아무 뜻도 없어진다. 그래서 축끼리의
+ * 상관과 묶었을 때의 α를 **결과보다 먼저** 둔다. 근거가 약하면 아래 그래프를
+ * 읽지 말라는 뜻이고, 근거가 있으면 마음 놓고 읽으라는 뜻이다.
+ *
+ * 우리 데이터에서는 셋이 `+.33 ~ +.36`으로 묶여 α가 `.60`이 나온다 —
+ * **개별 축보다 총합이 더 안정적이다.** 협력 하나는 `.08`이라 못 쓰는데,
+ * 평균을 내면 각 축의 잡음이 상쇄되고 셋이 공유하는 부분만 남는다.
+ */
+export function CompositePanel({ c }: { c: Composite }) {
+  const top = c.drivers[0];
+  const shaky = c.verdict === "poor";
+
+  return (
+    <div className="grid gap-x-14 gap-y-8 xl:grid-cols-[minmax(0,22rem)_minmax(0,1fr)]">
+      {/* ── 묶어도 되는가 ── */}
+      <div>
+        <p className="text-axis text-ink-muted mb-2">묶어도 되는가</p>
+        <ul className="mb-4 flex flex-col gap-1.5">
+          {c.pairs.map((p) => (
+            <li key={`${p.a}${p.b}`} className="text-axis flex items-center gap-3">
+              <span className="text-ink-secondary w-[9.5rem] shrink-0 truncate">
+                {p.a} <span className="text-ink-muted">×</span> {p.b}
+              </span>
+              <span className="block w-full max-w-[8rem] shrink">
+                <DivergingBar r={p.r} height={11} />
+              </span>
+              <span className="tabular w-11 shrink-0 text-right">
+                {formatR(p.r)}
+              </span>
+            </li>
+          ))}
+        </ul>
+
+        <p className="text-axis text-ink-secondary leading-relaxed">
+          {c.alpha !== null && (
+            <>
+              셋을 묶으면{" "}
+              <strong
+                className="tabular"
+                style={{ color: shaky ? "var(--status-critical)" : undefined }}
+              >
+                α {c.alpha.toFixed(2).replace(/^0/, "")}
+              </strong>
+              {shaky ? (
+                <>
+                  입니다. <strong>아직 묶을 만하지 않습니다</strong> — 아래
+                  그래프는 참고로만 보십시오.
+                </>
+              ) : (
+                <>
+                  입니다. 셋이 같은 방향으로 움직이므로{" "}
+                  <strong>공통분모를 하나의 값으로</strong> 볼 수 있습니다.
+                </>
+              )}
+            </>
+          )}{" "}
+          <span className="text-ink-muted">
+            축을 더한 것이 아니라 평균이라 눈금은 그대로 0~100입니다. 세 축이 다
+            있는 <span className="tabular">{c.values.length}</span>명만 셉니다.
+          </span>
+        </p>
+      </div>
+
+      {/* ── 무엇과 연관이 큰가 ── */}
+      <div>
+        <p className="text-axis text-ink-muted mb-3">
+          성향 7축과의 관련 — 큰 순
+        </p>
+        <ul className="flex flex-col gap-2">
+          {c.drivers.map((d) => {
+            const settled = !(d.corr.ci[0] <= 0 && d.corr.ci[1] >= 0);
+            const kind = (CHARACTER as readonly string[]).includes(d.scale)
+              ? "성격"
+              : "기질";
+            return (
+              <li key={d.scale} className="flex items-center gap-3">
+                <span className="text-table w-[9rem] shrink-0 truncate">
+                  {d.scale}
+                  <span className="text-axis text-ink-muted ml-1.5">{kind}</span>
+                </span>
+                <span className="block w-full max-w-[26rem] shrink">
+                  <DivergingBar
+                    r={d.corr.r}
+                    faded={!settled}
+                    ci={d.corr.ci}
+                    height={16}
+                  />
+                </span>
+                <span className="tabular w-12 shrink-0 text-right font-medium">
+                  {formatR(d.corr.r)}
+                </span>
+                <span
+                  className="text-axis text-ink-secondary w-[5rem] shrink-0"
+                  style={{ opacity: settled ? 1 : 0.6 }}
+                >
+                  {gradeOf(d.corr.r)}
+                  {!settled && <span aria-hidden>?</span>}
+                </span>
+              </li>
+            );
+          })}
+        </ul>
+
+        {top && (
+          <p className="text-ink-secondary mt-5 max-w-[46rem] leading-relaxed">
+            가장 크게 연관된 것은 <strong className="text-ink">{top.scale}</strong>
+            입니다 (<span className="tabular">{formatR(top.corr.r)}</span>).{" "}
+            {top.scale}
+            {subjectParticle(top.scale)}{" "}
+            {top.corr.r > 0 ? (
+              <>
+                높은 사람일수록 세 능력이 <strong>고르게 높게</strong> 나옵니다.
+              </>
+            ) : (
+              <>
+                <strong>낮은</strong> 사람일수록 세 능력이 고르게 높게 나옵니다.
+              </>
+            )}{" "}
+            <span className="text-ink-muted">
+              가는 선은 95% 구간입니다 — 0을 지나가면 방향이 아직 확정된 것이
+              아닙니다.
+            </span>
+          </p>
+        )}
+      </div>
+    </div>
+  );
+}

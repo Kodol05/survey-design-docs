@@ -8,8 +8,13 @@
  * 확인할 방법이 사라지고, n·신뢰구간 배지는 11 §2.2에서 필수로 못 박혀 있다.
  */
 
-/** 받침이 있으면 `이`, 없으면 `가` */
-function subjectParticle(word: string): string {
+/**
+ * 받침이 있으면 `이`, 없으면 `가`.
+ *
+ * 화면에 축 이름을 문장에 넣는 자리가 여럿이라 내보낸다 — 손으로 적으면
+ * **「위험회피이 낮은 사람일수록」** 같은 것이 나온다. 실제로 났다.
+ */
+export function subjectParticle(word: string): string {
   const c = word.charCodeAt(word.length - 1);
   if (c < 0xac00 || c > 0xd7a3) return "가";
   return (c - 0xac00) % 28 === 0 ? "가" : "이";

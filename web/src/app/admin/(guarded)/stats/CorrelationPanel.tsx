@@ -138,12 +138,11 @@ export function CorrelationPanel({
           <div className="mt-4">
             <WarningBadge kind="lowReliability" />
             <p className="text-axis text-ink-secondary mt-2 max-w-[42rem] leading-relaxed">
-              <strong>{[...dimmed].join(" · ")}</strong> 열을 흐리게 두었습니다.
-              이 척도는 문항끼리 맞물리지 않아서, 여기서 잰 상관은{" "}
-              <strong>실제보다 작게</strong> 나옵니다. 「관련이 약하다」가 아니라{" "}
-              <strong>「아직 말할 수 없다」</strong>로 읽어 주십시오.{" "}
+              <strong>{[...dimmed].join(" · ")}</strong> 열은 문항끼리 맞물리지
+              않아 상관이 <strong>실제보다 작게</strong> 나옵니다. 「관련이
+              약하다」가 아니라 <strong>「아직 말할 수 없다」</strong>입니다.{" "}
               <a href="/admin/stats?tab=reliability" className="underline">
-                검사 신뢰도에서 보기
+                신뢰도 보기
               </a>
             </p>
           </div>
@@ -192,8 +191,7 @@ export function CorrelationPanel({
                 <>
                   {" "}
                   <span style={{ color: "var(--status-critical)" }}>
-                    {sel.col}은 문항이 아직 맞물리지 않아 이 그림의 기울기를
-                    그대로 믿을 수 없습니다.
+                    {sel.col}은 문항이 안 맞물려 기울기를 믿기 어렵습니다.
                   </span>
                 </>
               )}
