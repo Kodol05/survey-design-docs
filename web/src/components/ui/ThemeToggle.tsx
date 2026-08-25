@@ -49,17 +49,48 @@ export function ThemeToggle({ className = "" }: { className?: string }) {
     setTheme(next);
   };
 
+  const dark = theme === "dark";
+
+  /*
+    ── 스위치로 둔다 (2026-08-25) ──
+
+    전에는 버튼 하나가 `☀`↔`☾`로 모양만 바뀌었다. 그러면 **지금 아이콘이
+    현재 상태인지 누르면 될 상태인지** 알 수 없다 — 해가 떠 있으면 지금
+    밝다는 뜻인지, 누르면 밝아진다는 뜻인지 매번 헷갈린다.
+
+    스위치는 **꺼짐/켜짐이 위치로 보인다.** 손잡이가 오른쪽에 가 있으면
+    켜진 것이고, 그건 아이콘과 달리 해석할 여지가 없다.
+  */
   return (
     <button
       type="button"
+      role="switch"
+      aria-checked={dark}
       onClick={flip}
-      // 값을 읽기 전에는 자리만 잡아 둔다. 아이콘이 바뀌며 튀는 것을 막는다
-      className={`inline-flex size-9 items-center justify-center rounded-lg ${className}`}
-      style={{ background: "var(--wash)", opacity: theme ? 1 : 0 }}
-      aria-label={theme === "dark" ? "밝게 보기" : "어둡게 보기"}
-      title={theme === "dark" ? "밝게 보기" : "어둡게 보기"}
+      className={`inline-flex items-center gap-2 ${className}`}
+      // 값을 읽기 전에는 자리만 잡아 둔다. 손잡이가 튀는 것을 막는다
+      style={{ opacity: theme ? 1 : 0 }}
+      title={dark ? "밝게 보기" : "어둡게 보기"}
     >
-      <span aria-hidden>{theme === "dark" ? "☀" : "☾"}</span>
+      <span className="text-axis text-ink-muted">다크</span>
+
+      <span
+        aria-hidden
+        className="relative inline-flex h-7 w-12 shrink-0 items-center rounded-full transition-colors"
+        style={{
+          background: dark ? "var(--series-1)" : "var(--grid)",
+          outline: "1px solid var(--border)",
+        }}
+      >
+        <span
+          className="absolute size-5 rounded-full transition-[left] duration-200"
+          style={{
+            left: dark ? "1.5rem" : "0.25rem",
+            background: dark ? "#fff" : "var(--page)",
+            boxShadow: "0 1px 2px rgb(0 0 0 / 0.2)",
+          }}
+        />
+      </span>
     </button>
   );
 }
