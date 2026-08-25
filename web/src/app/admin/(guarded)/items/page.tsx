@@ -83,6 +83,7 @@ export default async function ItemsPage(props: {
                 <Link
                   key={s}
                   href={picked === s ? "/admin/items" : `/admin/items?scale=${encodeURIComponent(s)}`}
+                  scroll={false}
                   className="rounded-md px-3 py-1.5"
                   style={{
                     background: picked === s ? "var(--ink)" : "var(--wash)",

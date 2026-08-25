@@ -397,6 +397,8 @@ function SortChip({
   return (
     <Link
       href={href}
+      // 정렬을 바꿔도 보던 자리에 머문다
+      scroll={false}
       className="inline-flex items-center gap-1 rounded-md px-3 py-1.5"
       style={{
         background: on ? "var(--ink)" : "var(--wash)",

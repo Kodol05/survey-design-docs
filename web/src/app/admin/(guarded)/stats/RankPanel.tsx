@@ -137,6 +137,14 @@ function Picker({
         <Link
           key={o}
           href={href(o)}
+          /*
+            **화면이 위로 튀지 않게 한다** (2026-08-25).
+
+            축을 바꾸면 주소가 바뀌면서 맨 위로 올라갔다. 아래쪽에서
+            「이 성향으로 갈리는 직무능력」을 읽다가 다른 성향으로 바꾸면
+            읽던 자리를 잃는다 — 바뀌는 것은 바로 그 자리인데.
+          */
+          scroll={false}
           className="text-table rounded-lg px-3 py-1.5"
           style={{
             background: o === picked ? "var(--ink)" : "var(--wash)",

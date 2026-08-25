@@ -155,7 +155,8 @@ export function AgreementPanel({ data }: { data: RatingCompare }) {
 /** 0을 가운데 두고 좌우로. 오른쪽이면 대표님이 더 높게 보신 것 */
 function GapBar({ gap }: { gap: number }) {
   const FULL = 50;
-  const w = Math.min(50, (Math.abs(gap) / FULL) * 50);
+  // 시작점과 폭에 같은 값을 쓴다 — 다르게 쓰면 작은 음수에서 가운데를 넘어간다
+  const w = Math.max(1.6, Math.min(50, (Math.abs(gap) / FULL) * 50));
   const big = Math.abs(gap) >= NOTABLE;
   return (
     <span className="relative block h-3" title={`${gap >= 0 ? "+" : "−"}${Math.abs(Math.round(gap))}점`}>
@@ -167,7 +168,7 @@ function GapBar({ gap }: { gap: number }) {
         className="absolute inset-y-0 rounded-sm"
         style={{
           left: gap < 0 ? `${50 - w}%` : "50%",
-          width: `${Math.max(2, w)}%`,
+          width: `${w}%`,
           background: gap < 0 ? "var(--diverge-neg)" : "var(--diverge-pos)",
           opacity: big ? 1 : 0.4,
         }}

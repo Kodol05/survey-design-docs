@@ -170,19 +170,35 @@ const FULL = 0.7;
  * 모양으로 나오면 눈이 다시 배워야 한다.
  */
 function CellBar({ r, faded }: { r: number; faded: boolean }) {
-  const w = Math.min(50, (Math.abs(r) / FULL) * 50);
+  /*
+    ⚠️ **최소 폭과 시작점에 같은 값을 써야 한다.**
+
+    전에는 시작점을 `50 - w`로 잡고 폭만 `max(2, w)`로 늘렸다. 그래서 값이
+    아주 작은 음수(`−.01` 같은)에서 **왼쪽 막대가 가운데 선을 1.3%쯤
+    넘어갔다.** 넘어간 자리에 가운데 선이 겹쳐 색이 하나 더 있는 것처럼
+    보였다 — 실제로 그렇게 보인다는 지적을 받았다.
+
+    한 번만 계산해서 양쪽에 같이 쓴다. 어떤 값이든 막대는 가운데에서
+    한쪽으로만 뻗는다.
+  */
+  const w = Math.max(1.6, Math.min(50, (Math.abs(r) / FULL) * 50));
   return (
     // 배경색을 옅게 내린 만큼 막대는 굵고 넓게 — 이제 크기를 이쪽이 진다
     <span className="relative my-1.5 block h-3.5 w-[86%]">
+      {/*
+        가운데 선은 **막대 아래에 아주 옅게** 둔다. 진하게 두면 막대 끝에
+        붙어 다른 색 조각처럼 보인다. 어두운 화면에서 `--ink`는 거의 흰색이라
+        특히 눈에 걸렸다.
+      */}
       <span
         className="absolute inset-y-0 left-1/2 w-px"
-        style={{ background: "var(--ink)", opacity: 0.3 }}
+        style={{ background: "var(--ink)", opacity: 0.14 }}
       />
       <span
         className="absolute inset-y-0 rounded-sm"
         style={{
           left: r < 0 ? `${50 - w}%` : "50%",
-          width: `${Math.max(2, w)}%`,
+          width: `${w}%`,
           background: r < 0 ? "var(--diverge-neg)" : "var(--diverge-pos)",
           opacity: faded ? 0.45 : 1,
         }}
