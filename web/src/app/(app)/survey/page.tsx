@@ -1,6 +1,6 @@
 import { redirect } from "next/navigation";
-import { ButtonLink } from "@/components/ui/Button";
 import { SectionForm } from "@/components/survey/SectionForm";
+import { SectionProgress } from "@/components/survey/SectionProgress";
 import { requireUser } from "@/lib/auth/guard";
 import {
   SECTION_COUNT,
@@ -12,39 +12,28 @@ import {
 export const metadata = { title: "응시 — 7차원 성향 설문" };
 
 export default async function SurveyPage(props: {
-  searchParams: Promise<{ section?: string; start?: string; rest?: string }>;
+  searchParams: Promise<{ section?: string; rest?: string }>;
 }) {
   const me = await requireUser();
   const session = await getOrCreateSession(me.id);
 
-  const { section: raw, start, rest } = await props.searchParams;
+  const { section: raw, rest } = await props.searchParams;
   const asked = Number(raw);
   const resume = (await firstUnansweredSection(session.id)) ?? SECTION_COUNT;
   const section =
     Number.isInteger(asked) && asked >= 1 && asked <= SECTION_COUNT ? asked : resume;
 
   /*
-    아직 한 문항도 답하지 않았고 「시작」을 누르지도 않았으면 **안내 화면**을
-    먼저 보여준다 (01 §2.9).
+    ⚠️ **중간에 화면을 끊지 않는다** (2026-08-25 사용자 결정).
 
-    전에는 로그인하자마자 1번 문항이 튀어나왔다. 얼마나 걸리는지, 중간에
-    나가도 되는지 모른 채로 시작하게 된다. 이어서 하는 사람에게는 안 보인다 —
-    이미 아는 내용을 매번 다시 읽힐 이유가 없다.
+    한때 두 자리에 안내 화면을 뒀다 — 시작 전 「이런 검사입니다」와 묶음 사이
+    「몇 개 남았습니다」. 둘 다 뺐다.
+
+    앞엣것은 **아직 시작도 안 한 사람에게 읽을 것을 먼저 들이미는 꼴**이었고,
+    뒤엣것은 **답하던 흐름을 끊고 버튼을 한 번 더 누르게** 했다. 남은 묶음
+    수는 그대로 알리되, 다음 묶음 위에 잠깐 떴다 사라지는 쪽으로 옮겼다
+    (`SectionProgress`).
   */
-  const fresh = (await firstUnansweredSection(session.id)) === 1;
-  if (fresh && start !== "1") return <StartNotice />;
-
-  /*
-    묶음을 넘길 때 **한 번 쉬어 간다** (2026-08-25).
-
-    114문항이 끊김 없이 이어지면 끝이 안 보인다. 묶음이 끝날 때마다
-    「몇 개 끝났고 몇 개 남았다」를 한 번 보여주면 17분이 덜 길게 느껴진다.
-    누르면 다음 묶음이니 손이 한 번 더 가지만, 그 대신 **지금 어디쯤인지**를
-    안다.
-  */
-  if (rest === "1" && section > 1 && section <= SECTION_COUNT)
-    return <Breather section={section} />;
-
   const { items, answers } = await getSection(session.id, section);
   if (!items.length) redirect("/me");
 
@@ -76,7 +65,21 @@ export default async function SurveyPage(props: {
         </div>
       </div>
 
-      <p className="text-ink-secondary my-12 text-center text-xl">
+      {/*
+        묶음을 넘겨 왔으면 남은 개수를 **잠깐만** 알린다. 자리는 늘 차지하고
+        있어서 사라질 때 아래 문항이 밀리지 않는다.
+      */}
+      <div className="mt-8 mb-4 h-8">
+        {rest === "1" && section > 1 && (
+          <SectionProgress
+            key={section}
+            section={section}
+            sectionCount={SECTION_COUNT}
+          />
+        )}
+      </div>
+
+      <p className="text-ink-secondary mb-12 text-center text-xl">
         정답이 없습니다. 오래 고민하지 마시고 평소 모습에 가까운 쪽을 골라 주세요.
       </p>
 
@@ -88,95 +91,6 @@ export default async function SurveyPage(props: {
         items={items}
         initialAnswers={answers}
       />
-    </main>
-  );
-}
-
-/**
- * 응시 시작 안내.
- *
- * ⚠️ **분량을 늘리지 않는다 (01 §2.9).** 「인사평가에 쓰지 않습니다」,
- *    「관리자가 조회할 수 있습니다」 같은 문구는 넣지 않는다 — 굳이 꺼내면
- *    반감만 산다는 것이 그때의 결정이었고, 열람 범위는 가입 화면의
- *    개인정보 고지에 이미 한 줄로 들어 있다 (D-14).
- */
-function StartNotice() {
-  return (
-    <main className="reading-column flex flex-1 flex-col justify-center py-20">
-      <h1 className="text-screen-title mb-8">시작하기 전에</h1>
-
-      <ul className="text-item mb-10 flex flex-col gap-3">
-        <li className="flex gap-3">
-          <span aria-hidden className="text-ink-muted">·</span>
-          <span>약 17분 · 114문항 · 일곱 묶음으로 나뉘어 있습니다</span>
-        </li>
-        <li className="flex gap-3">
-          <span aria-hidden className="text-ink-muted">·</span>
-          <span>
-            <strong>중간에 그만두어도 됩니다.</strong> 묶음을 넘길 때마다 저장되고
-            다음에 들어오면 멈춘 자리부터 이어서 합니다
-          </span>
-        </li>
-        <li className="flex gap-3">
-          <span aria-hidden className="text-ink-muted">·</span>
-          <span>정답과 오답이 없습니다. 오래 고민하지 마시고 평소 모습에 가까운 쪽을 고르시면 됩니다</span>
-        </li>
-      </ul>
-
-      <p>
-        <ButtonLink href="/survey?start=1" size="lg">
-          검사 시작하기
-        </ButtonLink>
-      </p>
-
-      <p className="text-axis text-ink-muted mt-16 border-t border-[--border] pt-6">
-        2주 넘게 이어서 하지 않으면 처음부터 다시 하시게 됩니다. 오래 전 답과
-        지금 답이 한 결과로 섞이지 않게 하기 위해서입니다.
-      </p>
-    </main>
-  );
-}
-
-/**
- * 묶음 사이 쉬어 가는 자리.
- *
- * **진행률만으로는 부족하다.** 위에 막대가 있지만 문항을 답하는 동안에는
- * 눈이 문항에만 간다. 묶음이 끝나는 순간이 유일하게 고개를 드는 때다.
- */
-function Breather({ section }: { section: number }) {
-  const done = section - 1;
-  const left = SECTION_COUNT - done;
-
-  return (
-    <main className="reading-column flex flex-1 flex-col justify-center py-24 text-center">
-      <p className="text-axis text-ink-muted mb-3">
-        {SECTION_COUNT}개 묶음 중 {done}개 끝났습니다
-      </p>
-
-      <h1 className="text-screen-title mb-10">
-        {left === 1 ? "마지막 묶음이 남았습니다" : `${left}개 남았습니다`}
-      </h1>
-
-      {/* 묶음 하나가 칸 하나. 진행률 막대보다 「몇 개」가 눈에 잡힌다 */}
-      <ul className="mb-12 flex justify-center gap-2" aria-hidden>
-        {Array.from({ length: SECTION_COUNT }, (_, i) => (
-          <li
-            key={i}
-            className="h-2.5 w-10 rounded-full"
-            style={{ background: i < done ? "var(--series-1)" : "var(--grid)" }}
-          />
-        ))}
-      </ul>
-
-      <p>
-        <ButtonLink href={`/survey?section=${section}`} size="lg">
-          이어서 하기
-        </ButtonLink>
-      </p>
-
-      <p className="text-axis text-ink-muted mt-10">
-        여기서 나가셔도 됩니다. 다음에 들어오면 이 자리부터 이어서 합니다.
-      </p>
     </main>
   );
 }

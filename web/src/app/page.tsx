@@ -3,8 +3,6 @@ import { redirect } from "next/navigation";
 import { currentUser } from "@/lib/auth/session";
 import { ButtonLink } from "@/components/ui/Button";
 import { ThemeToggle } from "@/components/ui/ThemeToggle";
-import { POLES } from "@/lib/interpretation/poles";
-import { CHARACTER, GRADIENT, TEMPERAMENT } from "@/components/charts/scale";
 
 export const metadata = { title: "7차원 성향 설문" };
 
@@ -31,8 +29,6 @@ export const metadata = { title: "7차원 성향 설문" };
 export default async function Home() {
   const me = await currentUser();
   if (me) redirect(me.role === "ADMIN" ? "/admin" : "/me");
-
-  const axes = [...TEMPERAMENT, ...CHARACTER];
 
   return (
     <>
@@ -102,96 +98,53 @@ export default async function Home() {
           </div>
 
           <a
-            href="#what"
+            href="#more"
             className="text-axis pb-10 text-center"
             style={{ color: "#6b6258" }}
           >
-            무엇을 재는지 보기
-            <span aria-hidden className="mt-1 block">
-              ↓
-            </span>
+            <span aria-hidden className="block">↓</span>
           </a>
         </div>
       </section>
 
-      {/* ── 내려야 나오는 것 ── */}
-      <section id="what" className="page-column scroll-mt-0 py-24">
-        <div className="mx-auto w-full max-w-[62rem]">
-          <div className="mb-16 flex items-baseline justify-between gap-4">
-            <h2 className="text-screen-title">일곱 개의 자</h2>
+      {/*
+        아래는 **보통 웹사이트 맨 아래처럼** 둔다 (2026-08-25).
+
+        처음에는 일곱 축을 다 펼쳐 놨었다. 내용 자체가 틀린 것은 아닌데,
+        **아직 시작도 안 한 사람에게 먼저 들이밀 것이 아니었다.** 화면도
+        예뻐지지 않았다. 필요한 사람만 읽는 자리로 내린다.
+      */}
+      <footer id="more" className="border-t border-[--border]">
+        <div className="page-column py-14">
+          <div className="flex flex-wrap items-start justify-between gap-x-12 gap-y-8">
+            <div className="max-w-[34rem]">
+              <p className="text-table mb-2 font-medium">7차원 성향 설문</p>
+              <p className="text-axis text-ink-muted leading-relaxed">
+                클로닝거의 기질·성격 이론을 참고해 사내에서 만들었습니다. 공개된
+                검사를 그대로 쓴 것이 아니라 문항을 직접 썼고, 아직 다듬는
+                중입니다. 자기 이해를 돕는 참고 자료로 봐 주시면 됩니다.
+              </p>
+            </div>
+
+            <nav className="text-axis flex flex-col gap-2">
+              <Link href="/signup" className="text-ink-secondary">
+                시작하기
+              </Link>
+              <Link href="/login" className="text-ink-secondary">
+                로그인
+              </Link>
+              <Link href="/admin/login" className="text-ink-muted">
+                관리자
+              </Link>
+            </nav>
+          </div>
+
+          <div className="mt-12 flex flex-wrap items-center justify-between gap-4 border-t border-[--border] pt-6">
+            <p className="text-axis text-ink-muted">약 17분 · 114문항</p>
             <ThemeToggle />
           </div>
-
-          <p className="text-item text-ink-secondary mb-16 max-w-[40rem]">
-            결과지에 나오는 눈금이 이것입니다. 양 끝은 둘 다 그냥 설명입니다 — 어느
-            쪽이 맞고 틀린 것이 아닙니다.
-          </p>
-
-          <ul className="mb-24 flex flex-col gap-9">
-            {axes.map((axis) => (
-              <li key={axis}>
-                <div className="grid items-center gap-x-5 gap-y-2 sm:grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)]">
-                  <span className="text-axis text-ink-secondary sm:text-right">
-                    {POLES[axis].low}
-                  </span>
-
-                  <span className="order-last flex flex-col items-center gap-1.5 sm:order-none">
-                    <span
-                      className="block h-2.5 w-full rounded-full sm:w-[13rem]"
-                      style={{ background: GRADIENT }}
-                      aria-hidden
-                    />
-                    <span
-                      className="text-ink-muted"
-                      style={{ letterSpacing: "0.18em", fontSize: "0.8125rem" }}
-                    >
-                      {axis}
-                    </span>
-                  </span>
-
-                  <span className="text-axis text-ink-secondary">{POLES[axis].high}</span>
-                </div>
-              </li>
-            ))}
-          </ul>
-
-          <dl className="mb-20 grid gap-8 sm:grid-cols-3">
-            <Fact term="걸리는 시간" desc="약 17분 · 114문항" />
-            <Fact term="중간에 그만두면" desc="묶음마다 저장됩니다. 다음에 이어서 하시면 됩니다" />
-            <Fact term="결과는" desc="끝내면 바로 본인 화면에서 보실 수 있습니다" />
-          </dl>
-
-          <div className="flex flex-wrap items-center gap-x-8 gap-y-4 border-t border-[--border] pt-12">
-            <ButtonLink href="/signup" size="lg">
-              시작하기
-            </ButtonLink>
-            <Link href="/login" className="text-table text-ink-secondary underline">
-              이미 계정이 있습니다
-            </Link>
-          </div>
-
-          <p className="text-axis text-ink-muted mt-20 max-w-[46rem]">
-            클로닝거의 기질·성격 이론을 참고해 사내에서 만든 설문입니다. 공개된 검사를
-            그대로 쓴 것이 아니라 문항을 직접 썼고, <strong>아직 다듬는 중입니다.</strong>{" "}
-            자기 이해를 돕는 참고 자료로 봐 주시면 됩니다.
-          </p>
-
-          <p className="text-axis text-ink-muted mt-6">
-            <Link href="/admin/login" className="underline">
-              관리자 로그인
-            </Link>
-          </p>
         </div>
-      </section>
+      </footer>
     </>
-  );
-}
-
-function Fact({ term, desc }: { term: string; desc: string }) {
-  return (
-    <div>
-      <dt className="text-axis text-ink-muted mb-1">{term}</dt>
-      <dd className="text-table">{desc}</dd>
-    </div>
   );
 }
