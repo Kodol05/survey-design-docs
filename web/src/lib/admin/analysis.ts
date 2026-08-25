@@ -203,6 +203,62 @@ export async function rankForAbility(
 }
 
 /**
+ * **한 조합을 세부 항목으로 쪼갠다** (2026-08-25 사용자 요청).
+ *
+ * 표의 한 칸은 「인내력 × 협력」처럼 축 전체로 말한다. 그런데 인내력 안에는
+ * 네 가지 세부 항목이 들어 있고, **그중 하나만 관련이 있는데 나머지 셋에
+ * 묻혀 축 전체로는 안 보이는** 일이 실제로 생긴다. 반대로 축 전체가 관련
+ * 있어 보이는데 알고 보니 한 항목이 끌고 있는 경우도 있다.
+ *
+ * 「순위」 탭은 **능력 하나에 대해 28개 항목을 통째로** 줄 세운다. 여기는
+ * 반대로 **고른 조합 하나**만 쪼갠다 — 표에서 눈에 띈 칸을 그 자리에서 더
+ * 들여다보는 용도다.
+ *
+ * ⚠️ 항목이 서넛뿐이라 다중비교 경고는 축 전체 순위만큼 무겁지 않다. 그래도
+ *    **한 항목만 튀는 것을 발견으로 읽으면 안 된다** — 항목당 문항이 서너
+ *    개뿐이라 축 전체보다 잡음이 크다.
+ */
+export async function facetPairs(
+  excludePoor = false,
+  source: AbilitySource = "self",
+): Promise<Record<string, RankRow[]>> {
+  const rows = await loadFacetLevel(excludePoor, source);
+  const out: Record<string, RankRow[]> = {};
+
+  for (const [label, values] of rows.facets) {
+    const [scale, facet] = label.split(" · ");
+    for (const axis of ABILITY_AXES) {
+      const pairs = values
+        .map((v, i) => [v, rows.abilities[axis]?.[i]] as const)
+        .filter(
+          ([a, b]) =>
+            typeof a === "number" &&
+            typeof b === "number" &&
+            !Number.isNaN(a) &&
+            !Number.isNaN(b),
+        );
+      if (pairs.length < 4) continue;
+      const k = key(scale, axis);
+      (out[k] ??= []).push({
+        label: facet ?? label,
+        scale,
+        corr: correlate(
+          pairs.map(([a]) => a),
+          pairs.map(([, b]) => b),
+        ),
+      });
+    }
+  }
+
+  /*
+    큰 순서가 아니라 **검사에 든 순서**로 둔다. 항목 순서는 검사의 구조라
+    조합마다 뒤바뀌면 같은 축인데도 다른 축처럼 보인다. 「어느 항목이 큰가」는
+    막대 길이가 이미 말한다.
+  */
+  return out;
+}
+
+/**
  * 세부 항목(하위척도) 단위 점수. 순위 화면에서만 쓴다.
  *
  * 직무능력은 고른 출처를 따른다 — 대표님 평가로 보면 **자기보고끼리의**

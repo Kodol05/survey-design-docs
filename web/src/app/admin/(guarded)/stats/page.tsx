@@ -5,8 +5,10 @@ import type { Cell } from "@/components/analysis/CorrelationTable";
 import type { Point } from "@/components/analysis/ScatterPlot";
 import { WarningBadge } from "@/components/ui/WarningBadge";
 import { requireAdmin } from "@/lib/auth/guard";
-import type { ScaleReliability } from "@/lib/admin/analysis";
+import type { RankRow, ScaleReliability } from "@/lib/admin/analysis";
+import { influenceOf, type Influence } from "@/lib/admin/influence";
 import {
+  facetPairs,
   RANK_LIMIT,
   abilitiesByTraitTercile,
   cellOf,
@@ -20,9 +22,8 @@ import {
 } from "@/lib/admin/analysis";
 import { ALPHA } from "@/lib/admin/stats";
 import { ABILITY_AXES, TRAIT_SCALES } from "@/lib/items/types";
-import { getCell, loadResearchTable } from "@/lib/research/correlations";
 import { MIN_N } from "@/components/ui/NBadge";
-import { ResearchCompareTable } from "@/components/analysis/ResearchCompareTable";
+import { ResearchCompare } from "@/components/analysis/ResearchCompare";
 import { compareToResearch } from "@/lib/admin/researchCompare";
 import { SourcePicker } from "@/components/analysis/SourcePicker";
 import { CHARACTER, TEMPERAMENT } from "@/components/charts/scale";
@@ -46,7 +47,7 @@ import { spreadOf, type Spread } from "@/lib/admin/spread";
 export const metadata = { title: "분석 — 관리자" };
 
 const TABS = [
-  { key: "matrix", label: "직무능력과 성향" },
+  { key: "matrix", label: "직무능력과 기질·성격" },
   { key: "rank", label: "순위" },
   { key: "spread", label: "분포" },
   { key: "prediction", label: "예측 대 실제" },
@@ -60,19 +61,29 @@ export default async function StatsPage(props: {
     axis?: string;
     scale?: string;
     src?: string;
+    clean?: string;
   }>;
 }) {
   await requireAdmin();
   const sp = await props.searchParams;
   const tab = TABS.some((t) => t.key === sp.tab) ? sp.tab! : "matrix";
   const source = parseSource(sp.src);
+  /*
+    **응답 신뢰도가 낮은 사람을 빼고 다시 본다** (2026-08-25 사용자 요청).
 
-  const [people, reliability, bossCount, personQuality, agreement] = await Promise.all([
-    loadPeople(false, source),
+    「이 결과가 대충 찍은 몇 명 때문인가」는 늘 남는 물음인데, 그동안
+    `loadPeople(excludePoor)`라는 손잡이가 코드에만 있고 화면에는 없었다.
+    켜고 끄면서 숫자가 얼마나 움직이는지 보는 것이 답이다.
+  */
+  const clean = sp.clean === "1";
+
+  const [people, reliability, bossCount, personQuality, agreement, facets] = await Promise.all([
+    loadPeople(clean, source),
     loadReliability(),
     countRatedEmployees(),
     loadPersonQuality(),
     loadRatingCompare(),
+    facetPairs(clean, source),
   ]);
   const matrix = traitAbilityMatrix(people);
   const alphas = reliability
@@ -88,6 +99,12 @@ export default async function StatsPage(props: {
     안 된다 (2026-08-25 사용자 결정).
   */
   const byScale = Object.fromEntries(reliability.map((r) => [r.scale, r]));
+  /*
+    빠지는 인원을 **품질 목록에서 직접 센다.** `people.length`와 빼서 구하면
+    거르개가 꺼져 있을 때는 0이 나와 「몇 명이 빠지는지」를 미리 말할 수 없다.
+    켜기 전에 알려줘야 누를지 말지 정할 수 있다.
+  */
+  const poorN = personQuality.filter((q) => q.flag === "poor").length;
   const reviewCount = people.filter((p) => p.quality !== "ok").length;
 
   return (
@@ -146,6 +163,9 @@ export default async function StatsPage(props: {
           source={source}
           bossCount={bossCount}
           reliability={byScale}
+          facets={facets}
+          clean={clean}
+          poorN={poorN}
         />
       )}
       {tab === "rank" && (
@@ -166,7 +186,9 @@ export default async function StatsPage(props: {
           reliability={byScale}
         />
       )}
-      {tab === "prediction" && <PredictionTab people={people} />}
+      {tab === "prediction" && (
+        <PredictionTab people={people} matrix={matrix} />
+      )}
       {tab === "agreement" && <AgreementTab data={agreement} />}
       {tab === "reliability" && (
         <ReliabilityTab rows={reliability} quality={personQuality} />
@@ -239,41 +261,102 @@ type People = Awaited<ReturnType<typeof loadPeople>>;
  *    합치면 없는 숫자를 만들어내는 셈이 된다 (11 §3.2). 한 화면에 두되
  *    표는 끝까지 따로 둔다 — 대조는 3절에서 칸끼리 나란히 놓는 것으로만 한다.
  */
+/**
+ * **한 절만 남긴다** (2026-08-25 사용자 결정).
+ *
+ * 전에는 여기에 두 절이 세로로 쌓여 있었다 — 「우리 회사 데이터」와 「연구에서
+ * 나온 값」. 그런데 연구값은 **논문이 본 것과 우리가 잰 것을 맞대는 이야기**라
+ * 「예측 대 실제」 탭이 하는 일과 같다. 두 탭에 나눠 두면 같은 물음의 답이
+ * 두 군데로 흩어진다.
+ *
+ * 연구 표는 그리로 옮기고, 여기는 **우리 데이터 하나를 깊게** 판다.
+ */
 function MatrixTab({
   people,
   matrix,
   source,
   bossCount,
   reliability,
+  facets,
+  clean,
+  poorN,
 }: {
   people: People;
   matrix: ReturnType<typeof traitAbilityMatrix>;
   source: AbilitySource;
   bossCount: number;
   reliability: Record<string, ScaleReliability>;
+  facets: Record<string, RankRow[]>;
+  clean: boolean;
+  poorN: number;
 }) {
   return (
-    <div className="flex flex-col gap-16">
-      <InHouseSection
-        people={people}
-        matrix={matrix}
-        source={source}
-        bossCount={bossCount}
-        reliability={reliability}
-      />
-      <ResearchSection
-        compare={
-          matrix.enough ? (
-            <ResearchCompareTable data={compareToResearch(matrix)} />
-          ) : (
-            <p className="text-ink-secondary">
-              우리 회사 값이 아직 없어 맞대 볼 수 없습니다. {MIN_N}명이 넘으면
-              나옵니다.
-            </p>
-          )
-        }
-      />
-    </div>
+    <InHouseSection
+      people={people}
+      matrix={matrix}
+      source={source}
+      bossCount={bossCount}
+      reliability={reliability}
+      facets={facets}
+      clean={clean}
+      poorN={poorN}
+    />
+  );
+}
+
+/**
+ * 표의 행 묶음 — **기질 4 / 성격 3** (2026-08-25 사용자 요청).
+ *
+ * 일곱을 평평하게 늘어놓으면 이 검사의 뼈대가 표에서 사라진다. 묶어 두면
+ * 「관련 있는 것은 타고나는 쪽인가, 만들어지는 쪽인가」라는 물음이 새로
+ * 생긴다 — 숫자를 더 만들지 않고 줄만 나눠서 눈으로 답하게 한다.
+ */
+const TRAIT_GROUPS = [
+  { label: "기질", note: "타고나는 쪽", rows: [...TEMPERAMENT] },
+  { label: "성격", note: "살면서 만들어지는 쪽", rows: [...CHARACTER] },
+];
+
+/**
+ * 응답 신뢰도가 낮은 사람을 빼고 다시 보는 손잡이.
+ *
+ * 「이 결과가 대충 찍은 몇 명 때문인가」는 늘 남는 물음이다. 그동안
+ * `loadPeople(excludePoor)`가 코드에만 있고 화면에는 없었다. **켜고 끄면서
+ * 숫자가 얼마나 움직이는지 보는 것**이 답이다 — 안 움직이면 걱정 안 해도
+ * 되고, 크게 움직이면 그 자체가 발견이다.
+ *
+ * 켠 상태를 기본으로 두지 않는다. 사람을 빼고 시작하면 뺐다는 사실을
+ * 잊는다.
+ */
+function CleanToggle({
+  clean,
+  poorN,
+  source,
+}: {
+  clean: boolean;
+  poorN: number;
+  source: AbilitySource;
+}) {
+  if (poorN === 0) return null;
+  const sp = new URLSearchParams();
+  if (source !== "self") sp.set("src", source);
+  if (!clean) sp.set("clean", "1");
+  const q = sp.toString();
+
+  return (
+    <Link
+      href={`/admin/stats${q ? `?${q}` : ""}`}
+      scroll={false}
+      className="text-axis inline-flex items-center gap-2 rounded-lg px-3 py-1.5"
+      style={{
+        background: clean ? "var(--ink)" : "var(--wash)",
+        color: clean ? "var(--page)" : "var(--ink-secondary)",
+        fontWeight: clean ? 600 : 400,
+      }}
+      title="응답 신뢰도가 「낮음」인 사람을 빼고 다시 계산합니다"
+    >
+      <span aria-hidden>{clean ? "☑" : "☐"}</span>
+      신뢰도 낮은 응답 {poorN}명 빼기
+    </Link>
   );
 }
 
@@ -285,12 +368,18 @@ function InHouseSection({
   source,
   bossCount,
   reliability,
+  facets,
+  clean,
+  poorN,
 }: {
   people: People;
   matrix: ReturnType<typeof traitAbilityMatrix>;
   source: AbilitySource;
   bossCount: number;
   reliability: Record<string, ScaleReliability>;
+  facets: Record<string, RankRow[]>;
+  clean: boolean;
+  poorN: number;
 }) {
   if (!matrix.enough)
     return (
@@ -307,6 +396,7 @@ function InHouseSection({
   const cells: Record<string, Cell> = {};
   const scatter: Record<string, Point[]> = {};
   const trends: Record<string, { x: number; y: number }[] | null> = {};
+  const influence: Record<string, Influence | null> = {};
 
   for (const scale of TRAIT_SCALES)
     for (const axis of ABILITY_AXES) {
@@ -320,11 +410,16 @@ function InHouseSection({
       const pts = scatterPoints(people, scale, axis);
       scatter[k] = pts;
       trends[k] = trendLine(pts);
+      // 「한 사람에 매달려 있는가」 — 산점도와 같은 점으로 잰다
+      influence[k] = influenceOf(pts);
     }
 
   return (
     <section>
-      <SourcePicker value={source} bossCount={bossCount} className="mb-1" />
+      <div className="mb-1 flex flex-wrap items-center gap-x-6 gap-y-3">
+        <SourcePicker value={source} bossCount={bossCount} />
+        <CleanToggle clean={clean} poorN={poorN} source={source} />
+      </div>
       <p className="text-ink-secondary mb-8 max-w-[56rem]">
         우리 직원 {matrix.n}명 값입니다. {SOURCE_NOTE[source]}{" "}
         <strong>칸을 누르면 그 조합만 크게 보고, 다시 누르면 돌아옵니다.</strong>
@@ -337,54 +432,10 @@ function InHouseSection({
         trends={trends}
         inHouse
         reliability={reliability}
+        groups={TRAIT_GROUPS}
+        influence={influence}
+        facets={facets}
       />
-    </section>
-  );
-}
-
-// ── 2절 · 연구에서 나온 값 ──────────────────────────────────────────
-
-function ResearchSection({ compare }: { compare: React.ReactNode }) {
-  const table = loadResearchTable();
-  const cells: Record<string, Cell> = {};
-  for (const scale of TRAIT_SCALES)
-    for (const axis of ABILITY_AXES) {
-      const c = getCell(table, scale, axis);
-      cells[`${scale}|${axis}`] =
-        c.kind === "value"
-          ? { kind: "value", r: c.value, n: 0, ci: [c.value, c.value] }
-          : c.kind === "none"
-            ? { kind: "none" }
-            : c.kind === "expected"
-              ? {
-                  kind: "expected",
-                  direction: c.direction,
-                  basis: c.chain ? `${c.basis} — ${c.chain}` : c.basis,
-                  estimate: c.estimate,
-                }
-              : { kind: "unstudied" };
-    }
-
-  return (
-    <section>
-      <h2 className="text-section-title mb-1">연구에서 나온 값</h2>
-      <p className="text-ink-secondary mb-8 max-w-[56rem]">
-        논문 값을 그대로 적은 것입니다. 사람이 늘어도 바뀌지 않고, 점수 계산에도
-        쓰지 않습니다.
-      </p>
-      <CorrelationPanel
-        rows={[...TRAIT_SCALES]}
-        cols={[...ABILITY_AXES]}
-        cells={cells}
-        scatter={{}}
-        trends={{}}
-        inHouse={false}
-        aside={compare}
-      />
-      <p className="text-axis text-ink-muted mt-6 max-w-[56rem]">
-        서로 다른 연구에서 온 값이라 칸끼리 비교할 수 있는 값은 아닙니다.
-        조직생활 열이 통째로 빈 것은 이 개념을 정의한 연구를 찾지 못해서입니다.
-      </p>
     </section>
   );
 }
@@ -541,7 +592,24 @@ function AgreementTab({ data }: { data: Awaited<ReturnType<typeof loadRatingComp
 
 // ── 계산식 ──────────────────────────────────────────────────────────
 
-function PredictionTab({ people }: { people: People }) {
+/**
+ * **논문이 본 것과 우리가 잰 것** — 두 절 (2026-08-25 사용자 결정).
+ *
+ *   1. 사람별 예측 대 실제 — 논문 가중치로 계산한 값과 실제 값
+ *   2. 논문 값과 우리 값 — 상관 하나하나를 막대 두 개로 맞댐
+ *
+ * 2절은 「직무능력과 기질·성격」 탭 아래쪽에 있던 것을 옮겨 왔다. 그 탭은
+ * **우리 데이터 안의 이야기**를 하는 자리인데, 연구값 대조는 **바깥과
+ * 맞대는 이야기**라 여기가 제자리다. 같은 물음의 답이 두 탭으로 흩어져
+ * 있었다.
+ */
+function PredictionTab({
+  people,
+  matrix,
+}: {
+  people: People;
+  matrix: ReturnType<typeof traitAbilityMatrix>;
+}) {
   const items = ABILITY_AXES.map((axis) => predictFromResearch(people, axis)).filter(
     (x): x is NonNullable<typeof x> => x !== null,
   );
@@ -572,7 +640,7 @@ function PredictionTab({ people }: { people: People }) {
         <PredictionPanel items={items} missing={missing} />
       )}
 
-      <Note label="이 예측을 어디까지 믿을 수 있는지" className="mt-8">
+      <Note label="이 예측을 어디까지 믿을 수 있는지" className="mt-8 mb-16">
         <p className="mb-2">
           <strong>서로 다른 논문에서 온 값을 한 식에 넣습니다.</strong> 표본도 지표도
           나라도 다릅니다. 이렇게 만든 예측은 대략의 눈금이지 정밀한 값이 아닙니다.
@@ -588,6 +656,47 @@ function PredictionTab({ people }: { people: People }) {
           「맞는다」였습니다. 여기서는 바깥에서 온 값을 씁니다.
         </p>
       </Note>
+
+      {/* ── 2절 · 상관 하나하나를 맞대 본다 ── */}
+      <div className="border-t border-[--border] pt-14">
+        <h2 className="text-section-title mb-3">논문 값과 우리 값</h2>
+        <p className="text-item text-ink-secondary mb-8 max-w-[52rem]">
+          위쪽이 <strong>사람</strong>을 맞대 본 것이라면, 여기는{" "}
+          <strong>관계 하나하나</strong>를 맞대 봅니다. 막대 두 개가 한 쌍이고
+          위가 논문, 아래가 우리 회사입니다.{" "}
+          <strong>끝이 비슷하면 맞은 것</strong>입니다.
+        </p>
+
+        {matrix.enough ? (
+          <ResearchCompare data={compareToResearch(matrix)} />
+        ) : (
+          <>
+            <WarningBadge kind="smallSample" />
+            <p className="text-ink-secondary mt-4">
+              우리 회사 값이 아직 없어 맞대 볼 수 없습니다. {MIN_N}명이 넘으면
+              나옵니다.
+            </p>
+          </>
+        )}
+
+        <Note label="논문 값을 어떻게 읽는지" className="mt-10">
+          <p className="mb-2">
+            <strong>서로 다른 연구에서 온 값입니다.</strong> 표본도 지표도
+            나라도 달라서 칸끼리 견줄 수 있는 값이 아닙니다. 각 칸을 우리
+            값과만 맞대 보십시오.
+          </p>
+          <p className="mb-2">
+            판정 기준은 <strong>논문 값이 우리 95% 신뢰구간 안에 들어오는가</strong>
+            입니다. 두 숫자를 빼서 크면 다르다고 하지 않습니다 — 우리 값은
+            40명 남짓에서 나온 것이라 원래 흔들립니다. 사람이 늘어 구간이
+            좁아질수록 이 판정이 날카로워집니다.
+          </p>
+          <p>
+            논문 값은 <strong>사람이 늘어도 바뀌지 않고</strong>, 점수 계산에도
+            쓰지 않습니다. 우리 값을 견줄 바깥 기준으로만 둡니다.
+          </p>
+        </Note>
+      </div>
     </section>
   );
 }

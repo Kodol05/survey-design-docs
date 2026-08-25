@@ -56,6 +56,7 @@ export function CorrelationTable({
   onSelect,
   colNote,
   dimCol,
+  groups,
 }: {
   rows: string[];
   cols: string[];
@@ -66,6 +67,20 @@ export function CorrelationTable({
   colNote?: (col: string) => React.ReactNode;
   /** 참이면 그 열의 칸을 통째로 흐리게 그린다 */
   dimCol?: (col: string) => boolean;
+  /**
+   * 행을 묶어서 보여준다 — 기질 4 / 성격 3 (2026-08-25 사용자 요청).
+   *
+   * 일곱 축을 평평하게 늘어놓으면 **어디까지가 타고나는 쪽이고 어디부터
+   * 만들어지는 쪽인지**가 안 보인다. 이 검사의 뼈대가 그 구분인데
+   * (Cloninger의 기질·성격 이론), 표에서는 그게 사라져 있었다.
+   *
+   * 묶어 두면 물음이 하나 더 생긴다 — **「직무능력과 관련 있는 것은 타고나는
+   * 쪽인가, 만들어지는 쪽인가」.** 숫자를 더 만들지 않고 줄만 나눠서
+   * 눈으로 답하게 한다.
+   *
+   * 주지 않으면 `rows` 순서대로 평평하게 그린다.
+   */
+  groups?: { label: string; note?: string; rows: string[] }[];
 }) {
   return (
     <div className="overflow-x-auto">
@@ -116,8 +131,21 @@ export function CorrelationTable({
             ))}
           </tr>
         </thead>
-        <tbody>
-          {rows.map((r) => (
+        {(groups ?? [{ label: "", rows }]).map((g) => (
+        <tbody key={g.label}>
+          {g.label && (
+            <tr>
+              <th
+                scope="colgroup"
+                colSpan={cols.length + 1}
+                className="text-axis border-b border-[--border] px-2 pt-5 pb-1 text-left font-medium"
+              >
+                <span className="text-ink-secondary">{g.label}</span>
+                {g.note && <span className="text-ink-muted ml-2">{g.note}</span>}
+              </th>
+            </tr>
+          )}
+          {g.rows.map((r) => (
             <tr key={r}>
               <th
                 scope="row"
@@ -179,6 +207,7 @@ export function CorrelationTable({
             </tr>
           ))}
         </tbody>
+        ))}
       </table>
     </div>
   );
