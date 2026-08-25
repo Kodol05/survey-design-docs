@@ -80,7 +80,29 @@ export function correlationFill(r: number, faded = false): string {
   return `color-mix(in oklab, ${end} ${(k * 100).toFixed(1)}%, var(--diverge-mid))`;
 }
 
-/** 소수 둘째 자리, 앞의 0 생략, 부호 항상 — `+.28` (11 §3.2) */
+/*
+  ── 0과 1 사이 값을 적는 법 (2026-08-26 사용자 요청으로 바로잡음) ──
+
+  **앞의 0을 적는다.** `+0.73`, `0.94`.
+
+  전에는 `+.73`처럼 생략했다. 논문 표기 관습이고, 읽는 사람이 「r은 −1에서
+  +1 사이」라는 걸 이미 알고 있을 때만 통한다. **우리 화면을 보는 사람은
+  연구자가 아니다.**
+
+  ⚠️ 게다가 실제로 어긋나 있었다 — 「예측이 맞은 정도 `+.73`」 바로 옆
+  타일에 「실제로 나타난 기울기 `0.73`」이 있었다. **같은 0.73인데 표기가
+  다른 두 수가 나란히** 있었던 것이다. 생략 규칙이 다섯 군데에 복사돼
+  있었고 기울기만 빠져 있었다.
+
+  이제 이 파일이 그 규칙을 혼자 갖는다.
+*/
+
+/** 상관·기울기처럼 부호가 뜻을 갖는 값 — `+0.73` · `−0.56` */
 export function formatR(r: number): string {
-  return (r < 0 ? "−" : "+") + Math.abs(r).toFixed(2).replace(/^0/, "");
+  return (r < 0 ? "−" : "+") + Math.abs(r).toFixed(2);
+}
+
+/** α처럼 0~1 사이에서 부호가 없는 값 — `0.94` */
+export function formatRatio(v: number): string {
+  return v.toFixed(2);
 }

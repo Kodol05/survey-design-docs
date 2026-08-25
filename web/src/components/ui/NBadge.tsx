@@ -36,7 +36,7 @@ export function crossesZero(ci: [number, number]): boolean {
 /** 소수 둘째 자리, 앞의 0 생략, 부호 항상 표기 — `+.28` (11 §3.2) */
 export function formatR(r: number): string {
   const sign = r < 0 ? "−" : "+";
-  return sign + Math.abs(r).toFixed(2).replace(/^0/, "");
+  return sign + Math.abs(r).toFixed(2);
 }
 
 export function NBadge({ value }: { value: CorrelationValue }) {

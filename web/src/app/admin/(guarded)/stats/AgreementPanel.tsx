@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useState } from "react";
 import { ScatterPlot } from "@/components/analysis/ScatterPlot";
-import { formatR } from "@/components/analysis/correlationColor";
+import { formatR, formatRatio } from "@/components/analysis/correlationColor";
 import { GradeTag } from "@/components/analysis/GradeTag";
 import { PeekGap, PeekToggle, usePeek } from "@/components/analysis/PeekList";
 import type { RatingCompare } from "@/lib/admin/ratingCompare";
@@ -136,9 +136,37 @@ export function AgreementPanel({ data }: { data: RatingCompare }) {
               </span>
             </span>
           </div>
+          {/*
+            선 두 개의 뜻을 **예측 대 실제와 같은 꼴로** 적는다 (2026-08-26
+            사용자 요청). 두 화면 다 「이랬으면 하는 선」과 「실제로 그어진 선」을
+            겹쳐 보는 자리라, 읽는 법이 같아야 한다.
+          */}
+          <p className="text-axis text-ink-muted mb-3 flex flex-wrap gap-x-5 gap-y-1">
+            <span>
+              <span aria-hidden className="text-ink-muted mr-1.5">
+                ---
+              </span>
+              두 값이 똑같다면 기울기 1.00
+            </span>
+            {cur.fit && (
+              <span>
+                <span
+                  aria-hidden
+                  className="mr-1.5"
+                  style={{ color: "var(--series-1)" }}
+                >
+                  —
+                </span>
+                실제 기울기{" "}
+                <strong className="tabular text-ink-secondary">
+                  {formatRatio(cur.fit.slope)}
+                </strong>
+              </span>
+            )}
+          </p>
           <p className="text-axis text-ink-muted mb-3">
-            <strong>대각선은 두 값이 똑같다는 선</strong>입니다. 위에 있으면
-            대표님이 더 높게, 아래면 본인이 더 높게 본 사람입니다.
+            대각선 <strong>위</strong>에 있으면 대표님이 더 높게,{" "}
+            <strong>아래</strong>면 본인이 더 높게 본 사람입니다.
           </p>
 
           <ScatterPlot
@@ -152,6 +180,7 @@ export function AgreementPanel({ data }: { data: RatingCompare }) {
             }))}
             trend={null}
             guides={[
+              // 두 값이 똑같다면 지나갈 선
               {
                 points: [
                   { x: 0, y: 0 },
@@ -160,6 +189,19 @@ export function AgreementPanel({ data }: { data: RatingCompare }) {
                 color: "var(--ink-muted)",
                 dashed: true,
               },
+              // 실제로 그어진 선
+              ...(cur.fit
+                ? [
+                    {
+                      points: [
+                        { x: 0, y: cur.fit.intercept },
+                        { x: 100, y: cur.fit.intercept + cur.fit.slope * 100 },
+                      ],
+                      color: "var(--series-1)",
+                      width: 3,
+                    },
+                  ]
+                : []),
             ]}
             xLabel="본인 답"
             yLabel="대표님 평가"

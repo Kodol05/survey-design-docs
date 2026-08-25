@@ -1,4 +1,5 @@
 import { Note } from "@/components/ui/Note";
+import { formatRatio } from "@/components/analysis/correlationColor";
 import { CHARACTER, TEMPERAMENT } from "@/components/charts/scale";
 import type { loadPersonQuality, loadReliability } from "@/lib/admin/analysis";
 import { LowQualityList, QualityRanking } from "./PersonQuality";
@@ -35,13 +36,15 @@ export function ReliabilityTab({
       label: "기질",
       note: "타고나는 쪽 · TCI 4축",
       has: (r: { scale: string; kind: string }) =>
-        r.kind === "trait" && (TEMPERAMENT as readonly string[]).includes(r.scale),
+        r.kind === "trait" &&
+        (TEMPERAMENT as readonly string[]).includes(r.scale),
     },
     {
       label: "성격",
       note: "살면서 만들어지는 쪽 · TCI 3축",
       has: (r: { scale: string; kind: string }) =>
-        r.kind === "trait" && (CHARACTER as readonly string[]).includes(r.scale),
+        r.kind === "trait" &&
+        (CHARACTER as readonly string[]).includes(r.scale),
     },
   ];
 
@@ -74,15 +77,23 @@ export function ReliabilityTab({
                   <div key={g.label} className="overflow-x-auto">
                     <p className="text-table text-ink-secondary mb-2">
                       {g.label}
-                      <span className="text-axis text-ink-muted ml-2">{g.note}</span>
+                      <span className="text-axis text-ink-muted ml-2">
+                        {g.note}
+                      </span>
                     </p>
                     <table className="text-table w-full min-w-[22rem]">
                       <thead>
                         <tr className="text-axis text-ink-muted border-b border-[--border]">
                           <th className="py-1.5 text-left font-medium">척도</th>
-                          <th className="w-16 py-1.5 text-right font-medium">문항</th>
-                          <th className="w-16 py-1.5 text-right font-medium">α</th>
-                          <th className="w-28 py-1.5 pl-6 text-left font-medium">판정</th>
+                          <th className="w-16 py-1.5 text-right font-medium">
+                            문항
+                          </th>
+                          <th className="w-16 py-1.5 text-right font-medium">
+                            α
+                          </th>
+                          <th className="w-28 py-1.5 pl-6 text-left font-medium">
+                            판정
+                          </th>
                         </tr>
                       </thead>
                       <tbody>
@@ -91,14 +102,17 @@ export function ReliabilityTab({
                             key={r.scale}
                             className="border-b border-[--border] last:border-0"
                           >
-                            <th scope="row" className="py-2 text-left font-normal">
+                            <th
+                              scope="row"
+                              className="py-2 text-left font-normal"
+                            >
                               {r.scale}
                             </th>
-                            <td className="tabular py-2 text-right">{r.itemCount}</td>
+                            <td className="tabular py-2 text-right">
+                              {r.itemCount}
+                            </td>
                             <td className="tabular py-2 text-right font-medium">
-                              {r.alpha === null
-                                ? "—"
-                                : r.alpha.toFixed(2).replace(/^0/, "")}
+                              {r.alpha === null ? "—" : formatRatio(r.alpha)}
                             </td>
                             <td
                               className="text-axis py-2 pl-6"
@@ -131,8 +145,8 @@ export function ReliabilityTab({
             같습니다.
           </p>
           <p>
-            직무능력의 신뢰도는 <strong>같은 사람을 두 번 재서</strong>{" "}
-            확인해야 합니다. 아직 두 번째 응시 데이터가 없어{" "}
+            직무능력의 신뢰도는 <strong>같은 사람을 두 번 재서</strong> 확인해야
+            합니다. 아직 두 번째 응시 데이터가 없어{" "}
             <strong>지금은 답할 수 없는 상태</strong>입니다.
           </p>
         </Note>
@@ -141,23 +155,22 @@ export function ReliabilityTab({
       <section>
         <h2 className="text-section-title mb-1">사람별 응답 신뢰도</h2>
         <p className="text-axis text-ink-muted mb-6">
-          서로 반대인 문항에 같은 방향으로 답했는지 — 무작위로 답하면 60
-          근처가 나옵니다
+          서로 반대인 문항에 같은 방향으로 답했는지 — 무작위로 답하면 60 근처가
+          나옵니다
         </p>
         <QualityRanking rows={quality} />
         <Note label="이 점수를 어떻게 읽는지" className="mt-8">
           <p>
-            <strong>성격에 대한 판정이 아닙니다.</strong> 그 사람의 점수를 해석에
-            쓸 수 있는지를 말합니다. 위 α와는 다른 이야기입니다 — α는 문항이 잘
-            만들어졌는지를, 이쪽은 그 문항에 <strong>답한 방식</strong>이 앞뒤가
-            맞는지를 봅니다.
+            <strong>성격에 대한 판정이 아닙니다.</strong> 그 사람의 점수를
+            해석에 쓸 수 있는지를 말합니다. 위 α와는 다른 이야기입니다 — α는
+            문항이 잘 만들어졌는지를, 이쪽은 그 문항에{" "}
+            <strong>답한 방식</strong>이 앞뒤가 맞는지를 봅니다.
           </p>
         </Note>
       </section>
     </div>
   );
 }
-
 
 /**
  * 한 능력에 대해 성향 7축을 **큰 순으로** 모은다.

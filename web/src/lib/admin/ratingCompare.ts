@@ -2,7 +2,7 @@ import { ABILITY_AXES } from "@/lib/items/types";
 import { prisma } from "../db";
 import { ratingToPercent } from "./abilitySource";
 import { pickBossScores } from "./ratings";
-import { correlate, type Correlation } from "./stats";
+import { correlate, fitLine, type Correlation } from "./stats";
 import type { StoredAbilities } from "../survey/result";
 
 /**
@@ -30,6 +30,16 @@ export type AxisAgreement = {
   corr: Correlation;
   /** 점 하나가 한 사람 */
   points: { id: string; name: string; self: number; boss: number }[];
+  /**
+   * 점들에 가장 잘 맞는 직선. 예측 대 실제와 **같은 함수**로 긋는다.
+   *
+   * 대각선(두 값이 같다)만 있으면 점들이 그 선을 어느 쪽으로 기울어 지나는지가
+   * 안 보인다. 기울기가 1보다 작으면 「본인이 높게 본 사람일수록 대표님은
+   * 그만큼까지는 높게 보지 않았다」는 뜻이다.
+   *
+   * 가로 값이 하나도 안 흔들리면 그을 수 없어 `null`이다.
+   */
+  fit: { slope: number; intercept: number } | null;
   /** 대표님 평가 − 본인 답의 평균. 양수면 대표님이 전반적으로 후하게 보신다 */
   meanShift: number;
 };
@@ -52,7 +62,8 @@ export type RatingCompare = {
   gaps: PersonGap[];
 };
 
-const mean = (xs: number[]) => (xs.length ? xs.reduce((a, b) => a + b, 0) / xs.length : 0);
+const mean = (xs: number[]) =>
+  xs.length ? xs.reduce((a, b) => a + b, 0) / xs.length : 0;
 
 export async function loadRatingCompare(): Promise<RatingCompare> {
   const [sessions, ratings] = await Promise.all([
@@ -93,7 +104,9 @@ export async function loadRatingCompare(): Promise<RatingCompare> {
     rows.push({
       id: s.employeeId,
       name: s.employee.name,
-      self: Object.fromEntries(Object.entries(stored).map(([k, v]) => [k, v.percent])),
+      self: Object.fromEntries(
+        Object.entries(stored).map(([k, v]) => [k, v.percent]),
+      ),
       boss: Object.fromEntries(
         Object.entries(boss).map(([k, v]) => [k, ratingToPercent(v)]),
       ),
@@ -103,7 +116,8 @@ export async function loadRatingCompare(): Promise<RatingCompare> {
   const axes: AxisAgreement[] = [];
   for (const axis of ABILITY_AXES) {
     const usable = rows.filter(
-      (r) => typeof r.self[axis] === "number" && typeof r.boss[axis] === "number",
+      (r) =>
+        typeof r.self[axis] === "number" && typeof r.boss[axis] === "number",
     );
     if (usable.length < 3) continue;
     const self = usable.map((r) => r.self[axis]);
@@ -111,6 +125,7 @@ export async function loadRatingCompare(): Promise<RatingCompare> {
     axes.push({
       axis,
       corr: correlate(self, boss),
+      fit: fitLine(self, boss),
       points: usable.map((r) => ({
         id: r.id,
         name: r.name,

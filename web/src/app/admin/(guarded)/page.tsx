@@ -6,6 +6,7 @@ import { MIN_N } from "@/components/ui/NBadge";
 import { Attendance } from "@/components/charts/Attendance";
 import { ALPHA } from "@/lib/admin/stats";
 import { requireAdmin } from "@/lib/auth/guard";
+import { formatRatio } from "@/components/analysis/correlationColor";
 import { EXPECTED } from "@/lib/items/types";
 import { loadDashboard } from "@/lib/admin/dashboard";
 import { INTERVAL_HOURS, KEEP_COUNT, type Backup } from "@/lib/admin/backup";
@@ -72,12 +73,12 @@ export default async function AdminHome() {
         />
         <Tile
           label="검사 신뢰도"
-          value={meanAlpha === null ? "—" : fmtAlpha(meanAlpha)}
+          value={meanAlpha === null ? "—" : formatRatio(meanAlpha)}
           href="/admin/stats?tab=reliability"
           hint={
             poorScales.length
-              ? `${poorScales.length}개 축이 ${fmtAlpha(ALPHA.poor)} 아래`
-              : "성향 7축 평균 α"
+              ? `${poorScales.length}개 축이 ${formatRatio(ALPHA.poor)} 아래`
+              : "성향 7축 평균 α · 1.00 에 가까울수록 좋음"
           }
         />
       </div>
@@ -283,7 +284,7 @@ export default async function AdminHome() {
             lines={[
               meanAlpha === null
                 ? "아직 계산할 수 없습니다"
-                : `성향 7축 평균 α ${fmtAlpha(meanAlpha)}`,
+                : `성향 7축 평균 α ${formatRatio(meanAlpha)}`,
               poorScales.length
                 ? `기준 아래 축 ${poorScales.length}개 — ${poorScales.map((r) => r.scale).join(" · ")}`
                 : "기준 아래 축 없음",
@@ -496,11 +497,3 @@ function Shortcut({
     </Link>
   );
 }
-
-/**
- * α 표기 — **앞의 0을 뗀다.**
- *
- * 화면 다른 곳에서 상관을 `+.44`로 적는다. 같은 「0과 1 사이 값」인데
- * 여기만 `0.77`이면 눈이 두 가지 표기를 오간다.
- */
-const fmtAlpha = (a: number) => a.toFixed(2).replace(/^0/, "");

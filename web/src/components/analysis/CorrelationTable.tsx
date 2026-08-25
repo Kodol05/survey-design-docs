@@ -142,57 +142,63 @@ export function CorrelationTable({
           </tr>
         </thead>
         {(groups ?? [{ label: "", rows }]).map((g) => (
-        <tbody key={g.label}>
-          {g.label && (
-            <tr>
-              <th
-                scope="colgroup"
-                colSpan={cols.length + 1}
-                className="text-axis border-b border-[--border] px-2 pt-5 pb-1 text-left font-medium"
-              >
-                <span className="text-ink-secondary">{g.label}</span>
-                {g.note && <span className="text-ink-muted ml-2">{g.note}</span>}
-              </th>
-            </tr>
-          )}
-          {g.rows.map((r) => (
-            <tr key={r}>
-              <th
-                scope="row"
-                className="text-table border-r border-b border-[--border] px-2 text-left font-normal"
-              >
-                {r}
-              </th>
-              {cols.map((c) => {
-                const v = cell(r, c);
-                const on = selected?.row === r && selected?.col === c;
-                const clickable = Boolean(onSelect) && v.kind === "value";
-                return (
-                  <td
-                    key={c}
-                    className="border-r border-b border-[--border] p-0 last:border-r-0"
-                  >
-                    <button
-                      type="button"
-                      disabled={!clickable}
-                      onClick={() => clickable && onSelect?.({ row: r, col: c })}
-                      aria-label={describe(r, c, v)}
-                      className={`flex h-[6.25rem] w-full flex-col items-center justify-center transition ${
-                        clickable ? "cursor-pointer hover:brightness-95" : "cursor-default"
-                      }`}
-                      style={{
-                        /*
+          <tbody key={g.label}>
+            {g.label && (
+              <tr>
+                <th
+                  scope="colgroup"
+                  colSpan={cols.length + 1}
+                  className="text-axis border-b border-[--border] px-2 pt-5 pb-1 text-left font-medium"
+                >
+                  <span className="text-ink-secondary">{g.label}</span>
+                  {g.note && (
+                    <span className="text-ink-muted ml-2">{g.note}</span>
+                  )}
+                </th>
+              </tr>
+            )}
+            {g.rows.map((r) => (
+              <tr key={r}>
+                <th
+                  scope="row"
+                  className="text-table border-r border-b border-[--border] px-2 text-left font-normal"
+                >
+                  {r}
+                </th>
+                {cols.map((c) => {
+                  const v = cell(r, c);
+                  const on = selected?.row === r && selected?.col === c;
+                  const clickable = Boolean(onSelect) && v.kind === "value";
+                  return (
+                    <td
+                      key={c}
+                      className="border-r border-b border-[--border] p-0 last:border-r-0"
+                    >
+                      <button
+                        type="button"
+                        disabled={!clickable}
+                        onClick={() =>
+                          clickable && onSelect?.({ row: r, col: c })
+                        }
+                        aria-label={describe(r, c, v)}
+                        className={`flex h-[6.25rem] w-full flex-col items-center justify-center transition ${
+                          clickable
+                            ? "cursor-pointer hover:brightness-95"
+                            : "cursor-default"
+                        }`}
+                        style={{
+                          /*
                           값이 있는 칸은 언제나 칠한다. 안 칠하면 0에 가까운 칸이
                           "연구된 적 없음" 칸과 같아 보인다.
                           방향이 확정 안 된 칸은 투명도가 아니라 색으로 옅게 만든다 —
                           투명도를 걸면 안에 든 숫자까지 흐려져 안 읽힌다.
                         */
-                        backgroundColor:
-                          v.kind === "value"
-                            ? correlationFill(v.r, crosses(v.ci))
-                            : "transparent",
-                        color: v.kind === "value" ? "var(--ink)" : undefined,
-                        /*
+                          backgroundColor:
+                            v.kind === "value"
+                              ? correlationFill(v.r, crosses(v.ci))
+                              : "transparent",
+                          color: v.kind === "value" ? "var(--ink)" : undefined,
+                          /*
                           **고른 칸에 테두리를 두르지 않는다** (2026-08-25).
 
                           전에는 `var(--ink)` 2px이라 밝은 화면에서는 검은
@@ -204,17 +210,19 @@ export function CorrelationTable({
                           올려** 눌린 자리를 표시한다 — 테두리를 더하지 않고
                           이미 있는 색만 진하게 쓴다.
                         */
-                        filter: on ? "saturate(1.45) brightness(0.97)" : undefined,
-                      }}
-                    >
-                      <Body cell={v} showN={showN} />
-                    </button>
-                  </td>
-                );
-              })}
-            </tr>
-          ))}
-        </tbody>
+                          filter: on
+                            ? "saturate(1.45) brightness(0.97)"
+                            : undefined,
+                        }}
+                      >
+                        <Body cell={v} showN={showN} />
+                      </button>
+                    </td>
+                  );
+                })}
+              </tr>
+            ))}
+          </tbody>
         ))}
       </table>
     </div>
@@ -271,7 +279,8 @@ function CellBar({ r, faded }: { r: number; faded: boolean }) {
 }
 
 function Body({ cell, showN = true }: { cell: Cell; showN?: boolean }) {
-  if (cell.kind === "unstudied") return <span className="text-ink-muted">—</span>;
+  if (cell.kind === "unstudied")
+    return <span className="text-ink-muted">—</span>;
   if (cell.kind === "expected")
     return (
       <span
@@ -287,9 +296,9 @@ function Body({ cell, showN = true }: { cell: Cell; showN?: boolean }) {
             ? cell.direction > 0
               ? "+"
               : "−"
-            : `≈${cell.estimate < 0 ? "−" : "+"}${Math.abs(cell.estimate)
-                .toFixed(2)
-                .replace(/^0/, "")}`}
+            : `≈${cell.estimate < 0 ? "−" : "+"}${Math.abs(
+                cell.estimate,
+              ).toFixed(2)}`}
         </span>
         <span className="text-axis leading-tight">추정</span>
       </span>
@@ -300,7 +309,10 @@ function Body({ cell, showN = true }: { cell: Cell; showN?: boolean }) {
     return <span className="text-axis text-ink-muted">n 부족</span>;
   return (
     <>
-      <span className="tabular text-axis leading-tight" style={{ opacity: 0.75 }}>
+      <span
+        className="tabular text-axis leading-tight"
+        style={{ opacity: 0.75 }}
+      >
         {gradeOf(cell.r)}
       </span>
       {/*
@@ -323,7 +335,10 @@ function Body({ cell, showN = true }: { cell: Cell; showN?: boolean }) {
         {formatR(cell.r)}
       </span>
       {showN && (
-        <span className="text-axis tabular leading-tight" style={{ opacity: 0.6 }}>
+        <span
+          className="text-axis tabular leading-tight"
+          style={{ opacity: 0.6 }}
+        >
           n={cell.n}
         </span>
       )}
@@ -375,7 +390,9 @@ export function CorrelationLegend({
         <span className="flex items-center gap-2">
           <span
             className="h-3 w-20 rounded-sm"
-            style={{ background: "linear-gradient(90deg, #b3623f, #eae6de, #3a5fa0)" }}
+            style={{
+              background: "linear-gradient(90deg, #b3623f, #eae6de, #3a5fa0)",
+            }}
           />
           음의 관계 ← → 양의 관계
         </span>
@@ -411,8 +428,9 @@ export function CorrelationLegend({
         {hatched && <span>빗금 = 문항이 아직 안 맞물림 (아래 유의사항)</span>}
         {!inHouse && (
           <span>
-            <span className="text-ink-secondary">없음</span> 연구했는데 관련 없음
-            · <span className="text-ink-secondary">—</span> 연구된 적 없음 ·{" "}
+            <span className="text-ink-secondary">없음</span> 연구했는데 관련
+            없음 · <span className="text-ink-secondary">—</span> 연구된 적 없음
+            ·{" "}
             <span
               className="rounded px-1.5"
               style={{

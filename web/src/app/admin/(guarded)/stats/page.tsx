@@ -1,3 +1,4 @@
+import { formatRatio } from "@/components/analysis/correlationColor";
 import Link from "next/link";
 import { Tile } from "@/components/ui/Tile";
 import { requireAdmin } from "@/lib/auth/guard";
@@ -106,20 +107,18 @@ export default async function StatsPage(props: {
         />
         <Tile
           label="검사 신뢰도"
-          value={
-            meanAlpha === null ? "—" : meanAlpha.toFixed(2).replace(/^0/, "")
-          }
+          value={meanAlpha === null ? "—" : formatRatio(meanAlpha)}
           href="/admin/stats?tab=reliability"
-          hint="성향 7축 평균 α"
+          // 예측 대 실제의 「0.00 → 1.00」과 같은 꼴로 적는다 — 화면이 달라도
+          // 0~1 값을 읽는 법은 하나여야 한다 (2026-08-26)
+          hint="성향 7축 평균 α · 1.00 에 가까울수록 좋음"
         />
         <Tile
           label="기준 아래 성향 축"
           value={poorCount}
           href="/admin/stats?tab=reliability"
           hint={
-            poorCount
-              ? `α ${ALPHA.poor.toFixed(2).replace(/^0/, "")} 아래`
-              : "전부 기준 안"
+            poorCount ? `α ${formatRatio(ALPHA.poor)} 아래` : "전부 기준 안"
           }
         />
       </div>

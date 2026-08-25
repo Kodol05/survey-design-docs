@@ -3,10 +3,14 @@
 import { useState } from "react";
 import Link from "next/link";
 import { ScatterPlot } from "@/components/analysis/ScatterPlot";
-import { formatR } from "@/components/analysis/correlationColor";
+import { Note } from "@/components/ui/Note";
+import { formatR, formatRatio } from "@/components/analysis/correlationColor";
 import { GradeTag } from "@/components/analysis/GradeTag";
 import { PeekGap, PeekToggle, usePeek } from "@/components/analysis/PeekList";
-import type { ResearchPrediction } from "@/lib/admin/researchPrediction";
+import {
+  COMPOSITE_AXIS,
+  type ResearchPrediction,
+} from "@/lib/admin/researchPrediction";
 
 /**
  * 논문 예측 ↔ 실제 대조.
@@ -37,6 +41,7 @@ export function PredictionPanel({
     React는 **「지난번보다 훅이 많다」며 화면을 통째로 떨어뜨린다.**
     훅은 늘 같은 순서로 다 부르고, 빠져나가는 것은 그 뒤에 한다.
   */
+  const isComposite = cur?.axis === COMPOSITE_AXIS;
   const sorted = cur ? [...cur.rows].sort((a, b) => b.gap - a.gap) : [];
   const peek = usePeek(sorted);
   if (!cur) return null;
@@ -90,31 +95,62 @@ export function PredictionPanel({
         ))}
       </div>
 
+      {/*
+        접어 둔다 (2026-08-26 사용자 요청). 늘 펼쳐 두면 이 축을 볼 때마다
+        같은 문단을 지나쳐야 하는데, **한 번 읽으면 되는 이야기**다.
+        접힌 채로도 제목이 「예측이 가장 어렵다」는 요점을 말한다.
+      */}
+      {/*
+        접어 둔다 (2026-08-26 사용자 요청). 늘 펼쳐 두면 이 축을 볼 때마다
+        같은 문단을 지나쳐야 하는데, **한 번 읽으면 되는 이야기**다.
+        접힌 채로도 제목이 요점을 말한다.
+
+        ⚠️ **축마다 사연이 다르다.** 처음에는 조직생활용 문장을 그대로 띄웠는데,
+        「세 능력 평균」을 고르면 「세 능력 평균은 조직시민행동 0.6 + 직무만족
+        0.4를 섞어…」가 되었다. 묶은 값에 추정치가 섞인 이유는 **그 안에
+        조직생활이 들어 있어서**지, 묶은 값을 그렇게 계산해서가 아니다.
+      */}
       {cur.fromEstimates && (
-        <div
-          className="mb-8 max-w-[52rem] rounded-xl p-5"
-          style={{ background: "var(--wash)" }}
+        <Note
+          label={
+            isComposite
+              ? `⚠ ${cur.axis}에는 잰 값이 아닌 수치가 섞여 있습니다 — 왜 그런지`
+              : `⚠ ${cur.axis}은 세 축 중 예측이 가장 어렵습니다 — 왜 그런지`
+          }
+          className="mb-8"
         >
-          <p className="text-table mb-2 font-medium">
-            <span aria-hidden className="mr-1.5">
-              ⚠
-            </span>
-            {cur.axis}은 <strong>세 축 중 예측이 가장 어렵습니다</strong>
-          </p>
-          <p className="text-axis text-ink-secondary leading-relaxed">
-            직접 잰 연구가 하나도 없어, 가까운 개념 둘(
-            <strong>조직시민행동</strong> 0.6 + <strong>직무만족</strong> 0.4)을
-            섞어 <strong>계산한 값</strong>을 가중치로 썼습니다. 잰 값이
-            아닙니다. 게다가 그 계수 자체가{" "}
-            <span className="tabular">.08~.10</span>으로 작습니다 — 성격으로는
-            이 능력을 거의 설명하지 못한다는 뜻입니다.
-          </p>
-          <p className="text-axis text-ink-secondary mt-2 leading-relaxed">
-            <strong>여기 나오는 예측은 참고선으로만 보십시오.</strong> 이
-            축이야말로{" "}
-            <strong>대표님 평가와 맞대 보는 것이 가장 중요합니다.</strong>
-          </p>
-        </div>
+          {isComposite ? (
+            <>
+              <p>
+                묶은 값 안에 <strong>조직생활</strong>이 들어 있습니다. 그 축은
+                직접 잰 연구가 하나도 없어 가까운 개념 둘을 섞어{" "}
+                <strong>계산한 값</strong>을 가중치로 쓰고 있고, 그것이 평균에도
+                따라 들어옵니다.
+              </p>
+              <p className="mt-2">
+                대신 셋을 묶으면 축 하나하나의 잡음이 상쇄됩니다. 실제로 크게
+                어긋난 사람이 줄고 평균 어긋남도 작아집니다 — 위 숫자를 축별
+                값과 견줘 보십시오.
+              </p>
+            </>
+          ) : (
+            <>
+              <p>
+                직접 잰 연구가 하나도 없어, 가까운 개념 둘(
+                <strong>조직시민행동</strong> 0.6 + <strong>직무만족</strong>{" "}
+                0.4)을 섞어 <strong>계산한 값</strong>을 가중치로 썼습니다. 잰
+                값이 아닙니다. 게다가 그 계수 자체가{" "}
+                <span className="tabular">0.08~0.10</span>으로 작습니다 —
+                성격으로는 이 능력을 거의 설명하지 못한다는 뜻입니다.
+              </p>
+              <p className="mt-2">
+                <strong>여기 나오는 예측은 참고선으로만 보십시오.</strong> 이
+                축이야말로{" "}
+                <strong>대표님 평가와 맞대 보는 것이 가장 중요합니다.</strong>
+              </p>
+            </>
+          )}
+        </Note>
       )}
 
       {/* 한 줄 요약 — 이 화면의 답 */}
@@ -122,14 +158,28 @@ export function PredictionPanel({
         <Fact
           label="예측이 맞은 정도"
           value={formatR(cur.corr)}
-          extra={<GradeTag r={cur.corr} className="mt-1 block" />}
+          extra={
+            <>
+              <GradeTag r={cur.corr} className="mt-1 block" />
+              {/*
+                숫자만으로는 어느 정도인지 안 잡힌다 (2026-08-26 사용자 지적).
+                **눈금의 양 끝**을 적어 준다 — 그것만 알면 0.73이 어디쯤인지
+                바로 감이 온다. 등급 낱말과 짝이 되는 자리다.
+              */}
+              <span className="text-axis text-ink-muted mt-1 block leading-snug">
+                0.00 관계 없음 → 1.00 논문대로
+              </span>
+            </>
+          }
         />
         <Fact
           label="실제로 나타난 기울기"
-          value={cur.fit.slope.toFixed(2)}
+          value={formatRatio(cur.fit.slope)}
           extra={
-            <span className="text-axis text-ink-muted">
+            <span className="text-axis text-ink-muted mt-1 block leading-snug">
               논문이 본 차이의 {Math.round(Math.max(0, cur.fit.slope) * 100)}%
+              <br />
+              1.00 이면 논문과 똑같은 폭
             </span>
           }
         />
@@ -137,8 +187,10 @@ export function PredictionPanel({
           label="크게 어긋난 사람"
           value={`${cur.farOff}명`}
           extra={
-            <span className="text-axis text-ink-muted">
-              10점 넘게 · {cur.n}명 중 · 평균 {cur.meanAbsGap.toFixed(1)}점
+            <span className="text-axis text-ink-muted mt-1 block leading-snug">
+              10점 넘게 · {cur.n}명 중
+              <br />
+              평균 {cur.meanAbsGap.toFixed(1)}점 어긋남
             </span>
           }
         />
@@ -221,7 +273,7 @@ export function PredictionPanel({
               <span className="text-ink-secondary">
                 실제{" "}
                 <strong className="tabular">
-                  기울기 {cur.fit.slope.toFixed(2)}
+                  기울기 {formatRatio(cur.fit.slope)}
                 </strong>
               </span>
             </span>

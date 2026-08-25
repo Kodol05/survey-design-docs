@@ -62,6 +62,40 @@ export const crossesZero = (c: Correlation) => c.ci[0] <= 0 && c.ci[1] >= 0;
 
 // ── 회귀 ────────────────────────────────────────────────────────────
 
+/**
+ * 점들에 가장 잘 맞는 직선 하나 — `실제 = 절편 + 기울기 × 예측`.
+ *
+ * ## 왜 대각선만으로는 부족한가
+ *
+ * 산점도에 「두 값이 같다」는 대각선만 그으면, 점들이 그 선을 **어느 쪽으로
+ * 기울어 지나는지**가 안 보인다. 기울기가 1보다 작으면 「높게 잰 쪽이 생각만큼
+ * 높지 않았다」는 뜻이고, 그건 대각선 위아래 어디에 점이 많은지와는 다른
+ * 이야기다.
+ *
+ * `predictFromResearch`가 쓰던 것을 떼어냈다 (2026-08-26) — 평가 대조에도
+ * 같은 선이 필요해졌고, **두 화면이 같은 방식으로 그은 선이어야** 나란히 두고
+ * 읽을 수 있다.
+ *
+ * 가로 값이 하나도 안 흔들리면 기울기를 낼 수 없어 `null`이다.
+ */
+export function fitLine(
+  xs: number[],
+  ys: number[],
+): { slope: number; intercept: number } | null {
+  if (xs.length < 2 || xs.length !== ys.length) return null;
+  const mx = xs.reduce((a, b) => a + b, 0) / xs.length;
+  const my = ys.reduce((a, b) => a + b, 0) / ys.length;
+  let sxy = 0;
+  let sxx = 0;
+  for (let i = 0; i < xs.length; i++) {
+    sxy += (xs[i] - mx) * (ys[i] - my);
+    sxx += (xs[i] - mx) ** 2;
+  }
+  if (sxx === 0) return null;
+  const slope = sxy / sxx;
+  return { slope, intercept: my - slope * mx };
+}
+
 export type Regression = {
   /** 절편 + 각 예측변수의 계수 */
   intercept: number;
@@ -176,7 +210,9 @@ export function cronbachAlpha(rows: number[][]): number | null {
 /** α 판정 기준. 편의값이지만 관행상 널리 쓰이는 선이다. */
 export const ALPHA = { poor: 0.6, fair: 0.7 } as const;
 
-export function alphaVerdict(a: number | null): "unknown" | "poor" | "fair" | "good" {
+export function alphaVerdict(
+  a: number | null,
+): "unknown" | "poor" | "fair" | "good" {
   if (a === null) return "unknown";
   if (a < ALPHA.poor) return "poor";
   if (a < ALPHA.fair) return "fair";
@@ -228,7 +264,8 @@ export function groupDiff(upper: number[], lower: number[]): GroupDiff | null {
     1.96에 작은 표본 보정을 얹는다 — df가 10을 넘으면 오차가 5% 안쪽이라
     화면에 적는 구간으로는 충분하다.
   */
-  const df = (v1 / n1 + v2 / n2) ** 2 /
+  const df =
+    (v1 / n1 + v2 / n2) ** 2 /
     ((v1 / n1) ** 2 / (n1 - 1) + (v2 / n2) ** 2 / (n2 - 1));
   const t = 1.96 + 2.4 / Math.max(1, df);
 

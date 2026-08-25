@@ -1,4 +1,5 @@
 import { formatR } from "./correlationColor";
+import { formatRatio } from "./correlationColor";
 import { Note } from "../ui/Note";
 import { SplitHeadline, SplitList } from "./SplitPanel";
 import type { Point } from "./ScatterPlot";
@@ -81,10 +82,7 @@ export function CompositePanel({
         <Note label="평균을 낼 만한가">
           <ul className="mb-3 flex flex-col gap-1.5">
             {c.pairs.map((p) => (
-              <li
-                key={`${p.a}${p.b}`}
-                className="flex items-center gap-3"
-              >
+              <li key={`${p.a}${p.b}`} className="flex items-center gap-3">
                 <span className="w-[11rem] shrink-0">
                   {p.a} <span className="text-ink-muted">×</span> {p.b}
                 </span>
@@ -104,7 +102,7 @@ export function CompositePanel({
                 className="tabular"
                 style={{ color: shaky ? "var(--status-critical)" : undefined }}
               >
-                α {c.alpha.toFixed(2).replace(/^0/, "")}
+                α {formatRatio(c.alpha)}
               </strong>
             )}
             {shaky ? (
