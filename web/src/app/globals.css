@@ -385,6 +385,11 @@ body {
   }
 }
 
+/* 어두운 화면에서는 밝은 사진을 깔지 않는다 — 배경만 밝아져 겉돈다 */
+:root[data-theme="dark"] .dark-hide {
+  display: none;
+}
+
 :focus-visible {
   outline: 2px solid var(--series-1);
   outline-offset: 2px;

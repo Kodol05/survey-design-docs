@@ -4,7 +4,7 @@ import { PairReadings } from "@/components/charts/PairReadings";
 import { ButtonLink } from "@/components/ui/Button";
 import { ResultNav } from "@/components/charts/ResultNav";
 import { TraitSummary } from "@/components/charts/TraitSummary";
-import { CHARACTER, TEMPERAMENT } from "@/components/charts/scale";
+import { CHARACTER, TEMPERAMENT, colorAt } from "@/components/charts/scale";
 import { EmptyState } from "@/components/ui/Card";
 import { requireUser } from "@/lib/auth/guard";
 import { readPairs, type AxisInput } from "@/lib/interpretation/pairs";
@@ -59,6 +59,18 @@ export default async function MePage() {
     );
   };
 
+  /*
+    머리 영역에 올릴 두드러진 축.
+
+    가운데 범위(40~60)는 뺀다 — 「이런 사람이다」가 아니라 「이 축으로는
+    설명하기 어렵다」는 뜻이라, 요약에 올리면 없는 특징을 만들어낸다.
+    관리자 화면의 「한눈에」와 같은 규칙이다.
+  */
+  const standout = traits
+    .filter((t) => t.band !== "middle")
+    .sort((a, b) => Math.abs(b.percent - 50) - Math.abs(a.percent - 50))
+    .slice(0, 3);
+
   const nav = [
     { id: "summary", label: "한눈에" },
     ...TEMPERAMENT.map((x) => ({ id: anchor(x), label: x })),
@@ -69,14 +81,52 @@ export default async function MePage() {
 
   return (
     <main className="page-column py-16">
-      <header className="mb-14">
-        <h1 className="text-screen-title mb-2">{me.name} 님의 결과</h1>
-        <p className="text-table text-ink-muted">
+      {/*
+        **머리 영역을 보고서처럼 둔다** (2026-08-25).
+
+        전에는 제목 한 줄 뒤에 곧장 그래프가 나왔다. 「내 결과지」라기보다
+        화면 하나가 열린 느낌이었다. 이름·응시일과 함께 **두드러진 축 몇 개**를
+        먼저 놓으면, 아래를 읽기 전에 자기 이야기가 한 줄 잡힌다.
+      */}
+      <header
+        className="mb-16 rounded-2xl px-8 py-10 sm:px-10"
+        style={{ background: "var(--wash)" }}
+      >
+        <p className="text-axis text-ink-secondary mb-1">7차원 성향 설문 결과</p>
+        <h1 className="text-screen-title mb-3">{me.name} 님</h1>
+        <p className="text-table text-ink-secondary mb-8">
           {result.completedAt?.toLocaleDateString("ko-KR")} 응시
           {result.durationSec
             ? ` · ${Math.round(result.durationSec / 60)}분 소요`
             : ""}
         </p>
+
+        {standout.length > 0 ? (
+          <div>
+            <p className="text-axis text-ink-muted mb-3">두드러진 축</p>
+            <ul className="flex flex-wrap gap-x-8 gap-y-4">
+              {standout.map((t) => (
+                <li key={t.scale}>
+                  <a href={`#${anchor(t.scale)}`} className="flex items-baseline gap-2">
+                    <span
+                      aria-hidden
+                      className="size-2.5 translate-y-px rounded-[2px]"
+                      style={{ background: colorAt(t.percent) }}
+                    />
+                    <span className="text-table font-medium">{t.scale}</span>
+                    <span className="tabular text-table text-ink-secondary">
+                      {Math.round(t.percent)}
+                    </span>
+                  </a>
+                </li>
+              ))}
+            </ul>
+          </div>
+        ) : (
+          <p className="text-table text-ink-secondary">
+            일곱 축이 모두 가운데 범위입니다. 특별히 두드러지는 쪽이 없습니다.
+          </p>
+        )}
       </header>
 
       {/*

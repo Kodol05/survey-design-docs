@@ -99,7 +99,8 @@ export function SectionForm({
         return;
       }
       if (r.nextSection) {
-        window.location.href = `/survey?section=${r.nextSection}`;
+        // `rest=1`이면 묶음 사이 쉬어 가는 화면을 한 번 거친다
+        window.location.href = `/survey?section=${r.nextSection}&rest=1`;
         return;
       }
       const s = await submitAction(sessionId);

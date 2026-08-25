@@ -12,12 +12,12 @@ import {
 export const metadata = { title: "응시 — 7차원 성향 설문" };
 
 export default async function SurveyPage(props: {
-  searchParams: Promise<{ section?: string; start?: string }>;
+  searchParams: Promise<{ section?: string; start?: string; rest?: string }>;
 }) {
   const me = await requireUser();
   const session = await getOrCreateSession(me.id);
 
-  const { section: raw, start } = await props.searchParams;
+  const { section: raw, start, rest } = await props.searchParams;
   const asked = Number(raw);
   const resume = (await firstUnansweredSection(session.id)) ?? SECTION_COUNT;
   const section =
@@ -33,6 +33,17 @@ export default async function SurveyPage(props: {
   */
   const fresh = (await firstUnansweredSection(session.id)) === 1;
   if (fresh && start !== "1") return <StartNotice />;
+
+  /*
+    묶음을 넘길 때 **한 번 쉬어 간다** (2026-08-25).
+
+    114문항이 끊김 없이 이어지면 끝이 안 보인다. 묶음이 끝날 때마다
+    「몇 개 끝났고 몇 개 남았다」를 한 번 보여주면 17분이 덜 길게 느껴진다.
+    누르면 다음 묶음이니 손이 한 번 더 가지만, 그 대신 **지금 어디쯤인지**를
+    안다.
+  */
+  if (rest === "1" && section > 1 && section <= SECTION_COUNT)
+    return <Breather section={section} />;
 
   const { items, answers } = await getSection(session.id, section);
   if (!items.length) redirect("/me");
@@ -121,6 +132,50 @@ function StartNotice() {
       <p className="text-axis text-ink-muted mt-16 border-t border-[--border] pt-6">
         2주 넘게 이어서 하지 않으면 처음부터 다시 하시게 됩니다. 오래 전 답과
         지금 답이 한 결과로 섞이지 않게 하기 위해서입니다.
+      </p>
+    </main>
+  );
+}
+
+/**
+ * 묶음 사이 쉬어 가는 자리.
+ *
+ * **진행률만으로는 부족하다.** 위에 막대가 있지만 문항을 답하는 동안에는
+ * 눈이 문항에만 간다. 묶음이 끝나는 순간이 유일하게 고개를 드는 때다.
+ */
+function Breather({ section }: { section: number }) {
+  const done = section - 1;
+  const left = SECTION_COUNT - done;
+
+  return (
+    <main className="reading-column flex flex-1 flex-col justify-center py-24 text-center">
+      <p className="text-axis text-ink-muted mb-3">
+        {SECTION_COUNT}개 묶음 중 {done}개 끝났습니다
+      </p>
+
+      <h1 className="text-screen-title mb-10">
+        {left === 1 ? "마지막 묶음이 남았습니다" : `${left}개 남았습니다`}
+      </h1>
+
+      {/* 묶음 하나가 칸 하나. 진행률 막대보다 「몇 개」가 눈에 잡힌다 */}
+      <ul className="mb-12 flex justify-center gap-2" aria-hidden>
+        {Array.from({ length: SECTION_COUNT }, (_, i) => (
+          <li
+            key={i}
+            className="h-2.5 w-10 rounded-full"
+            style={{ background: i < done ? "var(--series-1)" : "var(--grid)" }}
+          />
+        ))}
+      </ul>
+
+      <p>
+        <ButtonLink href={`/survey?section=${section}`} size="lg">
+          이어서 하기
+        </ButtonLink>
+      </p>
+
+      <p className="text-axis text-ink-muted mt-10">
+        여기서 나가셔도 됩니다. 다음에 들어오면 이 자리부터 이어서 합니다.
       </p>
     </main>
   );
