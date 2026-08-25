@@ -33,15 +33,33 @@ const SIZE = [88, 72, 58, 46, 58, 72, 88] as const;
  * 청회색↔테라코타는 적록색약에서도 갈린다(ΔE 14.5). 여기에 크기·위치·라벨까지 있어
  * 색을 못 봐도 방향을 읽을 수 있다.
  */
+/*
+  ── 색을 토큰에서 가져온다 (2026-08-25) ──
+
+  전에는 hex를 그대로 박아 뒀다. 그래서 **어두운 화면에서 밝은 곳 색이
+  그대로 깔렸다** — 응시 중에 어둡게 바꾸면 원들이 배경에서 겉돈다.
+
+  일곱 단계가 성향 눈금의 일곱 단계와 정확히 같은 자리다. 같은 토큰을 쓰면
+  다크 모드가 따라오고, **응시 화면과 결과 화면이 같은 색 언어**를 쓰게 된다.
+*/
 const COLOR = [
-  "#3a5fa0",
-  "#7f95b3",
-  "#b7c3d3",
-  "#c6c6c8",
-  "#dbc4b1",
-  "#c4906f",
-  "#b3623f",
+  "var(--scale-0)",
+  "var(--scale-20)",
+  "var(--scale-38)",
+  "var(--scale-50)",
+  "var(--scale-62)",
+  "var(--scale-80)",
+  "var(--scale-100)",
 ] as const;
+
+/**
+ * 고른 칸의 글자색.
+ *
+ * **원의 색을 글자에 그대로 쓰지 않는다.** 가운데 세 단계는 옅어서 작은
+ * 글자로 쓰면 배경에 묻힌다. 색은 원이 지고, 글자는 본문 잉크로 굵게 쓴다 —
+ * 어느 화면에서든 읽힌다.
+ */
+const PICKED_INK = "var(--ink)";
 
 export function LikertScale({
   name,
@@ -55,7 +73,10 @@ export function LikertScale({
   dimmed?: boolean;
 }) {
   return (
-    <fieldset className={`transition-opacity ${dimmed ? "opacity-45" : "opacity-100"}`}>
+    <fieldset
+      className="transition-opacity duration-200"
+      style={{ opacity: dimmed ? 0.3 : 1 }}
+    >
       <legend className="sr-only">7단계 중 하나를 고르세요</legend>
 
       {/*
@@ -101,16 +122,22 @@ export function LikertScale({
                     width: size,
                     height: size,
                     // 안 고른 것은 테두리만, 고른 것은 꽉 채운다
-                    border: `3px solid ${color}`,
+                    /*
+                      고른 것이 **한눈에 잡혀야 한다** (2026-08-25).
+                      전에는 채우기 말고는 안 고른 것과 차이가 적었다.
+                      테두리를 굵히고 후광을 진하게 넓혀 둔다.
+                    */
+                    border: `${on ? 4 : 2.5}px solid ${on ? color : `color-mix(in oklab, ${color} 60%, transparent)`}`,
                     background: on ? color : "transparent",
-                    boxShadow: on ? `0 0 0 7px ${color}22` : undefined,
+                    boxShadow: on ? `0 0 0 9px color-mix(in oklab, ${color} 22%, transparent)` : undefined,
+                    transform: on ? "scale(1.06)" : undefined,
                   }}
                 >
                   {on && (
                     <svg viewBox="0 0 24 24" className="size-1/2" fill="none" aria-hidden>
                       <path
                         d="M5 12.5l4.5 4.5L19 7.5"
-                        stroke="#fff"
+                        stroke="var(--page)"
                         strokeWidth="3"
                         strokeLinecap="round"
                         strokeLinejoin="round"
@@ -119,9 +146,11 @@ export function LikertScale({
                   )}
                 </span>
                 <span
-                  className={`text-table text-center leading-tight whitespace-nowrap ${
-                    on ? "font-semibold text-ink" : "text-ink-muted"
-                  }`}
+                  className="text-table text-center leading-tight whitespace-nowrap transition-all"
+                  style={{
+                    color: on ? PICKED_INK : "var(--ink-muted)",
+                    fontWeight: on ? 700 : 400,
+                  }}
                 >
                   {label}
                 </span>
@@ -139,10 +168,10 @@ export function LikertScale({
           return (
             <label
               key={v}
-              className="flex min-h-12 cursor-pointer items-center gap-3 rounded-xl border-2 px-4"
+              className="flex min-h-14 cursor-pointer items-center gap-3 rounded-xl px-4 transition-all"
               style={{
-                borderColor: on ? COLOR[i] : "var(--border)",
-                background: on ? `${COLOR[i]}15` : "transparent",
+                border: on ? `2.5px solid ${COLOR[i]}` : "1.5px solid var(--border)",
+                background: on ? `color-mix(in oklab, ${COLOR[i]} 16%, transparent)` : "transparent",
               }}
             >
               <input
@@ -158,13 +187,20 @@ export function LikertScale({
                 aria-hidden
                 className="shrink-0 rounded-full"
                 style={{
-                  width: 22,
-                  height: 22,
-                  border: `2.5px solid ${COLOR[i]}`,
+                  width: 24,
+                  height: 24,
+                  border: on ? `4px solid ${COLOR[i]}` : `2px solid color-mix(in oklab, ${COLOR[i]} 60%, transparent)`,
                   background: on ? COLOR[i] : "transparent",
                 }}
               />
-              <span className={on ? "font-semibold" : "text-ink-secondary"}>{label}</span>
+              <span
+                style={{
+                  color: on ? PICKED_INK : "var(--ink-secondary)",
+                  fontWeight: on ? 700 : 400,
+                }}
+              >
+                {label}
+              </span>
             </label>
           );
         })}

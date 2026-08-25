@@ -141,13 +141,21 @@ export function SectionForm({
                 첫 글자를 찾느라 눈이 헤맨다 (01 §2.3). 아래 척도 줄은 글이
                 아니므로 이 제한을 받지 않는다. */}
             <p
-              className={`mx-auto mb-10 max-w-[54rem] text-center transition-opacity ${
-                done || current ? "opacity-100" : "opacity-45"
-              }`}
+              /*
+                **지금 답할 문항을 더 분명히 한다** (2026-08-25).
+
+                전에는 굵기가 500↔600으로 한 단만 차이 나고 흐림도 45%라
+                「어디를 답할 차례인지」가 잘 안 잡혔다. 굵기 차이를 벌리고,
+                아직 안 온 문항은 더 흐리게, 이미 답한 문항은 중간쯤 둔다 —
+                답한 것과 아직인 것도 서로 구분되어야 한다.
+              */
+              className="mx-auto mb-10 max-w-[54rem] text-center transition-opacity duration-200"
               style={{
                 fontSize: "clamp(1.25rem, 1rem + 1vw, 2.1rem)",
                 lineHeight: 1.45,
-                fontWeight: current ? 600 : 500,
+                fontWeight: current ? 700 : 500,
+                opacity: current ? 1 : done ? 0.72 : 0.35,
+                color: current ? "var(--ink)" : undefined,
               }}
             >
               <span className="text-ink-muted tabular mr-3 text-[0.6em] font-normal">
