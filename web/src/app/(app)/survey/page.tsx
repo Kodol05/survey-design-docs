@@ -1,5 +1,5 @@
-import Link from "next/link";
 import { redirect } from "next/navigation";
+import { ButtonLink } from "@/components/ui/Button";
 import { SectionForm } from "@/components/survey/SectionForm";
 import { requireUser } from "@/lib/auth/guard";
 import {
@@ -113,13 +113,9 @@ function StartNotice() {
       </ul>
 
       <p>
-        <Link
-          href="/survey?start=1"
-          className="text-item inline-flex h-14 items-center rounded-lg px-8 font-medium"
-          style={{ background: "var(--series-1)", color: "#fff" }}
-        >
+        <ButtonLink href="/survey?start=1" size="lg">
           검사 시작하기
-        </Link>
+        </ButtonLink>
       </p>
 
       <p className="text-axis text-ink-muted mt-16 border-t border-[--border] pt-6">

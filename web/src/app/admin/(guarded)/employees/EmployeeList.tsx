@@ -12,6 +12,7 @@ import {
 } from "@/components/analysis/TraitStrip";
 import { CHARACTER, TEMPERAMENT, abilityColorAt } from "@/components/charts/scale";
 import { QuickRead } from "@/components/analysis/QuickRead";
+import { ButtonLink } from "@/components/ui/Button";
 import { ABILITY_AXES } from "@/lib/items/types";
 import { formatPhone } from "@/lib/auth/phone";
 
@@ -225,13 +226,9 @@ function Panel({ row }: { row: Row }) {
     <div>
       <div className="mb-6 flex flex-wrap items-center justify-between gap-4">
         <h3 className="text-section-title">{row.name}</h3>
-        <Link
-          href={`/admin/employees/${row.id}`}
-          className="inline-flex h-13 items-center rounded-lg px-6 font-medium"
-          style={{ background: "var(--series-1)", color: "#fff" }}
-        >
+        <ButtonLink href={`/admin/employees/${row.id}`} size="lg">
           상세 보기 →
-        </Link>
+        </ButtonLink>
       </div>
 
       {/*

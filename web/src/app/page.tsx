@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { currentUser } from "@/lib/auth/session";
+import { ButtonLink } from "@/components/ui/Button";
 import { ThemeToggle } from "@/components/ui/ThemeToggle";
 
 export const metadata = { title: "7차원 성향 설문" };
@@ -43,13 +44,9 @@ export default async function Home() {
       </ul>
 
       <div className="flex flex-wrap items-center gap-x-6 gap-y-3">
-        <Link
-          href="/signup"
-          className="text-item inline-flex h-14 items-center rounded-lg px-8 font-medium"
-          style={{ background: "var(--series-1)", color: "#fff" }}
-        >
+        <ButtonLink href="/signup" size="lg">
           시작하기
-        </Link>
+        </ButtonLink>
         <Link href="/login" className="text-table text-ink-secondary underline">
           이미 계정이 있습니다
         </Link>

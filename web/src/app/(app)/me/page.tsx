@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { AxisDetail } from "@/components/charts/AxisDetail";
 import { PairReadings } from "@/components/charts/PairReadings";
+import { ButtonLink } from "@/components/ui/Button";
 import { ResultNav } from "@/components/charts/ResultNav";
 import { TraitSummary } from "@/components/charts/TraitSummary";
 import { CHARACTER, TEMPERAMENT } from "@/components/charts/scale";
@@ -22,13 +23,9 @@ export default async function MePage() {
         <h1 className="text-screen-title mb-6">내 결과</h1>
         <EmptyState message="아직 응시하지 않으셨습니다." />
         <div className="flex justify-center">
-          <Link
-            href="/survey"
-            className="inline-flex h-12 items-center rounded-lg px-6 font-medium text-white"
-            style={{ background: "var(--series-1)" }}
-          >
+          <ButtonLink href="/survey" size="lg">
             설문 시작하기
-          </Link>
+          </ButtonLink>
         </div>
       </main>
     );

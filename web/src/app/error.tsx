@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useEffect } from "react";
+import { Button } from "@/components/ui/Button";
 
 /**
  * 화면을 그리다 오류가 났을 때.
@@ -32,14 +33,9 @@ export default function Error({
       </p>
 
       <div className="flex flex-wrap items-center gap-x-6 gap-y-3">
-        <button
-          type="button"
-          onClick={reset}
-          className="text-table inline-flex h-13 items-center rounded-lg px-6 font-medium"
-          style={{ background: "var(--series-1)", color: "#fff" }}
-        >
+        <Button size="lg" onClick={reset}>
           다시 시도
-        </button>
+        </Button>
         <Link href="/" className="text-table text-ink-secondary underline">
           처음으로
         </Link>

@@ -174,7 +174,8 @@ export function SectionForm({
         <p className="text-axis text-ink-muted tabular" aria-hidden>
           {answered} / {items.length}
         </p>
-        <Button onClick={next} disabled={pending} className="h-16 min-w-72 text-xl">
+        {/* 이 화면의 유일한 동작이라 크기를 한 단 더 준다 */}
+        <Button size="lg" onClick={next} disabled={pending} className="min-w-72">
           {pending ? "저장 중…" : isLast ? "제출하고 결과 보기" : "다음 묶음"}
         </Button>
       </div>

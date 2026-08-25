@@ -3,6 +3,7 @@ import { WarningBadge } from "@/components/ui/WarningBadge";
 import { colorAt } from "@/components/charts/scale";
 import { CompletionTrend } from "@/components/charts/CompletionTrend";
 import { ratingProgress } from "@/lib/admin/ratings";
+import { ButtonLink } from "@/components/ui/Button";
 import { loadCompletionByDate, loadSummary } from "@/lib/admin/summary";
 import {
   cellOf,
@@ -155,13 +156,9 @@ export default async function AdminHome() {
             먼저 보면 그 인상이 섞여서, 본인 답과 맞대 보는 의미가 줄어듭니다.
             막아 두지는 않았으니 순서는 알아서 정하시면 됩니다.
           </p>
-          <Link
-            href="/admin/ratings"
-            className="inline-flex h-13 items-center rounded-lg px-6 font-medium"
-            style={{ background: "var(--series-1)", color: "#fff" }}
-          >
+          <ButtonLink href="/admin/ratings" size="lg">
             평가하러 가기 →
-          </Link>
+          </ButtonLink>
         </section>
       )}
 
