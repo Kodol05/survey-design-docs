@@ -112,8 +112,7 @@ function Robustness({ influence }: { influence: Influence | null }) {
       </p>
 
       <p className="text-axis text-ink-muted mt-2">
-        <strong>「이분이 이상하다」가 아닙니다.</strong> 뺀 값을 진짜 값으로
-        삼지도 않습니다 — 얼마나 위태로운지를 재는 값입니다.
+        <strong>「이분이 이상하다」가 아닙니다.</strong>
       </p>
     </div>
   );
@@ -201,10 +200,7 @@ function Facets({
 
       <p className="text-axis text-ink-secondary leading-relaxed">
         {settled.length === 0 ? (
-          <>
-            <strong>어느 항목도 방향이 확정되지 않았습니다.</strong> 항목당
-            문항이 서너 개뿐이라 축 전체보다 훨씬 크게 흔들립니다.
-          </>
+          <strong>어느 항목도 방향이 확정되지 않았습니다.</strong>
         ) : spread >= 0.3 ? (
           <>
             항목마다 크게 갈립니다 (
@@ -221,9 +217,7 @@ function Facets({
         )}
       </p>
 
-      <p className="text-axis text-ink-muted mt-2">
-        진한 막대는 방향이 확정된 것입니다.
-      </p>
+
     </div>
   );
 }

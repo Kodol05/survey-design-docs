@@ -1,10 +1,9 @@
 import Link from "next/link";
 import { formatR } from "./correlationColor";
+import { SplitHeadline, SplitList } from "./SplitPanel";
+import type { Split } from "@/lib/admin/split";
 import { abilityColorAt } from "../charts/scale";
-import { subjectParticle } from "./correlationWords";
-import { GradeTag } from "./GradeTag";
 import { DivergingBar } from "./DivergingBar";
-import { CHARACTER } from "../charts/scale";
 import type { Composite } from "@/lib/admin/composite";
 
 /**
@@ -26,22 +25,55 @@ import type { Composite } from "@/lib/admin/composite";
  * **개별 축보다 총합이 더 안정적이다.** 협력 하나는 `.08`이라 못 쓰는데,
  * 평균을 내면 각 축의 잡음이 상쇄되고 셋이 공유하는 부분만 남는다.
  */
-export function CompositePanel({ c }: { c: Composite }) {
-  const top = c.drivers[0];
+export function CompositePanel({
+  c,
+  splits,
+}: {
+  c: Composite;
+  splits: Split[];
+}) {
   const shaky = c.verdict === "poor";
 
   return (
-    <div className="grid gap-x-14 gap-y-8 xl:grid-cols-[minmax(0,26rem)_minmax(0,1fr)]">
+    <div>
+      {/* ── 결론부터 ── */}
+      <SplitHeadline splits={splits} />
+
+      {/* ── 일곱 축 전부 ── */}
+      <div className="mt-10">
+        <div className="text-axis text-ink-muted mb-3 flex flex-wrap items-baseline justify-between gap-x-6 gap-y-1">
+          <span>일곱 축 전부 — 차이가 큰 순</span>
+          <span className="flex items-center gap-3">
+            <span className="flex items-center gap-1.5">
+              <span
+                aria-hidden
+                className="block size-2.5 rounded-full"
+                style={{ background: "var(--ink-muted)" }}
+              />
+              높은 무리
+            </span>
+            <span className="flex items-center gap-1.5">
+              <span
+                aria-hidden
+                className="block size-2.5 rounded-full"
+                style={{ outline: "2px solid var(--ink-muted)", outlineOffset: -2 }}
+              />
+              낮은 무리
+            </span>
+            <span>
+              무리마다 <span className="tabular">{splits[0]?.groupN ?? 0}</span>명
+            </span>
+            <span>눈금 40·60·80점</span>
+          </span>
+        </div>
+        <SplitList splits={splits} dim={shaky} />
+      </div>
+
       {/* ── 묶어도 되는가 ── */}
-      <div>
-        <p className="text-axis text-ink-muted mb-2">묶어도 되는가</p>
-        <ul className="mb-4 flex flex-col gap-1.5">
+      <div className="mt-10 grid gap-x-14 gap-y-4 xl:grid-cols-[minmax(0,26rem)_minmax(0,1fr)] xl:items-start">
+        <ul className="flex flex-col gap-1.5">
           {c.pairs.map((p) => (
             <li key={`${p.a}${p.b}`} className="text-axis flex items-center gap-3">
-              {/*
-                이름을 자르지 않는다. `truncate`를 걸었더니 「조직생활 ×
-                자율적...」로 끝나 **어느 쌍인지 알 수 없었다.**
-              */}
               <span className="text-ink-secondary w-[11rem] shrink-0">
                 {p.a} <span className="text-ink-muted">×</span> {p.b}
               </span>
@@ -55,81 +87,38 @@ export function CompositePanel({ c }: { c: Composite }) {
           ))}
         </ul>
 
-        <p className="text-axis text-ink-secondary leading-relaxed">
+        <p className="text-axis text-ink-secondary max-w-[44rem] leading-relaxed">
+          <strong>평균을 낼 만한가</strong> — 세 능력이 서로 같이 움직여야
+          평균이 뜻을 갖습니다. 셋을 묶으면{" "}
           {c.alpha !== null && (
+            <strong
+              className="tabular"
+              style={{ color: shaky ? "var(--status-critical)" : undefined }}
+            >
+              α {c.alpha.toFixed(2).replace(/^0/, "")}
+            </strong>
+          )}
+          {shaky ? (
             <>
-              셋을 묶으면{" "}
-              <strong
-                className="tabular"
-                style={{ color: shaky ? "var(--status-critical)" : undefined }}
-              >
-                α {c.alpha.toFixed(2).replace(/^0/, "")}
-              </strong>
-              {shaky ? (
-                <>
-                  입니다. <strong>아직 묶을 만하지 않습니다</strong> — 아래
-                  그래프는 참고로만 보십시오.
-                </>
-              ) : (
-                <>
-                  입니다. 셋이 같은 방향으로 움직이므로{" "}
-                  <strong>공통분모를 하나의 값으로</strong> 볼 수 있습니다.
-                </>
-              )}
+              {" "}
+              — <strong>아직 묶을 만하지 않습니다.</strong>
+            </>
+          ) : (
+            <>
+              {" "}
+              입니다. 뜻밖에도 <strong>개별 축보다 안정적입니다</strong> — 평균을
+              내면 각 축의 잡음이 서로 상쇄되기 때문입니다.
             </>
           )}{" "}
           <span className="text-ink-muted">
-            축을 더한 것이 아니라 평균이라 눈금은 그대로 0~100입니다. 세 축이 다
-            있는 <span className="tabular">{c.values.length}</span>명만 셉니다.
+            세 축이 다 있는 <span className="tabular">{c.values.length}</span>
+            명의 평균이고, 눈금은 그대로 0~100입니다.
           </span>
         </p>
       </div>
 
-      {/* ── 무엇과 연관이 큰가 ── */}
-      <div>
-        <p className="text-axis text-ink-muted mb-3">
-          성향 7축과의 관련 — 큰 순
-        </p>
-        <ul className="flex flex-col gap-2">
-          {c.drivers.map((d) => {
-            const settled = !(d.corr.ci[0] <= 0 && d.corr.ci[1] >= 0);
-            const kind = (CHARACTER as readonly string[]).includes(d.scale)
-              ? "성격"
-              : "기질";
-            return (
-              <li key={d.scale} className="flex items-center gap-3">
-                <span className="text-table w-[9rem] shrink-0 truncate">
-                  {d.scale}
-                  <span className="text-axis text-ink-muted ml-1.5">{kind}</span>
-                </span>
-                <span className="block w-full max-w-[26rem] shrink">
-                  <DivergingBar
-                    r={d.corr.r}
-                    faded={!settled}
-                    ci={d.corr.ci}
-                    height={16}
-                  />
-                </span>
-                <span className="tabular w-12 shrink-0 text-right font-medium">
-                  {formatR(d.corr.r)}
-                </span>
-                <GradeTag
-                  r={d.corr.r}
-                  ci={d.corr.ci}
-                  className="w-[5rem] shrink-0"
-                />
-              </li>
-            );
-          })}
-        </ul>
-
-        {top && <Conclusion c={c} />}
-      </div>
-
       {/* ── 사람 ── */}
-      <div className="xl:col-span-2">
-        <Ranking c={c} />
-      </div>
+      <Ranking c={c} />
     </div>
   );
 }
@@ -245,65 +234,3 @@ function Ranking({ c }: { c: Composite }) {
  * 위 표를 기질·성격으로 나눠 둔 이유가 「타고나는 쪽인가 만들어지는 쪽인가」
  * 였다. 총합에서도 그 답이 나오므로 한 마디로 적는다.
  */
-/** 「3개가」보다 「셋이」가 읽힌다. 일곱 축뿐이라 표로 두면 충분하다 */
-const COUNT: Record<number, string> = {
-  2: "둘",
-  3: "셋",
-  4: "넷",
-  5: "다섯",
-  6: "여섯",
-  7: "일곱",
-};
-
-function Conclusion({ c }: { c: Composite }) {
-  const g = c.topGroup;
-  const kindOf = (s: string) =>
-    (CHARACTER as readonly string[]).includes(s) ? "성격" : "기질";
-  const kinds = new Set(g.map((d) => kindOf(d.scale)));
-
-  return (
-    <p className="text-ink-secondary mt-5 max-w-[46rem] leading-relaxed">
-      {g.length === 1 ? (
-        <>
-          가장 크게 연관된 것은{" "}
-          <strong className="text-ink">{g[0].scale}</strong>입니다 (
-          <span className="tabular">{formatR(g[0].corr.r)}</span>).{" "}
-          {g[0].scale}
-          {subjectParticle(g[0].scale)}{" "}
-          {g[0].corr.r > 0 ? "높은" : <strong>낮은</strong>} 사람일수록 세 능력이{" "}
-          <strong>고르게 높게</strong> 나옵니다.
-        </>
-      ) : (
-        <>
-          <strong className="text-ink">
-            {g.map((d) => d.scale).join(" · ")}
-          </strong>{" "}
-          {COUNT[g.length] ?? `${g.length}개`}가{" "}
-          <strong>비슷하게 큽니다</strong> (
-          <span className="tabular">
-            {g.map((d) => formatR(d.corr.r)).join(" / ")}
-          </span>
-          ). 이만한 차이로는 순위를 가릴 수 없으니{" "}
-          <strong>셋 다 관련이 있다</strong>고 읽으시면 됩니다 —{" "}
-          {g
-            .map((d) => `${d.scale}${d.corr.r > 0 ? "은 높을수록" : "는 낮을수록"}`)
-            .join(", ")}{" "}
-          세 능력이 고르게 높습니다.
-        </>
-      )}{" "}
-      {kinds.size === 2 ? (
-        <span className="text-ink-muted">
-          타고나는 쪽(기질)과 만들어지는 쪽(성격)이 <strong>섞여</strong>{" "}
-          있습니다 — 어느 한쪽만으로 갈리지 않습니다.
-        </span>
-      ) : (
-        <span className="text-ink-muted">
-          전부 <strong>{[...kinds][0]}</strong> 쪽입니다.
-        </span>
-      )}{" "}
-      <span className="text-ink-muted">
-        가는 선은 95% 구간입니다 — 0을 지나가면 방향이 아직 확정된 것이 아닙니다.
-      </span>
-    </p>
-  );
-}

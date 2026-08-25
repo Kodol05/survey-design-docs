@@ -38,9 +38,12 @@ import { predictFromResearch } from "@/lib/admin/researchPrediction";
 import { LowQualityList, QualityRanking } from "./PersonQuality";
 import { CorrelationPanel } from "./CorrelationPanel";
 import { DistributionPanel } from "./DistributionPanel";
-import { AbilityDrivers } from "@/components/analysis/AbilityDrivers";
 import { CompositePanel } from "@/components/analysis/CompositePanel";
+import { SplitList } from "@/components/analysis/SplitPanel";
+import { Cautions } from "@/components/analysis/Cautions";
+import { AlphaNote } from "@/components/analysis/AlphaNote";
 import { abilityComposite } from "@/lib/admin/composite";
+import { splitsFor } from "@/lib/admin/split";
 import { spreadOf, type Spread } from "@/lib/admin/spread";
 
 export const metadata = { title: "분석 — 관리자" };
@@ -384,6 +387,9 @@ function InHouseSection({
   const trends: Record<string, { x: number; y: number }[] | null> = {};
   const influence: Record<string, Influence | null> = {};
   const composite = abilityComposite(people);
+  const byComposite = new Map(
+    (composite?.values ?? []).map((v) => [v.employeeId, v.value]),
+  );
 
   for (const scale of TRAIT_SCALES)
     for (const axis of ABILITY_AXES) {
@@ -401,12 +407,33 @@ function InHouseSection({
       influence[k] = influenceOf(pts);
     }
 
+  const splits = composite
+    ? splitsFor(people, (p) => byComposite.get(p.employeeId))
+    : [];
+
   return (
     <section>
       <div className="mb-1 flex flex-wrap items-center gap-x-6 gap-y-3">
         <SourcePicker value={source} bossCount={bossCount} />
         <CleanToggle clean={clean} poorN={poorN} source={source} />
       </div>
+      {/* ── 1절 · 직무능력이 높으려면 ── */}
+      {composite && (
+        <div className="mb-20">
+          <h2 className="text-section-title mb-2">
+            직무능력이 높으려면 — 무엇이 가장 크게 가르나
+          </h2>
+          <p className="text-ink-secondary mb-8 max-w-[56rem]">
+            협력·조직생활·자율적 실행 <strong>세 값의 평균</strong>을 놓고, 성향
+            축마다 <strong>높은 3분의 1</strong>과 <strong>낮은 3분의 1</strong>의
+            평균을 견줍니다. 상관 숫자 대신 <strong>점수 차이</strong>로 말합니다.
+          </p>
+          <CompositePanel c={composite} splits={splits} />
+        </div>
+      )}
+
+      {/* ── 2절 · 축 하나하나 ── */}
+      <h2 className="text-section-title mb-2">성향 축과 직무능력 세 가지</h2>
       <p className="text-ink-secondary mb-8 max-w-[56rem]">
         우리 직원 {matrix.n}명 값입니다. {SOURCE_NOTE[source]}{" "}
         <strong>칸을 누르면 그 하나만 크게 봅니다.</strong>
@@ -424,35 +451,34 @@ function InHouseSection({
         facets={facets}
       />
 
-      {/* ── 능력마다 무엇과 관련이 깊은가 ── */}
+      {/* ── 3절 · 능력마다 ── */}
       <div className="mt-20 border-t border-[--border] pt-12">
-        <h2 className="text-section-title mb-1">능력마다 무엇과 관련이 깊은가</h2>
-        <p className="text-ink-secondary mb-8 max-w-[52rem]">
-          위 표가 축 일곱 개로 말한 것을 <strong>세부 항목까지 쪼갠 것</strong>
-          입니다. 관련이 큰 것부터 왼쪽에 둡니다.
+        <h2 className="text-section-title mb-2">능력마다 무엇이 가장 크게 가르나</h2>
+        <p className="text-ink-secondary mb-10 max-w-[56rem]">
+          위 표를 <strong>능력 하나씩 풀어 놓은 것</strong>입니다. 여기도 상관이
+          아니라 <strong>점수 차이</strong>로 봅니다 — 축이 높은 3분의 1과 낮은
+          3분의 1의 평균입니다.
         </p>
-        <AbilityDrivers
-          axes={ABILITY_AXES.map((a) => ({ axis: a, rows: driversFor(facets, a) }))}
-          reliability={reliability}
-        />
-        <p className="text-axis text-ink-muted mt-6 max-w-[52rem]">
-          세부 항목 28개 × 능력 3개면 84개 상관입니다. 관계가 없어도 네댓 개는
-          우연히 높게 나오므로 능력마다 위에서 다섯 개까지만 봅니다.
-        </p>
+        <div className="flex flex-col gap-12">
+          {ABILITY_AXES.map((axis) => (
+            <div key={axis}>
+              <p className="mb-3 flex flex-wrap items-baseline gap-x-3 border-b border-[--border] pb-2">
+                <span className="text-section-title">{axis}</span>
+                <AlphaNote r={reliability[axis]} className="!mt-0 !inline" />
+              </p>
+              <SplitList
+                splits={splitsFor(people, (p) => p.abilities[axis])}
+                dim={reliability[axis]?.verdict === "poor"}
+              />
+            </div>
+          ))}
+        </div>
       </div>
 
-      {/* ── 셋을 묶으면 ── */}
-      {composite && (
-        <div className="mt-20 border-t border-[--border] pt-12">
-          <h2 className="text-section-title mb-1">셋을 묶으면</h2>
-          <p className="text-ink-secondary mb-8 max-w-[52rem]">
-            협력·조직생활·자율적 실행을 <strong>하나의 값</strong>으로 놓고 어떤
-            기질·성격과 연관이 큰지 봅니다 —{" "}
-            <strong>전반적으로 일이 되는 사람은 어떤 사람인가</strong>.
-          </p>
-          <CompositePanel c={composite} />
-        </div>
-      )}
+      <Cautions
+        poor={ABILITY_AXES.filter((a) => reliability[a]?.verdict === "poor")}
+      />
+
     </section>
   );
 }
@@ -819,18 +845,3 @@ function ReliabilityTab({
   );
 }
 
-/**
- * 한 능력에 관련이 큰 세부 항목을 **큰 순으로** 모은다.
- *
- * `facetPairs`는 「축 안의 어느 항목인가」를 위해 **축 순서**로 준다 —
- * 거기서는 순서가 검사 구조라 바뀌면 안 된다. 여기는 반대로 「무엇과 관련이
- * 깊은가」라 크기가 순서다. 같은 데이터를 다르게 정렬해 쓴다.
- */
-function driversFor(
-  facets: Record<string, RankRow[]>,
-  axis: string,
-): RankRow[] {
-  return TRAIT_SCALES.flatMap((s) => facets[`${s}|${axis}`] ?? []).sort(
-    (a, b) => Math.abs(b.corr.r) - Math.abs(a.corr.r),
-  );
-}

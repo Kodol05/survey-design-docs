@@ -131,21 +131,14 @@ export function CorrelationPanel({
         />
         <CorrelationLegend inHouse={inHouse} />
         {/*
-          흐린 이유를 표 바로 아래에 적는다. 열 머리의 「α .08 · 기준 아래」만
-          으로는 **왜 흐린지**까지는 말하지 못한다.
+          이유는 **화면 맨 아래 「읽으실 때 유의할 것」**에 모아 두었다
+          (2026-08-25). 여기에는 「빗금이 뭐지」에 답할 한 줄만 남긴다 —
+          같은 경고를 세 군데에 적으면 세 번째부터는 눈이 건너뛴다.
         */}
         {dimmed.size > 0 && (
-          <div className="mt-4">
-            <WarningBadge kind="lowReliability" />
-            <p className="text-axis text-ink-secondary mt-2 max-w-[42rem] leading-relaxed">
-              <strong>{[...dimmed].join(" · ")}</strong> 열은 문항끼리 맞물리지
-              않아 상관이 <strong>실제보다 작게</strong> 나옵니다. 「관련이
-              약하다」가 아니라 <strong>「아직 말할 수 없다」</strong>입니다.{" "}
-              <a href="/admin/stats?tab=reliability" className="underline">
-                신뢰도 보기
-              </a>
-            </p>
-          </div>
+          <p className="text-axis text-ink-muted mt-3">
+            빗금 친 열은 문항이 아직 안 맞물립니다 — 아래 유의사항 참고
+          </p>
         )}
       </div>
 
@@ -187,14 +180,7 @@ export function CorrelationPanel({
             <p className="text-axis text-ink-muted mt-2">
               점 하나가 한 사람입니다. 마우스를 올리면 누구인지 나옵니다. 같은
               칸을 다시 누르면 넷으로 돌아갑니다.
-              {dimmed.has(sel.col) && (
-                <>
-                  {" "}
-                  <span style={{ color: "var(--status-critical)" }}>
-                    {sel.col}은 문항이 안 맞물려 기울기를 믿기 어렵습니다.
-                  </span>
-                </>
-              )}
+
             </p>
           </>
         ) : featured.length === 0 ? (
@@ -270,11 +256,7 @@ export function CorrelationPanel({
         </div>
       )}
 
-      {inHouse && (
-        <div className="xl:col-span-2">
-          <WarningBadge kind="multipleComparison" />
-        </div>
-      )}
+
     </div>
   );
 }
