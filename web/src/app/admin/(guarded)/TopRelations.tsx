@@ -1,7 +1,10 @@
 "use client";
 
 import { useState } from "react";
-import { correlationFill, formatR } from "@/components/analysis/correlationColor";
+import {
+  correlationFill,
+  formatR,
+} from "@/components/analysis/correlationColor";
 import {
   describeCorrelation,
   gradeOf,
@@ -59,11 +62,21 @@ export function TopRelations({ items }: { items: Relation[] }) {
               0을 가운데 둔 막대를 앞에 놓으면 크기와 방향이 먼저 들어오고
               문장은 그 확인이 된다.
             */}
-            <div className="grid grid-cols-[1.5rem_7rem_1fr_auto] items-center gap-2 lg:gap-3 xl:grid-cols-[1.5rem_11rem_1fr_auto]">
+            {/*
+              ⚠️ 마지막 칸이 `auto`였다 — **글자 길이에 따라 막대 칸 폭이
+              줄마다 달라졌다.** `+0.59 매우 뚜렷함`과 `−0.02 없음`은 길이가
+              다르고, 줄마다 자기 격자를 쓰므로 그만큼 막대 칸이 밀린다.
+              그래서 **0선이 줄마다 다른 자리에 있었다** (2026-08-26 사용자 지적).
+              폭을 못 박아 모든 줄에서 같은 자리에 오게 한다.
+            */}
+            <div className="grid grid-cols-[1.5rem_7rem_1fr_9.5rem] items-center gap-2 lg:gap-3 xl:grid-cols-[1.5rem_11rem_1fr_9.5rem]">
               <span className="tabular text-ink-muted text-axis text-right">
                 {from + i + 1}
               </span>
-              <span className="text-axis truncate" title={`${it.scale} × ${it.axis}`}>
+              <span
+                className="text-axis truncate"
+                title={`${it.scale} × ${it.axis}`}
+              >
                 {it.scale}
                 <span className="text-ink-muted mx-1">×</span>
                 {it.axis}
@@ -141,14 +154,33 @@ function PageButton({
 /** 값이 여기까지 가면 막대가 끝까지 찬다. 실제 데이터에서 |r|이 1에 가는 일은 없다 */
 const FULL = 0.7;
 
-/** 0을 가운데 두고 좌우로. 순위 탭 막대와 같은 색 언어를 쓴다 */
+/**
+ * 0을 가운데 두고 좌우로.
+ *
+ * ## 칸을 눈에 보이게 두른다 (2026-08-26 사용자 요청)
+ *
+ * 전에는 칠해진 부분만 떠 있고 **어디부터 어디까지가 눈금인지**가 안 보였다.
+ * 왼쪽으로만 가거나 오른쪽으로만 가는 막대라 더 그랬다 — 짧은 막대를 보고
+ * 「작다」인지 「칸이 여기까지밖에 없다」인지 알 수 없었다.
+ *
+ * 그래서 **연한 테두리 칸을 먼저 그리고** 그 안에 채운다. 칸의 양 끝이
+ * `±{FULL}`이라는 것과, 0이 정확히 가운데라는 것이 눈으로 보인다.
+ */
 function MiniBar({ r, uncertain }: { r: number; uncertain: boolean }) {
   const w = Math.min(50, (Math.abs(r) / FULL) * 50);
   return (
-    <div className="relative h-4" title={`${formatR(r)}`}>
+    <div
+      className="relative h-5 rounded-md"
+      title={`${formatR(r)} · 칸 양 끝은 ±${FULL.toFixed(2)}`}
+      style={{
+        background: "var(--wash)",
+        outline: "1px solid var(--border)",
+      }}
+    >
+      {/* 0선 — 칸 한가운데. 테두리보다 진하게 해서 기준선임을 말한다 */}
       <div
-        className="absolute inset-y-0 left-1/2 w-px"
-        style={{ background: "var(--axis)" }}
+        className="absolute inset-y-0 left-1/2 w-0.5 -translate-x-1/2"
+        style={{ background: "var(--ink-muted)" }}
       />
       <div
         className="absolute inset-y-1 rounded-sm"
