@@ -12,26 +12,43 @@ export const metadata: Metadata = {
  * 리액트가 붙은 뒤에 걸면 밝게 한 번 그려졌다가 어두워져 화면이 번쩍인다.
  * `<head>` 안의 스크립트는 본문을 그리기 전에 돌기 때문에 그 틈이 없다.
  *
- * 저장된 것이 없으면 **관리자 화면만 어둡게** 시작한다 — 숫자와 그래프를
- * 오래 보는 자리라 밝은 바탕이 눈에 부담이 된다. 사원 화면은 밝게 둔다.
+ * ## 규칙 (2026-08-25 사용자 결정)
  *
- * **고른 것도 영역별로 따로 기억한다** (2026-08-25). 전에는 한 곳에 저장해서
- * 관리자에서 어둡게 바꾸면 사원 화면까지 어두워졌다. 두 화면은 하는 일이
- * 다르므로 취향도 따로 두는 것이 맞다.
+ *   관리자에 들어갈 때      항상 어둡게
+ *   관리자 안에서 이동      바꾼 것이 유지된다
+ *   관리자에서 나갈 때      바꾼 것을 지운다 → 다음에 또 어둡게
+ *   사원 화면              바꾼 것이 계속 유지된다
+ *   첫 화면(`/`)           초기화 → 밝게
+ *
+ * **두 영역이 서로 다른 이유** — 관리자는 숫자와 그래프를 오래 보는 자리라
+ * 어두운 바탕이 기본으로 맞다. 사원은 결과를 한 번 읽고 나가는 자리라 밝은
+ * 쪽이 맞지만, 응시 중에 눈이 부시면 바꿀 수 있어야 하고 그 선택은 남아야
+ * 한다.
+ *
+ * **초기화 지점을 두는 이유** — 어딘가에서 되돌아가지 않으면, 한 번 어둡게
+ * 바꾼 사람은 영영 어두운 화면만 보게 된다. 첫 화면은 처음 오는 사람이
+ * 보는 자리라 거기서 되돌린다.
  *
  * `try`로 감싸는 이유는 사생활 보호 모드에서 `localStorage` 접근 자체가
  * 예외를 던지기 때문이다. 그때는 기본값으로 간다.
  */
 const THEME_SCRIPT = `
 (function () {
-  var admin = location.pathname.indexOf("/admin") === 0;
-  var fallback = admin ? "dark" : "light";
+  var p = location.pathname;
+  var admin = p.indexOf("/admin") === 0;
+  var t = admin ? "dark" : "light";
   try {
-    var saved = localStorage.getItem("survey-theme:" + (admin ? "admin" : "app"));
-    document.documentElement.dataset.theme = saved || fallback;
-  } catch (e) {
-    document.documentElement.dataset.theme = fallback;
-  }
+    if (admin) {
+      t = localStorage.getItem("survey-theme:admin") || "dark";
+    } else {
+      // 관리자를 벗어났다 — 거기서 바꾼 것은 여기까지 따라오지 않는다
+      localStorage.removeItem("survey-theme:admin");
+      // 첫 화면은 초기화 지점이다
+      if (p === "/") localStorage.removeItem("survey-theme:app");
+      t = localStorage.getItem("survey-theme:app") || "light";
+    }
+  } catch (e) {}
+  document.documentElement.dataset.theme = t;
 })();
 `;
 

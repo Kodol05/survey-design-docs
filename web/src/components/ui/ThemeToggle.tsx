@@ -10,6 +10,9 @@ export type Theme = "light" | "dark";
  * 한 곳에 저장하면 관리자에서 어둡게 바꾼 것이 사원 화면까지 따라간다.
  * 관리자는 숫자를 오래 보는 자리고 사원은 결과를 한 번 읽는 자리라
  * 편한 밝기가 다르다.
+ *
+ * 관리자 쪽 값은 **관리자를 벗어나는 순간 지워진다** (`app/layout.tsx`).
+ * 그래서 관리자는 들어갈 때마다 어둡게 시작한다.
  */
 const scopeOf = (path: string) => (path.indexOf("/admin") === 0 ? "admin" : "app");
 export const themeKey = (path: string) => `survey-theme:${scopeOf(path)}`;
