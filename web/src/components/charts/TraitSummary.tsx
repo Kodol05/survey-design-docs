@@ -29,7 +29,12 @@ export function TraitSummary({
     .filter((r): r is SummaryRow => Boolean(r));
 
   return (
-    <div className="grid gap-10 lg:grid-cols-2 lg:items-center">
+    /*
+      좁으면 세로로 쌓는다. 반반으로 나누면 막대 칸이 60px까지 줄어
+      축 이름이 겹친다 — 실제로 개인 결과 화면에서 그랬다.
+      2xl(1536px)부터만 나란히 둔다.
+    */
+    <div className="grid gap-12 2xl:grid-cols-2 2xl:items-center">
       <div>
         <TraitRadar
           data={ordered.map((r) => ({ scale: r.scale, percent: r.percent }))}
@@ -38,7 +43,10 @@ export function TraitSummary({
       </div>
 
       <div>
-        <TraitBars rows={ordered.map((r) => ({ scale: r.scale, percent: r.percent }))} />
+        <TraitBars
+          rows={ordered.map((r) => ({ scale: r.scale, percent: r.percent }))}
+          height={320}
+        />
         <p className="text-table text-ink-muted mt-3 text-center">
           앞의 네 개가 기질, 뒤의 세 개가 성격입니다
         </p>

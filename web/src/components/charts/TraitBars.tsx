@@ -33,7 +33,7 @@ export function TraitBars({ rows, height = 280 }: { rows: BarRow[]; height?: num
       <ResponsiveContainer>
         <BarChart
           data={data}
-          margin={{ top: 24, right: 4, bottom: 4, left: 4 }}
+          margin={{ top: 24, right: 4, bottom: 0, left: 4 }}
           /* 막대 사이를 벌린다. 붙어 있으면 일곱 개가 한 덩어리로 읽힌다 */
           barCategoryGap="26%"
         >
@@ -42,8 +42,9 @@ export function TraitBars({ rows, height = 280 }: { rows: BarRow[]; height?: num
             dataKey="scale"
             tickLine={false}
             axisLine={{ stroke: "var(--axis)" }}
-            tick={{ fill: "var(--ink-secondary)", fontSize: 18 }}
+            tick={(props: TickProps) => <AxisTick {...props} />}
             interval={0}
+            height={46}
           />
           {/* 중립선 — 전 문항에 "보통"으로 답하면 나오는 값 */}
           <ReferenceLine
@@ -84,5 +85,47 @@ export function TraitBars({ rows, height = 280 }: { rows: BarRow[]; height?: num
         </BarChart>
       </ResponsiveContainer>
     </div>
+  );
+}
+
+/**
+ * 축 이름을 **두 줄로 접는다.**
+ *
+ * 한 칸이 60px 안팎인데 「사회적민감성」은 한 줄로 100px이 넘는다. 그대로 두면
+ * 옆 이름과 겹쳐 글자가 뭉개진다 — 개인 결과 화면에서 실제로 그랬다.
+ *
+ * 줄이거나 자르지 않고 **접는다.** 「민감성」처럼 잘라 쓰면 무슨 축인지
+ * 알아보기 어렵고, 글자를 줄이면 안 읽힌다.
+ *
+ * 두 줄이 되는 것은 여섯 자짜리 둘(사회적민감성·자기초월은 넉 자라 한 줄)뿐이라
+ * 대부분은 한 줄 그대로다.
+ */
+const WRAP: Record<string, [string, string]> = {
+  사회적민감성: ["사회적", "민감성"],
+};
+
+type TickProps = {
+  x?: number | string;
+  y?: number | string;
+  payload?: { value?: string };
+};
+
+function AxisTick({ x, y, payload }: TickProps) {
+  const name = payload?.value ?? "";
+  const lines = WRAP[name] ?? [name];
+  return (
+    <text
+      x={x}
+      y={Number(y ?? 0) + 18}
+      textAnchor="middle"
+      fill="var(--ink-secondary)"
+      fontSize={17}
+    >
+      {lines.map((line, i) => (
+        <tspan key={line} x={x} dy={i === 0 ? 0 : 19}>
+          {line}
+        </tspan>
+      ))}
+    </text>
   );
 }
