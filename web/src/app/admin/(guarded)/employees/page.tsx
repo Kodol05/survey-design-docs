@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { EmptyState } from "@/components/ui/Card";
+import { Note } from "@/components/ui/Note";
 import { EmployeeList } from "./EmployeeList";
 import { ExportLink } from "./ExportLink";
 import { requireAdmin } from "@/lib/auth/guard";
@@ -10,13 +11,7 @@ import {
   SOURCE_PARAM,
   parseSource,
 } from "@/lib/admin/abilitySource";
-import {
-  BANDS,
-  MEAN_KEY,
-  loadRoster,
-  type SortDir,
-} from "@/lib/admin/roster";
-
+import { BANDS, MEAN_KEY, loadRoster, type SortDir } from "@/lib/admin/roster";
 
 export const metadata = { title: "구성원 — 관리자" };
 
@@ -219,38 +214,43 @@ export default async function EmployeesPage(props: {
         />
       </div>
 
-      <div className="text-table text-ink-muted mt-6 flex flex-col gap-2">
-        <p className="max-w-[56rem]">
-          <strong className="text-ink-secondary">성향</strong> 일곱 칸은 축을
-          왼쪽부터 늘어놓은 것입니다.{" "}
-          <span style={{ color: "var(--diverge-pos)" }}>■</span> 낮음{" "}
-          <span style={{ color: "var(--diverge-neg)" }}>■</span> 높음 — 어느 쪽도 좋고 나쁜
-          것이 아닙니다. 색으로 모양을 먼저 보고 숫자로 값을 확인하시면 됩니다.
+      {/*
+        칸 뜻풀이 — **한 줄만 펴 두고 나머지는 접는다.**
+
+        전에는 문단 넷이 늘 펼쳐져 있었다. 표 아래 그 정도 분량이 깔리면
+        읽는 사람은 아무것도 안 읽는다. 늘 보여야 하는 건 **색이 어느 쪽인가**
+        하나뿐이다 — 그건 표를 훑는 동안 계속 필요하다. 나머지는 처음 한 번만
+        궁금한 것이라 접어 둔다.
+      */}
+      <div className="text-table text-ink-muted mt-6">
+        <p>
+          성향 일곱 칸은 <span style={{ color: "var(--diverge-pos)" }}>■</span>{" "}
+          낮음 <span style={{ color: "var(--diverge-neg)" }}>■</span> 높음,
+          직무능력 세 칸은 <strong>{SOURCE_LABEL[source]}</strong>이고 막대
+          길이가 값입니다. 줄을 누르면 그래프가 펼쳐집니다.
         </p>
-        <p className="max-w-[56rem]">
-          <strong className="text-ink-secondary">직무능력</strong> 세 칸은{" "}
-          <strong>{SOURCE_LABEL[source]}</strong>이고 막대 길이가 값입니다.
-          여기는 성향과 달리 <strong>높을수록 좋은 값</strong>이라 갈라지는 색을
-          쓰지 않고 한 가지 색의 길이로만 표시합니다.
-        </p>
-        <p className="max-w-[56rem]">
-          <strong className="text-ink-secondary">신뢰도</strong> 숫자는 반대
-          문항 일치도입니다 — 서로 반대인 문항에 같은 방향으로 답했는지를
-          100점으로 잰 값이고, 아무렇게나 답하면 60 근처가 나옵니다.{" "}
-          <strong>성격에 대한 판정이 아니라 이 응답을 믿을 수 있는지</strong>에
-          대한 값입니다.{" "}
-          <span style={{ color: "var(--status-warn)" }}>검토</span>
-          {" · "}
-          <span style={{ color: "var(--status-critical)" }}>낮음</span>이 붙은
-          사람은 값이 낮은 경우이고,{" "}
-          <span style={{ color: "var(--status-warn)" }}>속도</span>는 일치도는
-          괜찮지만 문항을 너무 빨리 넘긴 경우입니다.
-        </p>
-        <p className="max-w-[56rem]">
-          정렬을 무엇으로 바꾸든 <strong>완료한 사람이 먼저</strong> 나오고,
-          진행 중·미응시는 아래에 모입니다.{" "}
-          <strong>줄을 누르면 그 자리에서 그래프가 펼쳐집니다.</strong>
-        </p>
+        <Note label="칸마다 무슨 뜻인지" className="mt-3">
+          <p>
+            <strong>성향</strong>은 축을 왼쪽부터 늘어놓은 것입니다. 어느 쪽도
+            좋고 나쁜 것이 아니라 색으로 모양을 먼저 보고 숫자로 값을 확인하는
+            칸입니다. <strong>직무능력</strong>은 높을수록 좋은 값이라 갈라지는
+            색을 쓰지 않고 한 가지 색의 길이로만 표시합니다.
+          </p>
+          <p className="mt-2">
+            <strong>신뢰도</strong> 숫자는 서로 반대인 문항에 같은 방향으로
+            답했는지를 100점으로 잰 값입니다. 아무렇게나 답하면 60 근처가
+            나옵니다. 성격에 대한 판정이 아니라 이 응답을 믿을 수 있는지에 대한
+            값입니다. <span style={{ color: "var(--status-warn)" }}>검토</span>
+            {" · "}
+            <span style={{ color: "var(--status-critical)" }}>낮음</span>은 값이
+            낮은 경우, <span style={{ color: "var(--status-warn)" }}>속도</span>
+            는 일치도는 괜찮지만 문항을 너무 빨리 넘긴 경우입니다.
+          </p>
+          <p className="mt-2">
+            정렬을 무엇으로 바꾸든 완료한 사람이 먼저 나오고, 진행 중·미응시는
+            아래에 모입니다.
+          </p>
+        </Note>
       </div>
     </>
   );
