@@ -5,6 +5,7 @@ import type { Cell } from "@/components/analysis/CorrelationTable";
 import type { Point } from "@/components/analysis/ScatterPlot";
 import { WarningBadge } from "@/components/ui/WarningBadge";
 import { requireAdmin } from "@/lib/auth/guard";
+import type { ScaleReliability } from "@/lib/admin/analysis";
 import {
   RANK_LIMIT,
   abilitiesByTraitTercile,
@@ -39,12 +40,15 @@ import { predictFromResearch } from "@/lib/admin/researchPrediction";
 import { LowQualityList, QualityRanking } from "./PersonQuality";
 import { CorrelationPanel } from "./CorrelationPanel";
 import { RankPanel } from "./RankPanel";
+import { DistributionPanel } from "./DistributionPanel";
+import { spreadOf, type Spread } from "@/lib/admin/spread";
 
 export const metadata = { title: "분석 — 관리자" };
 
 const TABS = [
   { key: "matrix", label: "직무능력과 성향" },
   { key: "rank", label: "순위" },
+  { key: "spread", label: "분포" },
   { key: "prediction", label: "예측 대 실제" },
   { key: "agreement", label: "평가 대조" },
   { key: "reliability", label: "검사 신뢰도" },
@@ -78,6 +82,12 @@ export default async function StatsPage(props: {
     ? alphas.reduce((a, b) => a + b, 0) / alphas.length
     : null;
   const poorCount = reliability.filter((r) => r.verdict === "poor").length;
+  /*
+    척도 이름으로 찾아 쓰는 표. 상관 화면과 순위 화면이 **α를 알아야**
+    한다 — 문항이 안 맞물리는 축의 상관은 축소 편향되어 있어 그대로 읽으면
+    안 된다 (2026-08-25 사용자 결정).
+  */
+  const byScale = Object.fromEntries(reliability.map((r) => [r.scale, r]));
   const reviewCount = people.filter((p) => p.quality !== "ok").length;
 
   return (
@@ -135,6 +145,7 @@ export default async function StatsPage(props: {
           matrix={matrix}
           source={source}
           bossCount={bossCount}
+          reliability={byScale}
         />
       )}
       {tab === "rank" && (
@@ -144,6 +155,15 @@ export default async function StatsPage(props: {
           people={people}
           source={source}
           bossCount={bossCount}
+          reliability={byScale}
+        />
+      )}
+      {tab === "spread" && (
+        <SpreadTab
+          people={people}
+          source={source}
+          bossCount={bossCount}
+          reliability={byScale}
         />
       )}
       {tab === "prediction" && <PredictionTab people={people} />}
@@ -224,11 +244,13 @@ function MatrixTab({
   matrix,
   source,
   bossCount,
+  reliability,
 }: {
   people: People;
   matrix: ReturnType<typeof traitAbilityMatrix>;
   source: AbilitySource;
   bossCount: number;
+  reliability: Record<string, ScaleReliability>;
 }) {
   return (
     <div className="flex flex-col gap-16">
@@ -237,6 +259,7 @@ function MatrixTab({
         matrix={matrix}
         source={source}
         bossCount={bossCount}
+        reliability={reliability}
       />
       <ResearchSection
         compare={
@@ -261,11 +284,13 @@ function InHouseSection({
   matrix,
   source,
   bossCount,
+  reliability,
 }: {
   people: People;
   matrix: ReturnType<typeof traitAbilityMatrix>;
   source: AbilitySource;
   bossCount: number;
+  reliability: Record<string, ScaleReliability>;
 }) {
   if (!matrix.enough)
     return (
@@ -311,6 +336,7 @@ function InHouseSection({
         scatter={scatter}
         trends={trends}
         inHouse
+        reliability={reliability}
       />
     </section>
   );
@@ -371,12 +397,14 @@ async function RankTab({
   people,
   source,
   bossCount,
+  reliability,
 }: {
   axis?: string;
   scale?: string;
   people: People;
   source: AbilitySource;
   bossCount: number;
+  reliability: Record<string, ScaleReliability>;
 }) {
   const pickedAxis = ABILITY_AXES.includes(axis as never)
     ? axis!
@@ -404,7 +432,60 @@ async function RankTab({
       tercile={tercile}
       source={source}
       bossCount={bossCount}
+      axisAlpha={reliability[pickedAxis]}
+      scaleAlpha={reliability[pickedScale]}
     />
+  );
+}
+
+// ── 분포 ────────────────────────────────────────────────────────────
+
+/**
+ * 「우리 회사 사람들이 각 축에서 어떻게 퍼져 있는가」 (2026-08-25 사용자 결정).
+ *
+ * 관계를 보기 전에 먼저 궁금한 것이라 **분석 안의 별도 탭**으로 둔다.
+ * 직무능력은 고른 출처를 따른다 — 대표님 평가로 보면 그 값의 분포가 나온다.
+ */
+function SpreadTab({
+  people,
+  source,
+  bossCount,
+  reliability,
+}: {
+  people: People;
+  source: AbilitySource;
+  bossCount: number;
+  reliability: Record<string, ScaleReliability>;
+}) {
+  const of = (
+    scale: string,
+    kind: Spread["kind"],
+    pick: (p: People[number]) => number | undefined,
+  ) =>
+    spreadOf(
+      scale,
+      kind,
+      people
+        .map((p) => ({ employeeId: p.employeeId, name: p.name, value: pick(p)! }))
+        .filter((x) => typeof x.value === "number"),
+    );
+
+  const spreads = [
+    ...TEMPERAMENT.map((s) => of(s, "temperament", (p) => p.traits[s])),
+    ...CHARACTER.map((s) => of(s, "character", (p) => p.traits[s])),
+    ...ABILITY_AXES.map((a) => of(a, "ability", (p) => p.abilities[a])),
+  ].filter((x): x is Spread => x !== null);
+
+  return (
+    <div>
+      <div className="mb-8">
+        <SourcePicker value={source} bossCount={bossCount} />
+        <p className="text-axis text-ink-muted mt-2 max-w-[52rem]">
+          {SOURCE_NOTE[source]}
+        </p>
+      </div>
+      <DistributionPanel spreads={spreads} reliability={reliability} />
+    </div>
   );
 }
 

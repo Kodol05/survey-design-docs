@@ -13,6 +13,8 @@ import {
 } from "@/lib/admin/abilitySource";
 import { countRatedEmployees, pickBossScores } from "@/lib/admin/ratings";
 import type { StoredAbilities, StoredTraits } from "@/lib/survey/result";
+import { quantile } from "@/lib/admin/spread";
+import { ExportLink } from "./ExportLink";
 
 export const metadata = { title: "구성원 — 관리자" };
 
@@ -24,10 +26,11 @@ export default async function EmployeesPage(props: {
     src?: string;
     flag?: string;
     status?: string;
+    pos?: string;
   }>;
 }) {
   await requireAdmin();
-  const { sort, dir, q, src, flag, status } = await props.searchParams;
+  const { sort, dir, q, src, flag, status, pos } = await props.searchParams;
   const source = parseSource(src);
 
   const [employees, bossCount] = await Promise.all([
@@ -87,6 +90,15 @@ export default async function EmployeesPage(props: {
     };
   });
 
+  /*
+    구간을 자르는 기준은 **거르기 전 전체**로 잡는다 (2026-08-25 사용자 결정).
+
+    이미 걸러진 목록에서 다시 상위 4분의 1을 뽑으면 그게 무엇의 상위인지
+    알 수 없다. 「협력 상위 4분의 1」은 늘 **회사 전체 안에서의 위치**여야
+    한다 — 그래야 검색어를 바꿔도 같은 사람들이 남는다.
+  */
+  const everyone = rows;
+
   const keyword = (q ?? "").trim();
   if (keyword) rows = rows.filter((r) => r.name.includes(keyword));
 
@@ -125,6 +137,45 @@ export default async function EmployeesPage(props: {
   */
   const valueFlip = sortDir === "asc" ? -1 : 1;
   const nameFlip = sortDir === "asc" ? 1 : -1;
+
+  /*
+    **점수로 목록을 좁힌다** (2026-08-25 사용자 결정).
+
+    이름 검색만으로는 「협력이 높은 사람들」을 볼 수 없었다. 정렬해서 위에서
+    세는 수밖에 없는데, 그러면 **어디서 끊어야 할지**를 눈으로 정하게 된다.
+    사분위로 끊으면 기준이 데이터에서 나온다.
+
+    정렬로 고른 축을 그대로 쓴다 — 축을 고르는 자리를 하나 더 만들지 않는다.
+    이미 「무엇을 보고 있나」를 정한 자리가 있는데 둘로 나누면 둘이 어긋난다.
+  */
+  const bandOf = (r: Row) =>
+    !sortKey
+      ? null
+      : isTrait
+        ? (r.traits?.[sortKey] ?? null)
+        : (r.abilities?.[sortKey] ?? null);
+
+  const scores = sortKey
+    ? everyone
+        .map(bandOf)
+        .filter((v): v is number => typeof v === "number")
+        .sort((a, b) => a - b)
+    : [];
+  const cut =
+    scores.length >= 4
+      ? { low: quantile(scores, 0.25), high: quantile(scores, 0.75) }
+      : null;
+
+  const band = sortKey && cut && BANDS.some((b) => b.key === pos) ? pos! : null;
+  if (band) {
+    rows = rows.filter((r) => {
+      const v = bandOf(r);
+      if (v === null) return false;
+      if (band === "top") return v >= cut!.high;
+      if (band === "low") return v <= cut!.low;
+      return v > cut!.low && v < cut!.high;
+    });
+  }
 
   /*
     무엇으로 정렬하든 **완료한 사람이 먼저**다.
@@ -166,6 +217,7 @@ export default async function EmployeesPage(props: {
     if (params.sort) sp.set("sort", params.sort);
     if (params.dir) sp.set("dir", params.dir);
     if (params.q) sp.set("q", params.q);
+    if (params.pos) sp.set("pos", params.pos);
     // 고른 출처와 거르개는 정렬·검색을 바꿔도 따라간다
     if (source !== "self") sp.set(SOURCE_PARAM, source);
     if (!params.clear) {
@@ -276,6 +328,36 @@ export default async function EmployeesPage(props: {
             </SortChip>
           ))}
         </SortRow>
+
+        {/*
+          **정렬 축을 고른 뒤에만 나온다.** 이름순일 때 「상위 4분의 1」은
+          말이 안 된다 — 무엇의 상위인지가 없다. 자리를 미리 비워 두면
+          누를 수 없는 칩이 늘 떠 있게 되므로 아예 나오지 않게 한다.
+        */}
+        {sortKey && cut && (
+          <SortRow label="구간">
+            {BANDS.map((b) => (
+              <SortChip
+                key={b.key}
+                href={link({
+                  sort: sortKey,
+                  q: keyword,
+                  dir: sortDir !== fallbackDir ? sortDir : undefined,
+                  pos: band === b.key ? undefined : b.key,
+                })}
+                on={band === b.key}
+              >
+                {b.label}
+              </SortChip>
+            ))}
+            <span className="text-ink-muted ml-1 self-center">
+              {sortKey} 기준 · 경계{" "}
+              <span className="tabular">
+                {Math.round(cut.low)} / {Math.round(cut.high)}
+              </span>
+            </span>
+          </SortRow>
+        )}
       </div>
 
       {rows.length === 0 ? (
@@ -287,6 +369,15 @@ export default async function EmployeesPage(props: {
       ) : (
         <EmployeeList rows={rows} />
       )}
+
+      <div className="mt-8 flex justify-end">
+        <ExportLink
+          href={`/admin/employees/export${
+            source !== "self" ? `?${SOURCE_PARAM}=${source}` : ""
+          }`}
+          count={rows.length}
+        />
+      </div>
 
       <div className="text-table text-ink-muted mt-6 flex flex-col gap-2">
         <p className="max-w-[56rem]">
@@ -421,3 +512,16 @@ function SortChip({
     </Link>
   );
 }
+
+/**
+ * 점수 구간 — 사분위로 자른다.
+ *
+ * 「상위 10명」처럼 **사람 수로** 자르지 않는다. 회사가 44명일 때와 60명일
+ * 때 같은 「10명」이 서로 다른 위치를 뜻하게 되기 때문이다. 4분의 1로
+ * 자르면 인원이 늘어도 뜻이 그대로다.
+ */
+const BANDS = [
+  { key: "top", label: "상위 4분의 1" },
+  { key: "mid", label: "가운데 절반" },
+  { key: "low", label: "하위 4분의 1" },
+] as const;

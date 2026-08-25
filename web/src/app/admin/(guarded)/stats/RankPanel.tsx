@@ -6,6 +6,8 @@ import { WarningBadge } from "@/components/ui/WarningBadge";
 import type { TercileCompare } from "@/lib/admin/analysis";
 import { SourcePicker } from "@/components/analysis/SourcePicker";
 import { SOURCE_NOTE, type AbilitySource } from "@/lib/admin/abilitySource";
+import { AlphaNote } from "@/components/analysis/AlphaNote";
+import type { ScaleReliability } from "@/lib/admin/analysis";
 
 /**
  * 양방향 순위 화면.
@@ -25,6 +27,8 @@ export function RankPanel({
   tercile,
   source,
   bossCount,
+  axisAlpha,
+  scaleAlpha,
 }: {
   abilities: string[];
   scales: string[];
@@ -35,6 +39,9 @@ export function RankPanel({
   tercile: TercileCompare[];
   source: AbilitySource;
   bossCount: number;
+  /** 고른 직무능력·성향의 α. 기준 아래면 이 화면의 순서를 믿을 수 없다 */
+  axisAlpha?: ScaleReliability;
+  scaleAlpha?: ScaleReliability;
 }) {
   return (
     <div>
@@ -64,6 +71,8 @@ export function RankPanel({
               `/admin/stats?tab=rank&axis=${encodeURIComponent(v)}&scale=${encodeURIComponent(pickedScale)}`
             }
           />
+
+          <LowAlpha r={axisAlpha} name={pickedAxis} what="이 순서" />
 
           <div className="mt-6">
             <RankBars items={items} />
@@ -95,6 +104,8 @@ export function RankPanel({
               `/admin/stats?tab=rank&axis=${encodeURIComponent(pickedAxis)}&scale=${encodeURIComponent(v)}`
             }
           />
+
+          <LowAlpha r={scaleAlpha} name={pickedScale} what="이 비교" />
 
           {tercile.length === 0 ? (
             <p className="text-ink-muted mt-8">
@@ -318,5 +329,42 @@ function DiffBar({ ci, diff }: { ci: [number, number]; diff: number }) {
         )}
       </p>
     </div>
+  );
+}
+
+/**
+ * 고른 축의 문항이 안 맞물릴 때 다는 줄.
+ *
+ * 순위 화면은 **순서**를 말한다. 그런데 척도가 안 맞물리면 그 점수에 잡음이
+ * 섞이고, 잡음이 섞인 값으로 매긴 순서는 다시 재면 뒤바뀐다. 그러니
+ * 「이 사람이 협력 1등」이 아니라 **「지금은 순서를 말할 수 없다」**가 맞다.
+ *
+ * 그림을 지우지는 않는다 — 왜 못 믿는지를 옆에 두면 그림도 같이 읽힌다.
+ */
+function LowAlpha({
+  r,
+  name,
+  what,
+}: {
+  r?: ScaleReliability;
+  name: string;
+  what: string;
+}) {
+  if (!r || r.verdict !== "poor") return null;
+  return (
+    <p
+      role="note"
+      className="text-axis mt-4 max-w-[42rem] rounded-lg px-3 py-2 leading-relaxed"
+      style={{ background: "var(--wash)" }}
+    >
+      <span style={{ color: "var(--status-critical)" }}>⚠ </span>
+      <strong>{name}</strong>은 문항끼리 맞물리지 않습니다 (
+      <span className="tabular">α {r.alpha?.toFixed(2)}</span>, 문항{" "}
+      <span className="tabular">{r.itemCount}</span>개).{" "}
+      {what}를 그대로 믿기 어렵습니다 — 점수에 섞인 잡음이 순서를 흔듭니다.{" "}
+      <Link href="/admin/stats?tab=reliability" className="underline" scroll={false}>
+        검사 신뢰도에서 보기
+      </Link>
+    </p>
   );
 }

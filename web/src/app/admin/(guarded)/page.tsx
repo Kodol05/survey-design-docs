@@ -1,10 +1,10 @@
 import Link from "next/link";
 import { WarningBadge } from "@/components/ui/WarningBadge";
 import { colorAt } from "@/components/charts/scale";
-import { CompletionTrend } from "@/components/charts/CompletionTrend";
+import { Attendance } from "@/components/charts/Attendance";
 import { ratingProgress } from "@/lib/admin/ratings";
 import { ButtonLink } from "@/components/ui/Button";
-import { loadCompletionByDate, loadSummary } from "@/lib/admin/summary";
+import { loadAttendance, loadSummary } from "@/lib/admin/summary";
 import {
   cellOf,
   loadPeople,
@@ -19,12 +19,12 @@ import { TopRelations, type Relation } from "./TopRelations";
 export const metadata = { title: "대시보드 — 관리자" };
 
 export default async function AdminHome() {
-  const [rating, s, people, reliability, trend] = await Promise.all([
+  const [rating, s, people, reliability, attendance] = await Promise.all([
     ratingProgress(),
     loadSummary(),
     loadPeople(),
     loadReliability(),
-    loadCompletionByDate(),
+    loadAttendance(),
   ]);
   const matrix = traitAbilityMatrix(people);
 
@@ -183,14 +183,10 @@ export default async function AdminHome() {
         {/* ── 좌상 · 흐름 ── */}
         <section>
           <div className="mb-4 flex items-baseline justify-between border-b border-[--border] pb-2">
-            <h2 className="text-section-title">날짜별 누적 완료</h2>
-            {trend.length > 0 && (
-              <span className="text-axis text-ink-muted">
-                {trend.length}일째
-              </span>
-            )}
+            <h2 className="text-section-title">응시 현황</h2>
+            <span className="text-axis text-ink-muted">한 칸이 한 사람</span>
           </div>
-          <CompletionTrend points={trend} />
+          <Attendance people={attendance} />
         </section>
 
         {/* ── 우상 · 관련 ── */}
@@ -371,6 +367,16 @@ export default async function AdminHome() {
               top.length
                 ? `값이 0을 확실히 벗어난 조합 ${top.length}개`
                 : "아직 확정된 조합 없음",
+            ]}
+          />
+          <Shortcut
+            href="/admin/stats?tab=spread"
+            title="분포"
+            lines={[
+              "각 축에서 사람들이 어떻게 퍼져 있는지 봅니다",
+              spread.length
+                ? `가장 갈리는 축은 ${spread[0].scale} (${Math.round(spread[0].lo)}–${Math.round(spread[0].hi)})`
+                : "아직 그려 볼 값이 없습니다",
             ]}
           />
           <Shortcut

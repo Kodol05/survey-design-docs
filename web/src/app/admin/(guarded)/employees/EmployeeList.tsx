@@ -1,7 +1,6 @@
 "use client";
 
-import Link from "next/link";
-import { Fragment, useState } from "react";
+import { useState } from "react";
 import { TraitBars } from "@/components/charts/TraitBars";
 import { TraitRadar } from "@/components/charts/TraitRadar";
 import {
@@ -23,6 +22,22 @@ import { formatPhone } from "@/lib/auth/phone";
  * **줄을 누르면 그 자리에서 펼쳐진다.** 상세 화면으로 넘어가지 않아도 다각형
  * 그래프와 세로 막대로 모양을 볼 수 있다. 50명을 훑을 때 한 명 볼 때마다
  * 화면을 오가면 흐름이 끊긴다. 더 자세한 것은 상세 화면에서 본다.
+ *
+ * ## 표가 아니라 칸으로 둔다 (2026-08-25 사용자 결정)
+ *
+ * 전에는 `<table>`이었다. 줄과 줄 사이가 가는 선 하나뿐이라 **한 사람이
+ * 어디서 시작해 어디서 끝나는지**가 흐렸다 — 특히 펼쳤을 때, 펼쳐진 내용이
+ * 표의 다른 줄인지 그 사람의 것인지 눈으로 갈라야 했다.
+ *
+ * 한 사람을 테두리로 감싸면 그 물음이 없어진다. 펼친 내용도 **같은 테두리
+ * 안**에서 자라므로 누구 것인지 묻지 않아도 된다.
+ *
+ * 칸은 **크기가 서로 비슷해야** 한다. 사람마다 높이가 달라지면 훑는 눈이
+ * 자꾸 걸린다. 그래서 왼쪽 글자 블록을 두 줄로 못 박고, 값이 없는 자리도
+ * 빈 줄로 두지 않고 `—`를 적는다.
+ *
+ * 바탕은 칠하지 않는다. 마흔 칸을 색으로 채우면 화면이 무거워진다 —
+ * 테두리 한 줄이면 「감싸고 있다」는 말은 이미 다 한 것이다.
  */
 
 export type Row = {
@@ -54,95 +69,132 @@ const STATUS = {
   ABANDONED: "중단",
 } as const;
 
+/*
+  칸 안의 자리 배분.
+
+  왼쪽 글자 블록은 **고정폭**이다 — 이름 길이에 따라 오른쪽 스트립이 밀리면
+  칸끼리 축이 안 맞아서 세로로 훑을 수가 없다. 성향만 남는 폭을 가져간다.
+*/
+const LAYOUT =
+  "grid grid-cols-1 gap-x-6 gap-y-4 " +
+  "xl:grid-cols-[minmax(11rem,13rem)_5rem_minmax(0,1fr)_auto] xl:items-center";
+
 export function EmployeeList({ rows }: { rows: Row[] }) {
   const [openId, setOpenId] = useState<string | null>(null);
 
   return (
-    /*
-      폭 배분이 이 표의 핵심이다.
+    <div>
+      {/*
+        머리글은 칸 **바깥에** 한 번만 둔다. 칸마다 넣으면 마흔 번 반복되고,
+        빼면 어느 네모가 어느 축인지 알 수 없다. 자리는 아래 칸과 같은
+        격자를 써서 맞춘다 (좌우 여백 `px-5`까지 같이).
+      */}
+      <div
+        className={`text-axis text-ink-muted mb-2 hidden px-5 xl:grid ${LAYOUT.replace("grid-cols-1 ", "")}`}
+        aria-hidden
+      >
+        <span>이름</span>
+        <span>신뢰도</span>
+        <TraitStripHeader />
+        <AbilityStripHeader />
+      </div>
 
-      전에는 이름·번호·상태·성향이 전부 고정폭이고 **마지막 품질 칸이 남는 폭을
-      전부 흡수**했다. 1920 화면에서 성향과 품질 사이가 1,000px 가까이 벌어져
-      품질만 오른쪽 끝에 홀로 떠 있었다 — "전체화면이라 애매하다"의 정체.
-
-      고치는 방향은 폭을 줄이는 게 아니다. 11 §1.4가 관리자 표는 `max-width` 없이
-      전체 폭을 쓴다고 정해뒀다. 대신 **남는 폭을 데이터가 가져가게** 한다 —
-      성향(42%)과 직무능력(18%)에 퍼센트를 주면 넓어질수록 두 스트립이 벌어져
-      숫자 간격이 편해지고, 빈 칸이 생기지 않는다.
-    */
-    <div className="overflow-x-auto">
-      <table className="w-full">
-        <thead>
-          <tr className="text-axis text-ink-muted border-b border-[--border]">
-            <th className="w-36 pb-2 text-left font-medium">이름</th>
-            <th className="w-32 pb-2 text-left font-medium">번호</th>
-            <th className="w-16 pb-2 text-left font-medium">상태</th>
-            <th className="w-20 pb-2 text-left font-medium">신뢰도</th>
-            <th className="w-14 pb-2 text-left font-medium">완료</th>
-            <th className="w-[42%] pb-2 pl-4 text-left font-medium">
-              <TraitStripHeader />
-            </th>
-            <th className="w-[18%] pb-2 pl-4 text-left font-medium">
-              <AbilityStripHeader />
-            </th>
-          </tr>
-        </thead>
-        <tbody>
-          {rows.map((r) => {
-            const expanded = openId === r.id;
-            const canExpand = Boolean(r.traits);
-            return (
-              <Fragment key={r.id}>
-                <tr
-                  onClick={() => canExpand && setOpenId(expanded ? null : r.id)}
-                  className={`border-b border-[--border] ${
-                    canExpand ? "cursor-pointer hover:bg-[--wash]" : ""
-                  } ${expanded ? "bg-[--wash]" : ""}`}
-                >
-                  <td className="py-2.5">
-                    <span className="font-medium">{r.name}</span>
+      <ul className="flex flex-col gap-2">
+        {rows.map((r) => {
+          const expanded = openId === r.id;
+          const canExpand = Boolean(r.traits);
+          return (
+            <li
+              key={r.id}
+              className="rounded-xl border transition-colors"
+              style={{
+                borderColor: expanded ? "var(--ink-muted)" : "var(--border)",
+                background: expanded ? "var(--wash)" : undefined,
+              }}
+            >
+              {/*
+                칸 전체가 누르는 자리다. `<button>`으로 감싸면 안쪽 그래프의
+                `title`과 겹치므로 `<div>`에 역할을 준다.
+              */}
+              <div
+                role={canExpand ? "button" : undefined}
+                tabIndex={canExpand ? 0 : undefined}
+                aria-expanded={canExpand ? expanded : undefined}
+                onClick={() => canExpand && setOpenId(expanded ? null : r.id)}
+                onKeyDown={(e) => {
+                  if (!canExpand) return;
+                  if (e.key === "Enter" || e.key === " ") {
+                    e.preventDefault();
+                    setOpenId(expanded ? null : r.id);
+                  }
+                }}
+                className={`${LAYOUT} px-5 py-4 ${
+                  canExpand ? "cursor-pointer hover:bg-[--wash]" : ""
+                } ${expanded ? "rounded-t-xl" : "rounded-xl"}`}
+              >
+                {/* ── 누구인가 ── */}
+                <div className="min-w-0">
+                  <p className="flex items-baseline gap-2">
+                    <span className="text-table truncate font-medium">
+                      {r.name}
+                    </span>
+                    <span className="text-axis text-ink-muted shrink-0">
+                      {r.status
+                        ? STATUS[r.status as keyof typeof STATUS]
+                        : "미응시"}
+                    </span>
                     {canExpand && (
-                      <span className="text-ink-muted text-axis ml-2">
+                      <span aria-hidden className="text-ink-muted ml-auto">
                         {expanded ? "▾" : "▸"}
                       </span>
                     )}
-                  </td>
-                  <td className="text-axis tabular text-ink-secondary py-2.5">
-                    {r.phone ? formatPhone(r.phone) : "—"}
-                  </td>
-                  <td className="text-axis text-ink-secondary py-2.5">
-                    {r.status ? STATUS[r.status as keyof typeof STATUS] : "미응시"}
-                  </td>
-                  <td className="py-2.5">
-                    <Quality
-                      flag={r.flag}
-                      agreement={r.agreement}
-                      fastCount={r.fastCount}
-                    />
-                  </td>
-                  <td className="text-axis tabular text-ink-muted py-2.5">
-                    {r.completedLabel ?? "—"}
-                  </td>
-                  <td className="py-2.5 pl-4 whitespace-nowrap">
-                    <TraitStrip traits={r.traits} />
-                  </td>
-                  <td className="py-2.5 pl-4 whitespace-nowrap">
-                    <AbilityStrip abilities={r.abilities} />
-                  </td>
-                </tr>
+                  </p>
+                  <p className="text-axis text-ink-secondary tabular mt-0.5 truncate">
+                    {r.phone ? formatPhone(r.phone) : "번호 없음"}
+                    <span className="text-ink-muted">
+                      {" · "}
+                      {r.completedLabel ?? "—"}
+                    </span>
+                  </p>
+                </div>
 
-                {expanded && r.traits && (
-                  <tr className="border-b border-[--border]">
-                    <td colSpan={7} className="bg-[--wash] px-6 py-8">
-                      <Panel row={r} />
-                    </td>
-                  </tr>
-                )}
-              </Fragment>
-            );
-          })}
-        </tbody>
-      </table>
+                {/* ── 이 응답을 믿을 수 있는가 ── */}
+                <div>
+                  <span className="text-axis text-ink-muted mr-2 xl:hidden">
+                    신뢰도
+                  </span>
+                  <Quality
+                    flag={r.flag}
+                    agreement={r.agreement}
+                    fastCount={r.fastCount}
+                  />
+                </div>
+
+                {/* ── 어떤 사람인가 ── */}
+                <div className="min-w-0">
+                  <span className="text-axis text-ink-muted mb-1 block xl:hidden">
+                    성향
+                  </span>
+                  <TraitStrip traits={r.traits} />
+                </div>
+
+                <div className="min-w-0">
+                  <span className="text-axis text-ink-muted mb-1 block xl:hidden">
+                    직무능력
+                  </span>
+                  <AbilityStrip abilities={r.abilities} />
+                </div>
+              </div>
+
+              {expanded && r.traits && (
+                <div className="border-t border-[--border] px-5 py-8 sm:px-6">
+                  <Panel row={r} />
+                </div>
+              )}
+            </li>
+          );
+        })}
+      </ul>
     </div>
   );
 }
@@ -179,7 +231,7 @@ function Quality({
 
   return (
     <span
-      className="flex items-baseline gap-1.5"
+      className="inline-flex items-baseline gap-1.5"
       title={
         `반대 문항 일치도 ${pct}점` +
         (fastCount !== null ? ` · 1.5초 안에 답한 문항 ${fastCount}개` : "") +

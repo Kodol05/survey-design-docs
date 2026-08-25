@@ -11,6 +11,8 @@ import { ScatterPlot, type Point } from "@/components/analysis/ScatterPlot";
 import { WarningBadge } from "@/components/ui/WarningBadge";
 import { formatR } from "@/components/analysis/correlationColor";
 import { GradeTag } from "@/components/analysis/GradeTag";
+import { AlphaNote } from "@/components/analysis/AlphaNote";
+import type { ScaleReliability } from "@/lib/admin/analysis";
 
 /**
  * 관련도 표 + 산점도.
@@ -26,6 +28,7 @@ export function CorrelationPanel({
   trends,
   inHouse,
   aside,
+  reliability,
 }: {
   rows: string[];
   cols: string[];
@@ -33,6 +36,13 @@ export function CorrelationPanel({
   scatter: Record<string, Point[]>;
   trends: Record<string, { x: number; y: number }[] | null>;
   inHouse: boolean;
+  /**
+   * 척도별 α. 열 이름 아래에 적고, 기준 아래인 열은 통째로 흐리게 한다.
+   *
+   * **연구 표에는 주지 않는다** — 저기 값은 남이 다른 도구로 잰 것이라
+   * 우리 문항의 α와 아무 상관이 없다.
+   */
+  reliability?: Record<string, ScaleReliability>;
   /**
    * 오른쪽 칸에 대신 넣을 것. 연구 표에는 점 분포가 없어 이 칸이 비는데,
    * 안내 문구로 채우면 화면 절반이 놀게 된다. 볼 것을 넣는다.
@@ -47,6 +57,11 @@ export function CorrelationPanel({
     먼저 보여주고, 고르면 그것 하나로 좁힌다.
   */
   const [sel, setSel] = useState<Selected>(null);
+
+  /** 문항이 안 맞물리는 열 — 여기 상관은 축소 편향되어 그대로 읽으면 안 된다 */
+  const dimmed = new Set(
+    cols.filter((c) => reliability?.[c]?.verdict === "poor"),
+  );
 
   /** 같은 칸을 다시 누르면 선택이 풀려 다시 넷으로 돌아간다 */
   const toggle = (next: { row: string; col: string }) =>
@@ -66,7 +81,7 @@ export function CorrelationPanel({
     아무 기준 없이 위에서 넷을 자르면 표의 왼쪽 위만 계속 보게 된다.
   */
   const featured = Object.entries(cells)
-    .filter(([, c]) => c.kind === "value")
+    .filter(([key, c]) => c.kind === "value" && !dimmed.has(key.split("|")[1]))
     .map(([key, c]) => {
       const v = c as Extract<Cell, { kind: "value" }>;
       return {
@@ -93,8 +108,30 @@ export function CorrelationPanel({
           cell={(r, c) => cells[`${r}|${c}`] ?? { kind: "unstudied" }}
           selected={sel}
           onSelect={inHouse ? toggle : undefined}
+          colNote={
+            reliability ? (c) => <AlphaNote r={reliability[c]} /> : undefined
+          }
+          dimCol={dimmed.size ? (c) => dimmed.has(c) : undefined}
         />
         <CorrelationLegend inHouse={inHouse} />
+        {/*
+          흐린 이유를 표 바로 아래에 적는다. 열 머리의 「α .08 · 기준 아래」만
+          으로는 **왜 흐린지**까지는 말하지 못한다.
+        */}
+        {dimmed.size > 0 && (
+          <div className="mt-4">
+            <WarningBadge kind="lowReliability" />
+            <p className="text-axis text-ink-secondary mt-2 max-w-[42rem] leading-relaxed">
+              <strong>{[...dimmed].join(" · ")}</strong> 열을 흐리게 두었습니다.
+              이 척도는 문항끼리 맞물리지 않아서, 여기서 잰 상관은{" "}
+              <strong>실제보다 작게</strong> 나옵니다. 「관련이 약하다」가 아니라{" "}
+              <strong>「아직 말할 수 없다」</strong>로 읽어 주십시오.{" "}
+              <a href="/admin/stats?tab=reliability" className="underline">
+                검사 신뢰도에서 보기
+              </a>
+            </p>
+          </div>
+        )}
       </div>
 
       <div>
@@ -135,6 +172,15 @@ export function CorrelationPanel({
             <p className="text-axis text-ink-muted mt-2">
               점 하나가 한 사람입니다. 마우스를 올리면 누구인지 나옵니다. 같은
               칸을 다시 누르면 넷으로 돌아갑니다.
+              {dimmed.has(sel.col) && (
+                <>
+                  {" "}
+                  <span style={{ color: "var(--status-critical)" }}>
+                    {sel.col}은 문항이 아직 맞물리지 않아 이 그림의 기울기를
+                    그대로 믿을 수 없습니다.
+                  </span>
+                </>
+              )}
             </p>
           </>
         ) : featured.length === 0 ? (

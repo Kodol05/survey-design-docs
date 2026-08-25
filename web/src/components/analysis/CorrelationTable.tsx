@@ -12,6 +12,7 @@ import { gradeOf } from "./correlationWords";
  *  - **칸마다 n** — 같은 .30이라도 n=500과 n=37은 다르다
  *  - `숫자` / `없음` / `—` **세 상태를 구분**. 색으로는 뒤 둘을 못 가르므로 글자로
  *  - 신뢰구간이 0을 걸치면 흐리게
+ *  - **척도가 안 맞물리면 그 열을 통째로 흐리게** (아래 참고)
  *
  * 칸을 누르면 그 쌍의 산점도가 옆에 뜬다. 표는 어디를 볼지 고르는 도구이고,
  * 실제로 보는 것은 산점도다 — 한두 명이 상관을 끌고 있는지는 점을 봐야 안다.
@@ -33,18 +34,38 @@ export type Cell =
 
 export type Selected = { row: string; col: string } | null;
 
+/**
+ * 열을 통째로 흐리게 하는 이유 — **α와 상관을 잇는다** (2026-08-25 사용자 결정).
+ *
+ * 그동안 「검사 신뢰도」 탭은 협력 α가 기준 아래라고 말하고, 이 표는 협력
+ * 열을 다른 열과 **똑같이 진하게** 그렸다. 두 화면이 서로를 몰랐다.
+ *
+ * 척도가 안 맞물리면(α가 낮으면) 그 척도로 잰 상관은 **실제보다 작게**
+ * 나온다 — 잰 값에 잡음이 섞여 있으니 어떤 관계든 희석된다(attenuation).
+ * 그러니 「관련이 약하다」가 아니라 **「아직 말할 수 없다」**가 맞다.
+ *
+ * 숨기지는 않는다. 흐리게 하고 열 머리에 이유를 적는다 — 가려 버리면
+ * 왜 없는지 묻게 되고, 그대로 두면 잘못 읽는다.
+ */
+
 export function CorrelationTable({
   rows,
   cols,
   cell,
   selected,
   onSelect,
+  colNote,
+  dimCol,
 }: {
   rows: string[];
   cols: string[];
   cell: (row: string, col: string) => Cell;
   selected?: Selected;
   onSelect?: (sel: { row: string; col: string }) => void;
+  /** 열 이름 아래 한 줄 — 지금은 α를 적는다 */
+  colNote?: (col: string) => React.ReactNode;
+  /** 참이면 그 열의 칸을 통째로 흐리게 그린다 */
+  dimCol?: (col: string) => boolean;
 }) {
   return (
     <div className="overflow-x-auto">
@@ -85,9 +106,12 @@ export function CorrelationTable({
             {cols.map((c) => (
               <th
                 key={c}
-                className="text-table border-r border-b border-[--border] pb-2 text-center font-medium last:border-r-0"
+                className="text-table border-r border-b border-[--border] px-1 pb-2 text-center font-medium last:border-r-0"
               >
-                {c}
+                <span className={dimCol?.(c) ? "text-ink-secondary" : undefined}>
+                  {c}
+                </span>
+                {colNote?.(c)}
               </th>
             ))}
           </tr>
@@ -104,6 +128,8 @@ export function CorrelationTable({
               {cols.map((c) => {
                 const v = cell(r, c);
                 const on = selected?.row === r && selected?.col === c;
+                // 열이 흐린 상태면 칸 하나하나의 확실성과 무관하게 흐리다
+                const dim = Boolean(dimCol?.(c));
                 const clickable = Boolean(onSelect) && v.kind === "value";
                 return (
                   <td
@@ -127,7 +153,7 @@ export function CorrelationTable({
                         */
                         background:
                           v.kind === "value"
-                            ? correlationFill(v.r, crosses(v.ci))
+                            ? correlationFill(v.r, dim || crosses(v.ci))
                             : "transparent",
                         color: v.kind === "value" ? "var(--ink)" : undefined,
                         /*
@@ -145,7 +171,7 @@ export function CorrelationTable({
                         filter: on ? "saturate(1.45) brightness(0.97)" : undefined,
                       }}
                     >
-                      <Body cell={v} />
+                      <Body cell={v} dim={dim} />
                     </button>
                   </td>
                 );
@@ -207,7 +233,7 @@ function CellBar({ r, faded }: { r: number; faded: boolean }) {
   );
 }
 
-function Body({ cell }: { cell: Cell }) {
+function Body({ cell, dim = false }: { cell: Cell; dim?: boolean }) {
   if (cell.kind === "unstudied") return <span className="text-ink-muted">—</span>;
   if (cell.kind === "expected")
     return (
@@ -255,8 +281,13 @@ function Body({ cell }: { cell: Cell }) {
         내준다. 표를 훑을 때 먼저 잡히는 것이 「얼마나 큰가」여야 한다 —
         숫자는 그다음에 확인하는 것이다.
       */}
-      <CellBar r={cell.r} faded={crosses(cell.ci)} />
-      <span className="tabular font-medium leading-tight">{formatR(cell.r)}</span>
+      <CellBar r={cell.r} faded={dim || crosses(cell.ci)} />
+      <span
+        className="tabular leading-tight"
+        style={{ fontWeight: dim ? 400 : 500, color: dim ? "var(--ink-secondary)" : undefined }}
+      >
+        {formatR(cell.r)}
+      </span>
       <span className="text-axis tabular leading-tight" style={{ opacity: 0.6 }}>
         n={cell.n}
       </span>
