@@ -5,10 +5,8 @@ import { CHARACTER } from "../charts/scale";
 import { formatR } from "./correlationColor";
 import { DivergingBar } from "./DivergingBar";
 import { GradeTag } from "./GradeTag";
-import { AlphaNote } from "./AlphaNote";
 import { ScatterPlot, type Point } from "./ScatterPlot";
 import { describeCorrelation, gradeOf, subjectParticle } from "./correlationWords";
-import type { ScaleReliability } from "@/lib/admin/analysis";
 
 /**
  * 능력 하나에 대해 **성향 7축을 순위로** (2026-08-25 사용자 요청).
@@ -29,12 +27,12 @@ import type { ScaleReliability } from "@/lib/admin/analysis";
  *   약함                              막대를 옅게 (있긴 한데 작다)
  *   없음                              접어 둔다
  *
- * ## α가 낮아도 흐리게 두지 않는다 (2026-08-25 사용자 정정)
+ * ## α를 여기 적지 않는다 (2026-08-25 사용자와 함께 확인)
  *
- * 한때 α가 기준 아래인 능력의 목록 전체를 `opacity .55`로 눌러 뒀다.
- * **읽을 수가 없었다.** 경고는 열 머리의 `α .08 · 기준 아래`와 화면 맨
- * 아래 유의사항이 이미 하고 있다 — 글자를 안 보이게 하는 것은 경고가
- * 아니라 그냥 불편함이다.
+ * 한때 능력 이름 옆에 `α .08 · 기준 아래`를 달았다. **틀린 경고였다** —
+ * 직무능력 문항은 여러 요소가 모여 하나를 이루는 꼴이라 문항끼리 상관이
+ * 없어도 이상하지 않고, α는 그런 척도에 쓰는 지표가 아니다
+ * (`CorrelationTable` 머리말 참고).
  */
 
 export type AxisRow = {
@@ -47,14 +45,12 @@ export type AxisRow = {
 export function AxisRanking({
   axis,
   rows,
-  reliability,
   scatter,
   trends,
 }: {
   axis: string;
   /** 이미 큰 순으로 정렬된 7축 */
   rows: AxisRow[];
-  reliability?: ScaleReliability;
   /** `축이름` → 점. 줄을 눌렀을 때 그린다 */
   scatter?: Record<string, Point[]>;
   trends?: Record<string, { x: number; y: number }[] | null>;
@@ -68,9 +64,8 @@ export function AxisRanking({
 
   return (
     <div>
-      <p className="mb-3 flex flex-wrap items-baseline gap-x-3 border-b border-[--border] pb-2">
-        <span className="text-section-title">{axis}</span>
-        <AlphaNote r={reliability} className="!mt-0 !inline" />
+      <p className="text-section-title mb-3 border-b border-[--border] pb-2">
+        {axis}
       </p>
 
       {/* 한 줄 결론 */}

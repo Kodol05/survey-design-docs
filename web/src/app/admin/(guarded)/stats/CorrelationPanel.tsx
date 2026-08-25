@@ -11,8 +11,6 @@ import { ScatterPlot, type Point } from "@/components/analysis/ScatterPlot";
 import { WarningBadge } from "@/components/ui/WarningBadge";
 import { formatR } from "@/components/analysis/correlationColor";
 import { GradeTag } from "@/components/analysis/GradeTag";
-import { AlphaNote } from "@/components/analysis/AlphaNote";
-import type { ScaleReliability } from "@/lib/admin/analysis";
 
 /**
  * 관련도 표 + 산점도.
@@ -28,7 +26,6 @@ export function CorrelationPanel({
   trends,
   inHouse,
   aside,
-  reliability,
   groups,
 }: {
   rows: string[];
@@ -37,13 +34,6 @@ export function CorrelationPanel({
   scatter: Record<string, Point[]>;
   trends: Record<string, { x: number; y: number }[] | null>;
   inHouse: boolean;
-  /**
-   * 척도별 α. 열 이름 아래에 적고, 기준 아래인 열은 통째로 흐리게 한다.
-   *
-   * **연구 표에는 주지 않는다** — 저기 값은 남이 다른 도구로 잰 것이라
-   * 우리 문항의 α와 아무 상관이 없다.
-   */
-  reliability?: Record<string, ScaleReliability>;
   /** 행 묶음 — 기질 4 / 성격 3 */
   groups?: { label: string; note?: string; rows: string[] }[];
   /**
@@ -60,11 +50,6 @@ export function CorrelationPanel({
     먼저 보여주고, 고르면 그것 하나로 좁힌다.
   */
   const [sel, setSel] = useState<Selected>(null);
-
-  /** 문항이 안 맞물리는 열 — 여기 상관은 축소 편향되어 그대로 읽으면 안 된다 */
-  const dimmed = new Set(
-    cols.filter((c) => reliability?.[c]?.verdict === "poor"),
-  );
 
   /*
     칸마다 n을 적을지, 범례에 한 번만 적을지.
@@ -97,7 +82,7 @@ export function CorrelationPanel({
     아무 기준 없이 위에서 넷을 자르면 표의 왼쪽 위만 계속 보게 된다.
   */
   const featured = Object.entries(cells)
-    .filter(([key, c]) => c.kind === "value" && !dimmed.has(key.split("|")[1]))
+    .filter(([, c]) => c.kind === "value")
     .map(([key, c]) => {
       const v = c as Extract<Cell, { kind: "value" }>;
       return {
@@ -125,16 +110,8 @@ export function CorrelationPanel({
           selected={sel}
           onSelect={inHouse ? toggle : undefined}
           groups={groups}
-          colNote={
-            reliability ? (c) => <AlphaNote r={reliability[c]} /> : undefined
-          }
-          dimCol={dimmed.size ? (c) => dimmed.has(c) : undefined}
         />
-        <CorrelationLegend
-          inHouse={inHouse}
-          sharedN={sharedN}
-          hatched={dimmed.size > 0}
-        />
+        <CorrelationLegend inHouse={inHouse} sharedN={sharedN} />
       </div>
 
       <div>

@@ -12,7 +12,22 @@ import { gradeOf } from "./correlationWords";
  *  - **칸마다 n** — 같은 .30이라도 n=500과 n=37은 다르다
  *  - `숫자` / `없음` / `—` **세 상태를 구분**. 색으로는 뒤 둘을 못 가르므로 글자로
  *  - 신뢰구간이 0을 걸치면 흐리게
- *  - **척도가 안 맞물리면 그 열을 통째로 흐리게** (아래 참고)
+ *
+ * ## α로 열을 흐리게 하지 않는다 (2026-08-25 사용자와 함께 확인)
+ *
+ * 한때 α가 기준 아래인 열에 빗금을 치고 「아직 말할 수 없다」고 적었다.
+ * **틀린 경고였다.** 데이터로 확인해 보니 협력 세 문항은 인내력과 각각
+ * `+.16 / +.36 / +.24`로 **셋 다 같은 방향**이었고, 감쇠 보정을 하면
+ * `1.58`이 나왔다 — 상관은 1을 넘을 수 없으므로 **α가 이 척도의 신뢰도를
+ * 너무 낮게 잡고 있다**는 뜻이다.
+ *
+ * α는 「문항들이 **한 가지**를 재는가」를 잰다. 직무능력 문항은 성격이
+ * 다르다 — 「협력」은 내 몫 하기 + 미리 알리기 + 남 돕기가 **모여서
+ * 이루는** 것이라, 문항끼리 상관이 없어도 이상하지 않다(형성적 지표).
+ * 소득과 학력의 α를 재서 「사회경제적 지위 척도가 못 만들어졌다」고
+ * 하지 않는 것과 같다.
+ *
+ * 표에 뜨는 상관은 **실제 응답으로 낸 사실**이다. 예측이 아니다.
  *
  * 칸을 누르면 그 쌍의 산점도가 옆에 뜬다. 표는 어디를 볼지 고르는 도구이고,
  * 실제로 보는 것은 산점도다 — 한두 명이 상관을 끌고 있는지는 점을 봐야 안다.
@@ -34,38 +49,12 @@ export type Cell =
 
 export type Selected = { row: string; col: string } | null;
 
-/**
- * 열을 통째로 흐리게 하는 이유 — **α와 상관을 잇는다** (2026-08-25 사용자 결정).
- *
- * 그동안 「검사 신뢰도」 탭은 협력 α가 기준 아래라고 말하고, 이 표는 협력
- * 열을 다른 열과 **똑같이 진하게** 그렸다. 두 화면이 서로를 몰랐다.
- *
- * 척도가 안 맞물리면(α가 낮으면) 그 척도로 잰 상관은 **실제보다 작게**
- * 나온다 — 잰 값에 잡음이 섞여 있으니 어떤 관계든 희석된다(attenuation).
- * 그러니 「관련이 약하다」가 아니라 **「아직 말할 수 없다」**가 맞다.
- *
- * 숨기지는 않는다. 흐리게 하고 열 머리에 이유를 적는다 — 가려 버리면
- * 왜 없는지 묻게 되고, 그대로 두면 잘못 읽는다.
- *
- * ## 색만 옅게 해서는 전달되지 않는다 (2026-08-25 화면에서 확인)
- *
- * 처음에는 칠을 옅게 하는 것으로만 했다. **전혀 흐려 보이지 않았다** —
- * 협력 열에 `+.44` 같은 큰 값이 있어서 옅게 해도 여전히 진했고, 값이 작은
- * 옆 열보다 오히려 더 눈에 띄었다. 옅기는 **값의 크기와 섞여** 있어서
- * 「이 열은 다르다」를 말할 수단이 못 된다.
- *
- * 그래서 **값과 무관한 표시**를 얹는다 — 사선 빗금. 어떤 값이 들어 있든
- * 그 열만 결이 다르게 보이고, 색을 못 보는 사람에게도 남는다.
- */
-
 export function CorrelationTable({
   rows,
   cols,
   cell,
   selected,
   onSelect,
-  colNote,
-  dimCol,
   groups,
 }: {
   rows: string[];
@@ -73,10 +62,6 @@ export function CorrelationTable({
   cell: (row: string, col: string) => Cell;
   selected?: Selected;
   onSelect?: (sel: { row: string; col: string }) => void;
-  /** 열 이름 아래 한 줄 — 지금은 α를 적는다 */
-  colNote?: (col: string) => React.ReactNode;
-  /** 참이면 그 열의 칸을 통째로 흐리게 그린다 */
-  dimCol?: (col: string) => boolean;
   /**
    * 행을 묶어서 보여준다 — 기질 4 / 성격 3 (2026-08-25 사용자 요청).
    *
@@ -151,10 +136,7 @@ export function CorrelationTable({
                 key={c}
                 className="text-table border-r border-b border-[--border] px-1 pb-2 text-center font-medium last:border-r-0"
               >
-                <span className={dimCol?.(c) ? "text-ink-secondary" : undefined}>
-                  {c}
-                </span>
-                {colNote?.(c)}
+                {c}
               </th>
             ))}
           </tr>
@@ -184,8 +166,6 @@ export function CorrelationTable({
               {cols.map((c) => {
                 const v = cell(r, c);
                 const on = selected?.row === r && selected?.col === c;
-                // 열이 흐린 상태면 칸 하나하나의 확실성과 무관하게 흐리다
-                const dim = Boolean(dimCol?.(c));
                 const clickable = Boolean(onSelect) && v.kind === "value";
                 return (
                   <td
@@ -209,22 +189,8 @@ export function CorrelationTable({
                         */
                         backgroundColor:
                           v.kind === "value"
-                            ? correlationFill(v.r, dim || crosses(v.ci))
+                            ? correlationFill(v.r, crosses(v.ci))
                             : "transparent",
-                        /*
-                          흐린 열은 **빗금으로** 말한다. 칠만 옅게 하면 값이
-                          큰 칸에서는 아무 표시도 안 된다 (위 설명 참고).
-                          바탕과 같은 색으로 줄을 그어 결만 다르게 만든다.
-                        */
-                        /*
-                          간격을 넓게, 선을 반투명하게 둔다. 5px 간격에
-                          불투명한 선으로 그었더니 **어두운 화면에서 칸이
-                          긁힌 것처럼** 보여서 안에 든 숫자보다 빗금이 먼저
-                          들어왔다. 「결이 다르다」만 전하면 된다.
-                        */
-                        backgroundImage: dim
-                          ? "repeating-linear-gradient(45deg, transparent 0 8px, color-mix(in oklab, var(--page) 72%, transparent) 8px 9.5px)"
-                          : undefined,
                         color: v.kind === "value" ? "var(--ink)" : undefined,
                         /*
                           **고른 칸에 테두리를 두르지 않는다** (2026-08-25).
@@ -241,7 +207,7 @@ export function CorrelationTable({
                         filter: on ? "saturate(1.45) brightness(0.97)" : undefined,
                       }}
                     >
-                      <Body cell={v} dim={dim} showN={showN} />
+                      <Body cell={v} showN={showN} />
                     </button>
                   </td>
                 );
@@ -304,15 +270,7 @@ function CellBar({ r, faded }: { r: number; faded: boolean }) {
   );
 }
 
-function Body({
-  cell,
-  dim = false,
-  showN = true,
-}: {
-  cell: Cell;
-  dim?: boolean;
-  showN?: boolean;
-}) {
+function Body({ cell, showN = true }: { cell: Cell; showN?: boolean }) {
   if (cell.kind === "unstudied") return <span className="text-ink-muted">—</span>;
   if (cell.kind === "expected")
     return (
@@ -360,11 +318,8 @@ function Body({
         내준다. 표를 훑을 때 먼저 잡히는 것이 「얼마나 큰가」여야 한다 —
         숫자는 그다음에 확인하는 것이다.
       */}
-      <CellBar r={cell.r} faded={dim || crosses(cell.ci)} />
-      <span
-        className="tabular leading-tight"
-        style={{ fontWeight: dim ? 400 : 500, color: dim ? "var(--ink-secondary)" : undefined }}
-      >
+      <CellBar r={cell.r} faded={crosses(cell.ci)} />
+      <span className="tabular leading-tight font-medium">
         {formatR(cell.r)}
       </span>
       {showN && (

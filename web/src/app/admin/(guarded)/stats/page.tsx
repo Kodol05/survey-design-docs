@@ -441,7 +441,6 @@ function InHouseSection({
         scatter={scatter}
         trends={trends}
         inHouse
-        reliability={reliability}
         groups={TRAIT_GROUPS}
       />
 
@@ -459,7 +458,6 @@ function InHouseSection({
               key={axis}
               axis={axis}
               rows={rankingFor(cells, axis)}
-              reliability={reliability[axis]}
               scatter={byScale(scatter, axis)}
               trends={byScale(trends, axis)}
             />
@@ -482,9 +480,7 @@ function InHouseSection({
         </div>
       )}
 
-      <Cautions
-        poor={ABILITY_AXES.filter((a) => reliability[a]?.verdict === "poor")}
-      />
+      <Cautions />
 
     </section>
   );
