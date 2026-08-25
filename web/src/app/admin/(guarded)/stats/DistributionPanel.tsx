@@ -84,6 +84,26 @@ export function DistributionPanel({
           <p className="text-ink-secondary max-w-[52rem]">
             <strong>점 하나가 한 사람</strong>입니다. 겹치면 위로 쌓입니다.
           </p>
+          {/*
+            색 열쇠 — **이 화면에만 없었다.**
+
+            구성원 목록에는 「■ 낮음 ■ 높음」이 적혀 있는데 여기는 같은 색을
+            쓰면서 아무 말이 없었다. 게다가 이 화면은 성향과 직무능력이
+            **서로 다른 색 언어**를 쓴다 — 성향은 양쪽으로 갈라지고, 직무능력은
+            높을수록 좋은 값이라 한 색의 진하기로만 말한다. 열쇠가 없으면
+            같은 화면의 두 색을 같은 뜻으로 읽게 된다.
+          */}
+          <p className="text-axis text-ink-muted mt-2">
+            성향은{" "}
+            <span style={{ color: "var(--diverge-pos)" }} aria-hidden>
+              ■
+            </span>{" "}
+            낮음{" "}
+            <span style={{ color: "var(--diverge-neg)" }} aria-hidden>
+              ■
+            </span>{" "}
+            높음으로 갈라지고, 직무능력은 높을수록 진해집니다.
+          </p>
         </div>
 
         <div className="text-axis flex shrink-0 gap-1.5">
@@ -98,7 +118,8 @@ export function DistributionPanel({
               className="rounded-md px-3 py-1.5"
               style={{
                 background: bySpread === b.on ? "var(--ink)" : "var(--wash)",
-                color: bySpread === b.on ? "var(--page)" : "var(--ink-secondary)",
+                color:
+                  bySpread === b.on ? "var(--page)" : "var(--ink-secondary)",
                 fontWeight: bySpread === b.on ? 600 : 400,
               }}
             >
@@ -157,23 +178,15 @@ export function DistributionPanel({
         </p>
         <p>
           <strong>점수 자체는 높고 낮음을 뜻하지 않습니다.</strong> 눈금이 문항
-          가운데를 50으로 잡은 것이라{" "}
-          <strong>사내에서 서로 견주는 것만</strong> 말이 됩니다.
+          가운데를 50으로 잡은 것이라 <strong>사내에서 서로 견주는 것만</strong>{" "}
+          말이 됩니다.
         </p>
       </Note>
     </section>
   );
 }
 
-function Row({
-  s,
-  r,
-  dim,
-}: {
-  s: Spread;
-  r?: ScaleReliability;
-  dim: boolean;
-}) {
+function Row({ s, r, dim }: { s: Spread; r?: ScaleReliability; dim: boolean }) {
   return (
     <div className="grid gap-x-6 gap-y-2 xl:grid-cols-[9rem_minmax(0,1fr)] xl:items-end">
       <div className="xl:pb-1">
@@ -190,7 +203,10 @@ function Row({
         <DotStrip s={s} dim={dim} />
         <p className="text-axis text-ink-muted mt-1.5 flex flex-wrap gap-x-4">
           <span>
-            중앙 <span className="tabular text-ink-secondary">{Math.round(s.median)}</span>
+            중앙{" "}
+            <span className="tabular text-ink-secondary">
+              {Math.round(s.median)}
+            </span>
           </span>
           <span>
             가운데 절반{" "}
@@ -206,9 +222,10 @@ function Row({
           </span>
           <span title="표준편차 — 클수록 사람마다 많이 다릅니다">
             퍼진 정도{" "}
-            <span className="tabular text-ink-secondary">{s.sd.toFixed(1)}</span>
+            <span className="tabular text-ink-secondary">
+              {s.sd.toFixed(1)}
+            </span>
           </span>
-
         </p>
       </div>
     </div>

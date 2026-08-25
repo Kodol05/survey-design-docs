@@ -152,7 +152,6 @@ export function CorrelationPanel({
             <p className="text-axis text-ink-muted mt-2">
               점 하나가 한 사람입니다. 마우스를 올리면 누구인지 나옵니다. 같은
               칸을 다시 누르면 넷으로 돌아갑니다.
-
             </p>
           </>
         ) : featured.length === 0 ? (
@@ -177,9 +176,20 @@ export function CorrelationPanel({
                   */
                   className="-mx-2 rounded-xl px-2 py-1 text-left transition hover:bg-[--wash]"
                 >
-                  <p className="text-table mb-1 font-medium">
+                  {/*
+                    ⚠️ 이름·값·등급을 **한 줄에 두면 넷의 높이가 어긋난다.**
+
+                    「사회적민감성 × 협력」처럼 긴 조합만 두 줄로 넘쳐서, 그
+                    칸의 그래프만 아래로 밀렸다. 넷을 나란히 견주는 자리인데
+                    윗변이 안 맞으면 눈이 먼저 그 어긋남을 본다.
+
+                    이름은 이름대로, 값과 등급은 그 아래 한 줄로 고정한다.
+                  */}
+                  <p className="text-table font-medium">
                     {f.row} <span className="text-ink-muted">×</span> {f.col}
-                    <span className="tabular text-axis text-ink-secondary ml-2">
+                  </p>
+                  <p className="mb-1">
+                    <span className="tabular text-axis text-ink-secondary">
                       {formatR(f.cell.r)}
                     </span>
                     <GradeTag r={f.cell.r} ci={f.cell.ci} className="ml-1.5" />
@@ -197,7 +207,6 @@ export function CorrelationPanel({
           </>
         )}
       </div>
-
     </div>
   );
 }

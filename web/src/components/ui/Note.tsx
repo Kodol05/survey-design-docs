@@ -26,12 +26,25 @@ export function Note({
       <button
         type="button"
         onClick={() => setOpen(!open)}
-        className="text-axis text-ink-muted inline-flex items-center gap-1.5"
+        aria-expanded={open}
+        className="text-axis text-ink-muted hover:text-ink-secondary inline-flex items-center gap-1.5 transition"
       >
-        <span aria-hidden style={{ fontSize: "0.8em" }}>
-          {open ? "▾" : "▸"}
+        {/*
+          ⚠️ 삼각형을 **작게 두면 점으로 뭉개진다.** 0.8em으로 줄였더니
+          화면에서는 「▸」가 아니라 「•」로 보여서, 목록의 불릿과 구분이 안 되고
+          **누를 수 있다는 것 자체가 전해지지 않았다.** 크기를 줄이지 않고,
+          제목에 밑줄을 얹어 누를 곳임을 한 번 더 말한다.
+        */}
+        <span
+          aria-hidden
+          className="inline-block transition-transform"
+          style={{ transform: open ? "rotate(90deg)" : undefined }}
+        >
+          ▸
         </span>
-        {label}
+        <span className="underline decoration-dotted underline-offset-4">
+          {label}
+        </span>
       </button>
       {open && (
         <div className="text-axis text-ink-secondary mt-2 max-w-[52rem] border-l-2 border-[--border] pl-4 leading-relaxed">

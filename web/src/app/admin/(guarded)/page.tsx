@@ -181,51 +181,38 @@ export default async function AdminHome() {
               없습니다.
             </p>
           ) : (
-            <ul className="flex flex-col gap-3">
+            <ul className="flex flex-col gap-1">
               {needsReview.length > 0 && (
-                <li>
-                  <span
-                    className="mr-2"
-                    style={{ color: "var(--status-warn)" }}
-                  >
-                    ●
-                  </span>
-                  응답 신뢰도를 확인할 사람 {needsReview.length}명 —{" "}
-                  <span className="text-ink-secondary">
-                    {needsReview
+                <TodoItem
+                  href="/admin/employees?flag=review"
+                  color="var(--status-warn)"
+                  headline={`응답 신뢰도를 확인할 사람 ${needsReview.length}명`}
+                  detail={
+                    needsReview
                       .slice(0, 6)
                       .map((p) => p.name)
-                      .join(", ")}
-                    {needsReview.length > 6 &&
-                      ` 외 ${needsReview.length - 6}명`}
-                  </span>{" "}
-                  <Link href="/admin/employees" className="underline">
-                    목록
-                  </Link>
-                </li>
+                      .join(", ") +
+                    (needsReview.length > 6
+                      ? ` 외 ${needsReview.length - 6}명`
+                      : "")
+                  }
+                />
               )}
               {poorNames.length > 0 && (
-                <li>
-                  <span
-                    className="mr-2"
-                    style={{ color: "var(--status-critical)" }}
-                  >
-                    ●
-                  </span>
-                  문항이 아직 안 맞물리는 성향 축 — {poorNames.join(", ")}{" "}
-                  <Link
-                    href="/admin/stats?tab=reliability"
-                    className="underline"
-                  >
-                    신뢰도 보기
-                  </Link>
-                </li>
+                <TodoItem
+                  href="/admin/stats?tab=reliability"
+                  color="var(--status-critical)"
+                  headline="문항이 아직 안 맞물리는 성향 축"
+                  detail={poorNames.join(", ")}
+                />
               )}
               {s.inProgress > 0 && (
-                <li>
-                  <span className="text-ink-muted mr-2">●</span>
-                  응시를 시작하고 끝내지 않은 사람 {s.inProgress}명
-                </li>
+                <TodoItem
+                  href="/admin/employees?status=inprogress"
+                  color="var(--ink-muted)"
+                  headline={`응시를 시작하고 끝내지 않은 사람 ${s.inProgress}명`}
+                  detail="시작한 지 14일이 지나면 중단으로 정리됩니다"
+                />
               )}
             </ul>
           )}
@@ -406,6 +393,52 @@ function agoLabel(hours: number): string {
   if (hours < 24) return `${Math.floor(hours)}시간 전`;
   const days = Math.floor(hours / 24);
   return days === 1 ? "어제" : `${days}일 전`;
+}
+
+/**
+ * 지금 볼 것 한 줄.
+ *
+ * ## 왜 줄 전체가 링크인가
+ *
+ * 전에는 문장 끝에 「목록」 한 낱말만 링크였다. 줄이 넘치면 **그 낱말만
+ * 다음 줄에 홀로 떨어져** 무엇에 붙은 링크인지 알기 어려웠고, 누를 자리도
+ * 글자 두 개뿐이었다. 그리고 셋 중 하나(끝내지 않은 사람)는 **갈 곳이 아예
+ * 없어서** 읽고 나서 직접 찾아 들어가야 했다.
+ *
+ * 지금은 세 줄 모두 그 사람들만 걸러진 화면으로 바로 간다.
+ */
+function TodoItem({
+  href,
+  color,
+  headline,
+  detail,
+}: {
+  href: string;
+  color: string;
+  headline: string;
+  detail: string;
+}) {
+  return (
+    <li>
+      <Link
+        href={href}
+        className="-mx-2 block rounded-lg px-2 py-2 transition hover:bg-[--wash]"
+      >
+        <p>
+          <span className="mr-2" style={{ color }} aria-hidden>
+            ●
+          </span>
+          {headline}
+          <span aria-hidden className="text-ink-muted ml-2">
+            →
+          </span>
+        </p>
+        <p className="text-axis text-ink-secondary mt-0.5 pl-5 leading-snug">
+          {detail}
+        </p>
+      </Link>
+    </li>
+  );
 }
 
 /**

@@ -23,7 +23,13 @@ import {
  *  - 점마다 숫자를 붙이지 않는다. 값은 마우스를 올리면 나온다
  */
 
-export type Point = { id: string; name: string; x: number; y: number; quality: string };
+export type Point = {
+  id: string;
+  name: string;
+  x: number;
+  y: number;
+  quality: string;
+};
 
 export function ScatterPlot({
   height = 360,
@@ -56,7 +62,14 @@ export function ScatterPlot({
   return (
     <div className="w-full" style={{ height }}>
       <ResponsiveContainer>
-        <ComposedChart margin={{ top: 12, right: 16, bottom: 28, left: 8 }}>
+        {/*
+          ⚠️ `left`가 8이면 **세로로 쓴 축 이름이 잘린다.**
+
+          `insideLeft`로 놓인 이름은 왼쪽 가장자리에 세로로 서는데, 90도 돌린
+          글자는 그 자리를 중심으로 좌우로 퍼진다. 글자 절반이 그림 밖으로
+          나가서 「협력」이 반쪽만 보였다. 글자 크기(19)의 절반보다 넉넉히 준다.
+        */}
+        <ComposedChart margin={{ top: 12, right: 16, bottom: 28, left: 22 }}>
           <CartesianGrid stroke="var(--grid)" />
           <XAxis
             type="number"
@@ -136,7 +149,10 @@ export function ScatterPlot({
                   </p>
                   <p className="text-axis text-ink-secondary">{p.name}</p>
                   {p.quality !== "ok" && (
-                    <p className="text-axis" style={{ color: "var(--status-warn)" }}>
+                    <p
+                      className="text-axis"
+                      style={{ color: "var(--status-warn)" }}
+                    >
                       응답 품질 검토 필요
                     </p>
                   )}
