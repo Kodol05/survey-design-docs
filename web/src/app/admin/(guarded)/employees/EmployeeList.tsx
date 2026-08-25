@@ -42,7 +42,15 @@ const FLAG = {
   poor: { label: "낮음", color: "var(--status-critical)" },
 } as const;
 
-const STATUS = { COMPLETED: "완료", IN_PROGRESS: "진행 중" } as const;
+/*
+  `ABANDONED`가 빠져 있어 **빈 칸으로 나오고 있었다.** 14일 정리를 켜면
+  실제로 생기는 상태다 (2026-08-25).
+*/
+const STATUS = {
+  COMPLETED: "완료",
+  IN_PROGRESS: "진행 중",
+  ABANDONED: "중단",
+} as const;
 
 export function EmployeeList({ rows }: { rows: Row[] }) {
   const [openId, setOpenId] = useState<string | null>(null);

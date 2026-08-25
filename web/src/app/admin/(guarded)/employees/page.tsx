@@ -348,7 +348,12 @@ const STATUS_FILTERS = [
     label: "진행 중만",
     match: (s: string | null) => s === "IN_PROGRESS",
   },
-  { key: "none", label: "미응시만", match: (s: string | null) => s === null },
+  {
+    key: "none",
+    label: "미응시·중단만",
+    // 중단(14일 정리)도 「아직 결과가 없는 사람」이라 같이 묶는다
+    match: (s: string | null) => s === null || s === "ABANDONED",
+  },
 ] as const;
 
 type SortDir = "asc" | "desc";
