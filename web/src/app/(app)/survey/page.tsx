@@ -66,20 +66,18 @@ export default async function SurveyPage(props: {
       </div>
 
       {/*
-        묶음을 넘겨 왔으면 남은 개수를 **잠깐만** 알린다. 자리는 늘 차지하고
-        있어서 사라질 때 아래 문항이 밀리지 않는다.
+        묶음을 넘겨 왔으면 남은 개수를 **화면 가운데 잠깐** 띄운다.
+        화면 위에 떠 있는 것이라 이 자리가 본문 흐름을 밀지 않는다.
       */}
-      <div className="mt-8 mb-4 h-8">
-        {rest === "1" && section > 1 && (
-          <SectionProgress
-            key={section}
-            section={section}
-            sectionCount={SECTION_COUNT}
-          />
-        )}
-      </div>
+      {rest === "1" && section > 1 && (
+        <SectionProgress
+          key={section}
+          section={section}
+          sectionCount={SECTION_COUNT}
+        />
+      )}
 
-      <p className="text-ink-secondary mb-12 text-center text-xl">
+      <p className="text-ink-secondary my-12 text-center text-xl">
         정답이 없습니다. 오래 고민하지 마시고 평소 모습에 가까운 쪽을 골라 주세요.
       </p>
 
