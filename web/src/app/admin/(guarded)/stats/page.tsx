@@ -549,11 +549,16 @@ function SpreadTab({
 
   return (
     <div>
+      {/*
+        **`SOURCE_NOTE`를 여기 쓰지 않는다** (2026-08-25 사용자 지적).
+
+        그 문장은 「성향과 같은 설문이라 **관련도**가 실제보다 높게 나올 수
+        있습니다」로 끝난다 — **상관 화면을 위해 쓴 말**이다. 분포는 관련도를
+        보는 자리가 아니라서 여기 붙으면 읽는 사람이 없는 걱정을 하게 된다.
+        어느 값을 보고 있는지는 고르개가 이미 말한다.
+      */}
       <div className="mb-8">
         <SourcePicker value={source} bossCount={bossCount} />
-        <p className="text-axis text-ink-muted mt-2 max-w-[52rem]">
-          {SOURCE_NOTE[source]}
-        </p>
       </div>
       <DistributionPanel spreads={spreads} reliability={reliability} />
     </div>

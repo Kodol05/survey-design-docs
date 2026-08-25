@@ -32,6 +32,9 @@ import type { ScaleReliability } from "@/lib/admin/analysis";
  * 직무능력의 순서는 「순위」 탭이 따로 맡는다.
  */
 
+/** 묶어 만든 값의 이름. 요약 문장에서 뺄 때 쓴다 */
+const COMPOSITE = "세 능력 묶음";
+
 const GROUP = {
   temperament: { label: "기질", note: "타고나는 쪽 · TCI 4축" },
   character: { label: "성격", note: "살면서 만들어지는 쪽 · TCI 3축" },
@@ -57,21 +60,13 @@ export function DistributionPanel({
   const ranked = [...spreads].sort((a, b) => b.sd - a.sd);
 
   /*
-    **요약 문장에서 α가 기준 아래인 축을 뺀다** (2026-08-25 화면에서 확인).
+    **묶어 만든 값은 요약 문장에서 뺀다** (2026-08-25 사용자 지적).
 
-    「가장 다들 비슷한 축은 협력입니다」라고 나왔는데, 협력은 문항이 안
-    맞물려서(α .08) 점수가 거의 가운데로 몰린 것이다. **다들 비슷한 게
-    아니라 못 재고 있는 것**인데 문장은 발견처럼 말한다.
-
-    쓸 만한 축이 하나도 없으면 문장 자체를 내린다.
+    「세 능력 묶음」은 평균이라 **자동으로 좁게 모인다** — 각 축의 흔들림이
+    상쇄되기 때문이다. 그것을 「가장 비슷한 축」이라 부르면 발견처럼 읽히는데,
+    사실은 만드는 방식이 만들어낸 모양이다 (D-45와 같은 함정).
   */
-  /*
-    직무능력은 α로 판정하지 않으므로(D-93) 「못 재고 있는 것일 수 있다」는
-    단서도 **성향 축에만** 붙는다.
-  */
-  const usable = ranked.filter(
-    (s) => reliability[s.scale]?.verdict !== "poor" || s.kind === "ability",
-  );
+  const usable = ranked.filter((s) => s.scale !== COMPOSITE);
   const widest = usable[0];
   const tightest = usable[usable.length - 1];
 
@@ -87,9 +82,7 @@ export function DistributionPanel({
         <div>
           <h2 className="text-section-title mb-1">어떻게 퍼져 있는가</h2>
           <p className="text-ink-secondary max-w-[52rem]">
-            점 하나가 한 사람입니다. 같은 자리에 여러 명이면 위로 쌓입니다 —{" "}
-            <strong>쌓인 높이가 곧 인원</strong>입니다. 마우스를 올리면 누구인지
-            나옵니다.
+            <strong>점 하나가 한 사람</strong>입니다. 겹치면 위로 쌓입니다.
           </p>
         </div>
 
@@ -117,21 +110,14 @@ export function DistributionPanel({
 
       {/* 한 줄 요약 — 훑기 전에 결론부터 */}
       {widest && tightest && widest !== tightest && (
-        <p className="text-ink-secondary mb-10 max-w-[52rem] leading-relaxed">
-          가장 크게 갈리는 축은{" "}
-          <strong className="text-ink">{widest.scale}</strong>입니다 (
-          <span className="tabular">{Math.round(widest.min)}</span>부터{" "}
-          <span className="tabular">{Math.round(widest.max)}</span>까지). 가장
-          다들 비슷한 축은{" "}
-          <strong className="text-ink">{tightest.scale}</strong>이고, 이 축으로는
-          사람을 구분하기 어렵습니다.
-          {usable.length < ranked.length && (
-            <span className="text-ink-muted">
-              {" "}
-              문항이 아직 안 맞물리는 축은 이 문장에서 뺐습니다 — 좁게 모인
-              것이 아니라 못 재고 있는 것일 수 있습니다.
-            </span>
-          )}
+        <p className="text-ink-secondary mb-10 max-w-[52rem]">
+          사람이 가장 많이 갈리는 축은{" "}
+          <strong className="text-ink">{widest.scale}</strong> (
+          <span className="tabular">
+            {Math.round(widest.min)}~{Math.round(widest.max)}
+          </span>
+          ), 가장 비슷한 축은{" "}
+          <strong className="text-ink">{tightest.scale}</strong>입니다.
         </p>
       )}
 
@@ -165,14 +151,13 @@ export function DistributionPanel({
 
       <Note label="이 그림을 어떻게 읽는지" className="mt-12">
         <p className="mb-2">
-          <strong>옅은 상자는 가운데 절반</strong>(4분의 1 ~ 4분의 3), 세로선은
-          중앙값입니다. 상자가 좁으면 다들 비슷하고, 넓으면 사람마다 많이
-          다릅니다. 점이 두 덩어리로 갈라져 있으면 회사가 그 축에서 두 무리로
-          나뉜다는 뜻입니다.
+          <strong>상자는 가운데 절반</strong>, 세로선은 중앙값입니다. 상자가
+          좁으면 다들 비슷하고 넓으면 많이 다릅니다. 점이 두 덩어리로 갈라져
+          있으면 회사가 두 무리로 나뉜다는 뜻입니다.
         </p>
         <p>
-          <strong>평균을 앞에 두지 않았습니다.</strong> 이 눈금은 문항 가운데를
-          50으로 잡은 것이라 비교할 바깥 기준이 없습니다 —{" "}
+          <strong>점수 자체는 높고 낮음을 뜻하지 않습니다.</strong> 눈금이 문항
+          가운데를 50으로 잡은 것이라{" "}
           <strong>사내에서 서로 견주는 것만</strong> 말이 됩니다.
         </p>
       </Note>
