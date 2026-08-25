@@ -131,19 +131,18 @@ export function CorrelationTable({
                             : "transparent",
                         color: v.kind === "value" ? "var(--ink)" : undefined,
                         /*
-                          고른 칸 표시를 **조용하게** 둔다 (2026-08-25).
+                          **고른 칸에 테두리를 두르지 않는다** (2026-08-25).
 
                           전에는 `var(--ink)` 2px이라 밝은 화면에서는 검은
                           네모, 어두운 화면에서는 흰 네모가 칸 위에 씌워졌다.
                           칸 안의 막대·숫자보다 테두리가 먼저 보였다.
 
-                          지금은 오른쪽에 고른 조합의 이름이 크게 나오므로
-                          여기서는 **어느 칸이었는지만** 알면 된다.
+                          오른쪽에 고른 조합의 이름이 크게 나오므로 여기서
+                          한 번 더 말할 필요가 없다. 대신 **칸을 살짝 들어
+                          올려** 눌린 자리를 표시한다 — 테두리를 더하지 않고
+                          이미 있는 색만 진하게 쓴다.
                         */
-                        outline: on
-                          ? "2px solid color-mix(in oklab, var(--ink) 30%, transparent)"
-                          : undefined,
-                        outlineOffset: -2,
+                        filter: on ? "saturate(1.45) brightness(0.97)" : undefined,
                       }}
                     >
                       <Body cell={v} />
