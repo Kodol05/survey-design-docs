@@ -39,9 +39,8 @@ import { LowQualityList, QualityRanking } from "./PersonQuality";
 import { CorrelationPanel } from "./CorrelationPanel";
 import { DistributionPanel } from "./DistributionPanel";
 import { CompositePanel } from "@/components/analysis/CompositePanel";
-import { SplitList } from "@/components/analysis/SplitPanel";
+import { AxisRanking, type AxisRow } from "@/components/analysis/AxisRanking";
 import { Cautions } from "@/components/analysis/Cautions";
-import { AlphaNote } from "@/components/analysis/AlphaNote";
 import { abilityComposite } from "@/lib/admin/composite";
 import { splitsFor } from "@/lib/admin/split";
 import { spreadOf, type Spread } from "@/lib/admin/spread";
@@ -417,22 +416,6 @@ function InHouseSection({
         <SourcePicker value={source} bossCount={bossCount} />
         <CleanToggle clean={clean} poorN={poorN} source={source} />
       </div>
-      {/* ── 1절 · 직무능력이 높으려면 ── */}
-      {composite && (
-        <div className="mb-20">
-          <h2 className="text-section-title mb-2">
-            직무능력이 높으려면 — 무엇이 가장 크게 가르나
-          </h2>
-          <p className="text-ink-secondary mb-8 max-w-[56rem]">
-            협력·조직생활·자율적 실행 <strong>세 값의 평균</strong>을 놓고, 성향
-            축마다 <strong>높은 3분의 1</strong>과 <strong>낮은 3분의 1</strong>의
-            평균을 견줍니다. 상관 숫자 대신 <strong>점수 차이</strong>로 말합니다.
-          </p>
-          <CompositePanel c={composite} splits={splits} />
-        </div>
-      )}
-
-      {/* ── 2절 · 축 하나하나 ── */}
       <h2 className="text-section-title mb-2">성향 축과 직무능력 세 가지</h2>
       <p className="text-ink-secondary mb-8 max-w-[56rem]">
         우리 직원 {matrix.n}명 값입니다. {SOURCE_NOTE[source]}{" "}
@@ -451,29 +434,40 @@ function InHouseSection({
         facets={facets}
       />
 
-      {/* ── 3절 · 능력마다 ── */}
+      {/* ── 2절 · 능력마다 어떤 성향이 ── */}
       <div className="mt-20 border-t border-[--border] pt-12">
-        <h2 className="text-section-title mb-2">능력마다 무엇이 가장 크게 가르나</h2>
+        <h2 className="text-section-title mb-2">능력마다 어떤 성향이 뚜렷한가</h2>
         <p className="text-ink-secondary mb-10 max-w-[56rem]">
-          위 표를 <strong>능력 하나씩 풀어 놓은 것</strong>입니다. 여기도 상관이
-          아니라 <strong>점수 차이</strong>로 봅니다 — 축이 높은 3분의 1과 낮은
-          3분의 1의 평균입니다.
+          <strong>위 표와 같은 값</strong>을 능력마다 <strong>순위로</strong>{" "}
+          늘어놓은 것입니다. 표는 격자라 세로로 훑어야 하지만 여기는 이미 큰
+          순으로 정렬돼 있습니다.
         </p>
-        <div className="flex flex-col gap-12">
+        <div className="flex flex-col gap-14">
           {ABILITY_AXES.map((axis) => (
-            <div key={axis}>
-              <p className="mb-3 flex flex-wrap items-baseline gap-x-3 border-b border-[--border] pb-2">
-                <span className="text-section-title">{axis}</span>
-                <AlphaNote r={reliability[axis]} className="!mt-0 !inline" />
-              </p>
-              <SplitList
-                splits={splitsFor(people, (p) => p.abilities[axis])}
-                dim={reliability[axis]?.verdict === "poor"}
-              />
-            </div>
+            <AxisRanking
+              key={axis}
+              axis={axis}
+              rows={rankingFor(cells, axis)}
+              reliability={reliability[axis]}
+            />
           ))}
         </div>
       </div>
+
+      {/* ── 3절 · 셋을 합쳐서 ── */}
+      {composite && (
+        <div className="mt-20 border-t border-[--border] pt-12">
+          <h2 className="text-section-title mb-2">
+            직무능력이 높으려면 — 무엇이 가장 크게 가르나
+          </h2>
+          <p className="text-ink-secondary mb-8 max-w-[56rem]">
+            협력·조직생활·자율적 실행 <strong>세 값의 평균</strong>을 놓고, 성향
+            축마다 <strong>높은 3분의 1</strong>과 <strong>낮은 3분의 1</strong>의
+            평균을 견줍니다. 상관 숫자 대신 <strong>점수 차이</strong>로 말합니다.
+          </p>
+          <CompositePanel c={composite} splits={splits} />
+        </div>
+      )}
 
       <Cautions
         poor={ABILITY_AXES.filter((a) => reliability[a]?.verdict === "poor")}
@@ -845,3 +839,19 @@ function ReliabilityTab({
   );
 }
 
+
+/**
+ * 한 능력에 대해 성향 7축을 **큰 순으로** 모은다.
+ *
+ * 표를 그리는 데 쓴 `cells`를 그대로 쓴다 — **새로 계산하지 않는다.**
+ * 따로 재면 두 화면의 숫자가 어긋날 수 있고, 어긋나면 어느 쪽이 맞는지
+ * 알 방법이 없다.
+ */
+function rankingFor(cells: Record<string, Cell>, axis: string): AxisRow[] {
+  const out: AxisRow[] = [];
+  for (const scale of TRAIT_SCALES) {
+    const c = cells[`${scale}|${axis}`];
+    if (c?.kind === "value") out.push({ scale, r: c.r, n: c.n, ci: c.ci });
+  }
+  return out.sort((a, b) => Math.abs(b.r) - Math.abs(a.r));
+}
