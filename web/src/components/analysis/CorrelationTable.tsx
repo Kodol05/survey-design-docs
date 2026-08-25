@@ -130,7 +130,19 @@ export function CorrelationTable({
                             ? correlationFill(v.r, crosses(v.ci))
                             : "transparent",
                         color: v.kind === "value" ? "var(--ink)" : undefined,
-                        outline: on ? "2px solid var(--ink)" : undefined,
+                        /*
+                          고른 칸 표시를 **조용하게** 둔다 (2026-08-25).
+
+                          전에는 `var(--ink)` 2px이라 밝은 화면에서는 검은
+                          네모, 어두운 화면에서는 흰 네모가 칸 위에 씌워졌다.
+                          칸 안의 막대·숫자보다 테두리가 먼저 보였다.
+
+                          지금은 오른쪽에 고른 조합의 이름이 크게 나오므로
+                          여기서는 **어느 칸이었는지만** 알면 된다.
+                        */
+                        outline: on
+                          ? "2px solid color-mix(in oklab, var(--ink) 30%, transparent)"
+                          : undefined,
                         outlineOffset: -2,
                       }}
                     >
