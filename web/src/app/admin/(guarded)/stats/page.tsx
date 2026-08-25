@@ -572,11 +572,12 @@ function SpreadTab({
 function AgreementTab({ data }: { data: Awaited<ReturnType<typeof loadRatingCompare>> }) {
   return (
     <section>
-      <h2 className="text-section-title mb-3">본인 답과 대표님이 보시는 것</h2>
-      <p className="text-item text-ink-secondary mb-8 max-w-[52rem]">
-        같은 사람의 직무능력을 <strong>본인이 답한 값</strong>과{" "}
-        <strong>대표님이 매기신 값</strong>으로 나란히 놓았습니다.
-      </p>
+      {/*
+        **제목만 위에 두고 설명은 그림 아래로** (2026-08-25 사용자 요청).
+        설명 두 줄을 지나야 그림이 나오면, 화면을 열 때마다 같은 문장을
+        다시 읽게 된다. 그림이 먼저 보이고 궁금할 때 아래를 본다.
+      */}
+      <h2 className="text-section-title mb-6">본인 답과 대표님이 보시는 것</h2>
 
       {data.axes.length === 0 ? (
         <>
@@ -589,7 +590,12 @@ function AgreementTab({ data }: { data: Awaited<ReturnType<typeof loadRatingComp
         <AgreementPanel data={data} />
       )}
 
-      <Note label="이 화면을 어떻게 읽는지" className="mt-10">
+      <p className="text-ink-secondary mt-8 max-w-[52rem] leading-relaxed">
+        같은 사람의 직무능력을 <strong>본인이 답한 값</strong>과{" "}
+        <strong>대표님이 매기신 값</strong>으로 나란히 놓았습니다.
+      </p>
+
+      <Note label="이 화면을 어떻게 읽는지" className="mt-6">
         <p className="mb-2">
           <strong>「누가 맞았나」를 보는 화면이 아닙니다.</strong>{" "}
           <strong>둘이 갈리는 사람이 이야깃거리</strong>라는 뜻입니다 — 본인은
@@ -637,15 +643,11 @@ function PredictionTab({
   return (
     <section>
       {/*
-        설명을 위에 크게 둔다. 이 화면은 무엇을 보는 것인지 모르면
-        숫자가 아무 말도 하지 않는다.
+        **제목만 위에 둔다** (2026-08-25 사용자 요청). 설명 세 줄을 지나야
+        숫자가 나오면 화면을 열 때마다 같은 문장을 다시 읽게 된다. 요약 타일과
+        그림이 먼저 오고, 「이게 뭐였지」는 아래에서 답한다.
       */}
-      <h2 className="text-section-title mb-3">논문이 본 것과 우리가 잰 것</h2>
-      <p className="text-item text-ink-secondary mb-8 max-w-[52rem]">
-        논문 상관을 가중치로 삼아 <strong>이 사람의 직무능력이 얼마쯤일지 계산</strong>하고
-        실제 값과 나란히 놓았습니다. 어긋난다면{" "}
-        <strong>우리 회사가 논문과 다르거나, 그 사람이 남다르거나</strong>입니다.
-      </p>
+      <h2 className="text-section-title mb-6">논문이 본 것과 우리가 잰 것</h2>
 
       {items.length === 0 ? (
         <>
@@ -658,7 +660,15 @@ function PredictionTab({
         <PredictionPanel items={items} missing={missing} />
       )}
 
-      <Note label="이 예측을 어디까지 믿을 수 있는지" className="mt-8 mb-16">
+      <p className="text-ink-secondary mt-8 max-w-[52rem] leading-relaxed">
+        논문 상관을 가중치로 삼아{" "}
+        <strong>이 사람의 직무능력이 얼마쯤일지 계산</strong>하고 실제 값과
+        나란히 놓았습니다. 어긋난다면{" "}
+        <strong>우리 회사가 논문과 다르거나, 그 사람이 남다르거나</strong>
+        입니다.
+      </p>
+
+      <Note label="이 예측을 어디까지 믿을 수 있는지" className="mt-6 mb-16">
         <p className="mb-2">
           <strong>서로 다른 논문에서 온 값을 한 식에 넣습니다.</strong> 표본도
           지표도 나라도 달라서 대략의 눈금이지 정밀한 값이 아닙니다. 그리고 논문이

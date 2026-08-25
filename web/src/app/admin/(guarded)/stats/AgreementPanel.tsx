@@ -5,6 +5,11 @@ import { useState } from "react";
 import { ScatterPlot } from "@/components/analysis/ScatterPlot";
 import { formatR } from "@/components/analysis/correlationColor";
 import { GradeTag } from "@/components/analysis/GradeTag";
+import {
+  PeekGap,
+  PeekToggle,
+  usePeek,
+} from "@/components/analysis/PeekList";
 import type { RatingCompare } from "@/lib/admin/ratingCompare";
 
 /** 이만큼 벌어지면 「갈렸다」고 본다. 100점 눈금 */
@@ -21,7 +26,15 @@ export function AgreementPanel({ data }: { data: RatingCompare }) {
   const cur = data.axes.find((a) => a.axis === axis) ?? data.axes[0];
   if (!cur) return null;
 
+  /*
+    **크게 갈린 사람만 보여주지 않는다** (2026-08-25 사용자 요청).
+
+    전에는 `worst >= 15`인 사람만 목록에 올렸다. 그러면 「갈린 사람 12명」은
+    보이는데 **나머지 스물여섯이 어떤 모양인지**가 사라진다. 전부를 차이 순으로
+    두고 위·가운데·아래만 펴 둔다 — 접힌 수를 적어 두므로 감추는 것이 아니다.
+  */
   const notable = data.gaps.filter((g) => g.worst >= NOTABLE);
+  const peek = usePeek(data.gaps);
 
   return (
     <div>
@@ -45,7 +58,67 @@ export function AgreementPanel({ data }: { data: RatingCompare }) {
         ))}
       </div>
 
-      <div className="grid gap-12 xl:grid-cols-[minmax(0,34rem)_minmax(0,1fr)]">
+      <div className="grid gap-12 xl:grid-cols-[minmax(0,1fr)_minmax(0,34rem)]">
+        <div>
+          <h3 className="text-section-title mb-1">사람별 차이</h3>
+          <p className="text-axis text-ink-muted mb-4">
+            크게 갈린 사람부터. 한 축이라도{" "}
+            <span className="tabular">{NOTABLE}</span>점 넘게 벌어진 사람이{" "}
+            <strong className="text-ink tabular">{notable.length}</strong>명 ·
+            전체 <span className="tabular">{data.n}</span>명
+          </p>
+
+          {data.gaps.length === 0 ? (
+            <p className="text-ink-secondary">아직 맞대 볼 사람이 없습니다.</p>
+          ) : (
+            <ul className="flex flex-col">
+              {peek.items.map((it) => {
+                if (it.kind === "gap")
+                  return <PeekGap key={`g${it.n}`} n={it.n} />;
+                const g = it.row;
+                return (
+                <li
+                  key={g.employeeId}
+                  className="border-b border-[--border] py-3 last:border-0"
+                >
+                  <div className="mb-1.5 flex flex-wrap items-baseline justify-between gap-x-3">
+                    <Link
+                      href={`/admin/employees/${g.employeeId}`}
+                      className="text-table underline"
+                    >
+                      {g.name}
+                    </Link>
+                    <span className="text-axis text-ink-muted">
+                      {g.meanGap >= 0 ? "대표님이 더 높게" : "본인이 더 높게"}
+                    </span>
+                  </div>
+                  <ul className="flex flex-col gap-1">
+                    {g.byAxis.map((a) => (
+                      <li
+                        key={a.axis}
+                        className="text-axis grid grid-cols-[6rem_1fr_5rem] items-center gap-3"
+                      >
+                        <span className="text-ink-secondary truncate">{a.axis}</span>
+                        <GapBar gap={a.gap} />
+                        <span className="tabular text-ink-muted text-right">
+                          {Math.round(a.self)} → {Math.round(a.boss)}
+                        </span>
+                      </li>
+                    ))}
+                  </ul>
+                </li>
+                );
+              })}
+            </ul>
+          )}
+          {peek.foldable && (
+            <PeekToggle
+              all={peek.all}
+              hidden={peek.hidden}
+              onClick={peek.toggle}
+            />
+          )}
+        </div>
         <div>
           <div className="mb-1 flex flex-wrap items-baseline gap-x-3">
             <h3 className="text-section-title">{cur.axis}</h3>
@@ -97,56 +170,6 @@ export function AgreementPanel({ data }: { data: RatingCompare }) {
           </p>
         </div>
 
-        <div>
-          <h3 className="text-section-title mb-1">갈리는 사람</h3>
-          <p className="text-axis text-ink-muted mb-4">
-            한 축이라도 <span className="tabular">{NOTABLE}</span>점 넘게 벌어진 사람{" "}
-            <strong className="text-ink tabular">{notable.length}</strong>명 · 전체{" "}
-            <span className="tabular">{data.n}</span>명
-          </p>
-
-          {notable.length === 0 ? (
-            <p className="text-ink-secondary">
-              크게 갈리는 사람이 없습니다. 본인 답과 대표님이 보시는 것이 대체로
-              맞았다는 뜻입니다.
-            </p>
-          ) : (
-            <ul className="flex flex-col">
-              {notable.map((g) => (
-                <li
-                  key={g.employeeId}
-                  className="border-b border-[--border] py-3 last:border-0"
-                >
-                  <div className="mb-1.5 flex flex-wrap items-baseline justify-between gap-x-3">
-                    <Link
-                      href={`/admin/employees/${g.employeeId}`}
-                      className="text-table underline"
-                    >
-                      {g.name}
-                    </Link>
-                    <span className="text-axis text-ink-muted">
-                      {g.meanGap >= 0 ? "대표님이 더 높게" : "본인이 더 높게"}
-                    </span>
-                  </div>
-                  <ul className="flex flex-col gap-1">
-                    {g.byAxis.map((a) => (
-                      <li
-                        key={a.axis}
-                        className="text-axis grid grid-cols-[6rem_1fr_5rem] items-center gap-3"
-                      >
-                        <span className="text-ink-secondary truncate">{a.axis}</span>
-                        <GapBar gap={a.gap} />
-                        <span className="tabular text-ink-muted text-right">
-                          {Math.round(a.self)} → {Math.round(a.boss)}
-                        </span>
-                      </li>
-                    ))}
-                  </ul>
-                </li>
-              ))}
-            </ul>
-          )}
-        </div>
       </div>
     </div>
   );

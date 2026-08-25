@@ -5,6 +5,11 @@ import Link from "next/link";
 import { ScatterPlot } from "@/components/analysis/ScatterPlot";
 import { formatR } from "@/components/analysis/correlationColor";
 import { GradeTag } from "@/components/analysis/GradeTag";
+import {
+  PeekGap,
+  PeekToggle,
+  usePeek,
+} from "@/components/analysis/PeekList";
 import type { ResearchPrediction } from "@/lib/admin/researchPrediction";
 
 /**
@@ -31,6 +36,7 @@ export function PredictionPanel({
 
   const sorted = [...cur.rows].sort((a, b) => b.gap - a.gap);
   const widest = Math.max(...sorted.map((r) => Math.abs(r.gap)), 1);
+  const peek = usePeek(sorted);
 
   return (
     <div>
@@ -130,7 +136,58 @@ export function PredictionPanel({
         />
       </div>
 
-      <div className="grid gap-12 xl:grid-cols-[minmax(0,38rem)_minmax(0,1fr)]">
+      <div className="grid gap-12 xl:grid-cols-[minmax(0,1fr)_minmax(0,38rem)]">
+        <div>
+          <h3 className="text-table mb-1 font-medium">사람별 차이</h3>
+          <p className="text-axis text-ink-muted mb-4">
+            실제 − 예측. 위로 갈수록 논문이 본 것보다 실제가 높은 사람입니다
+          </p>
+          <ul className="flex flex-col">
+            {peek.items.map((it) => {
+              if (it.kind === "gap") return <PeekGap key={`g${it.n}`} n={it.n} />;
+              const r = it.row;
+              const w = (Math.abs(r.gap) / widest) * 50;
+              const up = r.gap >= 0;
+              return (
+                <li
+                  key={r.employeeId}
+                  className="grid grid-cols-[5rem_1fr_6rem] items-center gap-2 py-1.5 sm:grid-cols-[8rem_1fr_8rem] sm:gap-3"
+                >
+                  <Link
+                    href={`/admin/employees/${r.employeeId}`}
+                    className="text-axis truncate"
+                  >
+                    {r.name}
+                  </Link>
+                  <div className="relative h-4">
+                    <div
+                      className="absolute inset-y-0 left-1/2 w-px"
+                      style={{ background: "var(--axis)" }}
+                    />
+                    <div
+                      className="absolute inset-y-0.5 rounded-sm"
+                      style={{
+                        left: up ? "50%" : `${50 - w}%`,
+                        width: `${w}%`,
+                        background: up ? "var(--series-1)" : "var(--series-2)",
+                      }}
+                    />
+                  </div>
+                  <span className="text-axis tabular text-ink-muted text-right">
+                    {Math.round(r.predicted)} → {Math.round(r.actual)}
+                  </span>
+                </li>
+              );
+            })}
+          </ul>
+          {peek.foldable && (
+            <PeekToggle
+              all={peek.all}
+              hidden={peek.hidden}
+              onClick={peek.toggle}
+            />
+          )}
+        </div>
         <div>
           <h3 className="text-table mb-1 font-medium">예측 대 실제</h3>
           {/* 선이 둘이라는 것을 글자로도 적는다. 색만으로 읽게 두지 않는다 */}
@@ -201,48 +258,6 @@ export function PredictionPanel({
 
         </div>
 
-        <div>
-          <h3 className="text-table mb-1 font-medium">사람별 차이</h3>
-          <p className="text-axis text-ink-muted mb-4">
-            실제 − 예측. 위로 갈수록 논문이 본 것보다 실제가 높은 사람입니다
-          </p>
-          <ul className="flex flex-col">
-            {sorted.map((r) => {
-              const w = (Math.abs(r.gap) / widest) * 50;
-              const up = r.gap >= 0;
-              return (
-                <li
-                  key={r.employeeId}
-                  className="grid grid-cols-[5rem_1fr_6rem] items-center gap-2 py-1.5 sm:grid-cols-[8rem_1fr_8rem] sm:gap-3"
-                >
-                  <Link
-                    href={`/admin/employees/${r.employeeId}`}
-                    className="text-axis truncate"
-                  >
-                    {r.name}
-                  </Link>
-                  <div className="relative h-4">
-                    <div
-                      className="absolute inset-y-0 left-1/2 w-px"
-                      style={{ background: "var(--axis)" }}
-                    />
-                    <div
-                      className="absolute inset-y-0.5 rounded-sm"
-                      style={{
-                        left: up ? "50%" : `${50 - w}%`,
-                        width: `${w}%`,
-                        background: up ? "var(--series-1)" : "var(--series-2)",
-                      }}
-                    />
-                  </div>
-                  <span className="text-axis tabular text-ink-muted text-right">
-                    {Math.round(r.predicted)} → {Math.round(r.actual)}
-                  </span>
-                </li>
-              );
-            })}
-          </ul>
-        </div>
       </div>
 
       <p className="text-axis text-ink-muted mt-10">
