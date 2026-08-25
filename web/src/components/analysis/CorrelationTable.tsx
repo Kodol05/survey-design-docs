@@ -1,6 +1,6 @@
 "use client";
 
-import { correlationFill, formatR } from "./correlationColor";
+import { correlationFill, formatR, CORR_FULL } from "./correlationColor";
 import { gradeOf } from "./correlationWords";
 
 /**
@@ -232,7 +232,8 @@ export function CorrelationTable({
 const crosses = (ci: [number, number]) => ci[0] <= 0 && ci[1] >= 0;
 
 /** 막대가 끝까지 차는 값. 실제 데이터에서 |r|이 1에 가는 일은 없다 */
-const FULL = 0.7;
+/** 눈금 끝. 한 곳에서 정한다 — `correlationColor.ts` 머리말 참고 */
+const FULL = CORR_FULL;
 
 /**
  * 칸 안의 작은 막대 — 0을 가운데 두고 좌우로.

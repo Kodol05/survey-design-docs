@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import {
+  CORR_FULL,
   correlationFill,
   formatR,
 } from "@/components/analysis/correlationColor";
@@ -151,8 +152,8 @@ function PageButton({
   );
 }
 
-/** 값이 여기까지 가면 막대가 끝까지 찬다. 실제 데이터에서 |r|이 1에 가는 일은 없다 */
-const FULL = 0.7;
+/** 눈금 끝. 한 곳에서 정한다 — `correlationColor.ts` 머리말 참고 */
+const FULL = CORR_FULL;
 
 /**
  * 0을 가운데 두고 좌우로.

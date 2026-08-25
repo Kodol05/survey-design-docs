@@ -1,3 +1,5 @@
+import { CORR_FULL } from "./correlationColor";
+
 /**
  * 0을 가운데 둔 **넓은 줄용** 막대.
  *
@@ -31,8 +33,8 @@
  * 되고, 막대끼리는 여전히 견줄 수 있다.
  */
 
-/** 막대가 끝까지 차는 값. 실제 데이터에서 |r|이 1에 가는 일은 없다 */
-export const FULL = 0.7;
+/** 눈금 끝. 한 곳에서 정한다 — `correlationColor.ts` 머리말 참고 */
+export const FULL = CORR_FULL;
 
 /** 0에서 한쪽 끝까지의 폭(%). 반대쪽 절반과 합쳐 100 */
 const HALF = 50;
