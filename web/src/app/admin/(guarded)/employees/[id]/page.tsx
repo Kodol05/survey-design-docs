@@ -16,6 +16,7 @@ import {
   type StoredAbilities,
   type StoredTraits,
 } from "@/lib/survey/result";
+import { DeleteEmployee } from "./DeleteEmployee";
 import { ResetPassword } from "./ResetPassword";
 
 export const metadata = { title: "구성원 상세 — 관리자" };
@@ -98,6 +99,15 @@ export default async function EmployeeDetail(props: {
       <Card title="비밀번호 초기화">
         <ResetPassword employeeId={e.id} name={e.name} />
       </Card>
+
+      {/*
+        삭제는 **맨 아래에 따로** 둔다. 비밀번호 초기화 옆에 나란히 두면
+        손이 미끄러진다. 되돌릴 수 없는 것은 되돌릴 수 있는 것과 같은 줄에
+        놓지 않는다.
+      */}
+      <div className="mt-16 border-t border-[--border] pt-8">
+        <DeleteEmployee employeeId={e.id} name={e.name} />
+      </div>
     </>
   );
 }
