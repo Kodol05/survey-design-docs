@@ -3,6 +3,7 @@
 import { redirect, unstable_rethrow } from "next/navigation";
 import { prisma } from "../db";
 import { assertPasswordOk, hashPassword, verifyPassword } from "./password";
+import { SIGNUP_FULL_MESSAGE, signupFull } from "./signupCap";
 import { normalizePhone } from "./phone";
 import {
   LIMIT,
@@ -57,6 +58,10 @@ export async function signup(
     }
     if (str(form, "password") !== str(form, "passwordConfirm"))
       return { error: "비밀번호가 서로 다릅니다" };
+
+    // ⚠️ 밖에 열어 두고 시험하는 동안만 쓰는 임시 상한. `signupCap.ts` 참고
+    const members = await prisma.employee.count({ where: { role: "USER" } });
+    if (signupFull(members)) return { error: SIGNUP_FULL_MESSAGE };
 
     const existing = await prisma.employee.findUnique({ where: { phone } });
     if (existing) {
