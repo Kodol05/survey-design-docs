@@ -12,9 +12,7 @@ import { WarningBadge } from "@/components/ui/WarningBadge";
 import { formatR } from "@/components/analysis/correlationColor";
 import { GradeTag } from "@/components/analysis/GradeTag";
 import { AlphaNote } from "@/components/analysis/AlphaNote";
-import type { RankRow, ScaleReliability } from "@/lib/admin/analysis";
-import type { Influence } from "@/lib/admin/influence";
-import { CellDetail } from "@/components/analysis/CellDetail";
+import type { ScaleReliability } from "@/lib/admin/analysis";
 
 /**
  * 관련도 표 + 산점도.
@@ -32,8 +30,6 @@ export function CorrelationPanel({
   aside,
   reliability,
   groups,
-  influence,
-  facets,
 }: {
   rows: string[];
   cols: string[];
@@ -50,14 +46,6 @@ export function CorrelationPanel({
   reliability?: Record<string, ScaleReliability>;
   /** 행 묶음 — 기질 4 / 성격 3 */
   groups?: { label: string; note?: string; rows: string[] }[];
-  /**
-   * 칸마다 「한 사람에 매달려 있는가」와 「축 안의 어느 항목인가」.
-   *
-   * 고른 칸에서만 쓰지만 **서버에서 미리 다 계산해 둔다** — 고를 때마다
-   * 서버에 다녀오면 화면이 끊긴다. 21칸어치라 양도 얼마 안 된다.
-   */
-  influence?: Record<string, Influence | null>;
-  facets?: Record<string, RankRow[]>;
   /**
    * 오른쪽 칸에 대신 넣을 것. 연구 표에는 점 분포가 없어 이 칸이 비는데,
    * 안내 문구로 채우면 화면 절반이 놀게 된다. 볼 것을 넣는다.
@@ -77,6 +65,19 @@ export function CorrelationPanel({
   const dimmed = new Set(
     cols.filter((c) => reliability?.[c]?.verdict === "poor"),
   );
+
+  /*
+    칸마다 n을 적을지, 범례에 한 번만 적을지.
+
+    우리 표는 모든 칸이 같은 사람들에서 나오므로 대개 하나로 모인다.
+    다를 때만 칸에 적는다 (D-65).
+  */
+  const ns = new Set(
+    Object.values(cells)
+      .filter((c) => c.kind === "value")
+      .map((c) => (c as Extract<Cell, { kind: "value" }>).n),
+  );
+  const sharedN = ns.size === 1 ? [...ns][0] : null;
 
   /** 같은 칸을 다시 누르면 선택이 풀려 다시 넷으로 돌아간다 */
   const toggle = (next: { row: string; col: string }) =>
@@ -129,17 +130,11 @@ export function CorrelationPanel({
           }
           dimCol={dimmed.size ? (c) => dimmed.has(c) : undefined}
         />
-        <CorrelationLegend inHouse={inHouse} />
-        {/*
-          이유는 **화면 맨 아래 「읽으실 때 유의할 것」**에 모아 두었다
-          (2026-08-25). 여기에는 「빗금이 뭐지」에 답할 한 줄만 남긴다 —
-          같은 경고를 세 군데에 적으면 세 번째부터는 눈이 건너뛴다.
-        */}
-        {dimmed.size > 0 && (
-          <p className="text-axis text-ink-muted mt-3">
-            빗금 친 열은 문항이 아직 안 맞물립니다 — 아래 유의사항 참고
-          </p>
-        )}
+        <CorrelationLegend
+          inHouse={inHouse}
+          sharedN={sharedN}
+          hatched={dimmed.size > 0}
+        />
       </div>
 
       <div>
@@ -227,35 +222,6 @@ export function CorrelationPanel({
           </>
         )}
       </div>
-
-      {/*
-        **고른 칸을 더 들여다보는 자리는 전체 폭을 쓴다** (2026-08-25 사용자 요청).
-
-        오른쪽 칸 안에 넣어 봤더니 막대 두 줄이 130px 남짓으로 눌려서 길이를
-        견줄 수가 없었다. 여기가 답하는 물음(「한 사람에 매달려 있나」,
-        「축 안의 어느 항목인가」)은 **표와 산점도가 못 하는 말**이라 자리를
-        아낄 곳이 아니다.
-      */}
-      {inHouse && sel && cell?.kind === "value" && (influence || facets) && (
-        <div className="border-t border-[--border] pt-8 xl:col-span-2">
-          <p className="text-table mb-1">
-            <span className="text-ink-muted">더 들여다보기 — </span>
-            <strong>
-              {sel.row} <span className="text-ink-muted">×</span> {sel.col}
-            </strong>
-          </p>
-          <p className="text-axis text-ink-muted mb-2">
-            표와 산점도가 말하지 않는 두 가지입니다.
-          </p>
-          <CellDetail
-            influence={influence?.[k] ?? null}
-            facets={facets?.[k] ?? []}
-            scale={sel.row}
-            axis={sel.col}
-          />
-        </div>
-      )}
-
 
     </div>
   );

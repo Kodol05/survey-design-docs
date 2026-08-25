@@ -4,10 +4,8 @@ import type { Cell } from "@/components/analysis/CorrelationTable";
 import type { Point } from "@/components/analysis/ScatterPlot";
 import { WarningBadge } from "@/components/ui/WarningBadge";
 import { requireAdmin } from "@/lib/auth/guard";
-import type { RankRow, ScaleReliability } from "@/lib/admin/analysis";
-import { influenceOf, type Influence } from "@/lib/admin/influence";
+import type { ScaleReliability } from "@/lib/admin/analysis";
 import {
-  facetPairs,
 
   cellOf,
   loadPeople,
@@ -75,13 +73,12 @@ export default async function StatsPage(props: {
   */
   const clean = sp.clean === "1";
 
-  const [people, reliability, bossCount, personQuality, agreement, facets] = await Promise.all([
+  const [people, reliability, bossCount, personQuality, agreement] = await Promise.all([
     loadPeople(clean, source),
     loadReliability(),
     countRatedEmployees(),
     loadPersonQuality(),
     loadRatingCompare(),
-    facetPairs(clean, source),
   ]);
   const matrix = traitAbilityMatrix(people);
   const alphas = reliability
@@ -161,8 +158,7 @@ export default async function StatsPage(props: {
           source={source}
           bossCount={bossCount}
           reliability={byScale}
-          facets={facets}
-          clean={clean}
+            clean={clean}
           poorN={poorN}
         />
       )}
@@ -265,7 +261,6 @@ function MatrixTab({
   source,
   bossCount,
   reliability,
-  facets,
   clean,
   poorN,
 }: {
@@ -274,7 +269,6 @@ function MatrixTab({
   source: AbilitySource;
   bossCount: number;
   reliability: Record<string, ScaleReliability>;
-  facets: Record<string, RankRow[]>;
   clean: boolean;
   poorN: number;
 }) {
@@ -285,7 +279,6 @@ function MatrixTab({
       source={source}
       bossCount={bossCount}
       reliability={reliability}
-      facets={facets}
       clean={clean}
       poorN={poorN}
     />
@@ -356,7 +349,6 @@ function InHouseSection({
   source,
   bossCount,
   reliability,
-  facets,
   clean,
   poorN,
 }: {
@@ -365,7 +357,6 @@ function InHouseSection({
   source: AbilitySource;
   bossCount: number;
   reliability: Record<string, ScaleReliability>;
-  facets: Record<string, RankRow[]>;
   clean: boolean;
   poorN: number;
 }) {
@@ -384,7 +375,6 @@ function InHouseSection({
   const cells: Record<string, Cell> = {};
   const scatter: Record<string, Point[]> = {};
   const trends: Record<string, { x: number; y: number }[] | null> = {};
-  const influence: Record<string, Influence | null> = {};
   const composite = abilityComposite(people);
   const byComposite = new Map(
     (composite?.values ?? []).map((v) => [v.employeeId, v.value]),
@@ -402,8 +392,6 @@ function InHouseSection({
       const pts = scatterPoints(people, scale, axis);
       scatter[k] = pts;
       trends[k] = trendLine(pts);
-      // 「한 사람에 매달려 있는가」 — 산점도와 같은 점으로 잰다
-      influence[k] = influenceOf(pts);
     }
 
   const splits = composite
@@ -455,8 +443,6 @@ function InHouseSection({
         inHouse
         reliability={reliability}
         groups={TRAIT_GROUPS}
-        influence={influence}
-        facets={facets}
       />
 
       {/* ── 2절 · 능력마다 어떤 성향이 ── */}

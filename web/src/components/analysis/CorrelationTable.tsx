@@ -109,7 +109,6 @@ export function CorrelationTable({
       if (v.kind === "value") ns.add(v.n);
     }
   const showN = ns.size > 1;
-  const sharedN = ns.size === 1 ? [...ns][0] : null;
 
   return (
     <div className="overflow-x-auto">
@@ -252,12 +251,6 @@ export function CorrelationTable({
         </tbody>
         ))}
       </table>
-      {sharedN !== null && (
-        <p className="text-axis text-ink-muted mt-2">
-          모든 칸이 같은 <span className="tabular">{sharedN}</span>명에서 나온
-          값입니다.
-        </p>
-      )}
     </div>
   );
 }
@@ -397,55 +390,87 @@ function describe(row: string, col: string, c: Cell) {
 }
 
 /** 표 아래에 한 번 두는 범례. 색만으로 읽게 두지 않는다. */
-export function CorrelationLegend({ inHouse }: { inHouse?: boolean }) {
+/**
+ * 표 아래 범례 — **두 줄로 못 박는다** (2026-08-25 사용자 요청).
+ *
+ * 일곱 줄까지 늘어났었다. 색·등급·막대·흐림·n 부족·빗금·인원이 한 줄씩
+ * 차지하니 **표보다 범례가 길어 보였다.** 범례는 표를 읽는 열쇠지 읽을
+ * 거리가 아니다.
+ *
+ *   첫 줄  그림이 뜻하는 것 — 색, 막대, 흐림
+ *   둘째 줄 숫자가 뜻하는 것 — 등급 눈금, 인원, 빗금
+ *
+ * 더 긴 설명은 화면 맨 아래 「읽으실 때 유의할 것」이 맡는다 (D-86).
+ */
+export function CorrelationLegend({
+  inHouse,
+  sharedN,
+  hatched,
+}: {
+  inHouse?: boolean;
+  /** 모든 칸의 n이 같으면 그 값. 칸마다 다르면 `null` */
+  sharedN?: number | null;
+  /** 문항이 안 맞물려 빗금 친 열이 있는가 */
+  hatched?: boolean;
+}) {
   return (
-    <div className="text-axis text-ink-muted mt-4 flex flex-wrap items-center gap-x-6 gap-y-2">
-      <span className="flex items-center gap-2">
-        <span
-          className="h-3 w-24 rounded-sm"
-          style={{
-            background:
-              "linear-gradient(90deg, #b3623f, #eae6de, #3a5fa0)",
-          }}
-        />
-        음의 관계 ← → 양의 관계
-      </span>
-      <span className="text-ink-secondary">
-        등급 <span className="tabular">.10</span> 약함 ·{" "}
-        <span className="tabular">.20</span> 어느 정도 ·{" "}
-        <span className="tabular">.30</span> 뚜렷함 ·{" "}
-        <span className="tabular">.50</span> 매우 뚜렷함
-      </span>
-      <span className="flex items-center gap-2">
-        <span className="relative inline-block h-2 w-10">
+    <div className="text-axis text-ink-muted mt-4 flex flex-col gap-1.5">
+      {/* 첫 줄 — 그림 */}
+      <div className="flex flex-wrap items-center gap-x-5 gap-y-1.5">
+        <span className="flex items-center gap-2">
           <span
-            className="absolute inset-y-0 left-1/2 w-px"
-            style={{ background: "var(--ink)", opacity: 0.3 }}
+            className="h-3 w-20 rounded-sm"
+            style={{ background: "linear-gradient(90deg, #b3623f, #eae6de, #3a5fa0)" }}
           />
-          <span
-            className="absolute inset-y-0 left-1/2 w-[35%] rounded-sm"
-            style={{ background: "var(--diverge-pos)" }}
-          />
+          음의 관계 ← → 양의 관계
         </span>
-        막대 길이 = 관련도 크기 · 0이 가운데
-      </span>
-      <span>흐린 막대 = 신뢰구간이 0을 걸쳐 방향이 아직 확정되지 않음</span>
-      {inHouse ? (
-        <span>n 부족 = 30명 미만</span>
-      ) : (
-        <span>
-          <span className="text-ink-secondary">없음</span> 연구했는데 관련 없음 ·{" "}
-          <span className="text-ink-secondary">—</span> 연구된 적 없음 ·{" "}
-          <span
-            className="rounded px-1.5"
-            style={{ outline: "1px dashed var(--border)", color: "var(--ink-secondary)" }}
-          >
-            ≈+.08 추정
-          </span>{" "}
-          직접 잰 연구가 없어 가까운 개념 둘을 섞어 <strong>계산</strong>한 값. 잰 값이
-          아닙니다
+        <span className="flex items-center gap-2">
+          <span className="relative inline-block h-2 w-9">
+            <span
+              className="absolute inset-y-0 left-1/2 w-px"
+              style={{ background: "var(--ink)", opacity: 0.3 }}
+            />
+            <span
+              className="absolute inset-y-0 left-1/2 w-[35%] rounded-sm"
+              style={{ background: "var(--diverge-pos)" }}
+            />
+          </span>
+          막대 길이 = 크기, 0이 가운데
         </span>
-      )}
+        <span>흐린 막대 = 방향이 아직 확정되지 않음</span>
+      </div>
+
+      {/* 둘째 줄 — 숫자 */}
+      <div className="flex flex-wrap items-center gap-x-5 gap-y-1.5">
+        <span className="text-ink-secondary">
+          등급 <span className="tabular">.10</span> 약함 ·{" "}
+          <span className="tabular">.20</span> 어느 정도 ·{" "}
+          <span className="tabular">.30</span> 뚜렷함 ·{" "}
+          <span className="tabular">.50</span> 매우 뚜렷함
+        </span>
+        {sharedN != null && (
+          <span>
+            모든 칸 <span className="tabular">{sharedN}</span>명
+          </span>
+        )}
+        {hatched && <span>빗금 = 문항이 아직 안 맞물림 (아래 유의사항)</span>}
+        {!inHouse && (
+          <span>
+            <span className="text-ink-secondary">없음</span> 연구했는데 관련 없음
+            · <span className="text-ink-secondary">—</span> 연구된 적 없음 ·{" "}
+            <span
+              className="rounded px-1.5"
+              style={{
+                outline: "1px dashed var(--border)",
+                color: "var(--ink-secondary)",
+              }}
+            >
+              ≈+.08 추정
+            </span>{" "}
+            가까운 개념으로 계산한 값
+          </span>
+        )}
+      </div>
     </div>
   );
 }
