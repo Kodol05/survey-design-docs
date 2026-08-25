@@ -127,7 +127,7 @@ export default async function StatsPage(props: {
         />
         <Tile
           label="검사 신뢰도"
-          value={meanAlpha === null ? "—" : meanAlpha.toFixed(2)}
+          value={meanAlpha === null ? "—" : meanAlpha.toFixed(2).replace(/^0/, "")}
           href="/admin/stats?tab=reliability"
           hint="척도 평균 α"
         />
@@ -135,7 +135,7 @@ export default async function StatsPage(props: {
           label="기준 아래 척도"
           value={poorCount}
           href="/admin/stats?tab=reliability"
-          hint={poorCount ? `α ${ALPHA.poor} 아래` : "전부 기준 안"}
+          hint={poorCount ? `α ${ALPHA.poor.toFixed(2).replace(/^0/, "")} 아래` : "전부 기준 안"}
         />
       </div>
 
@@ -757,7 +757,8 @@ function ReliabilityTab({
           <div>
             <h2 className="text-section-title mb-1">문항이 맞물리는가</h2>
             <p className="text-axis text-ink-muted mb-6">
-              한 척도의 문항들이 같은 것을 재고 있는지 — α가 {ALPHA.poor} 아래면
+              한 척도의 문항들이 같은 것을 재고 있는지 — α가{" "}
+              {ALPHA.poor.toFixed(2).replace(/^0/, "")} 아래면
               그 상관은 볼 필요가 없습니다
             </p>
 
@@ -791,7 +792,9 @@ function ReliabilityTab({
                             </th>
                             <td className="tabular py-2 text-right">{r.itemCount}</td>
                             <td className="tabular py-2 text-right font-medium">
-                              {r.alpha === null ? "—" : r.alpha.toFixed(2)}
+                              {r.alpha === null
+                                ? "—"
+                                : r.alpha.toFixed(2).replace(/^0/, "")}
                             </td>
                             <td
                               className="text-axis py-2 pl-6"

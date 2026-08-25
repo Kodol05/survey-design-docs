@@ -217,8 +217,14 @@ export function CorrelationTable({
                           큰 칸에서는 아무 표시도 안 된다 (위 설명 참고).
                           바탕과 같은 색으로 줄을 그어 결만 다르게 만든다.
                         */
+                        /*
+                          간격을 넓게, 선을 반투명하게 둔다. 5px 간격에
+                          불투명한 선으로 그었더니 **어두운 화면에서 칸이
+                          긁힌 것처럼** 보여서 안에 든 숫자보다 빗금이 먼저
+                          들어왔다. 「결이 다르다」만 전하면 된다.
+                        */
                         backgroundImage: dim
-                          ? "repeating-linear-gradient(45deg, transparent 0 5px, var(--page) 5px 6.5px)"
+                          ? "repeating-linear-gradient(45deg, transparent 0 8px, color-mix(in oklab, var(--page) 72%, transparent) 8px 9.5px)"
                           : undefined,
                         color: v.kind === "value" ? "var(--ink)" : undefined,
                         /*

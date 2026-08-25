@@ -115,11 +115,11 @@ export default async function AdminHome() {
         />
         <Tile
           label="검사 신뢰도"
-          value={meanAlpha === null ? "—" : meanAlpha.toFixed(2)}
+          value={meanAlpha === null ? "—" : fmtAlpha(meanAlpha)}
           href="/admin/stats?tab=reliability"
           hint={
             poorScales.length
-              ? `${poorScales.length}개 척도가 ${ALPHA.poor} 아래`
+              ? `${poorScales.length}개 척도가 ${fmtAlpha(ALPHA.poor)} 아래`
               : "척도 평균 α"
           }
         />
@@ -385,7 +385,7 @@ export default async function AdminHome() {
             lines={[
               meanAlpha === null
                 ? "아직 계산할 수 없습니다"
-                : `척도 평균 α ${meanAlpha.toFixed(2)}`,
+                : `척도 평균 α ${fmtAlpha(meanAlpha)}`,
               poorScales.length
                 ? `기준 아래 척도 ${poorScales.length}개 — ${poorScales.map((r) => r.scale).join(" · ")}`
                 : "기준 아래 척도 없음",
@@ -512,3 +512,11 @@ function Tile({
     </div>
   );
 }
+
+/**
+ * α 표기 — **앞의 0을 뗀다.**
+ *
+ * 화면 다른 곳에서 상관을 `+.44`로 적는다. 같은 「0과 1 사이 값」인데
+ * 여기만 `0.77`이면 눈이 두 가지 표기를 오간다.
+ */
+const fmtAlpha = (a: number) => a.toFixed(2).replace(/^0/, "");

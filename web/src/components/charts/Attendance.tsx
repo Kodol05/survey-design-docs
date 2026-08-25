@@ -37,8 +37,14 @@ export function Attendance({ people }: { people: Attendee[] }) {
     people.filter((p) => p.status === k).length;
   const done = count("COMPLETED");
 
-  // 아직 남은 사람 — 이름을 그대로 적는다
-  const pending = people.filter((p) => p.status !== "COMPLETED");
+  /*
+    아직 남은 사람 — 이름을 그대로 적는다.
+
+    **다시 응시 중인 사람도 여기 적는다.** 그 사람은 「완료」로 세지만
+    (끝낸 적이 있으니까) 지금 답하고 있는 중이라는 사실을 감추면, 며칠 뒤
+    그 사람의 결과가 바뀌어 있는 이유를 알 수 없다.
+  */
+  const pending = people.filter((p) => p.status !== "COMPLETED" || p.retaking);
 
   return (
     <div>
@@ -92,7 +98,7 @@ export function Attendance({ people }: { people: Attendee[] }) {
 
       {pending.length > 0 && (
         <p className="text-axis text-ink-secondary mt-5 leading-relaxed">
-          <span className="text-ink-muted">아직 안 끝난 사람 — </span>
+          <span className="text-ink-muted">아직 답하는 중인 사람 — </span>
           {pending.map((p, i) => (
             <span key={p.id}>
               {i > 0 && ", "}
@@ -104,6 +110,9 @@ export function Attendance({ people }: { people: Attendee[] }) {
               )}
               {p.status === "ABANDONED" && (
                 <span className="text-ink-muted"> (중단)</span>
+              )}
+              {p.retaking && (
+                <span className="text-ink-muted"> (다시 응시 중)</span>
               )}
             </span>
           ))}

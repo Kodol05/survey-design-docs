@@ -459,7 +459,13 @@ function SortRow({
 }) {
   return (
     <div className="flex flex-wrap items-center gap-1.5">
-      <span className="text-ink-muted w-16 shrink-0">{label}</span>
+      {/*
+        `w-16`(64px)이 「직무능력」 네 글자에 좁아서 **두 줄로 접혔다** —
+        칩 줄만 아래로 밀려 어긋나 보였다. 가장 긴 이름에 맞춰 둔다.
+      */}
+      <span className="text-ink-muted w-20 shrink-0 whitespace-nowrap">
+        {label}
+      </span>
       {children}
     </div>
   );
