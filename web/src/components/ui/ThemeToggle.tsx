@@ -1,23 +1,9 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { themeKey, type Theme } from "@/lib/theme";
 
-export type Theme = "light" | "dark";
-
-/**
- * 저장 키 — **영역별로 따로 기억한다.**
- *
- * 한 곳에 저장하면 관리자에서 어둡게 바꾼 것이 사원 화면까지 따라간다.
- * 관리자는 숫자를 오래 보는 자리고 사원은 결과를 한 번 읽는 자리라
- * 편한 밝기가 다르다.
- *
- * **양쪽 다 바꾼 것은 그대로 남는다** (2026-08-26 사용자 결정). 기본값
- * (관리자 어둡게 · 그 밖은 밝게)은 **저장된 것이 없을 때** 무엇으로
- * 시작하느냐일 뿐이고, 한 번 고르면 그 선택이 이긴다.
- */
-const scopeOf = (path: string) =>
-  path.indexOf("/admin") === 0 ? "admin" : "app";
-export const themeKey = (path: string) => `survey-theme:${scopeOf(path)}`;
+// 밝기 규칙은 `lib/theme.ts` 한 곳에서 정한다
 
 /**
  * 밝게/어둡게 전환.

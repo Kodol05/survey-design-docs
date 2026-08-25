@@ -1,5 +1,5 @@
-import { readFileSync } from "node:fs";
 import { describe, expect, it } from "vitest";
+import { THEME_SCRIPT, themeFor } from "@/lib/theme";
 
 /*
   밝기 규칙 (2026-08-26 사용자 결정).
@@ -23,12 +23,7 @@ import { describe, expect, it } from "vitest";
   그래서 **진짜 스크립트를 파일에서 꺼내** 가짜 저장소를 물려 돌려 본다.
 */
 
-const SCRIPT = (() => {
-  const src = readFileSync("src/app/layout.tsx", "utf8");
-  const m = src.match(/const THEME_SCRIPT = `([\s\S]*?)`;/);
-  if (!m) throw new Error("layout.tsx 에서 THEME_SCRIPT 를 못 찾았다");
-  return m[1];
-})();
+const SCRIPT = THEME_SCRIPT;
 
 type Store = Record<string, string>;
 
@@ -136,5 +131,38 @@ describe("저장소를 못 쓰는 곳에서도 죽지 않는다", () => {
       ),
     ).not.toThrow();
     expect(documentElement.dataset.theme).toBe("dark");
+  });
+});
+
+describe("⚠️ 인라인 스크립트와 규칙 함수가 같은 답을 낸다", () => {
+  /*
+    같은 규칙이 두 군데에 있다 — `<head>` 문자열과 `themeFor()`.
+
+    문자열은 `lib/theme.ts`를 불러올 수 없어서(첫 그림 전에 혼자 돌아야 한다)
+    어쩔 수 없이 두 벌이다. 그러면 **하나만 고쳤을 때 화면마다 다른 밝기**가
+    된다 — 문서를 새로 받았느냐 링크로 왔느냐에 따라 갈린다.
+
+    그래서 둘을 같은 입력에 돌려 보고 답이 같은지 본다.
+  */
+  const CASES: [string, Store][] = [
+    ["/", {}],
+    ["/login", {}],
+    ["/survey", {}],
+    ["/me", {}],
+    ["/admin", {}],
+    ["/admin/login", {}],
+    ["/admin/stats", {}],
+    ["/admin/employees/abc", {}],
+    ["/admin", { [ADMIN]: "light" }],
+    ["/survey", { [APP]: "dark" }],
+    ["/me", { [ADMIN]: "light", [APP]: "dark" }],
+    ["/admin", { [ADMIN]: "light", [APP]: "dark" }],
+    ["/me", { [APP]: "이상한값" }],
+  ];
+
+  it.each(CASES)("%s", (pathname, saved) => {
+    const fromScript = run(pathname, saved).theme;
+    const fromRule = themeFor(pathname, (k) => saved[k] ?? null);
+    expect(fromScript, `${pathname} ${JSON.stringify(saved)}`).toBe(fromRule);
   });
 });
