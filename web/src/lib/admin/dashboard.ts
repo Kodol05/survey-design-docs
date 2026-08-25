@@ -1,6 +1,12 @@
 import { ABILITY_AXES, TRAIT_SCALES } from "@/lib/items/types";
-import { cellOf, loadPeople, loadReliability, traitAbilityMatrix } from "./analysis";
+import {
+  cellOf,
+  loadPeople,
+  loadReliability,
+  traitAbilityMatrix,
+} from "./analysis";
 import type { ScaleReliability } from "./analysis";
+import { ensureBackup, listBackups } from "./backup";
 import { ratingProgress } from "./ratings";
 import { loadAttendance, loadSummary } from "./summary";
 
@@ -47,13 +53,23 @@ export type Relation = {
 };
 
 export async function loadDashboard() {
+  /*
+    백업은 **여기서 걸린다.** 별도 스케줄러를 두지 않고, 관리자가 이 화면을
+    열 때 「마지막 백업이 24시간 넘었나」만 본다 (D-28). 지났으면 그 자리에서
+    뜬다 — 압축하면 100KB 남짓이라 화면이 느려지지 않는다.
+
+    `ensureBackup`은 던지지 않는다. 백업이 안 됐다고 대시보드가 안 열리면
+    안 되고, 실패는 화면의 「마지막 백업」 시각이 그대로인 것으로 드러난다.
+  */
   const [rating, summary, people, reliability, attendance] = await Promise.all([
     ratingProgress(),
     loadSummary(),
     loadPeople(),
     loadReliability(),
     loadAttendance(),
+    ensureBackup(),
   ]);
+  const backups = await listBackups();
 
   const matrix = traitAbilityMatrix(people);
   const alpha = traitAlpha(reliability);
@@ -69,7 +85,11 @@ export async function loadDashboard() {
     것을 「뚜렷한 관련」이라 부를 수는 없다.
   */
   const relations: Relation[] = TRAIT_SCALES.flatMap((scale) =>
-    ABILITY_AXES.map((axis) => ({ scale, axis, c: cellOf(matrix, scale, axis) })),
+    ABILITY_AXES.map((axis) => ({
+      scale,
+      axis,
+      c: cellOf(matrix, scale, axis),
+    })),
   )
     .filter((x) => x.c && !(x.c.ci[0] <= 0 && x.c.ci[1] >= 0))
     .sort((a, b) => Math.abs(b.c!.r) - Math.abs(a.c!.r))
@@ -88,6 +108,7 @@ export async function loadDashboard() {
     matrix,
     alpha,
     relations,
+    backups,
     /** 응답 신뢰도를 확인해 볼 사람 */
     needsReview: people.filter((p) => p.quality !== "ok"),
   };

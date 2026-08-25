@@ -6,6 +6,7 @@ import { MIN_N } from "@/components/ui/NBadge";
 import { Attendance } from "@/components/charts/Attendance";
 import { ALPHA } from "@/lib/admin/stats";
 import { loadDashboard } from "@/lib/admin/dashboard";
+import { INTERVAL_HOURS, KEEP_COUNT, type Backup } from "@/lib/admin/backup";
 import { TopRelations } from "./TopRelations";
 
 export const metadata = { title: "대시보드 — 관리자" };
@@ -15,8 +16,16 @@ export default async function AdminHome() {
     읽고 세는 일은 `lib/admin/dashboard.ts`가 한다 (2026-08-25 분리).
     여기는 **받은 것을 그리기만** 한다.
   */
-  const { rating, summary: s, attendance, matrix, alpha, relations: top, needsReview } =
-    await loadDashboard();
+  const {
+    rating,
+    summary: s,
+    attendance,
+    matrix,
+    alpha,
+    relations: top,
+    needsReview,
+    backups,
+  } = await loadDashboard();
   const { mean: meanAlpha, poor: poorScales } = alpha;
   const poorNames = poorScales.map((r) => r.scale);
 
@@ -313,8 +322,90 @@ export default async function AdminHome() {
           />
         </div>
       </section>
+
+      {/*
+        백업 — **바로 가기 아래**에 둔다.
+
+        평소에 볼 것이 아니라 「마지막이 언제였나」만 확인하면 되는 칸이라
+        위쪽 숫자 타일에 끼워 넣지 않았다. 다만 **아무 표시도 없으면 백업이
+        멈춰도 아무도 모른다** — 그래서 시각은 늘 보이게 둔다.
+      */}
+      <section className="mt-14">
+        <h2 className="text-section-title mb-4 border-b border-[--border] pb-2">
+          데이터 백업
+        </h2>
+        <BackupCard backups={backups} />
+      </section>
     </>
   );
+}
+
+/**
+ * 백업 칸.
+ *
+ * ## 왜 받는 쪽을 강조하는가
+ *
+ * 서버 안 덤프는 **디스크가 죽는 경우를 못 막는다** — 백업도 같이 죽는다.
+ * 그게 가장 흔한 사고다. 실질적인 방어는 파일을 서버 밖에 두는 것뿐이라
+ * 버튼이 주인공이고 자동 덤프는 그 옆의 참고 사항이다.
+ */
+function BackupCard({ backups }: { backups: Backup[] }) {
+  const [latest] = backups;
+  const hours = latest
+    ? (Date.now() - new Date(latest.at).getTime()) / 3_600_000
+    : null;
+  const stale = hours === null || hours >= INTERVAL_HOURS * 2;
+
+  return (
+    <div
+      className="flex flex-wrap items-start justify-between gap-6 rounded-xl p-5"
+      style={{ background: "var(--wash)" }}
+    >
+      <div className="text-axis">
+        <p className="text-table font-medium">
+          마지막 백업{" "}
+          <span
+            className="tabular"
+            style={stale ? { color: "var(--status-warn)" } : undefined}
+          >
+            {latest ? agoLabel(hours!) : "아직 없음"}
+          </span>
+        </p>
+        <p className="text-ink-secondary mt-1 leading-snug">
+          {latest
+            ? `서버 안에 ${backups.length}벌 · 하루 한 벌씩 최근 ${KEEP_COUNT}벌만 남습니다.`
+            : "이 화면을 열면 하루 한 벌씩 자동으로 뜹니다. 아직 한 벌도 없습니다."}
+        </p>
+        <p className="text-ink-muted mt-2 max-w-[30rem] leading-snug">
+          서버 안 백업은 <strong>디스크가 죽으면 같이 사라집니다.</strong> 가끔
+          받아서 서버 밖에 한 벌 두시는 편이 실제 방어가 됩니다.
+        </p>
+      </div>
+
+      <div className="text-axis text-right">
+        <a
+          href="/admin/backup"
+          className="text-table inline-flex h-11 items-center rounded-lg border border-[--border] px-4 font-medium"
+        >
+          백업 파일 받기
+        </a>
+        <p className="text-ink-muted mt-2 max-w-[24rem] leading-snug">
+          누르면 지금 상태로 새로 뜹니다.{" "}
+          <strong className="text-ink-secondary">
+            전화번호와 비밀번호 해시까지 전부 들어갑니다.
+          </strong>
+        </p>
+      </div>
+    </div>
+  );
+}
+
+/** "3시간 전" · "어제" — 초 단위 정확도가 필요한 값이 아니다 */
+function agoLabel(hours: number): string {
+  if (hours < 1) return "방금";
+  if (hours < 24) return `${Math.floor(hours)}시간 전`;
+  const days = Math.floor(hours / 24);
+  return days === 1 ? "어제" : `${days}일 전`;
 }
 
 /**
@@ -352,7 +443,6 @@ function Shortcut({
     </Link>
   );
 }
-
 
 /**
  * α 표기 — **앞의 0을 뗀다.**
