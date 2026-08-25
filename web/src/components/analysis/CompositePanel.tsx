@@ -1,4 +1,6 @@
+import Link from "next/link";
 import { formatR } from "./correlationColor";
+import { abilityColorAt } from "../charts/scale";
 import { subjectParticle } from "./correlationWords";
 import { GradeTag } from "./GradeTag";
 import { DivergingBar } from "./DivergingBar";
@@ -122,6 +124,106 @@ export function CompositePanel({ c }: { c: Composite }) {
         </ul>
 
         {top && <Conclusion c={c} />}
+      </div>
+
+      {/* ── 사람 ── */}
+      <div className="xl:col-span-2">
+        <Ranking c={c} />
+      </div>
+    </div>
+  );
+}
+
+/**
+ * 총합이 높은 사람부터 (2026-08-25 사용자 결정).
+ *
+ * ## 「순위」 탭을 없애 놓고 왜 여기에 사람을 줄 세우는가
+ *
+ * 없앤 것은 **성향으로 직무능력을 가르던 화면**이다 — 상위·하위 3분의 1의
+ * 평균 차이는 상관이 이미 말하는 것을 덜 정확하게 말하는 그림이었다.
+ * 여기는 다르다. **직무능력 값 그 자체로 사람을 줄 세우는 것**이고,
+ * 「종합적으로 잘하는 사람이 누구인가」에는 이 값 말고 답할 것이 없다.
+ *
+ * ## 두 줄로 나눈다
+ *
+ * 마흔 명을 한 줄로 세우면 1,000px가 넘어 화면 끝까지 스크롤해야 한다.
+ * 왼쪽에 위쪽 절반, 오른쪽에 아래쪽 절반을 두면 **한 화면에 다 들어온다.**
+ * 순서는 왼쪽 위에서 아래로, 그다음 오른쪽이다.
+ */
+function Ranking({ c }: { c: Composite }) {
+  const sorted = [...c.values].sort(
+    (a, b) => b.value - a.value || a.name.localeCompare(b.name, "ko"),
+  );
+  const half = Math.ceil(sorted.length / 2);
+  const cols = [sorted.slice(0, half), sorted.slice(half)];
+  const shaky = c.verdict === "poor";
+
+  return (
+    <div className="border-t border-[--border] pt-8">
+      <div className="mb-4 flex flex-wrap items-baseline gap-x-3">
+        <h3 className="text-section-title">종합이 높은 사람부터</h3>
+        <span className="text-axis text-ink-muted tabular">
+          {sorted.length}명
+        </span>
+      </div>
+
+      <p className="text-axis text-ink-secondary mb-5 max-w-[52rem] leading-relaxed">
+        세 능력의 <strong>평균</strong>입니다. 축 하나가 유별난 사람보다{" "}
+        <strong>셋이 고르게 높은 사람</strong>이 위로 옵니다.
+        {shaky ? (
+          <span style={{ color: "var(--status-critical)" }}>
+            {" "}
+            ⚠ 지금은 묶음이 안정적이지 않아 순서를 그대로 믿기 어렵습니다.
+          </span>
+        ) : (
+          <span className="text-ink-muted">
+            {" "}
+            ⚠ 가까운 순위끼리는 몇 점 차이라 다시 재면 뒤바뀝니다. 위쪽 무리와
+            아래쪽 무리를 가르는 정도로만 보십시오.
+          </span>
+        )}
+      </p>
+
+      <div className="grid gap-x-14 gap-y-1 lg:grid-cols-2">
+        {cols.map((col, ci) => (
+          <ul key={ci} className="flex flex-col">
+            {col.map((p, i) => {
+              const rank = ci * half + i + 1;
+              return (
+                <li
+                  key={p.employeeId}
+                  className="text-axis grid grid-cols-[2rem_minmax(0,7rem)_minmax(0,1fr)_2.75rem] items-center gap-3 border-b border-[--border] py-1.5 last:border-0"
+                >
+                  <span className="text-ink-muted tabular text-right">
+                    {rank}
+                  </span>
+                  <Link
+                    href={`/admin/employees/${p.employeeId}`}
+                    // 밑줄을 늘 그으면 서른여덟 줄이 시끄럽다. 올렸을 때만
+                    className="text-table truncate hover:underline"
+                  >
+                    {p.name}
+                  </Link>
+                  <span
+                    className="block h-2.5 rounded-full"
+                    style={{ background: "var(--grid)" }}
+                  >
+                    <span
+                      className="block h-full rounded-full"
+                      style={{
+                        width: `${Math.max(2, Math.min(100, p.value))}%`,
+                        background: abilityColorAt(p.value),
+                      }}
+                    />
+                  </span>
+                  <span className="tabular text-right font-medium">
+                    {Math.round(p.value)}
+                  </span>
+                </li>
+              );
+            })}
+          </ul>
+        ))}
       </div>
     </div>
   );
