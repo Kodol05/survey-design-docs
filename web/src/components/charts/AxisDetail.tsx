@@ -12,6 +12,8 @@ import { GRADIENT, HIGH_INK, LOW_INK, Marker } from "./scale";
 export type FacetRow = { name: string; percent: number };
 
 export type AxisDetailProps = {
+  /** 목차에서 건너뛸 자리표 */
+  id?: string;
   scale: string;
   percent: number;
   band: BandKey;
@@ -20,12 +22,12 @@ export type AxisDetailProps = {
 
 const BAND_LABEL = { lower: "낮은 편", middle: "보통", upper: "높은 편" } as const;
 
-export function AxisDetail({ scale, percent, band, facets }: AxisDetailProps) {
+export function AxisDetail({ id, scale, percent, band, facets }: AxisDetailProps) {
   const x = Math.max(0, Math.min(100, percent));
   const poles = POLES[scale];
 
   return (
-    <section className="border-t border-[--border] py-10">
+    <section id={id} className="scroll-mt-8 border-t border-[--border] py-10">
       <div className="mb-6 flex items-baseline gap-3">
         <h3 className="text-4xl font-medium">{scale}</h3>
         <span className="tabular text-2xl">{Math.round(percent)}</span>
