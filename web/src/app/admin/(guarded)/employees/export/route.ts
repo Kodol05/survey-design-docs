@@ -8,6 +8,7 @@ import {
   resolveAbilities,
 } from "@/lib/admin/abilitySource";
 import { pickBossScores } from "@/lib/admin/ratings";
+import { abilityMean } from "@/components/analysis/TraitStrip";
 import type { StoredAbilities, StoredTraits } from "@/lib/survey/result";
 
 /**
@@ -64,6 +65,7 @@ export async function GET(req: Request) {
     "신뢰도 판정",
     ...TRAIT_SCALES,
     ...ABILITY_AXES.map((a) => `${a}(${SOURCE_LABEL[source]})`),
+    `세 능력 평균(${SOURCE_LABEL[source]})`,
   ];
 
   const body = employees.map((e) => {
@@ -94,6 +96,11 @@ export async function GET(req: Request) {
       ...ABILITY_AXES.map((a) =>
         typeof abilities[a] === "number" ? String(Math.round(abilities[a])) : "",
       ),
+      // 한 축이라도 없으면 비워 둔다 — 있는 것만 평균 내면 다른 잣대가 된다
+      (() => {
+        const m = abilityMean(abilities);
+        return m === null ? "" : String(Math.round(m));
+      })(),
     ];
   });
 

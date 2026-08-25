@@ -61,13 +61,36 @@ const A_CELL = "min-w-[4.25rem] flex-1";
  *
  * 그래서 한 가지 색의 **길이와 진하기**로 말한다. 좁은 칸에서 62와 71을
  * 길이만으로 가르기는 어렵다 — 진하기를 같이 얹으면 훑을 때 먼저 들어온다.
+ *
+ * ## 맨 뒤에 평균 (2026-08-25 사용자 요청)
+ *
+ * 「종합적으로 잘하는 사람이 누구인가」에는 세 축을 따로 봐서 답할 수 없다.
+ * 평균을 한 칸 더 두면 목록에서 바로 보이고, **그 칸으로 정렬**할 수 있다.
+ *
+ * 세로선으로 갈라 둔다 — 앞의 셋은 **잰 값**이고 마지막은 **만든 값**이라
+ * 나란히 두되 같은 것으로 보이면 안 된다.
+ *
+ * ⚠️ **한 축이라도 없으면 평균을 내지 않는다.** 있는 것만 평균 내면 그
+ *    사람의 값은 다른 잣대로 잰 것이 되어 남과 견줄 수 없다.
  */
+/** 세 축이 다 있을 때만 평균. 없으면 `null` */
+export function abilityMean(
+  abilities: Record<string, number> | null | undefined,
+): number | null {
+  if (!abilities) return null;
+  const vs = ABILITY_AXES.map((a) => abilities[a]);
+  if (vs.some((v) => typeof v !== "number" || Number.isNaN(v))) return null;
+  return vs.reduce((a, b) => a + b, 0) / vs.length;
+}
+
 export function AbilityStrip({ abilities }: { abilities: Record<string, number> | null }) {
   if (!abilities || Object.keys(abilities).length === 0)
     return <span className="text-ink-muted text-axis">—</span>;
 
+  const mean = abilityMean(abilities);
+
   return (
-    <div className="flex w-full max-w-[25rem] gap-3" role="img" aria-label={describeAbility(abilities)}>
+    <div className="flex w-full max-w-[33rem] gap-3" role="img" aria-label={describeAbility(abilities)}>
       {ABILITY_AXES.map((a) => {
         const v = abilities[a];
         const has = typeof v === "number";
@@ -88,18 +111,50 @@ export function AbilityStrip({ abilities }: { abilities: Record<string, number> 
           </span>
         );
       })}
+
+      {/* 잰 값과 만든 값 사이에 선 하나 */}
+      <span
+        aria-hidden
+        className="w-px shrink-0 self-stretch"
+        style={{ background: "var(--border)" }}
+      />
+      <span
+        title={mean === null ? "세 축이 다 있어야 냅니다" : `평균 ${Math.round(mean)}`}
+        className={`${A_CELL} block`}
+      >
+        <span className="tabular text-table block text-right leading-none font-medium">
+          {mean === null ? "—" : Math.round(mean)}
+        </span>
+        <span aria-hidden className="mt-1 block h-1.5 rounded-full" style={{ background: "var(--grid)" }}>
+          <span
+            className="block h-full rounded-full"
+            style={{
+              width: `${mean === null ? 0 : Math.max(4, Math.min(100, mean))}%`,
+              background: mean === null ? "transparent" : abilityColorAt(mean),
+            }}
+          />
+        </span>
+      </span>
     </div>
   );
 }
 
 export function AbilityStripHeader() {
   return (
-    <div className="flex w-full max-w-[25rem] gap-3">
+    <div className="flex w-full max-w-[33rem] gap-3">
       {ABILITY_AXES.map((a) => (
         <span key={a} className={`${A_CELL} text-ink-muted text-right`} style={{ fontSize: 17 }}>
           {A_SHORT[a]}
         </span>
       ))}
+      <span aria-hidden className="w-px shrink-0" />
+      <span
+        className={`${A_CELL} text-ink-secondary text-right`}
+        style={{ fontSize: 17 }}
+        title="세 능력의 평균"
+      >
+        평균
+      </span>
     </div>
   );
 }
@@ -111,9 +166,12 @@ const A_SHORT: Record<string, string> = {
 };
 
 function describeAbility(a: Record<string, number>) {
-  return ABILITY_AXES.map((x) =>
-    typeof a[x] === "number" ? `${x} ${Math.round(a[x])}` : `${x} 없음`,
-  ).join(", ");
+  const m = abilityMean(a);
+  return (
+    ABILITY_AXES.map((x) =>
+      typeof a[x] === "number" ? `${x} ${Math.round(a[x])}` : `${x} 없음`,
+    ).join(", ") + (m === null ? "" : `, 평균 ${Math.round(m)}`)
+  );
 }
 
 export const SHORT: Record<string, string> = {

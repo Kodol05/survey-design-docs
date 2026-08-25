@@ -14,6 +14,7 @@ import {
 import { countRatedEmployees, pickBossScores } from "@/lib/admin/ratings";
 import type { StoredAbilities, StoredTraits } from "@/lib/survey/result";
 import { quantile } from "@/lib/admin/spread";
+import { abilityMean } from "@/components/analysis/TraitStrip";
 import { ExportLink } from "./ExportLink";
 
 export const metadata = { title: "구성원 — 관리자" };
@@ -125,7 +126,15 @@ export default async function EmployeesPage(props: {
   */
   const isTrait = TRAIT_SCALES.includes(sort as never);
   const isAbility = ABILITY_AXES.includes(sort as never);
-  const sortKey = isTrait || isAbility ? sort! : null;
+  /*
+    **직무능력 평균으로도 줄 세운다** (2026-08-25 사용자 요청).
+
+    「종합적으로 잘하는 사람이 누구인가」에는 세 축을 따로 봐서 답할 수 없다.
+    분석 화면에 명단을 따로 두는 것보다 **이미 사람을 보는 자리**에 정렬
+    하나를 더하는 쪽이 맞다 — 거기서 바로 펼쳐 볼 수 있다.
+  */
+  const isMean = sort === MEAN_KEY;
+  const sortKey = isTrait || isAbility || isMean ? sort! : null;
   const fallbackDir: SortDir = sortKey ? "desc" : "asc";
   const sortDir: SortDir = dir === "asc" || dir === "desc" ? dir : fallbackDir;
   /*
@@ -138,6 +147,16 @@ export default async function EmployeesPage(props: {
   const valueFlip = sortDir === "asc" ? -1 : 1;
   const nameFlip = sortDir === "asc" ? 1 : -1;
 
+  /** 값이 없는 사람은 방향과 무관하게 늘 아래로 */
+  const valueOf = (r: Row) =>
+    !sortKey
+      ? null
+      : isMean
+        ? abilityMean(r.abilities)
+        : isTrait
+          ? (r.traits?.[sortKey] ?? null)
+          : (r.abilities?.[sortKey] ?? null);
+
   /*
     **점수로 목록을 좁힌다** (2026-08-25 사용자 결정).
 
@@ -148,16 +167,10 @@ export default async function EmployeesPage(props: {
     정렬로 고른 축을 그대로 쓴다 — 축을 고르는 자리를 하나 더 만들지 않는다.
     이미 「무엇을 보고 있나」를 정한 자리가 있는데 둘로 나누면 둘이 어긋난다.
   */
-  const bandOf = (r: Row) =>
-    !sortKey
-      ? null
-      : isTrait
-        ? (r.traits?.[sortKey] ?? null)
-        : (r.abilities?.[sortKey] ?? null);
 
   const scores = sortKey
     ? everyone
-        .map(bandOf)
+        .map(valueOf)
         .filter((v): v is number => typeof v === "number")
         .sort((a, b) => a - b)
     : [];
@@ -169,7 +182,7 @@ export default async function EmployeesPage(props: {
   const band = sortKey && cut && BANDS.some((b) => b.key === pos) ? pos! : null;
   if (band) {
     rows = rows.filter((r) => {
-      const v = bandOf(r);
+      const v = valueOf(r);
       if (v === null) return false;
       if (band === "top") return v >= cut!.high;
       if (band === "low") return v <= cut!.low;
@@ -187,14 +200,6 @@ export default async function EmployeesPage(props: {
   */
   const statusRank = (s: string | null) =>
     s === "COMPLETED" ? 0 : s === "IN_PROGRESS" ? 1 : 2;
-
-  /** 값이 없는 사람은 방향과 무관하게 늘 아래로 */
-  const valueOf = (r: Row) =>
-    !sortKey
-      ? null
-      : isTrait
-        ? (r.traits?.[sortKey] ?? null)
-        : (r.abilities?.[sortKey] ?? null);
 
   rows = [...rows].sort((a, b) => {
     const byStatus = statusRank(a.status) - statusRank(b.status);
@@ -313,7 +318,7 @@ export default async function EmployeesPage(props: {
         </SortRow>
 
         <SortRow label="직무능력">
-          {ABILITY_AXES.map((x) => (
+          {[...ABILITY_AXES, MEAN_KEY].map((x) => (
             <SortChip
               key={x}
               href={link({
@@ -531,3 +536,11 @@ const BANDS = [
   { key: "mid", label: "가운데 절반" },
   { key: "low", label: "하위 4분의 1" },
 ] as const;
+
+/**
+ * 직무능력 평균으로 정렬할 때 쓰는 열쇠.
+ *
+ * 축 이름과 같은 자리에 들어가므로 **실제 축 이름과 겹치지 않아야** 한다.
+ * 화면에 그대로 보이는 말이라 칩 이름도 이것을 쓴다.
+ */
+const MEAN_KEY = "세 능력 평균";
