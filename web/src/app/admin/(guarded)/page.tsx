@@ -108,7 +108,7 @@ export default async function AdminHome() {
         {/* ── 좌상 · 대표님 평가 ── */}
         <section>
           <div className="mb-4 flex items-baseline justify-between border-b border-[--border] pb-2">
-            <h2 className="text-section-title">대표님 평가</h2>
+            <h2 className="text-section-title">관리자 평가</h2>
             <span className="text-axis text-ink-muted tabular">
               {rating.done} / {rating.total}명
             </span>
@@ -294,7 +294,7 @@ export default async function AdminHome() {
             href="/admin/stats?tab=agreement"
             title="평가 대조"
             lines={[
-              "본인 답과 대표님이 보시는 것을 맞대 봅니다",
+              "본인 답과 관리자가 보는 것을 맞대 봅니다",
               "크게 갈리는 사람이 이름으로 나옵니다",
             ]}
           />
@@ -316,7 +316,7 @@ export default async function AdminHome() {
           />
           <Shortcut
             href="/admin/ratings"
-            title="대표님 평가"
+            title="관리자 평가"
             lines={[
               `${rating.done} / ${rating.total}명 · ${rating.cells} / ${rating.cellTotal}칸`,
               rating.done >= rating.total

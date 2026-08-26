@@ -74,7 +74,7 @@ describe("resolveAbilities", () => {
 });
 
 describe("pickBossScores", () => {
-  it("대표님이 매긴 값이 심은 값을 이긴다", async () => {
+  it("관리자가 매긴 값이 심은 값을 이긴다", async () => {
     const { pickBossScores } = await import("./ratings");
     const out = pickBossScores([
       { axis: "COOPERATION", score: 3, ratedBy: "데모" },
@@ -93,7 +93,7 @@ describe("pickBossScores", () => {
 });
 
 describe("순위 화면의 축 길이 맞춤", () => {
-  it("대표님이 안 매긴 사람도 자리를 지켜야 한다", async () => {
+  it("관리자가 안 매긴 사람도 자리를 지켜야 한다", async () => {
     /*
       세부 항목 값과 직무능력 값을 순서로 짝지어 상관을 낸다.
       한 축만 사람 수가 줄면 **엉뚱한 사람끼리 짝지어진다.**

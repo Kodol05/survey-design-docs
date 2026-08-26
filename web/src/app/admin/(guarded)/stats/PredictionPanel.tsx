@@ -120,7 +120,7 @@ export function PredictionPanel({
           <p className="mt-2">
             그래서 <strong>이 축의 예측은 틀릴 수 있습니다.</strong>{" "}
             참고선으로만 보시고, 이 축이야말로{" "}
-            <strong>대표님 평가와 맞대 보는 것이 가장 중요합니다.</strong>
+            <strong>관리자 평가와 맞대 보는 것이 가장 중요합니다.</strong>
           </p>
         </Note>
       )}

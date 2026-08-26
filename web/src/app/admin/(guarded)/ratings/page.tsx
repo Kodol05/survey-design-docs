@@ -7,7 +7,7 @@ import { requireAdmin } from "@/lib/auth/guard";
 import { RATER, RATING } from "@/lib/admin/abilitySource";
 import { ABILITY_AXES, ABILITY_AXIS_FROM_DB } from "@/lib/items/types";
 
-export const metadata = { title: "대표님 평가 — 관리자" };
+export const metadata = { title: "관리자 평가" };
 
 /**
  * 대표님 평가 입력 (D-34).
@@ -48,7 +48,7 @@ export default async function RatingsPage() {
   return (
     <>
       <div className="mb-2 flex flex-wrap items-baseline justify-between gap-4">
-        <h1 className="text-screen-title">대표님 평가</h1>
+        <h1 className="text-screen-title">관리자 평가</h1>
         <p className="text-axis text-ink-muted tabular">
           {done} / {total}칸
         </p>
@@ -61,7 +61,7 @@ export default async function RatingsPage() {
       <Note label="이 값이 어디에 쓰이는지" className="mb-8">
         <p className="mb-2">
           직원 설문과 <strong>따로</strong> 남습니다. 구성원 목록과 분석 화면에서 제목을
-          눌러 「직원 설문」 · 「대표님 평가」 · 「두 값 평균」으로 바꿔 보실 수 있습니다.
+          눌러 「직원 설문」 · 「관리자 평가」 · 「두 값 평균」으로 바꿔 보실 수 있습니다.
         </p>
         <p className="mb-2">
           <strong>결과 화면을 보시기 전에 매기는 편이 낫습니다.</strong> 결과를 먼저 보면
@@ -69,7 +69,7 @@ export default async function RatingsPage() {
         </p>
         {demo > 0 && (
           <p>
-            여기에는 대표님이 직접 매기신 것만 나옵니다. 화면 확인용으로 심어 둔 값{" "}
+            여기에는 관리자가 직접 매긴 것만 나옵니다. 화면 확인용으로 심어 둔 값{" "}
             <span className="tabular">{demo}</span>칸은 데모 계정에 붙어 있어 보이지
             않습니다.
           </p>

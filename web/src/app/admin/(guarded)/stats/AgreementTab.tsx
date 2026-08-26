@@ -20,13 +20,13 @@ export function AgreementTab({ data }: { data: Awaited<ReturnType<typeof loadRat
         설명 두 줄을 지나야 그림이 나오면, 화면을 열 때마다 같은 문장을
         다시 읽게 된다. 그림이 먼저 보이고 궁금할 때 아래를 본다.
       */}
-      <h2 className="text-section-title mb-6">본인 답과 대표님이 보시는 것</h2>
+      <h2 className="text-section-title mb-6">본인 답과 관리자가 보는 것</h2>
 
       {data.axes.length === 0 ? (
         <>
           <WarningBadge kind="smallSample" />
           <p className="text-ink-secondary mt-4">
-            두 값이 다 있는 사람이 아직 없습니다. 대표님 평가를 먼저 매기셔야 합니다.
+            두 값이 다 있는 사람이 아직 없습니다. 관리자 평가를 먼저 매겨야 합니다.
           </p>
         </>
       ) : (
@@ -36,7 +36,7 @@ export function AgreementTab({ data }: { data: Awaited<ReturnType<typeof loadRat
       <Note label="이 화면이 무엇을 보여주는지" className="mt-8">
         <p>
           같은 사람의 직무능력을 <strong>본인이 답한 값</strong>과{" "}
-          <strong>대표님이 매기신 값</strong>으로 나란히 놓았습니다.
+          <strong>관리자가 매긴 값</strong>으로 나란히 놓았습니다.
         </p>
       </Note>
 
@@ -44,7 +44,7 @@ export function AgreementTab({ data }: { data: Awaited<ReturnType<typeof loadRat
         <p className="mb-2">
           <strong>「누가 맞았나」를 보는 화면이 아닙니다.</strong>{" "}
           <strong>둘이 갈리는 사람이 이야깃거리</strong>라는 뜻입니다 — 본인은
-          협력을 높게 보는데 대표님은 낮게 보신다면, 그 사이에 무슨 일이 있는지가
+          협력을 높게 보는데 관리자는 낮게 본다면, 그 사이에 무슨 일이 있는지가
           볼 것입니다. 자기보고는 좋게 보이려는 쪽으로, 상사 평가는 최근 일이나
           눈에 띄는 장면 쪽으로 기웁니다.
         </p>

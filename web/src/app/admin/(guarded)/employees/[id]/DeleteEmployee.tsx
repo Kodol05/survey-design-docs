@@ -39,7 +39,7 @@ export function DeleteEmployee({ employeeId, name }: { employeeId: string; name:
       <p className="text-table mb-1 font-medium">되돌릴 수 없습니다.</p>
       <p className="text-axis text-ink-secondary mb-4 max-w-[42rem]">
         <strong>{name}</strong> 님의 계정과 함께 <strong>설문 응답 · 채점 결과 · 응답
-        신뢰도 · 대표님 평가</strong>가 모두 지워집니다. 분석 화면의 인원도 그만큼
+        신뢰도 · 관리자 평가</strong>가 모두 지워집니다. 분석 화면의 인원도 그만큼
         줄어듭니다.
       </p>
 

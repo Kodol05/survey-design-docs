@@ -54,7 +54,7 @@ export function DeleteInline({ employeeId, name }: { employeeId: string; name: s
     <div className="text-axis">
       <p className="mb-3 max-w-[22rem] leading-snug">
         <strong className="text-ink">{name}</strong> 님의 계정과 <strong>설문 응답 ·
-        결과 · 대표님 평가</strong>가 모두 지워집니다. 되돌릴 수 없습니다.
+        결과 · 관리자 평가</strong>가 모두 지워집니다. 되돌릴 수 없습니다.
       </p>
 
       <div className="flex flex-wrap items-center gap-3">

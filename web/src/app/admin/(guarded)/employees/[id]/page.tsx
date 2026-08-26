@@ -179,7 +179,7 @@ async function ResultBlocks({
               <tr className="text-ink-secondary border-b border-[--border]">
                 <th className="py-2 text-left font-medium">능력</th>
                 <th className="py-2 text-right font-medium">본인</th>
-                <th className="py-2 pr-2 text-right font-medium">대표님</th>
+                <th className="py-2 pr-2 text-right font-medium">관리자</th>
                 <th className="py-2 pl-6 text-left font-medium">사내 위치</th>
                 <th className="py-2 pl-6 text-left font-medium">
                   관련 성향 축
@@ -250,7 +250,7 @@ async function ResultBlocks({
         </div>
         <p className="text-axis text-ink-muted mt-4">
           <strong className="text-ink-secondary">본인</strong>은 설문 점수,{" "}
-          <strong className="text-ink-secondary">대표님</strong>은 1~10으로
+          <strong className="text-ink-secondary">관리자</strong>는 1~10으로
           매기신 것을 같은 눈금으로 옮긴 값입니다. 숫자를 합치지 않고 옆에
           놓기만 합니다 — 어긋나는 지점이 경험과 대조하실 부분입니다.
         </p>

@@ -92,7 +92,7 @@ export function AgreementPanel({ data }: { data: RatingCompare }) {
                         {g.name}
                       </Link>
                       <span className="text-axis text-ink-muted">
-                        {g.meanGap >= 0 ? "대표님이 더 높게" : "본인이 더 높게"}
+                        {g.meanGap >= 0 ? "관리자가 더 높게" : "본인이 더 높게"}
                       </span>
                     </div>
                     <ul className="flex flex-col gap-1">
@@ -165,7 +165,7 @@ export function AgreementPanel({ data }: { data: RatingCompare }) {
             )}
           </p>
           <p className="text-axis text-ink-muted mb-3">
-            대각선 <strong>위</strong>에 있으면 대표님이 더 높게,{" "}
+            대각선 <strong>위</strong>에 있으면 관리자가 더 높게,{" "}
             <strong>아래</strong>면 본인이 더 높게 본 사람입니다.
           </p>
 
@@ -173,7 +173,7 @@ export function AgreementPanel({ data }: { data: RatingCompare }) {
             height={460}
             points={cur.points.map((p) => ({
               id: p.id,
-              name: `${p.name} · 본인 ${Math.round(p.self)} → 대표님 ${Math.round(p.boss)}`,
+              name: `${p.name} · 본인 ${Math.round(p.self)} → 관리자 ${Math.round(p.boss)}`,
               x: p.self,
               y: p.boss,
               quality: "ok",
@@ -204,11 +204,11 @@ export function AgreementPanel({ data }: { data: RatingCompare }) {
                 : []),
             ]}
             xLabel="본인 답"
-            yLabel="대표님 평가"
+            yLabel="관리자 평가"
           />
 
           <p className="text-axis text-ink-muted mt-3">
-            대표님 평가가 본인 답보다 평균{" "}
+            관리자 평가가 본인 답보다 평균{" "}
             <strong className="tabular">
               {cur.meanShift >= 0 ? "+" : "−"}
               {Math.abs(cur.meanShift).toFixed(1)}점

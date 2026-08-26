@@ -76,7 +76,7 @@ export function SourcePicker({
           background: open ? "var(--wash)" : "transparent",
           outline: "1px solid var(--border)",
         }}
-        title={ready ? "눌러서 바꿉니다" : "대표님 평가가 아직 없습니다"}
+        title={ready ? "눌러서 바꿉니다" : "관리자 평가가 아직 없습니다"}
       >
         {SOURCE_LABEL[value]}
         {ready ? (
@@ -88,7 +88,7 @@ export function SourcePicker({
             바꾸기 {open ? "▴" : "▾"}
           </span>
         ) : (
-          <span className="text-axis text-ink-muted">대표님 평가 없음</span>
+          <span className="text-axis text-ink-muted">관리자 평가 없음</span>
         )}
       </button>
 

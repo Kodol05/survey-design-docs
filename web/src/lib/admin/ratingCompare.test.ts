@@ -12,7 +12,7 @@ import { ratingToPercent } from "./abilitySource";
 const NOTABLE = 15;
 
 describe("두 값을 같은 자에 놓기", () => {
-  it("대표님 1~10이 본인 0~100과 같은 눈금이 된다", () => {
+  it("관리자 1~10이 본인 0~100과 같은 눈금이 된다", () => {
     expect(ratingToPercent(1)).toBe(0);
     expect(ratingToPercent(10)).toBe(100);
   });

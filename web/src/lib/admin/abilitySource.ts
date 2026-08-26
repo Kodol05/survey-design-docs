@@ -20,13 +20,13 @@ export type AbilitySource = (typeof ABILITY_SOURCES)[number];
 
 export const SOURCE_LABEL: Record<AbilitySource, string> = {
   self: "직원 설문 직무능력",
-  boss: "대표님 평가 직무능력",
+  boss: "관리자 평가 직무능력",
   mean: "두 값 평균",
 };
 
 export const SOURCE_NOTE: Record<AbilitySource, string> = {
   self: "본인이 설문에서 답한 값입니다. 성향과 같은 설문이라 관련도가 실제보다 높게 나올 수 있습니다.",
-  boss: "대표님이 1~10으로 매긴 값을 0~100으로 옮긴 것입니다. 성향과 출처가 달라 대조축으로는 이쪽이 낫습니다.",
+  boss: "관리자가 1~10으로 매긴 값을 0~100으로 옮긴 것입니다. 성향과 출처가 달라 대조축으로는 이쪽이 낫습니다.",
   mean: "두 값을 반씩 섞은 것입니다. 훑어볼 때 쓰고, 관련도를 따질 때는 한쪽만 보는 편이 낫습니다.",
 };
 

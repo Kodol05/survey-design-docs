@@ -9,7 +9,7 @@ const NAV = [
   { href: "/admin", label: "관리자", exact: true },
   { href: "/admin/stats", label: "분석" },
   { href: "/admin/employees", label: "구성원" },
-  { href: "/admin/ratings", label: "대표님 평가" },
+  { href: "/admin/ratings", label: "관리자 평가" },
   { href: "/admin/items", label: "문항" },
 ];
 
