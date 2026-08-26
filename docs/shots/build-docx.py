@@ -59,8 +59,11 @@ def style(doc):
     n.font.name = "맑은 고딕"
     n.font.size = Pt(10.5)
     n.font.color.rgb = INK
-    n.paragraph_format.space_after = Pt(7)
-    n.paragraph_format.line_spacing = 1.5
+    # ⚠️ 한 문단 **안**의 줄 간격은 좁게, 문단 **사이**는 넓게 (2026-08-26).
+    # 1.5로 두었더니 한 문단이 뜯어져 보였다. 줄이 멀면 이어지는 문장인지
+    # 새 이야기인지 눈이 못 가른다. 문단 구분은 사이 여백이 맡는다.
+    n.paragraph_format.space_after = Pt(11)
+    n.paragraph_format.line_spacing = 1.25
     # 한글 글꼴은 동아시아 속성에도 따로 넣어야 적용된다
     rpr = n.element.get_or_add_rPr()
     rfonts = rpr.get_or_add_rFonts()
