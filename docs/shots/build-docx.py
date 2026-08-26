@@ -5,7 +5,10 @@
     python docs/shots/build-docx.py
 
 `보고서-화면안내.md` 하나를 읽어 둘 다 만든다. 글은 완전히 같고 사진 유무만
-다르다 — 문구를 고치실 때는 `.md` 만 고치고 이걸 다시 돌리면 된다.
+다르다. 문구를 고칠 때는 `.md` 만 고치고 이걸 다시 돌리면 된다.
+
+⚠️ 워드로 파일을 열어 둔 채로 돌리면 「Permission denied」 로 막힌다.
+   닫고 다시 돌려야 한다.
 
 사진을 어느 제목 뒤에 넣을지는 `build.mjs` 와 같은 목록을 쓴다. 두 곳에
 따로 적으면 한쪽만 고쳤을 때 어긋난다.
@@ -56,18 +59,19 @@ def style(doc):
     n.font.name = "맑은 고딕"
     n.font.size = Pt(10.5)
     n.font.color.rgb = INK
-    n.paragraph_format.space_after = Pt(8)
-    n.paragraph_format.line_spacing = 1.6
+    n.paragraph_format.space_after = Pt(7)
+    n.paragraph_format.line_spacing = 1.5
     # 한글 글꼴은 동아시아 속성에도 따로 넣어야 적용된다
     rpr = n.element.get_or_add_rPr()
     rfonts = rpr.get_or_add_rFonts()
     from docx.oxml.ns import qn
     rfonts.set(qn("w:eastAsia"), "맑은 고딕")
 
+    # 제목 크기 차이를 크게 두지 않는다. 꾸미는 것보다 어디가 끊기는지가 중요하다
     for name, size, before in [
-        ("Heading 1", 17, 24),
-        ("Heading 2", 13.5, 20),
-        ("Heading 3", 11.5, 16),
+        ("Heading 1", 15, 22),
+        ("Heading 2", 12.5, 18),
+        ("Heading 3", 11, 14),
     ]:
         s = doc.styles[name]
         s.font.name = "맑은 고딕"
@@ -101,7 +105,7 @@ def add_images(doc, heading):
         if not os.path.exists(path):
             print("  사진 없음:", file)
             continue
-        doc.add_picture(path, width=Cm(16))
+        doc.add_picture(path, width=Cm(15))
         doc.paragraphs[-1].alignment = WD_ALIGN_PARAGRAPH.CENTER
         cap = doc.add_paragraph()
         cap.alignment = WD_ALIGN_PARAGRAPH.CENTER
