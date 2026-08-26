@@ -154,8 +154,24 @@ export async function adminLogin(
   });
 }
 
+/**
+ * 로그아웃.
+ *
+ * ⚠️ **여기만 감싸는 것이 빠져 있었다** (2026-08-26 점검에서 발견).
+ * DB가 끊긴 채로 로그아웃을 누르면 Prisma 오류가 그대로 올라가 화면에
+ * 내부 경로가 찍힌다 — `guarded()`를 둔 이유가 바로 그것이다.
+ *
+ * 다만 **쿠키는 어떻게든 지운다.** DB에서 행을 못 지워도 브라우저에서
+ * 쿠키가 없어지면 로그아웃된 것이나 마찬가지다. 「로그아웃을 눌렀는데
+ * 그대로 로그인 상태」가 가장 나쁘다.
+ */
 export async function logout() {
-  await destroySession();
+  try {
+    await destroySession();
+  } catch (e) {
+    unstable_rethrow(e);
+    console.error("[auth] 로그아웃", e);
+  }
   redirect("/login");
 }
 
