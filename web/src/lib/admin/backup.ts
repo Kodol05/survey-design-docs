@@ -43,6 +43,27 @@ export const INTERVAL_HOURS = 24;
 export const BACKUP_DIR =
   process.env.BACKUP_DIR ?? path.join(process.cwd(), "backups");
 
+/**
+ * 여기서 백업을 받을 수 있는가.
+ *
+ * 백업은 **DB 옆에서 도는 서버**를 전제로 한다 — `pg_dump` 를 부르고 그
+ * 결과를 디스크에 쓴다. 서버리스(Vercel 등)에는 **둘 다 없다.** 요청 하나
+ * 처리하고 사라지므로 디스크에 쓴 것이 다음 요청 때 없고, 도커도 없다.
+ *
+ * 그런 곳에서는 **끄는 것이 맞다.** 되지도 않을 일을 화면 열 때마다
+ * 시도하면 느려지기만 하고, 「백업이 없습니다」가 뜨면 관리자는 뭔가
+ * 잘못된 줄 안다. 대신 그런 서비스는 **자기들이 백업을 해준다.**
+ *
+ * ⚠️ **사내 서버로 옮기면 저절로 켜진다.** `BACKUP_OFF` 를 안 주면 되고,
+ * `VERCEL` 은 Vercel 이 스스로 넣는 값이라 사내에서는 없다. 되돌릴 것이
+ * 없다는 뜻이다 (`13-backup-restore.md`).
+ */
+export function backupSupported(): boolean {
+  if (process.env.BACKUP_OFF === "1") return false;
+  if (process.env.VERCEL) return false;
+  return true;
+}
+
 export type Backup = {
   name: string;
   path: string;
@@ -135,6 +156,7 @@ export async function createBackup(): Promise<Backup> {
  * 실패는 화면의 「마지막 백업」 시각이 그대로인 것으로 드러난다.
  */
 export async function ensureBackup(): Promise<Backup | null> {
+  if (!backupSupported()) return null;
   try {
     const [latest] = await listBackups();
     if (
