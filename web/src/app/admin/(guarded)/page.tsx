@@ -9,7 +9,12 @@ import { requireAdmin } from "@/lib/auth/guard";
 import { formatRatio } from "@/components/analysis/correlationColor";
 import { EXPECTED } from "@/lib/items/types";
 import { loadDashboard } from "@/lib/admin/dashboard";
-import { INTERVAL_HOURS, KEEP_COUNT, type Backup } from "@/lib/admin/backup";
+import {
+  INTERVAL_HOURS,
+  KEEP_COUNT,
+  backupSupported,
+  type Backup,
+} from "@/lib/admin/backup";
 import { TopRelations } from "./TopRelations";
 
 export const metadata = { title: "대시보드 — 관리자" };
@@ -338,9 +343,36 @@ export default async function AdminHome() {
         <h2 className="text-section-title mb-4 border-b border-[--border] pb-2">
           데이터 백업
         </h2>
-        <BackupCard backups={backups} hours={backupAgeHours} />
+        {backupSupported() ? (
+          <BackupCard backups={backups} hours={backupAgeHours} />
+        ) : (
+          <BackupElsewhere />
+        )}
       </section>
     </>
+  );
+}
+
+/**
+ * 백업을 이 서버에서 안 받을 때.
+ *
+ * 아무것도 안 보여주면 **관리자는 백업이 없다고 오해한다.** 실제로는 올린
+ * 곳이 대신 받고 있으므로, 「없다」가 아니라 「여기서 안 한다」를 말한다.
+ */
+function BackupElsewhere() {
+  return (
+    <div
+      className="text-axis rounded-xl p-5"
+      style={{ background: "var(--wash)", color: "var(--ink-secondary)" }}
+    >
+      <p className="text-table font-medium" style={{ color: "var(--ink)" }}>
+        이 서버에서는 백업을 받지 않습니다
+      </p>
+      <p className="mt-2 leading-relaxed">
+        올린 곳에서 데이터베이스를 자동으로 백업하고 있습니다. 사내 서버로
+        옮기면 여기서 직접 받는 방식으로 돌아갑니다.
+      </p>
+    </div>
   );
 }
 

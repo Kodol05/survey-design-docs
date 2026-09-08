@@ -19,6 +19,24 @@ const nextConfig: NextConfig = {
   outputFileTracingIncludes: {
     "/*": ["./data/research-correlations.yaml"],
   },
+
+  /*
+    검색에 안 걸리게 한다 (2026-08-27).
+
+    `robots.ts` 는 「긁지 말아 달라」는 **부탁**이라 지키지 않는 크롤러가
+    있다. 이 헤더는 색인 자체를 막는 지시라 한 겹 더 두껍다. 둘 다 둔다.
+
+    ⚠️ 어느 쪽도 자물쇠는 아니다. **실제 방어는 로그인이다** — 로그인 없이는
+    첫 화면 말고 아무것도 안 보인다.
+  */
+  async headers() {
+    return [
+      {
+        source: "/:path*",
+        headers: [{ key: "X-Robots-Tag", value: "noindex, nofollow" }],
+      },
+    ];
+  },
 };
 
 export default nextConfig;

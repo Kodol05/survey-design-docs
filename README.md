@@ -58,7 +58,8 @@ npm run share             # 밖에서 열 수 있는 임시 주소 (cloudflared 
 | [00 설계 작업본](docs/00-design-notes.md) | 결정 기록 — 무엇을 왜 그렇게 정했는지 |
 | [15 테스트](docs/15-테스트.md) | 두 갈래 테스트와 시험용 DB |
 | [13 백업·복구](docs/13-backup-restore.md) | 덤프 받기와 되돌리기 |
-| [14 올리기](docs/14-올리기.md) | 밖에서 열 수 있게 하기 |
+| [14 올리기](docs/14-올리기.md) | 밖에서 열 수 있게 하기 (임시 터널) |
+| [16 Vercel 배포](docs/16-vercel-배포.md) | PC 를 꺼도 열리는 주소 만들기 |
 | [12 남은 일](docs/12-backlog.md) | 아직 안 한 것 |
 
 **설계와 근거**
