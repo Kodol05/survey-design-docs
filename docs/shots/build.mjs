@@ -81,6 +81,21 @@ const inline = (s) =>
 // ── 조립 ──
 let md = readFileSync(DOC, "utf8");
 
+/*
+  접속 주소는 문서 원본에 적지 않는다. **저장소가 공개**라 주소가 알려지면
+  아무나 가입할 수 있고, 그 답이 평균과 상관에 그대로 섞인다.
+
+  주소는 커밋되지 않는 `site-url.txt`(gitignore)에 두고 만들 때만 끼운다.
+  파일이 없으면 주소 없이 만들어진다 — 받아서 바로 돌려도 깨지지 않는다.
+*/
+const urlFile = path.join(HERE, "site-url.txt");
+if (existsSync(urlFile)) {
+  const url = readFileSync(urlFile, "utf8").trim();
+  const NL = String.fromCharCode(10);
+  const at = md.indexOf(NL); // 첫 제목 줄 끝
+  if (url && at > 0) md = md.slice(0, at + 1) + NL + url + NL + md.slice(at + 1);
+}
+
 // 제목 뒤에 사진을 끼운다. 제목이 빈 문자열이면 바로 앞 사진 뒤에 이어 붙인다
 let pending = [];
 for (const [heading, file, caption] of SHOTS) {

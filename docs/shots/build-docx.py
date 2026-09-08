@@ -125,6 +125,16 @@ def build(with_images, out_name):
         s.left_margin = s.right_margin = Cm(2.5)
 
     md = io.open(SRC, encoding="utf-8").read()
+
+    # 접속 주소는 커밋되지 않는 site-url.txt 에 있다 (build.mjs 와 같은 이유).
+    # 파일이 없으면 주소 없이 만들어진다.
+    url_file = os.path.join(HERE, "site-url.txt")
+    if os.path.exists(url_file):
+        url = io.open(url_file, encoding="utf-8").read().strip()
+        nl = chr(10)
+        at = md.find(nl)  # 첫 제목 줄 끝
+        if url and at > 0:
+            md = md[: at + 1] + nl + url + nl + md[at + 1 :]
     for raw in md.split("\n"):
         line = raw.rstrip()
 

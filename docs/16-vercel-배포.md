@@ -1,7 +1,8 @@
 # Vercel 에 올리기
 
-> **올라가 있습니다 (2026-09-08).** https://survey-design-docs.vercel.app
-> 주소는 바뀌지 않고, 이 PC 가 꺼져 있어도 열립니다.
+> **올라가 있습니다 (2026-09-08).** 주소는 바뀌지 않고, 이 PC 가 꺼져 있어도 열립니다.
+> 실제 주소는 저장소에 적지 않습니다 — 가입이 아직 열려 있어서, 주소가 알려지면
+> 모르는 사람의 응답이 평균과 상관에 섞입니다.
 
 PC 를 꺼도 열리는 주소를 만드는 방법입니다. **사내 서버로 옮기기 전까지 쓰는 임시 자리**입니다.
 
@@ -71,7 +72,7 @@ npx dotenv -e .env.vercel -- npx tsx scripts/seed-ratings.mts
 vercel deploy --prod
 ```
 
-주소는 `survey-design-docs.vercel.app` 으로 **고정**입니다. `vercel git connect` 를
+주소는 `<프로젝트이름>.vercel.app` 으로 **고정**입니다. `vercel git connect` 를
 해 두면 GitHub 에 밀 때마다 저절로 올라갑니다.
 
 ## 올린 뒤 두들겨 본 것 (2026-09-08)
