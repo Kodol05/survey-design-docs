@@ -132,4 +132,4 @@ Vercel 때문에 더한 것들은 **전부 환경변수로 갈리거나 있어�
 | `robots.ts` · `X-Robots-Tag` | 그대로 두면 됩니다 |
 | `outputFileTracingIncludes` | `output: standalone` 으로 이미지를 줄일 때 **필요합니다** |
 
-사내 배포 자체는 [14 올리기](14-올리기.md)와 [13 백업·복구](13-backup-restore.md)를 보세요.
+사내 배포 자체는 [13 백업·복구](13-backup-restore.md)를 보세요.
