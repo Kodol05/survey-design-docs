@@ -1,5 +1,8 @@
 # Vercel 에 올리기
 
+> **올라가 있습니다 (2026-09-08).** https://survey-design-docs.vercel.app
+> 주소는 바뀌지 않고, 이 PC 가 꺼져 있어도 열립니다.
+
 PC 를 꺼도 열리는 주소를 만드는 방법입니다. **사내 서버로 옮기기 전까지 쓰는 임시 자리**입니다.
 
 ## 무엇이 어디서 도나
@@ -64,7 +67,35 @@ npx dotenv -e .env.vercel -- npx tsx scripts/seed-ratings.mts
 
 ### 5. 배포
 
-GitHub 에 밀면 자동으로 올라갑니다. 주소는 `프로젝트이름.vercel.app` 으로 **고정**입니다.
+```bash
+vercel deploy --prod
+```
+
+주소는 `survey-design-docs.vercel.app` 으로 **고정**입니다. `vercel git connect` 를
+해 두면 GitHub 에 밀 때마다 저절로 올라갑니다.
+
+## 올린 뒤 두들겨 본 것 (2026-09-08)
+
+| | |
+|---|---|
+| 첫 화면 · 가입 · 관리자 로그인 | 200. 첫 접속 1.1초, 이후 **0.25초** |
+| 로그인 없이 관리자 화면 | 전부 `/admin/login` 으로 튕김. 이름도 번호도 **한 건 안 샘** |
+| 백업 · CSV 내려받기 | **307 로 차단** |
+| 검색 노출 | `robots.txt` Disallow + `X-Robots-Tag: noindex` 둘 다 걸림 |
+| Neon 데이터 | 사람 43 · 문항 120 · 응답 4,320 · 결과 36 · 평가 108 |
+| 실행 중 오류 로그 | 없음 |
+
+### 겪은 것 둘
+
+**`vercel integration add neon` 을 두 번 돌리지 마세요.** 이미 `DATABASE_URL` 이
+있으면 연결에 실패하면서 **빈 DB 만 하나 더 생깁니다.** 지울 때는
+`vercel integration-resource remove <이름> --yes`. 지우기 전에
+`integration-resource inspect <이름>` 으로 **「No connected projects」 인지 반드시
+확인하세요** — 쓰고 있는 것을 지우면 데이터가 사라집니다.
+
+**마이그레이션은 `DATABASE_URL_UNPOOLED` 로 돌립니다.** 기본 `DATABASE_URL` 은
+연결을 모아 쓰는 주소라 표를 만들고 지우는 명령이 중간에 깨집니다. 앱이 쓸 때는
+모아 쓰는 쪽이 맞습니다 — 서버리스는 요청마다 새로 붙기 때문입니다.
 
 ## 여기서 달라지는 것
 
