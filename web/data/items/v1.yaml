@@ -44,7 +44,7 @@ items:
     code: NS1-01
     scale: 자극추구
     subscale: 탐색적 흥분
-    content: 처음 맡는 거래처를 배정받으면 부담보다 흥미가 앞선다.
+    content: 처음 맡아 보는 일에는 부담보다 흥미가 앞선다.
     sourceRef: 한국판 TCI-RS 탐색적 흥분 facet 정의 · IPIP Variety-seeking 참고(.72)
     antonymOf: NS1-02
 
@@ -52,7 +52,7 @@ items:
     code: NS1-02
     scale: 자극추구
     subscale: 탐색적 흥분
-    content: 늘 하던 방식대로 하는 일이 마음이 편하다.
+    content: 익숙한 방식대로 일할 때 마음이 편하다.
     reverse: true
     sourceRef: 한국판 TCI-RS 관습적 안정성(양극 반대편) · NS1-01의 반대 방향
     antonymOf: NS1-01
@@ -61,14 +61,14 @@ items:
     code: NS1-03
     scale: 자극추구
     subscale: 탐색적 흥분
-    content: 안 가본 동네나 새로 생긴 곳을 굳이 찾아가 보는 편이다.
+    content: 낯선 곳이나 새로 생긴 곳을 찾아가 보는 것을 좋아한다.
     sourceRef: 한국판 TCI-RS 탐색적 흥분 facet 정의 · IPIP Variety-seeking 참고
 
   - kind: trait
     code: NS1-04
     scale: 자극추구
     subscale: 탐색적 흥분
-    content: 늘 하던 방식보다 안 해본 방식에 먼저 눈이 간다.
+    content: 익숙한 방법보다 안 해 본 방법에 먼저 눈이 간다.
     # 2026-08-25 고침. 전 문장은 「회의에서 아무도 꺼내지 않은 방식을 먼저
     # 말해보는 편이다」였는데 **「회의에서 말한다」**가 끼어 있어 새로움
     # 추구가 아니라 **발언 자신감·직급**을 같이 쟀다. 신입은 새로움을
@@ -80,7 +80,7 @@ items:
     code: NS2-01
     scale: 자극추구
     subscale: 충동성
-    content: 괜찮아 보이는 일은 자세히 따져보기 전에 일단 시작한다.
+    content: 괜찮아 보이는 일은 깊이 따지기 전에 우선 시작한다.
     sourceRef: 한국판 TCI-RS 충동성 facet 정의 · IPIP Recklessness 참고(.60)
     antonymOf: NS2-02
 
@@ -88,7 +88,7 @@ items:
     code: NS2-02
     scale: 자극추구
     subscale: 충동성
-    content: 일을 정하기 전에 따져볼 것은 다 따져보고 넘어간다.
+    content: 일을 시작하기 전에 따져볼 것은 충분히 따져본다.
     reverse: true
     sourceRef: 한국판 TCI-RS 심사숙고(양극 반대편) · NS2-01의 반대 방향
     antonymOf: NS2-01
@@ -97,14 +97,14 @@ items:
     code: NS2-03
     scale: 자극추구
     subscale: 충동성
-    content: 하고 싶은 말이 떠오르면 담아두기가 어렵다.
+    content: 떠오른 말은 담아 두기보다 바로 꺼내는 편이다.
     sourceRef: 한국판 TCI-RS 충동성 facet 정의 · IPIP Recklessness 참고
 
   - kind: trait
     code: NS2-04
     scale: 자극추구
     subscale: 충동성
-    content: 언짢은 일이 있어도 한 박자 두고 반응하는 편이다.
+    content: 언짢은 일이 있어도 한 박자 두고 반응한다.
     reverse: true
     sourceRef: 한국판 TCI-RS 심사숙고(양극 반대편)
 
@@ -121,7 +121,7 @@ items:
     code: NS3-02
     scale: 자극추구
     subscale: 무절제
-    content: 쓸 돈은 미리 정해두고 그 안에서 쓴다.
+    content: 쓸 돈을 미리 정해 두고 그 안에서 쓴다.
     reverse: true
     sourceRef: 한국판 TCI-RS 절제(양극 반대편) · NS3-01의 반대 방향
     antonymOf: NS3-01
@@ -130,7 +130,7 @@ items:
     code: NS3-03
     scale: 자극추구
     subscale: 무절제
-    content: 재미있는 자리가 생기면 다음 날 일정을 생각하지 않고 끝까지 간다.
+    content: 즐거운 자리에서는 다음 일정을 미루고 끝까지 남는 편이다.
     sourceRef: 한국판 TCI-RS 무절제 facet 정의 · IPIP Extravagance 참고
 
   - kind: trait
@@ -153,7 +153,7 @@ items:
     code: NS4-02
     scale: 자극추구
     subscale: 자유분방
-    content: 정해진 규정은 번거로워도 그대로 따르는 편이다.
+    content: 번거로운 규정이라도 정해진 대로 따른다.
     reverse: true
     sourceRef: 한국판 TCI-RS 질서정연(양극 반대편) · NS4-01의 반대 방향
     antonymOf: NS4-01
@@ -162,7 +162,7 @@ items:
     code: NS4-03
     scale: 자극추구
     subscale: 자유분방
-    content: 미리 계획을 세우기보다 그때그때 정하는 편이 편하다.
+    content: 미리 계획하기보다 그때그때 정하는 편이 편하다.
     sourceRef: 한국판 TCI-RS 자유분방 facet 정의
 
   # ══ 위험회피 (HA) ══════════════════════════════════════════════════
@@ -457,7 +457,7 @@ items:
     code: PS1-04
     scale: 인내력
     subscale: 근면
-    content: 쉬는 날에도 해둘 일이 있으면 해두는 편이다.
+    content: 쉬는 날에도 할 일이 있으면 미리 해 두는 편이다.
     sourceRef: 한국판 TCI-RS 근면 facet 정의
 
   # ── 끈기 ──
@@ -586,7 +586,7 @@ items:
     code: SD2-01
     scale: 자율성
     subscale: 목적의식
-    content: 지금 하는 일이 어디로 가는 일인지 스스로 알고 있다.
+    content: 지금 하는 일이 무엇을 위한 것인지 스스로 알고 있다.
     sourceRef: 한국판 TCI-RS 목적의식 facet 정의 · IPIP Optimism 참고(.69) · 직장 맥락
     antonymOf: SD2-03
 
