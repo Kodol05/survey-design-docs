@@ -109,7 +109,7 @@ export default async function EmployeesPage(props: {
             on={!sortKey}
             dir={!sortKey ? sortDir : undefined}
           >
-            이름
+            최근 응시순
           </SortChip>
         </SortRow>
 
