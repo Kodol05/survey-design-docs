@@ -146,43 +146,52 @@ export async function submitAction(sessionId: string) {
     const startedAt = session.startedAt.getTime();
     const durationSec = Math.round((Date.now() - startedAt) / 1000);
 
-    await prisma.$transaction([
-      prisma.testSession.update({
-        where: { id: sessionId },
-        data: { status: "COMPLETED", completedAt: new Date(), durationSec },
-      }),
-      prisma.result.upsert({
-        where: { sessionId },
-        create: {
-          sessionId,
-          scoresJson: scores.traits,
-          abilityScoresJson: scores.abilities,
-          // 결과 화면은 채점 시점 값으로 고정한다 (D-09)
-          snapshotJson: { traits: scores.traits, abilities: scores.abilities },
-        },
-        update: {
-          scoresJson: scores.traits,
-          abilityScoresJson: scores.abilities,
-          snapshotJson: { traits: scores.traits, abilities: scores.abilities },
-        },
-      }),
-      prisma.qualityFlag.upsert({
-        where: { sessionId },
-        create: {
-          sessionId,
-          meanElapsedMs: quality.meanElapsedMs,
-          fastCount: quality.fastCount,
-          antonymAgreement: quality.antonymAgreement,
-          flag: quality.flag,
-        },
-        update: {
-          meanElapsedMs: quality.meanElapsedMs,
-          fastCount: quality.fastCount,
-          antonymAgreement: quality.antonymAgreement,
-          flag: quality.flag,
-        },
-      }),
-    ]);
+    /*
+      DB 트랜잭션 대신 **안전한 순서**로 쓴다 (2026-09-18).
+
+      Neon 은 HTTP 드라이버로 붙는데 이건 트랜잭션을 지원하지 않는다
+      (`lib/db.ts` 참고 — 서버 끊김을 없애기 위한 선택). 대신 지켜야 할
+      단 하나의 규칙은 「세션이 COMPLETED 면 결과가 반드시 있다」이다.
+
+      그래서 **결과와 품질을 먼저 쓰고, 세션 완료를 맨 마지막에** 한다.
+      앞의 둘이 실패하면 세션은 IN_PROGRESS 로 남아 사용자가 다시 제출하면
+      되고, 셋 다 sessionId 로 upsert 라 다시 눌러도 값이 겹치지 않는다.
+    */
+    await prisma.result.upsert({
+      where: { sessionId },
+      create: {
+        sessionId,
+        scoresJson: scores.traits,
+        abilityScoresJson: scores.abilities,
+        // 결과 화면은 채점 시점 값으로 고정한다 (D-09)
+        snapshotJson: { traits: scores.traits, abilities: scores.abilities },
+      },
+      update: {
+        scoresJson: scores.traits,
+        abilityScoresJson: scores.abilities,
+        snapshotJson: { traits: scores.traits, abilities: scores.abilities },
+      },
+    });
+    await prisma.qualityFlag.upsert({
+      where: { sessionId },
+      create: {
+        sessionId,
+        meanElapsedMs: quality.meanElapsedMs,
+        fastCount: quality.fastCount,
+        antonymAgreement: quality.antonymAgreement,
+        flag: quality.flag,
+      },
+      update: {
+        meanElapsedMs: quality.meanElapsedMs,
+        fastCount: quality.fastCount,
+        antonymAgreement: quality.antonymAgreement,
+        flag: quality.flag,
+      },
+    });
+    await prisma.testSession.update({
+      where: { id: sessionId },
+      data: { status: "COMPLETED", completedAt: new Date(), durationSec },
+    });
 
     redirect("/me");
   });

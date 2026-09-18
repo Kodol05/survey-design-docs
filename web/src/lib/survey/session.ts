@@ -132,25 +132,35 @@ export async function sessionProgress(sessionId: string) {
   return { saved: s._count.responses, total };
 }
 
-/** 섹션 단위로 저장한다. 문항마다 서버로 보내면 120번 왕복이 된다 (01 §2.6). */
+/**
+ * 섹션 단위로 저장한다. 문항마다 서버로 보내면 120번 왕복이 된다 (01 §2.6).
+ *
+ * ## 왜 트랜잭션이 아닌가 (2026-09-18)
+ *
+ * Neon 에는 HTTP 드라이버로 붙는데 이건 트랜잭션을 지원하지 않는다
+ * (`lib/db.ts` 참고 — 밖에서 서버가 끊기던 문제를 없애기 위한 선택).
+ *
+ * 대신 **쓰기 전에 값을 전부 검사한다.** 하나라도 1~7 밖이면 어떤 것도 쓰기
+ * 전에 멈춘다. 각 응답은 (세션·문항)으로 upsert 라 같은 묶음을 다시 저장해도
+ * 값이 덮어써질 뿐 겹치지 않는다. 저장 도중 끊겨 일부만 들어가도, 다음에
+ * 이어하기로 그 묶음을 다시 저장하면 마저 채워진다.
+ */
 export async function saveSection(sessionId: string, drafts: DraftResponse[]) {
   for (const d of drafts) {
     if (!Number.isInteger(d.value) || d.value < 1 || d.value > 7)
       throw new Error(`응답값이 ${d.value}입니다. 1~7이어야 합니다`);
   }
-  await prisma.$transaction(
-    drafts.map((d) =>
-      prisma.response.upsert({
-        where: { sessionId_itemId: { sessionId, itemId: d.itemId } },
-        create: { sessionId, ...d },
-        update: {
-          value: d.value,
-          elapsedMs: d.elapsedMs,
-          changedCount: d.changedCount,
-        },
-      }),
-    ),
-  );
+  for (const d of drafts) {
+    await prisma.response.upsert({
+      where: { sessionId_itemId: { sessionId, itemId: d.itemId } },
+      create: { sessionId, ...d },
+      update: {
+        value: d.value,
+        elapsedMs: d.elapsedMs,
+        changedCount: d.changedCount,
+      },
+    });
+  }
 }
 
 /** 아직 답하지 않은 문항이 있는 첫 섹션. 전부 답했으면 null. */

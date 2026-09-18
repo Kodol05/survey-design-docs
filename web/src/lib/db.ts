@@ -1,4 +1,5 @@
 import { PrismaPg } from "@prisma/adapter-pg";
+import { PrismaNeonHttp } from "@prisma/adapter-neon";
 import { PrismaClient } from "@/generated/prisma/client";
 
 /**
@@ -9,62 +10,49 @@ import { PrismaClient } from "@/generated/prisma/client";
  */
 
 /**
- * 서버리스(Vercel) + 잠드는 DB(Neon) 조합에서 나던 두 증상을 막는 설정이다
- * (2026-09-18. 사용자가 밖에서 열어 보다가 발견).
+ * ## 두 가지 드라이버를 주소 보고 고른다 (2026-09-18)
  *
- *   ① DB 오류가 뜨고, 새로고침하면 된다
- *   ② 오류는 안 뜨는데 다음 화면으로 안 넘어가고 멈춘다
+ * 밖에서 열어 보다가 **가끔 서버가 끊기는** 증상이 있었다. DB 오류가 뜨고
+ * 새로고침하면 되는 것, 그리고 오류 없이 멈추는 것. 원인은 하나다 —
  *
- * ## 왜 이런 일이 생기나
+ * Vercel 은 요청이 끝나면 컨테이너를 **얼린다.** 그 사이 Neon 무료 요금제는
+ * 5분이면 잠들며 TCP 커넥션을 끊는다. 다음 요청 때 컨테이너가 깨면서 풀에
+ * 남아 있던 **죽은 커넥션**을 꺼내 쓰면 503 이 난다. `pg` 풀은 커넥션을
+ * 꺼낼 때 살아있는지 검사하지 않기 때문에 첫 요청이 실패한다.
  *
- * Vercel 은 요청이 끝나면 컨테이너를 **얼린다.** 프로세스를 죽이는 게 아니라
- * 멈춰 세우는 것이라, 안에 있던 커넥션 풀이 그대로 살아 있는 것처럼 남는다.
- * 그런데 **타이머가 같이 얼어서 안 돈다.** `idleTimeoutMillis` 로 「10초 놀면
- * 닫는다」고 해둬도 그 10초가 흐르지 않는다.
+ * 그래서 **Neon 에는 HTTP 드라이버**를 쓴다. 매 질의가 새 HTTP 요청이라
+ * 오래 사는 소켓이 아예 없다 — 얼든 잠들든 상관이 없다. Vercel + Neon 조합의
+ * 정석이다.
  *
- * 그 사이 Neon 무료 요금제는 **5분만 안 쓰면 잠들고 커넥션을 끊는다.** 다음
- * 요청이 오면 컨테이너가 녹으면서 풀에 남아 있던 **이미 끊긴 커넥션**을 꺼내
- * 쓴다 → ①. 새로고침하면 풀이 그것을 버리고 새로 열기 때문에 된다.
+ * 로컬 개발과 테스트는 Neon 이 아니라 **도커 PostgreSQL**(localhost)이다.
+ * HTTP 드라이버는 Neon 전용이라 여기선 못 쓴다. 그래서 주소에 `neon.tech`
+ * 가 있으면 HTTP, 아니면 기존 `pg` 로 간다.
  *
- * ②는 기본값에 **`connectionTimeoutMillis` 가 없어서** 생긴다. 없으면 무한정
- * 기다린다. Neon 이 깨는 데 오래 걸리면 요청이 매달린 채로 있다가 Vercel 쪽
- * 시간 제한에 걸려 끊긴다. 서버가 오류를 돌려준 게 아니라 **응답 자체가 없는**
- * 것이라, 화면에서는 버튼만 멈추고 아무 문장도 안 뜬다.
+ * ⚠️ HTTP 드라이버는 **트랜잭션을 아예 지원하지 않는다**(배열 형·콜백 형 모두).
+ * 그래서 `$transaction` 은 쓰지 않는다 — 대신 쓰기 순서를 안전하게 잡고
+ * 각 쓰기를 idempotent upsert 로 둔다(`survey/actions.ts`·`survey/session.ts`
+ * 참고). `$transaction` 을 새로 쓰려면 이 드라이버 선택을 다시 봐야 한다.
  *
- * ## 값을 이렇게 잡은 이유
+ * ## 로컬 pg 풀 설정
  *
- * `max` — 컨테이너 하나가 동시에 처리하는 요청은 많지 않다. 10 개를 열어 두면
- * 얼었다 녹을 때 **죽은 커넥션이 그만큼 쌓인다.** 적게 잡을수록 ①이 줄어든다.
- *
- * `connectionTimeoutMillis` — 무한 대기를 없애는 것이 핵심이다. 8초 안에 못
- * 붙으면 포기하고 오류를 던진다. 그러면 위쪽 `try` 가 잡아 **사람에게 보이는
- * 문장**으로 바꾼다 (`lib/survey/actions.ts` 의 `guarded`). 멈춘 화면보다
- * 「잠시 후 다시 눌러 주세요」가 낫다.
- *
- * `idleTimeoutMillis` — 얼지 않은 동안에는 빨리 닫아 죽은 커넥션이 될 틈을
- * 줄인다. 얼어 있는 동안 안 도는 것은 위에 적은 대로다.
- *
- * `allowExitOnIdle` — 풀이 비면 프로세스가 끝날 수 있게 한다. 남은 커넥션
- * 하나 때문에 컨테이너가 안 죽는 일을 막는다.
- *
- * ⚠️ **사내 서버로 옮기면 이 값들은 굳이 필요 없다.** 컨테이너가 얼지도 않고
- * DB 가 잠들지도 않는다. 그래도 해롭지 않으니 그대로 둔다 — `max` 만 사람
- * 수에 맞춰 올리면 된다.
+ * 사내 서버(도커)로 옮기면 컨테이너가 얼지도 DB 가 잠들지도 않아 아래 값은
+ * 굳이 필요 없지만 해롭지도 않다. `max` 만 사람 수에 맞춰 올리면 된다.
  */
-const POOL = {
-  max: 3,
-  connectionTimeoutMillis: 8_000,
-  idleTimeoutMillis: 5_000,
-  allowExitOnIdle: true,
-} as const;
+const url = process.env.DATABASE_URL ?? "";
+const isNeon = url.includes("neon.tech");
 
-const makeClient = () =>
-  new PrismaClient({
-    adapter: new PrismaPg({
-      connectionString: process.env.DATABASE_URL,
-      ...POOL,
-    }),
-  });
+const makeAdapter = () =>
+  isNeon
+    ? new PrismaNeonHttp(url, {})
+    : new PrismaPg({
+        connectionString: url,
+        max: 3,
+        connectionTimeoutMillis: 8_000,
+        idleTimeoutMillis: 5_000,
+        allowExitOnIdle: true,
+      });
+
+const makeClient = () => new PrismaClient({ adapter: makeAdapter() });
 
 const globalForPrisma = globalThis as unknown as {
   prisma?: ReturnType<typeof makeClient>;

@@ -157,31 +157,46 @@ describe("묶음 저장", () => {
   });
 
   /*
-    ⚠️ **이 확인을 따로 두는 이유** (2026-08-26).
+    ⚠️ **트랜잭션이 없어졌으니 여기서 무엇이 남는지 못 박아 둔다** (2026-09-18).
 
-    처음에는 위 테스트 하나로 「통째로 취소된다」까지 확인한 줄 알았다.
-    그런데 `$transaction`을 `Promise.all`로 바꿔 놓아도 **그대로 통과했다.**
+    예전에는 이 저장이 `$transaction([...])` 한 덩어리라 「저장하다 실패하면
+    통째로 취소된다」였다. 지금은 Neon 을 HTTP 드라이버로 붙는데 이건
+    트랜잭션을 지원하지 않아(`lib/db.ts` 참고), **하나씩 순서대로 쓴다.**
+    그래서 저장 도중 DB 에서 걸리면 **앞의 정상 응답은 남는다.**
 
-    값 검사가 DB에 닿기 **전에** 다 걸러내기 때문이다. 잘못된 값으로는
-    저장 경로를 아예 안 지나니, 그 경로가 한 덩어리인지 아닌지는 확인되지
-    않는다. **통과하는 테스트가 곧 지켜지는 테스트는 아니다.**
+    그래도 사람 답이 뒤틀리지 않는 이유는 두 가지다 —
+    ① 값 1~7 검사가 DB 에 닿기 전에 다 끝나므로, 실제 응시에서 나올 수 있는
+       실패가 아니다(여기선 없는 문항으로 억지로 실패시킨다).
+    ② 각 응답이 (세션·문항)으로 upsert 라, 그 묶음을 다시 저장하면 남은 것은
+       채워지고 이미 쓴 것은 같은 값으로 덮여 **겹치지 않는다.**
 
-    그래서 **DB만 잡을 수 있는 실패**를 쓴다 — 없는 문항을 가리키는 답.
-    값은 멀쩡하니 앞 검사를 지나가고, 저장하다 외래키에서 걸린다.
+    이 테스트는 그 두 가지를 함께 못 박는다 — 중간에 걸리면 앞은 남고,
+    이어서 온전히 다시 저장하면 묶음이 정확히 완성된다.
   */
-  it("⚠️ 저장하다 실패하면 **통째로 취소된다** — 반쪽만 남으면 안 된다", async () => {
+  it("⚠️ 저장 도중 걸리면 앞부분은 남고, 다시 저장하면 온전히 채워진다", async () => {
     await seedAssessment();
     const me = await seedEmployee();
     const s = await getOrCreateSession(me.id);
     const { items } = await getSection(s.id, 1);
 
-    const mixed = [
+    const broken = [
       ...draftsFor(items),
       { itemId: "없는문항", value: 4, elapsedMs: 1000, changedCount: 0 },
     ];
 
-    await expect(saveSection(s.id, mixed)).rejects.toThrow();
-    expect(await prisma.response.count({ where: { sessionId: s.id } })).toBe(0);
+    // 없는 문항에서 외래키에 걸려 던진다. 하지만 앞의 정상 응답은 이미 쓰였다
+    await expect(saveSection(s.id, broken)).rejects.toThrow();
+    expect(await prisma.response.count({ where: { sessionId: s.id } })).toBe(
+      items.length,
+    );
+
+    // 이어하기로 그 묶음을 온전히 다시 저장하면, upsert 라 겹치지 않고 완성된다
+    await saveSection(s.id, draftsFor(items, 5));
+    expect(await prisma.response.count({ where: { sessionId: s.id } })).toBe(
+      items.length,
+    );
+    const one = await prisma.response.findFirst({ where: { sessionId: s.id } });
+    expect(one?.value).toBe(5);
   });
 });
 
