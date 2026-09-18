@@ -156,10 +156,10 @@ export default async function MePage(props: {
   const summary = (
     <>
       {/* 한 줄 헤더 */}
-      <header className="flex flex-wrap items-baseline justify-between gap-x-6 gap-y-1">
-        <div className="flex items-baseline gap-3">
+      <header className="flex flex-wrap items-end justify-between gap-x-6 gap-y-1">
+        <div>
+          <p className="eyebrow mb-1">7차원 성향 검사 · 결과 보고서</p>
           <h1 className="text-screen-title">{me.name} 님</h1>
-          <span className="text-axis text-ink-muted">7차원 성향 검사 결과</span>
         </div>
         <p className="text-axis text-ink-muted tabular">
           {result.completedAt?.toLocaleDateString("ko-KR")} 응시
@@ -175,6 +175,7 @@ export default async function MePage(props: {
           <TraitRadar
             data={traits.map((t) => ({ scale: t.scale, percent: t.percent }))}
             showValues
+            compact
           />
         </div>
 
@@ -200,7 +201,7 @@ export default async function MePage(props: {
                   />
                   {axisLink(t.scale)}
                 </span>
-                <span className="text-table truncate" title={LINE[t.scale]?.[t.band]}>
+                <span className="text-table lg:truncate" title={LINE[t.scale]?.[t.band]}>
                   {LINE[t.scale]?.[t.band]}
                 </span>
                 <span className="tabular text-table text-right font-medium">

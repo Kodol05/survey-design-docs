@@ -25,22 +25,46 @@ type TickProps = {
   y?: number | string;
   textAnchor?: string;
   values?: Map<string, number>;
+  compact?: boolean;
 };
 
-function Tick({ payload, x, y, textAnchor, values }: TickProps) {
+/**
+ * 결과지(종이 안)에서는 **작게** 그린다 — 글자 크기가 한 단 작은 자리라
+ * 19/21px 라벨은 차트를 압도한다. 긴 이름(「사회적민감성」)은 좁은 반지름에서
+ * 옆 축과 부딪히므로 **두 줄로 곱게 나눈다** (「사회적 / 민감성」).
+ */
+function Tick({ payload, x, y, textAnchor, values, compact }: TickProps) {
   const name = payload?.value ?? "";
   const v = values?.get(name);
+  const nameSize = compact ? 12 : 19;
+  const valueSize = compact ? 14 : 21;
+  const lines =
+    compact && name.length >= 6
+      ? [name.slice(0, Math.ceil(name.length / 2)), name.slice(Math.ceil(name.length / 2))]
+      : [name];
+  // 전체 블록(이름 줄들 + 값)이 꼭짓점을 중심으로 오게 위로 밀어 올린다
+  const lineH = nameSize + 2;
+  const total = lines.length * lineH + (v === undefined ? 0 : valueSize + 2);
+  const first = -(total / 2) + lineH / 2;
   return (
     <text x={x} y={y} textAnchor={textAnchor as never} dominantBaseline="central">
-      <tspan x={x} dy={v === undefined ? 0 : -9} fill="var(--ink-secondary)" fontSize={19}>
-        {name}
-      </tspan>
+      {lines.map((ln, i) => (
+        <tspan
+          key={i}
+          x={x}
+          dy={i === 0 ? first : lineH}
+          fill="var(--ink-secondary)"
+          fontSize={nameSize}
+        >
+          {ln}
+        </tspan>
+      ))}
       {v !== undefined && (
         <tspan
           x={x}
-          dy={19}
+          dy={valueSize + 2}
           fill="var(--ink)"
-          fontSize={21}
+          fontSize={valueSize}
           fontWeight={600}
           style={{ fontVariantNumeric: "tabular-nums" }}
         >
@@ -55,10 +79,13 @@ export function TraitRadar({
   data,
   showAverage,
   showValues,
+  compact,
 }: {
   data: RadarPoint[];
   showAverage?: boolean;
   showValues?: boolean;
+  /** 결과지 종이 안처럼 작은 자리 — 라벨을 작게, 긴 이름은 두 줄로 */
+  compact?: boolean;
 }) {
   const values = showValues
     ? new Map(data.map((d) => [d.scale, d.percent]))
@@ -67,11 +94,13 @@ export function TraitRadar({
   return (
     <div className="w-full" style={{ aspectRatio: "1 / 0.9" }}>
       <ResponsiveContainer>
-        <RadarChart data={data} outerRadius="66%">
+        <RadarChart data={data} outerRadius={compact ? "62%" : "66%"}>
           <PolarGrid stroke="var(--grid)" />
           <PolarAngleAxis
             dataKey="scale"
-            tick={(props: TickProps) => <Tick {...props} values={values} />}
+            tick={(props: TickProps) => (
+              <Tick {...props} values={values} compact={compact} />
+            )}
           />
           <PolarRadiusAxis domain={[0, 100]} tick={false} axisLine={false} />
           {showAverage && (
