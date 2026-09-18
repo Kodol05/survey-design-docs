@@ -18,18 +18,23 @@ export const metadata = { title: "내 결과 — 7차원 성향 설문" };
  *
  * ## 구조 — 실제 결과지처럼 네 장
  *
- *   ① 한눈에      이름·응시일 · 프로필 도형 · 7축 점수 · 일할 때 나는 ·
- *                 힘이 되는 점 / 살펴보면 좋은 점
- *   ② 기질(4축)   축마다 점수·구간·서술·하위척도 — 전부 펼쳐 둔다
+ *   ① 한눈에      이름·응시일 · 프로필 도형 · 7축 점수 · 두드러진 축 ·
+ *                 일할 때 나는 | 힘이 되는 점 / 살펴보면 좋은 점 (두 단)
+ *   ② 기질(4축)   축마다 점수·구간·서술·하위척도 — 전부 펼쳐, 넓은 화면은 2열
  *   ③ 성격(3축)   〃
  *   ④ 두 축을 같이 · 읽으실 때 · 다시 응시하기
  *
  * 첫 장에 「나는 어떤 사람인가」가 다 들어오고, 나머지는 장을 넘겨 본다.
- * 축을 전부 펼치기로 했으므로(사용자 결정) 기질과 성격을 한 장씩으로 나눠
- * 한 장이 너무 길어지지 않게 했다. 넘기는 방식은 `ResultBook` 참고.
+ * 축을 전부 펼치기로 했으므로(사용자 결정) 기질과 성격을 한 장씩으로 나눴다.
  *
- * 내용(서술·점수·조합)은 그대로다. 바꾼 것은 **무엇을 어디에 두느냐**뿐이다.
- * 직무능력과 사내 위치는 개인 화면에 두지 않는다 (00 D-35 · D-09).
+ * ## 폭과 구분선 (2026-09-18 사용자 요청)
+ *
+ * 넓은 모니터에서 양옆이 크게 비었다. 폭을 넓히되 **글줄을 길게 만들지 않고**
+ * 쓴다 — 축 카드를 두 열로, 1장의 요약을 두 단으로. 덩어리 사이에는 가는
+ * 선을 두고, 두 단 사이엔 세로 선을 둔다. 상자는 두지 않는다 (11 §1.1).
+ *
+ * 내용(서술·점수·조합)은 그대로다. 직무능력과 사내 위치는 개인 화면에 두지
+ * 않는다 (00 D-35 · D-09).
  */
 export default async function MePage(props: {
   searchParams: Promise<{ p?: string }>;
@@ -135,6 +140,9 @@ export default async function MePage(props: {
     </a>
   );
 
+  /** 덩어리 사이 가는 선 — 상자 대신 이걸로 나눈다 */
+  const rule = "border-t border-[--border]";
+
   // ── ① 한눈에 ──
   const overview = (
     <>
@@ -165,7 +173,7 @@ export default async function MePage(props: {
       </section>
 
       {standout.length === 0 ? (
-        <p className="text-item text-ink-secondary mt-14 max-w-[54rem]">
+        <p className={`text-item text-ink-secondary mt-12 max-w-[54rem] pt-10 ${rule}`}>
           일곱 축이 모두 가운데 범위입니다. 어느 축에서도 한쪽으로 크게 기울지
           않아, 상황에 따라 양쪽을 골라 쓰는 편입니다. 축마다 자세한 이야기는
           다음 장부터 보실 수 있습니다.
@@ -173,7 +181,7 @@ export default async function MePage(props: {
       ) : (
         <>
           {/* 두드러진 축 */}
-          <section className="mt-14">
+          <section className={`mt-12 pt-8 ${rule}`}>
             <p className="text-axis text-ink-muted mb-3">두드러진 축</p>
             <ul className="flex flex-wrap gap-x-8 gap-y-3">
               {standout.map((t) => (
@@ -197,63 +205,71 @@ export default async function MePage(props: {
             </ul>
           </section>
 
-          {/* 일할 때 나는 — 결과를 점치지 않고 편하게 느끼는 결만 (07) */}
-          <section className="mt-12">
-            <h2 className="text-section-title mb-2">일할 때 나는</h2>
-            <p className="text-ink-secondary mb-6 max-w-[54rem]">
-              두드러진 축을 모아 어떤 결의 일을 편하게 느끼는지 적었습니다.
-              무엇을 잘한다거나 어떤 일에 맞다는 뜻은 아니고, 평소 편하게
-              여기는 방식이라고 보시면 됩니다.
-            </p>
-            <ul className="flex flex-col gap-4">
-              {notes.map((n) => (
-                <li key={n.scale} className="flex gap-4">
-                  {dot(n.percent)}
-                  <p className="text-item">
-                    {axisLink(n.scale)}
-                    {" — "}
-                    {n.apply.work}
-                  </p>
-                </li>
-              ))}
-            </ul>
-          </section>
-
-          {/* 힘이 되는 점 / 살펴보면 좋은 점 — 두드러진 축 기준으로 한 줄씩 */}
-          <section className="mt-12 grid gap-x-12 gap-y-10 md:grid-cols-2">
-            <div>
-              <h2 className="text-section-title mb-4">힘이 되는 점</h2>
+          {/*
+            두 단 — 왼쪽 「일할 때 나는」, 오른쪽 「힘이 되는 점 / 살펴보면 좋은 점」.
+            넓은 화면에서 양옆이 비지 않게 쓰되, 각 단의 글줄은 짧게 유지된다.
+            단 사이엔 세로 선.
+          */}
+          <section
+            className={`mt-10 grid gap-y-12 pt-10 xl:grid-cols-2 xl:gap-x-0 ${rule}`}
+          >
+            {/* 일할 때 나는 — 결과를 점치지 않고 편하게 느끼는 결만 (07) */}
+            <div className="xl:pr-12">
+              <h2 className="text-section-title mb-2">일할 때 나는</h2>
+              <p className="text-ink-secondary mb-6">
+                두드러진 축을 모아 어떤 결의 일을 편하게 느끼는지 적었습니다.
+                무엇을 잘한다거나 어떤 일에 맞다는 뜻은 아니고, 평소 편하게
+                여기는 방식이라고 보시면 됩니다.
+              </p>
               <ul className="flex flex-col gap-4">
                 {notes.map((n) => (
                   <li key={n.scale} className="flex gap-4">
                     {dot(n.percent)}
                     <p className="text-item">
-                      <span className="text-ink-secondary">{n.scale}</span>
-                      {" · "}
-                      {n.apply.lift}
+                      {axisLink(n.scale)}
+                      {" — "}
+                      {n.apply.work}
                     </p>
                   </li>
                 ))}
               </ul>
             </div>
-            <div>
-              <h2 className="text-section-title mb-4">살펴보면 좋은 점</h2>
-              <ul className="flex flex-col gap-4">
-                {notes.map((n) => (
-                  <li key={n.scale} className="flex gap-4">
-                    <span
-                      aria-hidden
-                      className="mt-2.5 size-2.5 shrink-0 rounded-[2px]"
-                      style={{ background: "var(--grid)" }}
-                    />
-                    <p className="text-item">
-                      <span className="text-ink-secondary">{n.scale}</span>
-                      {" · "}
-                      {n.apply.watch}
-                    </p>
-                  </li>
-                ))}
-              </ul>
+
+            <div className="flex flex-col gap-10 xl:border-l xl:border-[--border] xl:pl-12">
+              <div>
+                <h2 className="text-section-title mb-4">힘이 되는 점</h2>
+                <ul className="flex flex-col gap-4">
+                  {notes.map((n) => (
+                    <li key={n.scale} className="flex gap-4">
+                      {dot(n.percent)}
+                      <p className="text-item">
+                        <span className="text-ink-secondary">{n.scale}</span>
+                        {" · "}
+                        {n.apply.lift}
+                      </p>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+              <div className={`pt-8 ${rule}`}>
+                <h2 className="text-section-title mb-4">살펴보면 좋은 점</h2>
+                <ul className="flex flex-col gap-4">
+                  {notes.map((n) => (
+                    <li key={n.scale} className="flex gap-4">
+                      <span
+                        aria-hidden
+                        className="mt-2.5 size-2.5 shrink-0 rounded-[2px]"
+                        style={{ background: "var(--grid)" }}
+                      />
+                      <p className="text-item">
+                        <span className="text-ink-secondary">{n.scale}</span>
+                        {" · "}
+                        {n.apply.watch}
+                      </p>
+                    </li>
+                  ))}
+                </ul>
+              </div>
             </div>
           </section>
         </>
@@ -261,14 +277,22 @@ export default async function MePage(props: {
     </>
   );
 
+  /*
+    축 카드를 넓은 화면에서 두 열로. 카드마다 위에 선이 있어 행이 갈리고,
+    열 사이엔 세로 선을 둔다. 카드 안 배치(글 | 하위척도)는 카드 자신의
+    폭을 보고 정한다 (`AxisDetail` 의 컨테이너 쿼리).
+  */
+  const axisGrid =
+    "grid xl:grid-cols-2 xl:gap-x-0 xl:[&>*:nth-child(even)]:border-l xl:[&>*:nth-child(even)]:border-[--border] xl:[&>*:nth-child(even)]:pl-10 xl:[&>*:nth-child(odd)]:pr-10";
+
   // ── ② 기질 ──
   const temperament = (
     <>
       <h2 className="text-section-title mb-2">기질</h2>
-      <p className="text-ink-secondary mb-4">
+      <p className="text-ink-secondary mb-6">
         타고난 부분입니다. 바꾸려 애쓰기보다 알고 쓰는 쪽이 맞습니다.
       </p>
-      {TEMPERAMENT.map(detail)}
+      <div className={axisGrid}>{TEMPERAMENT.map(detail)}</div>
     </>
   );
 
@@ -276,10 +300,10 @@ export default async function MePage(props: {
   const character = (
     <>
       <h2 className="text-section-title mb-2">성격</h2>
-      <p className="text-ink-secondary mb-4">
+      <p className="text-ink-secondary mb-6">
         살면서 형성된 부분입니다. 기질과 달리 시간이 지나며 달라질 수 있습니다.
       </p>
-      {CHARACTER.map(detail)}
+      <div className={axisGrid}>{CHARACTER.map(detail)}</div>
     </>
   );
 
@@ -294,7 +318,7 @@ export default async function MePage(props: {
       <PairReadings readings={readPairs(scores)} scores={scores} />
 
       {/* 전체 안내는 한 번만. 곳곳에 경고를 흩뿌리면 아무도 안 읽는다 */}
-      <section className="text-table text-ink-muted mt-20 max-w-[56rem] border-t border-[--border] pt-8">
+      <section className={`text-table text-ink-muted mt-20 max-w-[56rem] pt-8 ${rule}`}>
         <p className="text-ink-secondary mb-2 font-medium">읽으실 때</p>
         <p className="mb-1">
           점수는 잘한다 못한다가 아니라 이런 편이다 정도입니다. 이번 일을

@@ -29,14 +29,19 @@ export function AxisDetail({ id, scale, percent, band, facets }: AxisDetailProps
   const apply = APPLY[scale]?.[band];
 
   return (
-    <section id={id} className="scroll-mt-8 border-t border-[--border] py-10">
+    /*
+      `@container` — 안 배치(글 | 하위척도 나란히)를 **화면이 아니라 이 카드의
+      폭**으로 정한다. 결과지가 넓은 화면에서 카드를 두 열로 놓기 때문에,
+      화면 기준(`lg:`)으로 가르면 반쪽 카드 안에서도 나란히 놓여 비좁아진다.
+    */
+    <section id={id} className="@container scroll-mt-8 border-t border-[--border] py-10">
       <div className="mb-6 flex items-baseline gap-3">
         <h3 className="text-4xl font-medium">{scale}</h3>
         <span className="tabular text-2xl">{Math.round(percent)}</span>
         <span className="text-ink-muted">{BAND_LABEL[band]}</span>
       </div>
 
-      <div className="grid gap-10 lg:grid-cols-[minmax(0,1fr)_22rem]">
+      <div className="grid gap-10 @3xl:grid-cols-[minmax(0,1fr)_20rem]">
         <div>
           {/* 눈금 */}
           <div className="flex items-start gap-5">
@@ -73,7 +78,7 @@ export function AxisDetail({ id, scale, percent, band, facets }: AxisDetailProps
             (11 §1.1). 왼쪽 색선만 둘을 다르게 잡아준다.
           */}
           {apply && (
-            <dl className="mt-7 grid gap-x-10 gap-y-5 border-t border-[--border] pt-6 sm:grid-cols-2">
+            <dl className="mt-7 grid gap-x-10 gap-y-5 border-t border-[--border] pt-6 @xl:grid-cols-2">
               <div className="border-l-2 pl-4" style={{ borderColor: colorAt(x) }}>
                 <dt className="text-axis text-ink-muted mb-1.5">힘이 되는 점</dt>
                 <dd className="text-table">{apply.lift}</dd>

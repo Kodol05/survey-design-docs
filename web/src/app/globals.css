@@ -259,7 +259,9 @@
    차트·눈금·나란한 칸이 숨 쉴 자리만 는다. */
 @utility page-wide {
   width: 100%;
-  max-width: 96rem;
+  /* 96 → 120rem (2026-09-18). 넓은 모니터에서 양옆이 너무 비었다.
+     글줄은 안에서 두 열·두 단으로 나눠 짧게 유지한다 */
+  max-width: 120rem;
   margin-inline: auto;
   padding-inline: clamp(1.5rem, 5vw, 4.5rem);
 }
@@ -440,4 +442,24 @@ body {
   .result-page:first-of-type {
     break-before: auto;
   }
+}
+
+/*
+  장이 밀려 들어오는 전환 (`charts/ResultBook`, 2026-09-18 사용자 요청).
+  다음 장은 오른쪽에서, 이전 장은 왼쪽에서. 책장을 넘기는 느낌만 주고
+  길게 끌지 않는다. 움직임을 줄이도록 설정한 사람에게는 걸지 않는다.
+*/
+@keyframes page-in-next {
+  from { opacity: 0; transform: translateX(32px); }
+  to   { opacity: 1; transform: none; }
+}
+@keyframes page-in-prev {
+  from { opacity: 0; transform: translateX(-32px); }
+  to   { opacity: 1; transform: none; }
+}
+.result-page-enter-next { animation: page-in-next 0.32s cubic-bezier(0.2, 0.7, 0.2, 1) both; }
+.result-page-enter-prev { animation: page-in-prev 0.32s cubic-bezier(0.2, 0.7, 0.2, 1) both; }
+@media (prefers-reduced-motion: reduce) {
+  .result-page-enter-next,
+  .result-page-enter-prev { animation: none; }
 }
