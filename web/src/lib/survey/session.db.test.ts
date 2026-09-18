@@ -157,23 +157,17 @@ describe("묶음 저장", () => {
   });
 
   /*
-    ⚠️ **트랜잭션이 없어졌으니 여기서 무엇이 남는지 못 박아 둔다** (2026-09-18).
+    ⚠️ **트랜잭션 없이 하나씩 쓰므로, 쓰기 전 검사가 전부다** (2026-09-18).
 
-    예전에는 이 저장이 `$transaction([...])` 한 덩어리라 「저장하다 실패하면
-    통째로 취소된다」였다. 지금은 Neon 을 HTTP 드라이버로 붙는데 이건
-    트랜잭션을 지원하지 않아(`lib/db.ts` 참고), **하나씩 순서대로 쓴다.**
-    그래서 저장 도중 DB 에서 걸리면 **앞의 정상 응답은 남는다.**
-
-    그래도 사람 답이 뒤틀리지 않는 이유는 두 가지다 —
-    ① 값 1~7 검사가 DB 에 닿기 전에 다 끝나므로, 실제 응시에서 나올 수 있는
-       실패가 아니다(여기선 없는 문항으로 억지로 실패시킨다).
-    ② 각 응답이 (세션·문항)으로 upsert 라, 그 묶음을 다시 저장하면 남은 것은
-       채워지고 이미 쓴 것은 같은 값으로 덮여 **겹치지 않는다.**
-
-    이 테스트는 그 두 가지를 함께 못 박는다 — 중간에 걸리면 앞은 남고,
-    이어서 온전히 다시 저장하면 묶음이 정확히 완성된다.
+    Neon 에는 트랜잭션을 쓰지 않는다(`lib/db.ts` — 소켓을 붙잡지 않으려고).
+    그래서 「저장하다 실패하면 통째로 취소」가 아니라 **하나씩 순서대로** 쓴다.
+    사람 답이 뒤틀리지 않는 이유는 두 가지다 —
+    ① 값 1~7 과 문항 id 검사가 DB 에 닿기 전에 다 끝난다. 잘못된 묶음은
+       한 줄도 쓰이지 않는다.
+    ② 각 응답이 (세션·문항)으로 upsert 라, 같은 묶음을 다시 저장하면 이미 쓴
+       것은 같은 값으로 덮여 **겹치지 않는다.**
   */
-  it("⚠️ 저장 도중 걸리면 앞부분은 남고, 다시 저장하면 온전히 채워진다", async () => {
+  it("이 검사에 없는 문항이 섞이면 아무것도 쓰지 않는다 (2026-09-18)", async () => {
     await seedAssessment();
     const me = await seedEmployee();
     const s = await getOrCreateSession(me.id);
@@ -184,13 +178,11 @@ describe("묶음 저장", () => {
       { itemId: "없는문항", value: 4, elapsedMs: 1000, changedCount: 0 },
     ];
 
-    // 없는 문항에서 외래키에 걸려 던진다. 하지만 앞의 정상 응답은 이미 쓰였다
-    await expect(saveSection(s.id, broken)).rejects.toThrow();
-    expect(await prisma.response.count({ where: { sessionId: s.id } })).toBe(
-      items.length,
-    );
+    // 쓰기 전에 문항 id 를 검사하므로 정상 응답도 한 줄 안 들어간다
+    await expect(saveSection(s.id, broken)).rejects.toThrow(/없는 문항/);
+    expect(await prisma.response.count({ where: { sessionId: s.id } })).toBe(0);
 
-    // 이어하기로 그 묶음을 온전히 다시 저장하면, upsert 라 겹치지 않고 완성된다
+    // 온전한 묶음을 다시 저장하면 그대로 채워진다
     await saveSection(s.id, draftsFor(items, 5));
     expect(await prisma.response.count({ where: { sessionId: s.id } })).toBe(
       items.length,

@@ -48,8 +48,11 @@ export function ResultBook({
   const wrap = (n: number) => ((n % count) + count) % count;
 
   const [i, setI] = useState(() => wrap(initial));
+  // 콜백(키보드·해시)이 최신 장 번호를 읽기 위한 거울 — 그리는 중이 아니라 커밋 뒤에 맞춘다
   const iRef = useRef(i);
-  iRef.current = i;
+  useEffect(() => {
+    iRef.current = i;
+  }, [i]);
 
   /** 방금 들어온 장과 방향 — 전환 효과를 한 번만 건다 */
   const [enter, setEnter] = useState<{ key: string; dir: Dir } | null>(null);
@@ -141,6 +144,8 @@ export function ResultBook({
                 key={p.key}
                 role="tab"
                 type="button"
+                id={`tab-${p.key}`}
+                aria-controls={`page-${p.key}`}
                 aria-selected={n === i}
                 onClick={() => go(n)}
                 className="rounded-md px-2.5 py-1 transition"
@@ -164,6 +169,9 @@ export function ResultBook({
         {pages.map((p, n) => (
           <section
             key={p.key}
+            id={`page-${p.key}`}
+            role="tabpanel"
+            aria-labelledby={`tab-${p.key}`}
             className={`result-page${
               enter?.key === p.key && n === i ? ` result-page-enter-${enter.dir}` : ""
             }`}

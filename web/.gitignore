@@ -47,5 +47,3 @@ src/generated/
 # 개발 서버 로그 — 커밋하지 않는다
 dev.log
 
-.vercel
-.env*

@@ -27,18 +27,27 @@ npm run dev               # http://localhost:3000
 
 ```bash
 npm run demo:seed         # 가짜 직원과 응답
-npm run ratings:seed      # 가짜 관리자 평가
 npm run demo:clear        # 되돌리기
 ```
 
 ## 자주 쓰는 것
 
 ```bash
-npm test                  # 256개 · DB 없이 2초
+npm test                  # 253개 · DB 없이 2초
 npm run test:db           # 17개 · 시험용 DB 필요 (docs/15-테스트.md)
 npm run lint
 npm run build
 ```
+
+## 확인용 스크립트
+
+```bash
+npx tsx --env-file=.env scripts/test-session.mts admin 60   # 로그인 없이 관리자 세션 발급 (로컬 점검용)
+npx tsx scripts/apply-item-content.mts [env파일]              # data/items/v1.yaml 문구를 DB 문항에 반영 (응답은 손대지 않음)
+npm run items                                                # 문항 파일 검사 보고서
+```
+
+운영 DB 값을 받을 때는 `vercel env pull .env.vercel` 처럼 **`.env.production` 이 아닌 이름**으로 받습니다. `next start` 가 `.env.production` 을 자동으로 읽어 로컬 서버가 운영 DB 를 보게 됩니다.
 
 ## 폴더
 
@@ -58,6 +67,7 @@ npm run build
 | [15 테스트](docs/15-테스트.md) | 두 갈래 테스트와 시험용 DB |
 | [13 백업·복구](docs/13-backup-restore.md) | 덤프 받기와 되돌리기 |
 | [16 배포](docs/16-vercel-배포.md) | 밖에서 열 수 있게 올리기 |
+| [17 문항 다듬기](docs/17-문항-다듬기.md) | 문항을 실제 설문 말투로 고쳐 쓴 기록 (2026-09-18 완료) |
 | [12 남은 일](docs/12-backlog.md) | 아직 안 한 것 |
 
 **설계와 근거**

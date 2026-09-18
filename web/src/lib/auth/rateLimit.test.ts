@@ -9,7 +9,10 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
  * DB를 띄우지 않고 보기 위해 `prisma`만 가짜로 바꾼다 — 잠금 판단 규칙
  * 자체가 시험 대상이다.
  */
-const store = new Map<string, { count: number; lockedUntil: Date | null }>();
+const store = new Map<
+  string,
+  { count: number; lockedUntil: Date | null; updatedAt?: Date }
+>();
 
 vi.mock("../db", () => ({
   prisma: {
@@ -25,7 +28,7 @@ vi.mock("../db", () => ({
         create: { count: number; lockedUntil: Date | null };
         update: { count: number; lockedUntil: Date | null };
       }) => {
-        store.set(where.key, store.has(where.key) ? update : create);
+        store.set(where.key, { ...(store.has(where.key) ? update : create), updatedAt: new Date() });
       },
       deleteMany: async ({ where }: { where: { key: string } }) => {
         store.delete(where.key);
@@ -75,6 +78,16 @@ describe("로그인 실패 잠금", () => {
     for (let i = 0; i < LIMIT.admin; i++) await recordFailure("admin", LIMIT.admin);
     const row = store.get("admin")!;
     row.lockedUntil = new Date(Date.now() - 1000);
+    await expect(assertNotLocked("admin")).resolves.toBeUndefined();
+  });
+  it("창(15분)이 지나면 실패 횟수를 처음부터 다시 센다 — 영영 잠그기 방지", async () => {
+    for (let n = 0; n < LIMIT.admin - 1; n++) await recordFailure("admin", LIMIT.admin);
+    // 창이 지난 것처럼 마지막 기록 시각을 뒤로 돌린다
+    const a = store.get("admin")!;
+    store.set("admin", { ...a, updatedAt: new Date(Date.now() - LIMIT.windowMs - 1) });
+
+    await recordFailure("admin", LIMIT.admin);
+    expect(store.get("admin")!.count).toBe(1);
     await expect(assertNotLocked("admin")).resolves.toBeUndefined();
   });
 });

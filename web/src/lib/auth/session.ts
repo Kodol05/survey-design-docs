@@ -1,5 +1,6 @@
 import "server-only";
 import { cookies } from "next/headers";
+import { randomBytes } from "node:crypto";
 import { prisma } from "../db";
 
 /** 세션 쿠키. Next 16에서 cookies()는 비동기다. */
@@ -43,8 +44,18 @@ export async function createSession(employeeId: string) {
   // 만드는 자리에서 치운다. 실패해도 로그인은 되어야 하므로 막지 않는다
   await sweepExpired().catch(() => {});
 
+  /*
+    쿠키에 담기는 값이 곧 열쇠다. 스키마 기본값 `cuid()` 는 시각 + `Math.random()`
+    으로 만들어져 **맞힐 수 있다** — 가입은 누구나 하므로 같은 프로세스에서 나온
+    id 몇 개만 모으면 남의 세션을 추측할 길이 생긴다 (2026-09-18 점검).
+    여기서는 256비트 난수를 직접 넣는다. 기본값은 스크립트용 예비로만 남는다.
+  */
   const s = await prisma.authSession.create({
-    data: { employeeId, expiresAt: new Date(Date.now() + TTL_MS) },
+    data: {
+      id: randomBytes(32).toString("base64url"),
+      employeeId,
+      expiresAt: new Date(Date.now() + TTL_MS),
+    },
   });
   const jar = await cookies();
   jar.set(COOKIE, s.id, {
@@ -74,6 +85,22 @@ export async function destroySession() {
   const id = jar.get(COOKIE)?.value;
   jar.delete(COOKIE);
   if (id) await prisma.authSession.deleteMany({ where: { id } });
+}
+
+/**
+ * 이 사람의 **다른 기기 로그인**을 끊는다 — 비밀번호를 바꿨을 때 부른다.
+ * 지금 쓰는 쿠키의 세션은 남긴다 (바꾼 사람이 곧바로 튕기면 안 된다).
+ * 관리자가 남의 비밀번호를 초기화할 때는 `keepCurrent` 없이 전부 끊는다.
+ */
+export async function revokeSessions(
+  employeeId: string,
+  opts: { keepCurrent?: boolean } = {},
+) {
+  const jar = await cookies();
+  const keep = opts.keepCurrent ? jar.get(COOKIE)?.value : undefined;
+  await prisma.authSession.deleteMany({
+    where: { employeeId, ...(keep ? { id: { not: keep } } : {}) },
+  });
 }
 
 /** 로그인한 사람. 없으면 null. */

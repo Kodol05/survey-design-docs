@@ -21,9 +21,16 @@ export default async function AppLayout({ children }: { children: React.ReactNod
   return (
     <>
       <header className="border-b border-[--border]">
-        <div className="page-column flex h-16 items-center justify-between">
-          <Link href="/me" className="font-medium">7차원 성향 설문</Link>
-          <div className="text-axis text-ink-secondary flex items-center gap-4">
+        {/*
+          폰 폭(390px)에서 제목·「다크」·이름·「로그아웃」이 제각기 두 줄로 접혔다
+          (2026-09-18). 머리의 글자는 **절대 접지 않는다** — 좁으면 사이를 좁히고
+          「다크」 표시만 숨긴다(스위치 자체가 뜻을 말한다).
+        */}
+        <div className="page-column flex h-16 items-center justify-between gap-3">
+          <Link href="/me" className="shrink-0 font-medium whitespace-nowrap">
+            7차원 성향 설문
+          </Link>
+          <div className="text-axis text-ink-secondary flex items-center gap-3 whitespace-nowrap sm:gap-4">
             {me.role === "ADMIN" && (
               <Link
                 href="/admin"
@@ -33,7 +40,7 @@ export default async function AppLayout({ children }: { children: React.ReactNod
                 ← 관리자 화면
               </Link>
             )}
-            <ThemeToggle />
+            <ThemeToggle labelClassName="hidden sm:inline" />
             <span>{me.name}</span>
             <form action={logout}>
               <button className="underline">로그아웃</button>

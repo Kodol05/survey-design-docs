@@ -25,7 +25,13 @@ export async function assertNotLocked(key: string) {
 
 export async function recordFailure(key: string, max: number) {
   const a = await prisma.loginAttempt.findUnique({ where: { key } });
-  const count = (a?.count ?? 0) + 1;
+  /*
+    횟수는 **창 안에서만** 쌓인다 (2026-09-18 점검).
+    전에는 성공해야만 0 이 됐다. 한 번 한도에 닿으면 그 뒤 실패 한 번마다
+    15분씩 다시 잠겨서, 전화번호만 알면 남을 영영 못 들어오게 할 수 있었다.
+  */
+  const stale = !!a?.updatedAt && Date.now() - a.updatedAt.getTime() > LIMIT.windowMs;
+  const count = (stale ? 0 : (a?.count ?? 0)) + 1;
   const lockedUntil = count >= max ? new Date(Date.now() + LIMIT.windowMs) : null;
   await prisma.loginAttempt.upsert({
     where: { key },

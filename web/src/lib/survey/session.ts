@@ -137,11 +137,12 @@ export async function sessionProgress(sessionId: string) {
  *
  * ## 왜 트랜잭션이 아닌가 (2026-09-18)
  *
- * Neon 에는 HTTP 드라이버로 붙는데 이건 트랜잭션을 지원하지 않는다
- * (`lib/db.ts` 참고 — 밖에서 서버가 끊기던 문제를 없애기 위한 선택).
+ * Neon 에는 WebSocket 드라이버로 붙어 트랜잭션도 되지만, 단건 질의는 HTTP 로
+ * 보내 소켓이 얼어붙던 503 을 피한다 (`lib/db.ts`). 트랜잭션은 그 소켓을
+ * 붙잡아야 하므로 쓰지 않는다.
  *
- * 대신 **쓰기 전에 값을 전부 검사한다.** 하나라도 1~7 밖이면 어떤 것도 쓰기
- * 전에 멈춘다. 각 응답은 (세션·문항)으로 upsert 라 같은 묶음을 다시 저장해도
+ * 대신 **쓰기 전에 값을 전부 검사한다.** 하나라도 1~7 밖이거나 이 검사의
+ * 문항이 아니면 어떤 것도 쓰기 전에 멈춘다. 각 응답은 (세션·문항)으로 upsert 라 같은 묶음을 다시 저장해도
  * 값이 덮어써질 뿐 겹치지 않는다. 저장 도중 끊겨 일부만 들어가도, 다음에
  * 이어하기로 그 묶음을 다시 저장하면 마저 채워진다.
  */
@@ -150,6 +151,22 @@ export async function saveSection(sessionId: string, drafts: DraftResponse[]) {
     if (!Number.isInteger(d.value) || d.value < 1 || d.value > 7)
       throw new Error(`응답값이 ${d.value}입니다. 1~7이어야 합니다`);
   }
+  /*
+    문항 id 가 **이 세션의 검사에 있는 살아 있는 문항**인지 본다 (2026-09-18 점검).
+    전에는 아무 id 나 받아 Response 에 쌓였고, 그 줄이 「다 답했다」 판정에 섞여
+    들어가 채점 단계에서야 터졌다.
+  */
+  const s = await prisma.testSession.findUniqueOrThrow({
+    where: { id: sessionId },
+    select: { assessmentId: true },
+  });
+  const ids = [...new Set(drafts.map((d) => d.itemId))];
+  const known = await prisma.item.count({
+    where: { id: { in: ids }, assessmentId: s.assessmentId, status: "ACTIVE" },
+  });
+  if (known !== ids.length)
+    throw new Error("이 검사에 없는 문항이 섞여 있습니다");
+
   for (const d of drafts) {
     await prisma.response.upsert({
       where: { sessionId_itemId: { sessionId, itemId: d.itemId } },
@@ -168,14 +185,26 @@ export async function firstUnansweredSection(sessionId: string) {
   const s = await prisma.testSession.findUniqueOrThrow({
     where: { id: sessionId },
   });
+  /*
+    묶음마다 두 번씩 열네 번 세던 것을 **두 번**으로 (2026-09-18).
+    Neon 은 질의 하나가 한 번의 왕복이라 이 함수 하나가 응시 화면을 1초 가까이
+    붙들었다. 문항 120줄과 답한 id 를 한 번씩 받아 여기서 센다.
+  */
+  const items = await prisma.item.findMany({
+    where: { assessmentId: s.assessmentId, status: "ACTIVE" },
+    select: { id: true, section: true },
+  });
+  const answered = new Set(
+    (
+      await prisma.response.findMany({
+        where: { sessionId },
+        select: { itemId: true },
+      })
+    ).map((r) => r.itemId),
+  );
   for (let section = 1; section <= SECTION_COUNT; section++) {
-    const total = await prisma.item.count({
-      where: { assessmentId: s.assessmentId, section, status: "ACTIVE" },
-    });
-    const done = await prisma.response.count({
-      where: { sessionId, item: { section } },
-    });
-    if (done < total) return section;
+    const here = items.filter((i) => i.section === section);
+    if (here.some((i) => !answered.has(i.id))) return section;
   }
   return null;
 }

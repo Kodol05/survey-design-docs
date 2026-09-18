@@ -32,7 +32,14 @@ import { themeKey, type Theme } from "@/lib/theme";
   **오래 돌아간 쪽을 둔다.** 붙고 나서 한 번 더 그리는 비용은 작은 스위치
   하나의 렌더 한 번이다. 아래에서 lint를 끄는 것은 그 판단이다.
 */
-export function ThemeToggle({ className = "" }: { className?: string }) {
+export function ThemeToggle({
+  className = "",
+  labelClassName = "",
+}: {
+  className?: string;
+  /** 「다크」 글자에 붙는 class — 좁은 화면에서 숨길 때 쓴다 */
+  labelClassName?: string;
+}) {
   const [theme, setTheme] = useState<Theme | null>(null);
 
   // 서버에서는 무엇이 걸렸는지 알 수 없다. 붙고 나서 실제 값을 읽는다
@@ -76,7 +83,7 @@ export function ThemeToggle({ className = "" }: { className?: string }) {
       style={{ opacity: theme ? 1 : 0 }}
       title={dark ? "밝게 보기" : "어둡게 보기"}
     >
-      <span className="text-axis text-ink-muted">다크</span>
+      <span className={`text-axis text-ink-muted ${labelClassName}`}>다크</span>
 
       <span
         aria-hidden

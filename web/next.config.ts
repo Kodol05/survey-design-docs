@@ -33,7 +33,21 @@ const nextConfig: NextConfig = {
     return [
       {
         source: "/:path*",
-        headers: [{ key: "X-Robots-Tag", value: "noindex, nofollow" }],
+        headers: [
+          { key: "X-Robots-Tag", value: "noindex, nofollow" },
+          /*
+            기본 보호 헤더 (2026-09-18 점검). 다른 사이트 안에 iframe 으로 끼워
+            관리자 버튼을 누르게 하는 것(clickjacking)을 막고, 파일 형식 추측과
+            referer 새는 것을 막는다. HTTPS 가 아닌 사내 서버에서는 HSTS 가
+            무시되므로 두어도 해가 없다.
+          */
+          { key: "X-Frame-Options", value: "DENY" },
+          { key: "Content-Security-Policy", value: "frame-ancestors 'none'" },
+          { key: "X-Content-Type-Options", value: "nosniff" },
+          { key: "Referrer-Policy", value: "strict-origin-when-cross-origin" },
+          { key: "Permissions-Policy", value: "camera=(), microphone=(), geolocation=()" },
+          { key: "Strict-Transport-Security", value: "max-age=31536000" },
+        ],
       },
     ];
   },

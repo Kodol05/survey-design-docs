@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useRef, useState, useTransition } from "react";
+import { useRouter } from "next/navigation";
 import { Button } from "../ui/Button";
 import { LikertScale } from "./LikertScale";
 import { saveSectionAction, submitAction } from "@/lib/survey/actions";
@@ -37,6 +38,7 @@ export function SectionForm({
     useState<Record<string, number>>(initialAnswers);
   const [error, setError] = useState<string | null>(null);
   const [pending, start] = useTransition();
+  const router = useRouter();
 
   // 응답시간·수정횟수는 품질 지표의 원자료다. 응시자에게는 알리지 않는다.
   const shownAt = useRef<Record<string, number>>({});
@@ -128,7 +130,8 @@ export function SectionForm({
       }
       if (r.nextSection) {
         // `rest=1`이면 묶음 사이 쉬어 가는 화면을 한 번 거친다
-        window.location.href = `/survey?section=${r.nextSection}&rest=1`;
+        // 화면 쪽은 `key={section}` 으로 묶음마다 새로 마운트되므로 상태가 섞이지 않는다
+        router.push(`/survey?section=${r.nextSection}&rest=1`);
         return;
       }
       const s = await submitAction(sessionId);
@@ -208,6 +211,7 @@ export function SectionForm({
                 첫 글자를 찾느라 눈이 헤맨다 (01 §2.3). 아래 척도 줄은 글이
                 아니므로 이 제한을 받지 않는다. */}
             <p
+              id={`q-${item.id}`}
               /*
                 **지금 답할 문항을 더 분명히 한다** (2026-08-25).
 
@@ -235,6 +239,7 @@ export function SectionForm({
               value={answers[item.id]}
               onChange={(v) => pick(item.id, v)}
               dimmed={!done && !current}
+              labelledBy={`q-${item.id}`}
             />
           </div>
         );

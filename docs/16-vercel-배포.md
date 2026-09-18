@@ -53,7 +53,8 @@ Vercel 대시보드의 Settings → Environment Variables 에서 넣습니다.
 ```bash
 cd web
 vercel env pull .env.vercel        # Neon 주소를 받아온다
-npx dotenv -e .env.vercel -- npx prisma migrate deploy
+# 마이그레이션은 연결 풀을 거치지 않는 주소(DATABASE_URL_UNPOOLED)로 — 아래 「겪은 것」 참고
+npx dotenv -e .env.vercel -- sh -c 'DATABASE_URL=$DATABASE_URL_UNPOOLED npx prisma migrate deploy'
 npx dotenv -e .env.vercel -- npx tsx scripts/seed.mts
 ```
 
@@ -61,10 +62,10 @@ npx dotenv -e .env.vercel -- npx tsx scripts/seed.mts
 
 ```bash
 npx dotenv -e .env.vercel -- npx tsx scripts/seed-demo.mts
-npx dotenv -e .env.vercel -- npx tsx scripts/seed-ratings.mts
 ```
 
 > ⚠️ `.env.vercel` 은 실제 DB 주소라 **커밋되지 않습니다** (`.env*` 가 막혀 있음). 다 쓰면 지우세요.
+> 파일 이름을 `.env.production` 으로 두지 마세요 — `next start` 가 자동으로 읽어 로컬 서버가 운영 DB 를 보게 됩니다.
 
 ### 5. 배포
 

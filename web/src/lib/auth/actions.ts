@@ -198,7 +198,7 @@ export async function changePassword(
   form: FormData,
 ): Promise<FormState> {
   return guarded(async () => {
-    const { currentUser } = await import("./session");
+    const { currentUser, revokeSessions } = await import("./session");
     const me = await currentUser();
     if (!me) redirect("/login");
 
@@ -227,6 +227,8 @@ export async function changePassword(
         passwordChangedAt: new Date(),
       },
     });
+    // 비밀번호를 바꾼 뒤에도 다른 기기의 로그인이 12시간 살아 있었다 — 끊는다 (2026-09-18)
+    await revokeSessions(me.id, { keepCurrent: true });
 
     redirect(me.role === "ADMIN" ? "/admin" : "/me");
   });

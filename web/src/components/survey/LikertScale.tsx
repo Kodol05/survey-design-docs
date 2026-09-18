@@ -66,16 +66,20 @@ export function LikertScale({
   value,
   onChange,
   dimmed,
+  labelledBy,
 }: {
   name: string;
   value?: number;
   onChange: (v: number) => void;
   dimmed?: boolean;
+  /** 문항 글의 id — 화면 낭독기가 척도 앞에 문항을 읽게 한다 (2026-09-18) */
+  labelledBy?: string;
 }) {
   return (
     <fieldset
       className="transition-opacity duration-200"
       style={{ opacity: dimmed ? 0.3 : 1 }}
+      aria-labelledby={labelledBy}
     >
       <legend className="sr-only">7단계 중 하나를 고르세요</legend>
 
@@ -117,7 +121,7 @@ export function LikertScale({
                 />
                 <span
                   aria-hidden
-                  className="flex items-center justify-center rounded-full transition-all duration-150 group-hover:scale-110"
+                  className="flex items-center justify-center rounded-full transition-all duration-150 group-hover:scale-110 group-has-[:focus-visible]:outline-2 group-has-[:focus-visible]:outline-offset-4 group-has-[:focus-visible]:outline-[--ink]"
                   style={{
                     width: size,
                     height: size,
@@ -168,7 +172,7 @@ export function LikertScale({
           return (
             <label
               key={v}
-              className="flex min-h-14 cursor-pointer items-center gap-3 rounded-xl px-4 transition-all"
+              className="flex min-h-14 cursor-pointer items-center gap-3 rounded-xl px-4 transition-all has-[:focus-visible]:outline-2 has-[:focus-visible]:outline-offset-2 has-[:focus-visible]:outline-[--ink]"
               style={{
                 border: on ? `2.5px solid ${COLOR[i]}` : "1.5px solid var(--border)",
                 background: on ? `color-mix(in oklab, ${COLOR[i]} 16%, transparent)` : "transparent",

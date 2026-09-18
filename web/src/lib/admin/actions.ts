@@ -5,7 +5,8 @@ import { redirect, unstable_rethrow } from "next/navigation";
 import { Prisma } from "@/generated/prisma/client";
 import { prisma } from "../db";
 import { requireAdmin } from "../auth/guard";
-import { hashPassword } from "../auth/password";
+import { assertPasswordOk, hashPassword } from "../auth/password";
+import { revokeSessions } from "../auth/session";
 import { clearFailures } from "../auth/rateLimit";
 import {
   itemUpdateData,
@@ -29,13 +30,20 @@ export async function resetPasswordAction(
     if (!target) return { error: "없는 사람입니다." };
     if (target.role === "ADMIN")
       return { error: "관리자 비밀번호는 여기서 바꿀 수 없습니다." };
+    // 길이 규칙은 화면에서만 보고 있었다 — 서버에서도 본다 (2026-09-18)
+    try {
+      assertPasswordOk(temporary);
+    } catch (e) {
+      return { error: (e as Error).message };
+    }
 
     await prisma.employee.update({
       where: { id: employeeId },
       data: { passwordHash: await hashPassword(temporary), passwordChangedAt: null },
     });
-    // 잠긴 상태였다면 같이 풀어준다
+    // 잠긴 상태였다면 같이 풀어주고, 살아 있는 로그인은 전부 끊는다
     if (target.phone) await clearFailures(target.phone);
+    await revokeSessions(employeeId);
     revalidatePath(`/admin/employees/${employeeId}`);
   } catch (e) {
     unstable_rethrow(e);

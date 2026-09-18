@@ -51,11 +51,19 @@ async function guarded<T>(
   }
 }
 
-/** 세션이 내 것인지 확인한다. 남의 세션에 답을 쓰지 못하게. */
+/**
+ * 세션이 내 것이고 **아직 진행 중**인지 확인한다.
+ *
+ * 남의 세션에 답을 쓰지 못하게 하는 것에 더해, 끝난 응시를 다시 저장·제출하는
+ * 길을 막는다 (2026-09-18 점검) — 전에는 COMPLETED 세션에도 답을 덮어쓰고
+ * 다시 채점할 수 있었다. 다시 하고 싶으면 「다시 응시하기」로 새 세션을 연다.
+ */
 async function myTestSession(sessionId: string) {
   const me = await requireUser();
   const s = await prisma.testSession.findUnique({ where: { id: sessionId } });
   if (!s || s.employeeId !== me.id) throw new Error("세션을 찾을 수 없습니다");
+  if (s.status !== "IN_PROGRESS")
+    throw new Error("이미 끝난 응시입니다. 결과 화면에서 확인해 주세요");
   return { me, session: s };
 }
 
@@ -143,14 +151,22 @@ export async function submitAction(sessionId: string) {
     }));
     const quality = assessQuality(records, pairs);
 
-    const startedAt = session.startedAt.getTime();
-    const durationSec = Math.round((Date.now() - startedAt) / 1000);
+    /*
+      소요 시간은 **문항에 실제로 머문 시간의 합**이다 (2026-09-18).
+      전에는 시작~제출 벽시계였는데, 이어하기는 14일까지 되므로 다음 날 마저
+      한 사람이 「1,200분 소요」로 나왔다. 합이 없으면(옛 응답) 벽시계로 두되
+      하루를 넘지 않게 자른다.
+    */
+    const wallSec = Math.round((Date.now() - session.startedAt.getTime()) / 1000);
+    const activeSec = Math.round(records.reduce((a, r) => a + r.elapsedMs, 0) / 1000);
+    const durationSec = Math.min(wallSec, activeSec > 0 ? activeSec : 86_400);
 
     /*
       DB 트랜잭션 대신 **안전한 순서**로 쓴다 (2026-09-18).
 
-      Neon 은 HTTP 드라이버로 붙는데 이건 트랜잭션을 지원하지 않는다
-      (`lib/db.ts` 참고 — 서버 끊김을 없애기 위한 선택). 대신 지켜야 할
+      Neon 에는 WebSocket 드라이버로 붙어 트랜잭션도 되지만, 단건 질의는
+      HTTP 로 보내 소켓이 얼어붙던 503 을 피한다 (`lib/db.ts`). 트랜잭션은
+      그 소켓을 붙잡아야 하므로 여기서는 쓰지 않는다. 대신 지켜야 할
       단 하나의 규칙은 「세션이 COMPLETED 면 결과가 반드시 있다」이다.
 
       그래서 **결과와 품질을 먼저 쓰고, 세션 완료를 맨 마지막에** 한다.
