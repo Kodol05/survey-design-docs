@@ -2,10 +2,17 @@
 
 import { revalidatePath } from "next/cache";
 import { redirect, unstable_rethrow } from "next/navigation";
+import { Prisma } from "@/generated/prisma/client";
 import { prisma } from "../db";
 import { requireAdmin } from "../auth/guard";
 import { hashPassword } from "../auth/password";
 import { clearFailures } from "../auth/rateLimit";
+import {
+  itemUpdateData,
+  validateItemPatch,
+  type ItemKind,
+  type ItemPatch,
+} from "../items/edit";
 
 /**
  * 사원 비밀번호 초기화 (F-43).
@@ -85,4 +92,54 @@ export async function deleteEmployeeAction(
 
   revalidatePath("/admin/employees");
   redirect("/admin/employees");
+}
+
+/**
+ * 문항 수정 (2026-09-18 사용자 결정 — 문항 목록에서 바로 고친다).
+ *
+ * ## 원래는 못 고치게 해 두었다
+ *
+ * 문항의 원본은 `data/items/v1.yaml`(→ seed → DB)이라, 화면에서 고치면
+ * 파일과 DB 가 갈라진다. 그래도 목록에서 바로 고치는 편이 낫다고 정해,
+ * **이 저장은 DB 만 바꾼다.** 이미 응답이 쌓인 뒤라 seed 는 어차피 막혀
+ * 있어(응시 기록이 있으면 중단), 운영 중 진짜 값은 DB 다.
+ *
+ * ## ⚠️ 채점값을 바꾸면 지난 응답의 근거가 어긋난다
+ *
+ * 축·세부·역채점을 바꾸면, 그 문항에 이미 답한 사람들의 점수 근거가
+ * 달라진다 — 지난 결과는 채점 시점 값으로 고정돼 있어 그대로지만(D-09),
+ * **다시 채점하면 달라진다.** 화면에서 이 경고를 분명히 띄운다. 무엇을
+ * 감수할지는 회사의 판단이다.
+ *
+ * `code`·`orderNo`·`kind`·반대짝은 여기서 바꾸지 않는다 (`items/edit.ts`).
+ */
+export async function updateItemAction(
+  id: string,
+  kind: ItemKind,
+  patch: ItemPatch,
+): Promise<{ error: string } | undefined> {
+  try {
+    await requireAdmin();
+
+    const item = await prisma.item.findUnique({ where: { id } });
+    if (!item) return { error: "없는 문항입니다." };
+    if (item.kind !== kind)
+      return { error: "문항 종류가 맞지 않습니다. 목록을 새로고침해 주세요." };
+
+    const bad = validateItemPatch(kind, patch);
+    if (bad) return { error: bad };
+
+    await prisma.item.update({
+      where: { id },
+      data: itemUpdateData(kind, patch) as Prisma.ItemUncheckedUpdateInput,
+    });
+  } catch (e) {
+    unstable_rethrow(e);
+    console.error("[admin]", e);
+    return { error: "지금 저장할 수 없습니다. 잠시 후 다시 시도해 주세요." };
+  }
+
+  revalidatePath("/admin/items");
+  revalidatePath(`/admin/items/${id}`);
+  redirect("/admin/items");
 }

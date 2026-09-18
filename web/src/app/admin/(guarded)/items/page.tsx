@@ -150,6 +150,7 @@ export default async function ItemsPage(props: {
               <th className="pb-2 pl-4 text-left font-medium">문항</th>
               <th className="w-20 pb-2 text-center font-medium">역채점</th>
               <th className="w-16 pb-2 text-right font-medium">묶음</th>
+              <th className="w-16 pb-2 text-right font-medium">수정</th>
             </tr>
           </thead>
           <tbody>
@@ -196,6 +197,14 @@ export default async function ItemsPage(props: {
                 <td className="tabular text-ink-muted py-3 text-right">
                   {i.section}
                 </td>
+                <td className="py-3 text-right">
+                  <Link
+                    href={`/admin/items/${i.id}`}
+                    className="text-ink-secondary underline"
+                  >
+                    수정
+                  </Link>
+                </td>
               </tr>
             ))}
           </tbody>
@@ -220,9 +229,11 @@ export default async function ItemsPage(props: {
           사람마다 구분이 되지 않습니다.
         </p>
         <p>
-          문항을 고치려면 <code>data/items/v1.yaml</code>을 고치고 다시
-          올립니다. 이 화면에서는 고칠 수 없습니다 — 화면에서 고치게 하면 파일과
-          실제 문항이 갈라져 어느 쪽이 진짜인지 알 수 없게 됩니다.
+          문항은 오른쪽 <strong>수정</strong>으로 바로 고칠 수 있습니다 — 문구는
+          물론 축·세부 항목·역채점·묶음 같은 채점에 쓰는 값도요. 다만 채점값을
+          바꾸면 이미 답한 사람들의 점수 근거가 달라지니, 수정 화면의 경고를
+          먼저 읽어 주세요. 원본 파일 <code>data/items/v1.yaml</code>이 아니라
+          DB 만 바뀌므로, 같은 내용을 파일에도 반영해 두면 좋습니다.
         </p>
       </Note>
     </>
