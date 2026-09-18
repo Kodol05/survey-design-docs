@@ -7,7 +7,7 @@ import { describe, expect, it } from "vitest";
 
   ## 무슨 일이 있었나
 
-  관리자 화면 여덟 곳 중 대시보드 하나만 `requireAdmin()`을 부르지 않고
+  관리자 화면 여러 곳 중 대시보드 하나만 `requireAdmin()`을 부르지 않고
   레이아웃에 맡기고 있었다. App Router는 **레이아웃과 화면을 동시에 그린다** —
   레이아웃이 로그인 화면으로 보내기로 정하는 동안 화면은 이미 DB를 읽고
   결과를 흘려보낸다. 브라우저는 로그인 화면으로 넘어가지만 데이터는 이미
@@ -55,8 +55,8 @@ function screensIn(dir: string): string[] {
 describe("관리자 화면은 저마다 requireAdmin 을 부른다", () => {
   const files = screensIn("admin/(guarded)");
 
-  it("여덟 곳을 다 찾았다 — 경로가 바뀌어 빈손이 되면 이 검사는 헛돈다", () => {
-    expect(files.length).toBeGreaterThanOrEqual(8);
+  it("일곱 곳을 다 찾았다 — 경로가 바뀌어 빈손이 되면 이 검사는 헛돈다", () => {
+    expect(files.length).toBeGreaterThanOrEqual(7);
   });
 
   for (const f of files) {

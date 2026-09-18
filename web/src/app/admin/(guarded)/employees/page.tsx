@@ -5,12 +5,6 @@ import { EmployeeList } from "./EmployeeList";
 import { ExportLink } from "./ExportLink";
 import { requireAdmin } from "@/lib/auth/guard";
 import { ABILITY_AXES, TRAIT_SCALES } from "@/lib/items/types";
-import { SourcePicker } from "@/components/analysis/SourcePicker";
-import {
-  SOURCE_LABEL,
-  SOURCE_PARAM,
-  parseSource,
-} from "@/lib/admin/abilitySource";
 import { BANDS, MEAN_KEY, loadRoster, type SortDir } from "@/lib/admin/roster";
 
 export const metadata = { title: "구성원 — 관리자" };
@@ -20,7 +14,6 @@ export default async function EmployeesPage(props: {
     sort?: string;
     dir?: string;
     q?: string;
-    src?: string;
     flag?: string;
     status?: string;
     pos?: string;
@@ -28,7 +21,6 @@ export default async function EmployeesPage(props: {
 }) {
   await requireAdmin();
   const qs = await props.searchParams;
-  const source = parseSource(qs.src);
 
   /*
     읽고·거르고·줄 세우는 일은 `lib/admin/roster.ts`가 한다 (2026-08-25 분리).
@@ -44,8 +36,7 @@ export default async function EmployeesPage(props: {
     pickStatus,
     band,
     cut,
-    bossCount,
-  } = await loadRoster(qs, source);
+  } = await loadRoster(qs);
 
   const link = (params: Record<string, string | undefined>) => {
     const sp = new URLSearchParams();
@@ -53,8 +44,7 @@ export default async function EmployeesPage(props: {
     if (params.dir) sp.set("dir", params.dir);
     if (params.q) sp.set("q", params.q);
     if (params.pos) sp.set("pos", params.pos);
-    // 고른 출처와 거르개는 정렬·검색을 바꿔도 따라간다
-    if (source !== "self") sp.set(SOURCE_PARAM, source);
+    // 거르개는 정렬·검색을 바꿔도 따라간다
     if (!params.clear) {
       if (onlyReview) sp.set("flag", "review");
       if (pickStatus) sp.set("status", pickStatus.key);
@@ -90,10 +80,6 @@ export default async function EmployeesPage(props: {
         </p>
       )}
 
-      <div className="mb-6">
-        <SourcePicker value={source} bossCount={bossCount} />
-      </div>
-
       <div className="mb-4 flex flex-wrap items-center gap-x-6 gap-y-3">
         <form className="flex items-center gap-2">
           <input
@@ -105,9 +91,6 @@ export default async function EmployeesPage(props: {
           {sortKey && <input type="hidden" name="sort" value={sortKey} />}
           {sortDir !== fallbackDir && (
             <input type="hidden" name="dir" value={sortDir} />
-          )}
-          {source !== "self" && (
-            <input type="hidden" name={SOURCE_PARAM} value={source} />
           )}
           <button className="text-table text-ink-secondary underline">
             찾기
@@ -206,12 +189,7 @@ export default async function EmployeesPage(props: {
       )}
 
       <div className="mt-8 flex justify-end">
-        <ExportLink
-          href={`/admin/employees/export${
-            source !== "self" ? `?${SOURCE_PARAM}=${source}` : ""
-          }`}
-          count={rows.length}
-        />
+        <ExportLink href="/admin/employees/export" count={rows.length} />
       </div>
 
       {/*
@@ -226,8 +204,8 @@ export default async function EmployeesPage(props: {
         <p>
           성향 일곱 칸은 <span style={{ color: "var(--diverge-pos)" }}>■</span>{" "}
           낮음 <span style={{ color: "var(--diverge-neg)" }}>■</span> 높음,
-          직무능력 세 칸은 <strong>{SOURCE_LABEL[source]}</strong>이고 막대
-          길이가 값입니다. 줄을 누르면 그래프가 펼쳐집니다.
+          직무능력 세 칸은 <strong>직원 설문 값</strong>이고 막대 길이가
+          값입니다. 줄을 누르면 그래프가 펼쳐집니다.
         </p>
         <Note label="칸마다 무슨 뜻인지" className="mt-3">
           <p>

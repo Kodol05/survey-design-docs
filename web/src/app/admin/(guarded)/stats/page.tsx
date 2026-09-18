@@ -10,12 +10,8 @@ import {
 } from "@/lib/admin/analysis";
 import { ALPHA } from "@/lib/admin/stats";
 import { traitAlpha } from "@/lib/admin/dashboard";
-import { parseSource } from "@/lib/admin/abilitySource";
-import { countRatedEmployees } from "@/lib/admin/ratings";
-import { loadRatingCompare } from "@/lib/admin/ratingCompare";
 import { MatrixTab } from "./MatrixTab";
 import { SpreadTab } from "./SpreadTab";
-import { AgreementTab } from "./AgreementTab";
 import { PredictionTab } from "./PredictionTab";
 import { ReliabilityTab } from "./ReliabilityTab";
 
@@ -27,7 +23,6 @@ export const metadata = { title: "분석 — 관리자" };
     직무능력과 기질·성격   우리 데이터 안의 관계. 이 화면의 뼈대
     예측 대 실제          논문 값과 맞대 본다
     분포                  우리 사람들이 어떻게 퍼져 있나
-    평가 대조             대표님이 보시는 것과 맞대 본다
     검사 신뢰도           문항이 제대로 만들어졌나
 
   「예측 대 실제」를 「분포」 앞으로 올렸다 — 앞의 두 탭이 **바깥 기준과
@@ -37,21 +32,18 @@ const TABS = [
   { key: "matrix", label: "직무능력과 기질·성격" },
   { key: "prediction", label: "예측 대 실제" },
   { key: "spread", label: "분포" },
-  { key: "agreement", label: "평가 대조" },
   { key: "reliability", label: "검사 신뢰도" },
 ] as const;
 
 export default async function StatsPage(props: {
   searchParams: Promise<{
     tab?: string;
-    src?: string;
     clean?: string;
   }>;
 }) {
   await requireAdmin();
   const sp = await props.searchParams;
   const tab = TABS.some((t) => t.key === sp.tab) ? sp.tab! : "matrix";
-  const source = parseSource(sp.src);
   /*
     **응답 신뢰도가 낮은 사람을 빼고 다시 본다** (2026-08-25 사용자 요청).
 
@@ -61,14 +53,11 @@ export default async function StatsPage(props: {
   */
   const clean = sp.clean === "1";
 
-  const [people, reliability, bossCount, personQuality, agreement] =
-    await Promise.all([
-      loadPeople(clean, source),
-      loadReliability(),
-      countRatedEmployees(),
-      loadPersonQuality(),
-      loadRatingCompare(),
-    ]);
+  const [people, reliability, personQuality] = await Promise.all([
+    loadPeople(clean),
+    loadReliability(),
+    loadPersonQuality(),
+  ]);
   const matrix = traitAbilityMatrix(people);
   // α는 성향 축만 센다 — 대시보드와 같은 함수를 쓴다 (D-93)
   const { mean: meanAlpha, poor } = traitAlpha(reliability);
@@ -144,24 +133,16 @@ export default async function StatsPage(props: {
         <MatrixTab
           people={people}
           matrix={matrix}
-          source={source}
-          bossCount={bossCount}
           clean={clean}
           poorN={poorN}
         />
       )}
       {tab === "spread" && (
-        <SpreadTab
-          people={people}
-          source={source}
-          bossCount={bossCount}
-          reliability={byScale}
-        />
+        <SpreadTab people={people} reliability={byScale} />
       )}
       {tab === "prediction" && (
         <PredictionTab people={people} matrix={matrix} />
       )}
-      {tab === "agreement" && <AgreementTab data={agreement} />}
       {tab === "reliability" && (
         <ReliabilityTab rows={reliability} quality={personQuality} />
       )}

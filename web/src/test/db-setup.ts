@@ -70,7 +70,7 @@ async function wipe() {
   await prisma.$executeRawUnsafe(`
     TRUNCATE TABLE
       "Response", "Result", "QualityFlag", "TestSession",
-      "ManagerRating", "AuthSession", "Employee",
+      "AuthSession", "Employee",
       "Item", "Assessment", "Roster", "LoginAttempt"
     RESTART IDENTITY CASCADE
   `);

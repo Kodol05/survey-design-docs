@@ -2,8 +2,6 @@ import { prisma } from "../db";
 import { ABILITY_AXES, COMPOSITE_AXIS, TRAIT_SCALES } from "@/lib/items/types";
 import { abilityMean } from "@/components/analysis/TraitStrip";
 import { quantile } from "./spread";
-import { pickBossScores, countRatedEmployees } from "./ratings";
-import { resolveAbilities, type AbilitySource } from "./abilitySource";
 import type { StoredAbilities, StoredTraits } from "../survey/result";
 import type { Row } from "@/app/admin/(guarded)/employees/EmployeeList";
 
@@ -76,28 +74,20 @@ export type Roster = {
   band: string | null;
   /** 구간을 자르는 경계. 넷이 안 되면 `null` */
   cut: { low: number; high: number } | null;
-  bossCount: number;
 };
 
-export async function loadRoster(
-  qs: RosterQuery,
-  source: AbilitySource,
-): Promise<Roster> {
-  const [employees, bossCount] = await Promise.all([
-    prisma.employee.findMany({
-      where: { role: "USER" },
-      orderBy: { name: "asc" },
-      include: {
-        testSessions: {
-          orderBy: { startedAt: "desc" },
-          take: 1,
-          include: { result: true, qualityFlag: true },
-        },
-        ratings: true,
+export async function loadRoster(qs: RosterQuery): Promise<Roster> {
+  const employees = await prisma.employee.findMany({
+    where: { role: "USER" },
+    orderBy: { name: "asc" },
+    include: {
+      testSessions: {
+        orderBy: { startedAt: "desc" },
+        take: 1,
+        include: { result: true, qualityFlag: true },
       },
-    }),
-    countRatedEmployees(),
-  ]);
+    },
+  });
 
   const everyone: Row[] = employees.map((e) => {
     const s = e.testSessions[0];
@@ -105,12 +95,11 @@ export async function loadRoster(
     const ability = (s?.result?.abilityScoresJson ??
       null) as StoredAbilities | null;
 
-    const self = ability
+    const abilities = ability
       ? Object.fromEntries(
           Object.entries(ability).map(([k, v]) => [k, v.percent]),
         )
       : {};
-    const abilities = resolveAbilities(source, self, pickBossScores(e.ratings));
 
     return {
       id: e.id,
@@ -130,8 +119,6 @@ export async function loadRoster(
             Object.entries(stored).map(([k, v]) => [k, v.percent]),
           )
         : null,
-      // 고른 출처대로 만든다. 대표님이 아직 안 매긴 사람이면 빈 값이 된다 —
-      // 그게 맞다. 0으로 채우면 「낮게 평가받은 사람」으로 보인다
       abilities: Object.keys(abilities).length ? abilities : null,
     };
   });
@@ -240,7 +227,6 @@ export async function loadRoster(
     pickStatus,
     band,
     cut,
-    bossCount,
   };
 }
 

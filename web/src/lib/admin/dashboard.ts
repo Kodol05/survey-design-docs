@@ -7,7 +7,6 @@ import {
 } from "./analysis";
 import type { ScaleReliability } from "./analysis";
 import { ensureBackup, listBackups } from "./backup";
-import { ratingProgress } from "./ratings";
 import { loadAttendance, loadSummary } from "./summary";
 
 /**
@@ -61,8 +60,7 @@ export async function loadDashboard() {
     `ensureBackup`은 던지지 않는다. 백업이 안 됐다고 대시보드가 안 열리면
     안 되고, 실패는 화면의 「마지막 백업」 시각이 그대로인 것으로 드러난다.
   */
-  const [rating, summary, people, reliability, attendance] = await Promise.all([
-    ratingProgress(),
+  const [summary, people, reliability, attendance] = await Promise.all([
     loadSummary(),
     loadPeople(),
     loadReliability(),
@@ -112,7 +110,6 @@ export async function loadDashboard() {
     }));
 
   return {
-    rating,
     summary,
     attendance,
     matrix,

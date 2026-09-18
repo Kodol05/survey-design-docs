@@ -2,7 +2,6 @@ import Link from "next/link";
 import { WarningBadge } from "@/components/ui/WarningBadge";
 import { Note } from "@/components/ui/Note";
 import { MIN_N } from "@/components/ui/NBadge";
-import { SourcePicker } from "@/components/analysis/SourcePicker";
 import { AxisRanking, type AxisRow } from "@/components/analysis/AxisRanking";
 import { CompositePanel } from "@/components/analysis/CompositePanel";
 import { Cautions } from "@/components/analysis/Cautions";
@@ -17,7 +16,6 @@ import {
   traitAbilityMatrix,
   trendLine,
 } from "@/lib/admin/analysis";
-import { SOURCE_NOTE, type AbilitySource } from "@/lib/admin/abilitySource";
 import { abilityComposite } from "@/lib/admin/composite";
 import { splitsFor } from "@/lib/admin/split";
 import { CorrelationPanel } from "./CorrelationPanel";
@@ -53,15 +51,11 @@ type People = Awaited<ReturnType<typeof loadPeople>>;
 export function MatrixTab({
   people,
   matrix,
-  source,
-  bossCount,
   clean,
   poorN,
 }: {
   people: People;
   matrix: ReturnType<typeof traitAbilityMatrix>;
-  source: AbilitySource;
-  bossCount: number;
   clean: boolean;
   poorN: number;
 }) {
@@ -69,8 +63,6 @@ export function MatrixTab({
     <InHouseSection
       people={people}
       matrix={matrix}
-      source={source}
-      bossCount={bossCount}
       clean={clean}
       poorN={poorN}
     />
@@ -100,18 +92,9 @@ const TRAIT_GROUPS = [
  * 켠 상태를 기본으로 두지 않는다. 사람을 빼고 시작하면 뺐다는 사실을
  * 잊는다.
  */
-function CleanToggle({
-  clean,
-  poorN,
-  source,
-}: {
-  clean: boolean;
-  poorN: number;
-  source: AbilitySource;
-}) {
+function CleanToggle({ clean, poorN }: { clean: boolean; poorN: number }) {
   if (poorN === 0) return null;
   const sp = new URLSearchParams();
-  if (source !== "self") sp.set("src", source);
   if (!clean) sp.set("clean", "1");
   const q = sp.toString();
 
@@ -138,22 +121,17 @@ function CleanToggle({
 function InHouseSection({
   people,
   matrix,
-  source,
-  bossCount,
   clean,
   poorN,
 }: {
   people: People;
   matrix: ReturnType<typeof traitAbilityMatrix>;
-  source: AbilitySource;
-  bossCount: number;
   clean: boolean;
   poorN: number;
 }) {
   if (!matrix.enough)
     return (
       <section>
-        <SourcePicker value={source} bossCount={bossCount} className="mb-3" />
         <WarningBadge kind="smallSample" />
         <p className="text-ink-secondary mt-4">
           응시 완료 {matrix.n}명입니다. {MIN_N}명이 넘어야 사내 관련도를
@@ -216,15 +194,17 @@ function InHouseSection({
   return (
     <section>
       <div className="mb-1 flex flex-wrap items-center gap-x-6 gap-y-3">
-        <SourcePicker value={source} bossCount={bossCount} />
-        <CleanToggle clean={clean} poorN={poorN} source={source} />
+        <CleanToggle clean={clean} poorN={poorN} />
       </div>
       <h2 className="text-section-title mb-2">성향 축과 직무능력 세 가지</h2>
       <p className="text-ink-secondary mb-2 max-w-[56rem]">
         우리 직원 {matrix.n}명 값입니다. 칸을 누르면 그 하나만 크게 봅니다.
       </p>
       <Note label="지금 보는 값이 무엇인지" className="mb-8">
-        <p>{SOURCE_NOTE[source]}</p>
+        <p>
+          직무능력은 직원분이 설문에서 스스로 답한 값입니다. 성향과 같은
+          설문이라 관련도가 실제보다 다소 높게 나올 수 있습니다.
+        </p>
       </Note>
       <CorrelationPanel
         rows={[...TRAIT_SCALES]}

@@ -1,7 +1,6 @@
 import Link from "next/link";
 import { Tile } from "@/components/ui/Tile";
 import { WarningBadge } from "@/components/ui/WarningBadge";
-import { ButtonLink } from "@/components/ui/Button";
 import { MIN_N } from "@/components/ui/NBadge";
 import { Attendance } from "@/components/charts/Attendance";
 import { ALPHA } from "@/lib/admin/stats";
@@ -38,7 +37,6 @@ export default async function AdminHome() {
     여기는 **받은 것을 그리기만** 한다.
   */
   const {
-    rating,
     summary: s,
     attendance,
     matrix,
@@ -89,69 +87,19 @@ export default async function AdminHome() {
       </div>
 
       {/*
-        **네 칸만 둔다** (2026-08-25 사용자 결정).
+        **세 칸을 둔다.**
 
-          왼쪽 위   대표님 평가      오른쪽 위   응시 현황
-          왼쪽 아래 가장 뚜렷한 관련  오른쪽 아래 지금 볼 것
+          왼쪽 위   응시 현황       오른쪽 위   가장 뚜렷한 관련
+          왼쪽 아래 지금 볼 것
 
-        전에는 격자 **위에 대표님 평가가 통째로 한 줄**을 차지하고 있었고,
-        격자 안에는 「사람이 갈리는 축」이 있었다.
-
-        위 한 줄을 뺀 이유 — 그 자리는 **다 매기고 나면 사라지는 자리**라
-        화면이 두 가지 모양을 갖게 된다. 격자 안으로 넣으면 채워지든 비든
-        배치가 그대로다.
-
-        「사람이 갈리는 축」을 뺀 이유 — 최소~최대 폭만 그려서 **폭이 같아도
+        「사람이 갈리는 축」은 뺐다 — 최소~최대 폭만 그려서 **폭이 같아도
         모양이 다른 축을 구분하지 못했다.** 그 물음의 제대로 된 답은
         분석의 「분포」 탭에 있다(D-54).
-
-        위 두 칸이 **지금 할 일**, 아래 두 칸이 **읽을 것**이다.
 
         테두리를 두르지 않는다 (11 §2). 구분은 열 간격과 제목 아래 선으로만.
       */}
       <div className="mb-14 grid gap-x-16 gap-y-14 lg:grid-cols-2">
-        {/* ── 좌상 · 대표님 평가 ── */}
-        <section>
-          <div className="mb-4 flex items-baseline justify-between border-b border-[--border] pb-2">
-            <h2 className="text-section-title">관리자 평가</h2>
-            <span className="text-axis text-ink-muted tabular">
-              {rating.done} / {rating.total}명
-            </span>
-          </div>
-
-          {rating.done >= rating.total ? (
-            <>
-              <p className="text-ink-secondary mb-4">
-                <strong className="text-ink">다 매기셨습니다.</strong> 본인 답과
-                맞대 본 결과는 분석의 「평가 대조」에 있습니다.
-              </p>
-              <ButtonLink href="/admin/stats?tab=agreement" variant="secondary">
-                평가 대조 보기 →
-              </ButtonLink>
-            </>
-          ) : (
-            <>
-              <p className="text-ink-secondary mb-3">
-                <strong className="text-ink tabular">
-                  {rating.total - rating.done}명
-                </strong>
-                이 아직 남았습니다.{" "}
-                <span className="tabular text-ink-muted">
-                  {rating.cells} / {rating.cellTotal}칸
-                </span>
-              </p>
-              <p className="text-axis text-ink-muted mb-5 max-w-[34rem]">
-                <strong>결과를 보시기 전에 매기는 편이 낫습니다.</strong> 결과를
-                먼저 보면 그 인상이 섞입니다. 막아 두지는 않았습니다.
-              </p>
-              <ButtonLink href="/admin/ratings" size="lg">
-                평가하러 가기 →
-              </ButtonLink>
-            </>
-          )}
-        </section>
-
-        {/* ── 우상 · 응시 현황 ── */}
+        {/* ── 응시 현황 ── */}
         <section>
           <div className="mb-4 flex items-baseline justify-between border-b border-[--border] pb-2">
             <h2 className="text-section-title">응시 현황</h2>
@@ -296,14 +244,6 @@ export default async function AdminHome() {
             ]}
           />
           <Shortcut
-            href="/admin/stats?tab=agreement"
-            title="평가 대조"
-            lines={[
-              "본인 답과 관리자가 보는 것을 맞대 봅니다",
-              "크게 갈리는 사람이 이름으로 나옵니다",
-            ]}
-          />
-          <Shortcut
             href="/admin/stats?tab=prediction"
             title="예측 대 실제"
             lines={[
@@ -317,16 +257,6 @@ export default async function AdminHome() {
             lines={[
               `실제로 나가는 ${EXPECTED.total}문항을 그대로 봅니다`,
               "역채점 여부와 묶음 순서까지",
-            ]}
-          />
-          <Shortcut
-            href="/admin/ratings"
-            title="관리자 평가"
-            lines={[
-              `${rating.done} / ${rating.total}명 · ${rating.cells} / ${rating.cellTotal}칸`,
-              rating.done >= rating.total
-                ? "다 매기셨습니다"
-                : `${rating.total - rating.done}명 남았습니다`,
             ]}
           />
         </div>

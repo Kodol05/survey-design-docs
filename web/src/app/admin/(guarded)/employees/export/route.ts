@@ -2,12 +2,6 @@ import { requireAdmin } from "@/lib/auth/guard";
 import { prisma } from "@/lib/db";
 import { formatPhone } from "@/lib/auth/phone";
 import { ABILITY_AXES, TRAIT_SCALES } from "@/lib/items/types";
-import {
-  SOURCE_LABEL,
-  parseSource,
-  resolveAbilities,
-} from "@/lib/admin/abilitySource";
-import { pickBossScores } from "@/lib/admin/ratings";
 import { abilityMean } from "@/components/analysis/TraitStrip";
 import type { StoredAbilities, StoredTraits } from "@/lib/survey/result";
 
@@ -30,12 +24,8 @@ import type { StoredAbilities, StoredTraits } from "@/lib/survey/result";
  * 이유가 없고, 문항별 응답은 이 파일의 목적(사람을 훑는 것)과 다르다 —
  * 그건 나가면 「누가 몇 번 문항에 뭐라 답했는지」가 통째로 나가는 것이다.
  */
-export async function GET(req: Request) {
+export async function GET() {
   await requireAdmin();
-
-  const source = parseSource(
-    new URL(req.url).searchParams.get("src") ?? undefined,
-  );
 
   const employees = await prisma.employee.findMany({
     where: { role: "USER" },
@@ -46,7 +36,6 @@ export async function GET(req: Request) {
         take: 1,
         include: { result: true, qualityFlag: true },
       },
-      ratings: true,
     },
   });
 
@@ -64,8 +53,8 @@ export async function GET(req: Request) {
     "응답 신뢰도",
     "신뢰도 판정",
     ...TRAIT_SCALES,
-    ...ABILITY_AXES.map((a) => `${a}(${SOURCE_LABEL[source]})`),
-    `세 능력 평균(${SOURCE_LABEL[source]})`,
+    ...ABILITY_AXES.map((a) => `${a}(직원 설문)`),
+    "세 능력 평균(직원 설문)",
   ];
 
   const body = employees.map((e) => {
@@ -74,12 +63,11 @@ export async function GET(req: Request) {
     const ability = (s?.result?.abilityScoresJson ??
       null) as StoredAbilities | null;
 
-    const self = ability
+    const abilities = ability
       ? Object.fromEntries(
           Object.entries(ability).map(([k, v]) => [k, v.percent]),
         )
       : {};
-    const abilities = resolveAbilities(source, self, pickBossScores(e.ratings));
 
     return [
       e.name,

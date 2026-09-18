@@ -9,8 +9,6 @@ import { formatR } from "@/components/analysis/correlationColor";
 import { strengthOf } from "@/components/analysis/correlationWords";
 import { averageOf, bandOf, loadDistribution } from "@/lib/admin/distribution";
 import { prisma } from "@/lib/db";
-import { ratingToPercent } from "@/lib/admin/abilitySource";
-import { pickBossScores } from "@/lib/admin/ratings";
 import { loadResearchTable, relatedScales } from "@/lib/research/correlations";
 import {
   orderedAbilities,
@@ -37,25 +35,12 @@ export default async function EmployeeDetail(props: {
         take: 1,
         include: { result: true, qualityFlag: true },
       },
-      ratings: true,
     },
   });
   if (!e || e.role !== "USER") notFound();
 
   const session = e.testSessions[0];
   const result = session?.result;
-
-  /*
-    대표님 평가 — **한 사람을 보는 자리인데 여기에만 없었다** (2026-08-25).
-
-    표 아래에 「숫자를 합치지 않고 옆에 놓기만 합니다」라고 적어 두었는데,
-    정작 **옆에 놓을 두 번째 숫자가 없었다.** 있지도 않은 것을 설명하는
-    문장이었다. 보려면 분석의 「평가 대조」까지 가야 했다.
-
-    합치지 않는다. 1~10을 0~100으로 옮겨 눈금만 맞추고, 매기신 원래 점수도
-    같이 적는다 — 어긋나는 지점이 경험과 대조하실 부분이다.
-  */
-  const boss = pickBossScores(e.ratings);
 
   return (
     <>
@@ -85,7 +70,6 @@ export default async function EmployeeDetail(props: {
           abilities={
             (result.abilityScoresJson ?? {}) as unknown as StoredAbilities
           }
-          boss={boss}
         />
       )}
 
@@ -131,12 +115,9 @@ export default async function EmployeeDetail(props: {
 async function ResultBlocks({
   traits,
   abilities,
-  boss,
 }: {
   traits: StoredTraits;
   abilities: StoredAbilities;
-  /** 대표님이 매기신 1~10. 안 매기신 축은 없다 */
-  boss: Record<string, number>;
 }) {
   const dist = await loadDistribution();
   const research = loadResearchTable();
@@ -178,8 +159,7 @@ async function ResultBlocks({
             <thead>
               <tr className="text-ink-secondary border-b border-[--border]">
                 <th className="py-2 text-left font-medium">능력</th>
-                <th className="py-2 text-right font-medium">본인</th>
-                <th className="py-2 pr-2 text-right font-medium">관리자</th>
+                <th className="py-2 pr-2 text-right font-medium">점수</th>
                 <th className="py-2 pl-6 text-left font-medium">사내 위치</th>
                 <th className="py-2 pl-6 text-left font-medium">
                   관련 성향 축
@@ -198,20 +178,8 @@ async function ResultBlocks({
                     <th scope="row" className="py-3 text-left font-normal">
                       {x.axis}
                     </th>
-                    <td className="tabular py-3 text-right">
-                      {Math.round(x.percent)}
-                    </td>
                     <td className="tabular py-3 pr-2 text-right">
-                      {typeof boss[x.axis] === "number" ? (
-                        <>
-                          {Math.round(ratingToPercent(boss[x.axis]))}
-                          <span className="text-ink-muted ml-1">
-                            ({boss[x.axis]}점)
-                          </span>
-                        </>
-                      ) : (
-                        <span className="text-ink-muted">—</span>
-                      )}
+                      {Math.round(x.percent)}
                     </td>
                     <td className="py-3 pl-6">
                       <DistributionBar
@@ -249,10 +217,8 @@ async function ResultBlocks({
           </table>
         </div>
         <p className="text-axis text-ink-muted mt-4">
-          <strong className="text-ink-secondary">본인</strong>은 설문 점수,{" "}
-          <strong className="text-ink-secondary">관리자</strong>는 1~10으로
-          매기신 것을 같은 눈금으로 옮긴 값입니다. 숫자를 합치지 않고 옆에
-          놓기만 합니다 — 어긋나는 지점이 경험과 대조하실 부분입니다.
+          점수는 직원분이 설문에서 답한 값을 0~100으로 옮긴 것입니다. 사내
+          위치는 이 값이 전체에서 어디쯤인지 보여줍니다.
         </p>
       </Card>
     </>
