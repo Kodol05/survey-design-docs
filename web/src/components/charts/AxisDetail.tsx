@@ -1,19 +1,24 @@
 import { APPLY } from "@/lib/interpretation/apply";
 import { BAND_TEXT, type BandKey } from "@/lib/interpretation/bands";
 import { POLES } from "@/lib/interpretation/poles";
-import { GRADIENT, HIGH_INK, LOW_INK, Marker, colorAt } from "./scale";
+import { GRADIENT, HIGH_INK, LOW_INK, Marker } from "./scale";
 
 /**
- * 축 하나의 상세 — 실제 결과지 2페이지(하위척도)를 여기로 합쳤다.
+ * 축 하나의 상세 — 결과지 「축별로 보기」 장에 일곱 개가 이어진다.
  *
- * 종이라서 두 페이지로 나뉜 것이지, 웹에서는 **하위척도를 해당 축 바로 아래**
- * 두는 편이 잘 읽힌다. "같은 71도 안이 이렇게 갈린다"가 한 자리에서 보인다.
+ * ## 촘촘하게 (2026-09-18)
+ *
+ * 결과지 종이 안에서는 글자를 한 단 작게 쓰므로(`globals.css` 의 `.result-book`)
+ * 여기서도 제목·눈금·간격을 그에 맞춘다. 상자를 두르지 않고, 축과 축 사이는
+ * **위쪽 가는 선** 하나로만 가른다. 「힘이 되는 점 / 살펴보면 좋은 점」은 작은
+ * 머리표를 앞에 단 한 줄씩이다 — 전에 왼쪽에 색선을 세웠더니 칸처럼 보였다.
+ *
+ * 안 배치(글 | 하위척도)는 **이 블록의 폭**(`@container`)으로 정한다.
  */
 
 export type FacetRow = { name: string; percent: number };
 
 export type AxisDetailProps = {
-  /** 목차에서 건너뛸 자리표 */
   id?: string;
   scale: string;
   percent: number;
@@ -29,81 +34,70 @@ export function AxisDetail({ id, scale, percent, band, facets }: AxisDetailProps
   const apply = APPLY[scale]?.[band];
 
   return (
-    /*
-      `@container` — 안 배치(글 | 하위척도 나란히)를 **화면이 아니라 이 카드의
-      폭**으로 정한다. 결과지가 넓은 화면에서 카드를 두 열로 놓기 때문에,
-      화면 기준(`lg:`)으로 가르면 반쪽 카드 안에서도 나란히 놓여 비좁아진다.
-    */
-    <section id={id} className="@container scroll-mt-8 border-t border-[--border] py-10">
-      <div className="mb-6 flex items-baseline gap-3">
-        <h3 className="text-4xl font-medium">{scale}</h3>
-        <span className="tabular text-2xl">{Math.round(percent)}</span>
-        <span className="text-ink-muted">{BAND_LABEL[band]}</span>
+    <section id={id} className="@container border-t border-[--border] py-6">
+      <div className="mb-3 flex items-baseline gap-2.5">
+        <h3 className="text-lg font-semibold">{scale}</h3>
+        <span className="tabular text-base font-medium">{Math.round(percent)}</span>
+        <span className="text-axis text-ink-muted">{BAND_LABEL[band]}</span>
       </div>
 
-      <div className="grid gap-10 @3xl:grid-cols-[minmax(0,1fr)_20rem]">
-        <div>
+      <div className="grid gap-x-10 gap-y-5 @3xl:grid-cols-[minmax(0,1fr)_17rem]">
+        <div className="max-w-[46rem]">
           {/* 눈금 */}
-          <div className="flex items-start gap-5">
-            <span className="w-12 shrink-0 pt-1 text-right font-medium" style={{ color: LOW_INK }}>
+          <div className="flex items-center gap-3">
+            <span className="text-axis w-8 shrink-0 text-right font-medium" style={{ color: LOW_INK }}>
               낮음
             </span>
-            <div className="relative flex-1 pb-1">
-              <div className="h-4 w-full rounded-full" style={{ background: GRADIENT }} />
+            <div className="relative flex-1 py-2">
+              <div className="h-2 w-full rounded-full" style={{ background: GRADIENT }} />
               <div
-                className="absolute -top-1 -translate-x-1/2"
+                className="absolute top-1/2 -translate-x-1/2 -translate-y-1/2"
                 style={{ left: `${x}%` }}
               >
-                <Marker percent={percent} size={28} />
+                <Marker percent={percent} size={18} />
               </div>
             </div>
-            <span className="w-12 shrink-0 pt-1 font-medium" style={{ color: HIGH_INK }}>
+            <span className="text-axis w-8 shrink-0 font-medium" style={{ color: HIGH_INK }}>
               높음
             </span>
           </div>
-
           {poles && (
-            <div className="text-table text-ink-muted mt-3 flex gap-8">
+            <div className="text-axis text-ink-muted mt-1 flex gap-6 px-11">
               <p className="flex-1">{poles.low}</p>
               <p className="flex-1 text-right">{poles.high}</p>
             </div>
           )}
 
-          <p className="text-item mt-6">{BAND_TEXT[scale]?.[band]}</p>
+          <p className="text-item mt-4">{BAND_TEXT[scale]?.[band]}</p>
 
-          {/*
-            **힘이 되는 점 · 살펴보면 좋은 점** — 실제 결과지가 축마다 주는 것을
-            훑어보기 좋게 두 줄로 끊는다. 위 문단의 뒷부분을 압축한 것이라
-            새 이야기가 아니다. 상자를 두르지 않는다 — 구분은 가는 선과 여백으로
-            (11 §1.1). 왼쪽 색선만 둘을 다르게 잡아준다.
-          */}
           {apply && (
-            <dl className="mt-7 grid gap-x-10 gap-y-5 border-t border-[--border] pt-6 @xl:grid-cols-2">
-              <div className="border-l-2 pl-4" style={{ borderColor: colorAt(x) }}>
-                <dt className="text-axis text-ink-muted mb-1.5">힘이 되는 점</dt>
-                <dd className="text-table">{apply.lift}</dd>
+            <dl className="text-table mt-4 grid gap-x-8 gap-y-2 @xl:grid-cols-2">
+              <div>
+                <dt className="eyebrow mb-0.5">강점</dt>
+                <dd>{apply.lift}</dd>
               </div>
-              <div className="border-l-2 border-[--grid] pl-4">
-                <dt className="text-axis text-ink-muted mb-1.5">
-                  살펴보면 좋은 점
-                </dt>
-                <dd className="text-table">{apply.watch}</dd>
+              <div>
+                <dt className="eyebrow mb-0.5">유의할 점</dt>
+                <dd>{apply.watch}</dd>
               </div>
             </dl>
           )}
         </div>
 
-        {/* 하위척도 — 실제 결과지 2페이지에 해당 */}
+        {/* 하위척도 */}
         {facets.length > 0 && (
           <div>
-            <p className="text-table text-ink-muted mb-3">이 축을 이루는 것</p>
-            <div className="flex flex-col gap-2.5">
+            <p className="eyebrow mb-2">하위 척도</p>
+            <div className="flex flex-col gap-2">
               {facets.map((f) => (
-                <div key={f.name} className="grid grid-cols-[6rem_1fr_2rem] items-center gap-2 sm:grid-cols-[7.5rem_1fr_2rem] sm:gap-3">
-                  <span className="text-table text-ink-secondary truncate" title={f.name}>
+                <div
+                  key={f.name}
+                  className="grid grid-cols-[6rem_1fr_2rem] items-center gap-2.5"
+                >
+                  <span className="text-axis text-ink-secondary truncate" title={f.name}>
                     {f.name}
                   </span>
-                  <div className="relative h-1.5 rounded-full" style={{ background: "var(--grid)" }}>
+                  <div className="relative h-1 rounded-full" style={{ background: "var(--grid)" }}>
                     <div
                       className="absolute inset-y-0 left-0 rounded-full"
                       style={{
@@ -112,7 +106,7 @@ export function AxisDetail({ id, scale, percent, band, facets }: AxisDetailProps
                       }}
                     />
                   </div>
-                  <span className="tabular text-table text-right">{Math.round(f.percent)}</span>
+                  <span className="tabular text-axis text-right">{Math.round(f.percent)}</span>
                 </div>
               ))}
             </div>

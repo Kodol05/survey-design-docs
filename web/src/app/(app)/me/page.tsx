@@ -1,8 +1,9 @@
+import type { ReactNode } from "react";
 import Link from "next/link";
 import { AxisDetail } from "@/components/charts/AxisDetail";
 import { PairReadings } from "@/components/charts/PairReadings";
 import { ResultBook, type BookPage } from "@/components/charts/ResultBook";
-import { TraitSummary } from "@/components/charts/TraitSummary";
+import { TraitRadar } from "@/components/charts/TraitRadar";
 import { CHARACTER, TEMPERAMENT, colorAt } from "@/components/charts/scale";
 import { ButtonLink } from "@/components/ui/Button";
 import { EmptyState } from "@/components/ui/Card";
@@ -13,25 +14,25 @@ import { inProgress, latestResult, orderedTraits } from "@/lib/survey/result";
 
 export const metadata = { title: "내 결과 — 7차원 성향 설문" };
 
+const BAND_LABEL = { lower: "낮은 편", middle: "보통", upper: "높은 편" } as const;
+
 /**
- * 개인 결과지 (2026-09-18 다시 짬).
+ * 개인 결과지 (2026-09-18 다시 짬, 같은 날 사용자 피드백으로 한 번 더).
  *
- * ## 구조 — 실제 결과지처럼 네 장
+ * ## 종이 한 장, 세 장짜리
  *
- *   ① 한눈에      이름·응시일 · 프로필 도형 · 7축 점수 · 두드러진 축 ·
- *                 일할 때 나는 | 힘이 되는 점 / 살펴보면 좋은 점 (두 단)
- *   ② 기질(4축)   축마다 점수·구간·서술·하위척도 — 전부 펼쳐, 넓은 화면은 2열
- *   ③ 성격(3축)   〃
- *   ④ 두 축을 같이 · 읽으실 때 · 다시 응시하기
+ * 위 머리와 같은 폭의 종이(`ResultBook`)에 세 장이 실린다. 장 이름과 소제목은
+ * 실제 검사 보고서의 관행을 따른다 — 만든 말을 쓰지 않는다.
  *
- * 첫 장에 「나는 어떤 사람인가」가 다 들어오고, 나머지는 장을 넘겨 본다.
- * 축을 전부 펼치기로 했으므로(사용자 결정) 기질과 성격을 한 장씩으로 나눴다.
+ *   ① 결과 요약    한 줄 헤더 → 프로필 도형 | 척도별 점수 →
+ *                 일하는 방식 · 강점 · 유의할 점 (세 단)
+ *                 — 이 장이 **한 화면에 거의 다 들어오게** 짠다
+ *   ② 척도별 결과  기질 척도 4 + 성격 척도 3, 한 열로. 사이는 가는 선 하나
+ *   ③ 종합         척도 간 관계 · 결과 해석 시 유의사항 · 다시 응시하기
  *
- * ## 폭과 구분선 (2026-09-18 사용자 요청)
- *
- * 넓은 모니터에서 양옆이 크게 비었다. 폭을 넓히되 **글줄을 길게 만들지 않고**
- * 쓴다 — 축 카드를 두 열로, 1장의 요약을 두 단으로. 덩어리 사이에는 가는
- * 선을 두고, 두 단 사이엔 세로 선을 둔다. 상자는 두지 않는다 (11 §1.1).
+ * 기질과 성격을 장으로 가르지 않는다 — 나누면 어색했다(사용자). 상자·격자를
+ * 두지 않고, 덩어리는 **작은 머리표(eyebrow)와 가는 선**으로만 가른다.
+ * 종이 안 글자는 한 단 작다(`globals.css` `.result-book`).
  *
  * 내용(서술·점수·조합)은 그대로다. 직무능력과 사내 위치는 개인 화면에 두지
  * 않는다 (00 D-35 · D-09).
@@ -45,10 +46,7 @@ export default async function MePage(props: {
   if (!result) {
     /*
       ⚠️ **하다 만 사람에게 「시작하지 않았다」고 하면 안 된다** (2026-08-26).
-
-      `latestResult`는 끝낸 것만 찾는다. 105문항 중 여든까지 답한 사람이
-      「아직 응시하지 않으셨습니다」를 보면 **답이 날아간 줄 안다.**
-      실제로는 그대로 있고 이어서 하면 된다. 사실대로 말한다.
+      `latestResult`는 끝낸 것만 찾는다. 답이 날아간 줄 알지 않게 사실대로 말한다.
     */
     const doing = await inProgress(me.id);
     return (
@@ -82,9 +80,6 @@ export default async function MePage(props: {
     traits.map((t) => [t.scale, { percent: t.percent, band: t.band }]),
   );
 
-  /** 축이 실린 장 번호 — 기질은 2, 성격은 3. 본문 링크가 `?p=` 로 그 장을 연다 */
-  const pageOf = (scale: string) => (TEMPERAMENT.includes(scale) ? 2 : 3);
-
   const detail = (scale: string) => {
     const t = byScale.get(scale as never);
     if (!t) return null;
@@ -111,7 +106,6 @@ export default async function MePage(props: {
     .sort((a, b) => Math.abs(b.percent - 50) - Math.abs(a.percent - 50))
     .slice(0, 3);
 
-  /** 두드러진 축의 「일할 때의 결」·「힘이 되는 점」·「살펴보면 좋은 점」 */
   const notes = standout
     .map((t) => ({
       scale: t.scale as string,
@@ -123,36 +117,49 @@ export default async function MePage(props: {
         Boolean(n.apply),
     );
 
-  const dot = (percent: number) => (
+  const dot = (color: string) => (
     <span
       aria-hidden
-      className="mt-2.5 size-2.5 shrink-0 rounded-[2px]"
-      style={{ background: colorAt(percent) }}
+      className="mt-[0.45em] size-2 shrink-0 rounded-[2px]"
+      style={{ background: color }}
     />
   );
 
+  /** 척도별 결과 장(2)으로 가는 링크 */
   const axisLink = (scale: string) => (
-    <a
-      href={`?p=${pageOf(scale)}`}
-      className="text-ink-secondary underline underline-offset-2"
-    >
+    <a href="?p=2" className="text-ink-secondary underline underline-offset-2">
       {scale}
     </a>
   );
 
-  /** 덩어리 사이 가는 선 — 상자 대신 이걸로 나눈다 */
-  const rule = "border-t border-[--border]";
+  /** 결과 요약의 세 단 중 하나 — 머리표 + 짧은 줄 몇 개 */
+  const column = (
+    label: string,
+    items: { key: string; color: string; text: ReactNode }[],
+  ) => (
+    <div>
+      <p className="eyebrow mb-2.5">{label}</p>
+      <ul className="text-table flex flex-col gap-2.5">
+        {items.map((it) => (
+          <li key={it.key} className="flex gap-2.5">
+            {dot(it.color)}
+            <p>{it.text}</p>
+          </li>
+        ))}
+      </ul>
+    </div>
+  );
 
-  // ── ① 한눈에 ──
-  const overview = (
+  // ── ① 결과 요약 ──
+  const summary = (
     <>
-      <header
-        className="mb-10 rounded-2xl px-8 py-8 sm:px-10"
-        style={{ background: "var(--wash)" }}
-      >
-        <p className="text-axis text-ink-secondary mb-1">7차원 성향 설문 결과</p>
-        <h1 className="text-screen-title mb-2">{me.name} 님</h1>
-        <p className="text-table text-ink-secondary">
+      {/* 한 줄 헤더 */}
+      <header className="flex flex-wrap items-baseline justify-between gap-x-6 gap-y-1">
+        <div className="flex items-baseline gap-3">
+          <h1 className="text-screen-title">{me.name} 님</h1>
+          <span className="text-axis text-ink-muted">7차원 성향 검사 결과</span>
+        </div>
+        <p className="text-axis text-ink-muted tabular">
           {result.completedAt?.toLocaleDateString("ko-KR")} 응시
           {result.durationSec
             ? ` · ${Math.round(result.durationSec / 60)}분 소요`
@@ -160,197 +167,177 @@ export default async function MePage(props: {
         </p>
       </header>
 
-      {/* 프로필 도형 + 7축 점수. 축 이름을 누르면 그 축이 실린 장으로 (#pN → ResultBook 이 받는다) */}
-      <section>
-        <TraitSummary
-          anchorOf={(s) => `p${pageOf(s)}`}
-          rows={traits.map((t) => ({
-            scale: t.scale,
-            percent: t.percent,
-            band: t.band,
-          }))}
-        />
-      </section>
+      {/* 프로필 도형 | 일곱 축 점수표 */}
+      <section className="mt-5 grid items-center gap-x-10 gap-y-6 border-t border-[--border] pt-5 lg:grid-cols-[minmax(0,5fr)_minmax(0,7fr)]">
+        <div className="mx-auto w-full max-w-[21rem]">
+          <TraitRadar
+            data={traits.map((t) => ({ scale: t.scale, percent: t.percent }))}
+            showValues
+          />
+        </div>
 
-      {standout.length === 0 ? (
-        <p className={`text-item text-ink-secondary mt-12 max-w-[54rem] pt-10 ${rule}`}>
-          일곱 축이 모두 가운데 범위입니다. 어느 축에서도 한쪽으로 크게 기울지
-          않아, 상황에 따라 양쪽을 골라 쓰는 편입니다. 축마다 자세한 이야기는
-          다음 장부터 보실 수 있습니다.
-        </p>
-      ) : (
-        <>
-          {/* 두드러진 축 */}
-          <section className={`mt-12 pt-8 ${rule}`}>
-            <p className="text-axis text-ink-muted mb-3">두드러진 축</p>
-            <ul className="flex flex-wrap gap-x-8 gap-y-3">
-              {standout.map((t) => (
-                <li key={t.scale}>
-                  <a
-                    href={`?p=${pageOf(t.scale)}`}
-                    className="flex items-baseline gap-2"
-                  >
+        <div>
+          <p className="eyebrow mb-2">척도별 점수</p>
+          <ul className="flex flex-col">
+            {traits.map((t, n) => {
+              const x = Math.max(0, Math.min(100, t.percent));
+              return (
+                <li
+                  key={t.scale}
+                  className={`grid grid-cols-[6.5rem_minmax(0,1fr)_2.25rem_3.5rem] items-center gap-x-3 py-1.5 ${
+                    n === TEMPERAMENT.length ? "mt-1.5 border-t border-[--border] pt-3" : ""
+                  }`}
+                >
+                  {axisLink(t.scale)}
+                  {/* 자리 눈금 — 가운데 눈금 하나, 내 자리에 점 */}
+                  <div className="relative h-1.5 rounded-full" style={{ background: "var(--grid)" }}>
                     <span
                       aria-hidden
-                      className="size-2.5 translate-y-px rounded-[2px]"
-                      style={{ background: colorAt(t.percent) }}
+                      className="absolute inset-y-0 left-1/2 w-px"
+                      style={{ background: "var(--axis)" }}
                     />
-                    <span className="text-table font-medium">{t.scale}</span>
-                    <span className="tabular text-table text-ink-secondary">
-                      {Math.round(t.percent)}
-                    </span>
-                  </a>
+                    <span
+                      aria-hidden
+                      className="absolute top-1/2 size-3 -translate-x-1/2 -translate-y-1/2 rounded-full ring-2"
+                      style={{
+                        left: `${x}%`,
+                        background: colorAt(t.percent),
+                        ["--tw-ring-color" as string]: "var(--sheet)",
+                      }}
+                    />
+                  </div>
+                  <span className="tabular text-table text-right font-medium">
+                    {Math.round(t.percent)}
+                  </span>
+                  <span className="text-axis text-ink-muted">{BAND_LABEL[t.band]}</span>
                 </li>
-              ))}
-            </ul>
-          </section>
+              );
+            })}
+          </ul>
+          <p className="text-axis text-ink-muted mt-2">
+            위 네 개는 기질 척도, 아래 세 개는 성격 척도입니다.
+          </p>
+        </div>
+      </section>
 
-          {/*
-            두 단 — 왼쪽 「일할 때 나는」, 오른쪽 「힘이 되는 점 / 살펴보면 좋은 점」.
-            넓은 화면에서 양옆이 비지 않게 쓰되, 각 단의 글줄은 짧게 유지된다.
-            단 사이엔 세로 선.
-          */}
-          <section
-            className={`mt-10 grid gap-y-12 pt-10 xl:grid-cols-2 xl:gap-x-0 ${rule}`}
-          >
-            {/* 일할 때 나는 — 결과를 점치지 않고 편하게 느끼는 결만 (07) */}
-            <div className="xl:pr-12">
-              <h2 className="text-section-title mb-2">일할 때 나는</h2>
-              <p className="text-ink-secondary mb-6">
-                두드러진 축을 모아 어떤 결의 일을 편하게 느끼는지 적었습니다.
-                무엇을 잘한다거나 어떤 일에 맞다는 뜻은 아니고, 평소 편하게
-                여기는 방식이라고 보시면 됩니다.
-              </p>
-              <ul className="flex flex-col gap-4">
-                {notes.map((n) => (
-                  <li key={n.scale} className="flex gap-4">
-                    {dot(n.percent)}
-                    <p className="text-item">
-                      {axisLink(n.scale)}
-                      {" — "}
-                      {n.apply.work}
-                    </p>
-                  </li>
-                ))}
-              </ul>
-            </div>
-
-            <div className="flex flex-col gap-10 xl:border-l xl:border-[--border] xl:pl-12">
-              <div>
-                <h2 className="text-section-title mb-4">힘이 되는 점</h2>
-                <ul className="flex flex-col gap-4">
-                  {notes.map((n) => (
-                    <li key={n.scale} className="flex gap-4">
-                      {dot(n.percent)}
-                      <p className="text-item">
-                        <span className="text-ink-secondary">{n.scale}</span>
-                        {" · "}
-                        {n.apply.lift}
-                      </p>
-                    </li>
-                  ))}
-                </ul>
-              </div>
-              <div className={`pt-8 ${rule}`}>
-                <h2 className="text-section-title mb-4">살펴보면 좋은 점</h2>
-                <ul className="flex flex-col gap-4">
-                  {notes.map((n) => (
-                    <li key={n.scale} className="flex gap-4">
-                      <span
-                        aria-hidden
-                        className="mt-2.5 size-2.5 shrink-0 rounded-[2px]"
-                        style={{ background: "var(--grid)" }}
-                      />
-                      <p className="text-item">
-                        <span className="text-ink-secondary">{n.scale}</span>
-                        {" · "}
-                        {n.apply.watch}
-                      </p>
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            </div>
-          </section>
-        </>
+      {/* 일하는 방식 · 강점 · 유의할 점 */}
+      {standout.length === 0 ? (
+        <p className="text-table text-ink-secondary mt-6 max-w-[54rem] border-t border-[--border] pt-5">
+          일곱 척도가 모두 보통 범위입니다. 어느 쪽으로도 크게 기울지 않아
+          상황에 따라 양쪽을 고르게 쓰는 편입니다. 척도별 내용은 다음 장에
+          있습니다.
+        </p>
+      ) : (
+        <section className="mt-6 grid gap-x-10 gap-y-7 border-t border-[--border] pt-5 md:grid-cols-3">
+          {column(
+            "일하는 방식",
+            notes.map((n) => ({
+              key: n.scale,
+              color: colorAt(n.percent),
+              text: (
+                <>
+                  {axisLink(n.scale)}
+                  {" — "}
+                  {n.apply.work}
+                </>
+              ),
+            })),
+          )}
+          {column(
+            "강점",
+            notes.map((n) => ({
+              key: n.scale,
+              color: colorAt(n.percent),
+              text: (
+                <>
+                  <span className="text-ink-secondary">{n.scale}</span>
+                  {" · "}
+                  {n.apply.lift}
+                </>
+              ),
+            })),
+          )}
+          {column(
+            "유의할 점",
+            notes.map((n) => ({
+              key: n.scale,
+              color: "var(--axis)",
+              text: (
+                <>
+                  <span className="text-ink-secondary">{n.scale}</span>
+                  {" · "}
+                  {n.apply.watch}
+                </>
+              ),
+            })),
+          )}
+        </section>
       )}
     </>
   );
 
-  /*
-    축 카드를 넓은 화면에서 두 열로. 카드마다 위에 선이 있어 행이 갈리고,
-    열 사이엔 세로 선을 둔다. 카드 안 배치(글 | 하위척도)는 카드 자신의
-    폭을 보고 정한다 (`AxisDetail` 의 컨테이너 쿼리).
-  */
-  const axisGrid =
-    "grid xl:grid-cols-2 xl:gap-x-0 xl:[&>*:nth-child(even)]:border-l xl:[&>*:nth-child(even)]:border-[--border] xl:[&>*:nth-child(even)]:pl-10 xl:[&>*:nth-child(odd)]:pr-10";
+  // ── ② 척도별 결과 ──
+  const group = (label: string, note: string, scales: string[]) => (
+    <div>
+      <div className="flex flex-wrap items-baseline gap-x-3 gap-y-1 pb-2">
+        <h2 className="text-section-title">{label}</h2>
+        <p className="text-axis text-ink-muted">{note}</p>
+      </div>
+      {scales.map(detail)}
+    </div>
+  );
 
-  // ── ② 기질 ──
-  const temperament = (
+  const axes = (
     <>
-      <h2 className="text-section-title mb-2">기질</h2>
-      <p className="text-ink-secondary mb-6">
-        타고난 부분입니다. 바꾸려 애쓰기보다 알고 쓰는 쪽이 맞습니다.
-      </p>
-      <div className={axisGrid}>{TEMPERAMENT.map(detail)}</div>
+      {group("기질 척도", "타고난 부분. 바꾸기보다 알고 쓰는 쪽에 가깝습니다.", TEMPERAMENT)}
+      <div className="mt-10">
+        {group("성격 척도", "살면서 형성된 부분. 시간이 지나며 달라질 수 있습니다.", CHARACTER)}
+      </div>
     </>
   );
 
-  // ── ③ 성격 ──
-  const character = (
-    <>
-      <h2 className="text-section-title mb-2">성격</h2>
-      <p className="text-ink-secondary mb-6">
-        살면서 형성된 부분입니다. 기질과 달리 시간이 지나며 달라질 수 있습니다.
-      </p>
-      <div className={axisGrid}>{CHARACTER.map(detail)}</div>
-    </>
-  );
-
-  // ── ④ 두 축을 같이 · 읽으실 때 ──
+  // ── ③ 종합 ──
   const together = (
     <>
-      <h2 className="text-section-title mb-2">두 축을 같이 보면</h2>
-      <p className="text-ink-secondary mb-10 max-w-[54rem]">
-        축을 하나씩 보는 것과 둘을 겹쳐 보는 것은 다릅니다. 서로 당기는
-        방향이 다른 축이 만나면 그 안에서 긴장이 생깁니다.
-      </p>
-      <PairReadings readings={readPairs(scores)} scores={scores} />
+      <div className="flex flex-wrap items-baseline gap-x-3 gap-y-1 border-b border-[--border] pb-3">
+        <h2 className="text-section-title">척도 간 관계</h2>
+        <p className="text-axis text-ink-muted">
+          서로 다른 방향으로 작용하는 두 척도가 만났을 때의 해석입니다.
+        </p>
+      </div>
+      <div className="mt-6">
+        <PairReadings readings={readPairs(scores)} scores={scores} />
+      </div>
 
-      {/* 전체 안내는 한 번만. 곳곳에 경고를 흩뿌리면 아무도 안 읽는다 */}
-      <section className={`text-table text-ink-muted mt-20 max-w-[56rem] pt-8 ${rule}`}>
-        <p className="text-ink-secondary mb-2 font-medium">읽으실 때</p>
+      <section className="text-table text-ink-muted mt-10 max-w-[56rem] border-t border-[--border] pt-5">
+        <p className="eyebrow mb-2">결과 해석 시 유의사항</p>
         <p className="mb-1">
-          점수는 잘한다 못한다가 아니라 이런 편이다 정도입니다. 이번 일을
-          어떻게 할지보다 평소 일하는 방식을 보는 데 맞습니다.
+          점수는 우열이 아니라 경향의 정도입니다. 특정 상황의 결과를 예측하기보다
+          평소의 일하는 방식을 이해하는 데 맞습니다.
         </p>
         <p>
-          그리고 이 결과가 전부 맞지는 않을 수 있습니다. 스스로 답한 것을
-          모은 것이라 그날 상태에 따라 달라지고, 문항도 저희가 새로 쓴 것이라
-          아직 다듬는 중입니다. 자기 이해를 돕는 참고 자료로 보시면 됩니다.
+          자기보고 검사이므로 응답 당시의 상태에 따라 결과가 달라질 수 있고,
+          문항은 계속 다듬는 중입니다. 자기 이해를 돕는 참고 자료로 활용해
+          주십시오.
+        </p>
+        <p className="mt-4" data-print="hide">
+          <Link href="/survey" className="text-ink-secondary underline">
+            다시 응시하기
+          </Link>
         </p>
       </section>
-
-      <p className="mt-12" data-print="hide">
-        <Link href="/survey" className="text-ink-secondary underline">
-          다시 응시하기
-        </Link>
-      </p>
     </>
   );
 
   const pages: BookPage[] = [
-    { key: "overview", label: "한눈에", content: overview },
-    { key: "temperament", label: "기질", content: temperament },
-    { key: "character", label: "성격", content: character },
-    { key: "together", label: "두 축을 같이", content: together },
+    { key: "summary", label: "결과 요약", content: summary },
+    { key: "axes", label: "척도별 결과", content: axes },
+    { key: "together", label: "종합", content: together },
   ];
 
   /*
-    처음 펼 장은 **서버가 `?p=` 를 읽어** 정한다. 그래야 새로고침·공유 링크로
-    열어도 그 장이 바로 그려지고, 자바스크립트가 뜨기 전에 1장이 잠깐 보이는
-    일이 없다. 범위 밖이면 1장. `key` 를 주는 이유: 같은 화면 안에서 `?p=` 만
-    바뀌는 이동(본문 링크)에도 장이 새로 잡히게 하기 위해서다.
+    처음 펼 장은 서버가 `?p=` 를 읽어 정한다 — 새로고침·공유 링크에도 그 장이
+    바로 그려진다. `key` 로 `?p=` 만 바뀌는 이동에도 장이 새로 잡히게 한다.
   */
   const { p } = await props.searchParams;
   const asked = Number(p);
@@ -361,8 +348,9 @@ export default async function MePage(props: {
 
   return (
     // 좁은 화면에선 아래 넘김 줄이 떠 있으므로 바닥 여백을 넉넉히 둔다
-    <main className="page-wide py-12 pb-28 lg:pb-16">
+    <main className="page-column py-8 pb-24 lg:py-10 lg:pb-12">
       <ResultBook key={initialPage} pages={pages} initial={initialPage} />
     </main>
   );
 }
+

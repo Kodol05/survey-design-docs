@@ -138,27 +138,36 @@ export function SectionForm({
 
   return (
     <div className="flex flex-col">
-      {/* 진행률 — 바 + "묶음 N / 7". 퍼센트 숫자와 타이머는 두지 않는다 (01 §2.5) */}
-      <div className="bg-page/95 sticky top-0 z-10 -mx-6 px-6 pt-4 pb-4 backdrop-blur">
-        <div className="mb-2 flex items-baseline justify-between">
-          <h1 className="text-section-title">7차원 성향 설문</h1>
-          <span className="text-axis text-ink-secondary tabular">
-            묶음 {section} / {sectionCount}
-          </span>
-        </div>
-        <div
-          className="h-2 w-full overflow-hidden rounded-full"
-          style={{ background: "var(--grid)" }}
-          role="progressbar"
-          aria-valuenow={doneAll}
-          aria-valuemin={0}
-          aria-valuemax={totalItems}
-          aria-label={`전체 ${totalItems}문항 중 ${doneAll}문항 답함`}
-        >
+      {/*
+        진행률 — 바 + "N / 7 묶음". 퍼센트 숫자와 타이머는 두지 않는다 (01 §2.5).
+
+        **작게, 가운데에, 둘을 한 줄로** (2026-09-18 사용자 요청). 전에는 왼쪽에
+        「7차원 성향 설문」 제목, 오른쪽에 묶음 수, 아래에 화면 폭 가득한 바였다.
+        제목은 위 머리에 이미 있으니 「설문 진행도」로 바꾸고, 바는 폭을 2/3 로
+        줄여 한눈에 들어오게 한다.
+      */}
+      <div className="bg-page/95 sticky top-0 z-10 -mx-6 px-6 pt-3 pb-3 backdrop-blur">
+        <div className="mx-auto w-full max-w-[42rem]">
+          <div className="mb-1.5 flex items-baseline justify-center gap-3">
+            <h1 className="text-axis text-ink-secondary font-medium">설문 진행도</h1>
+            <span className="text-axis text-ink-secondary tabular">
+              {section} / {sectionCount} 묶음
+            </span>
+          </div>
           <div
-            className="h-full transition-[width] duration-300"
-            style={{ width: `${pct}%`, background: "var(--series-1)" }}
-          />
+            className="h-1.5 w-full overflow-hidden rounded-full"
+            style={{ background: "var(--grid)" }}
+            role="progressbar"
+            aria-valuenow={doneAll}
+            aria-valuemin={0}
+            aria-valuemax={totalItems}
+            aria-label={`전체 ${totalItems}문항 중 ${doneAll}문항 답함`}
+          >
+            <div
+              className="h-full transition-[width] duration-300"
+              style={{ width: `${pct}%`, background: "var(--series-1)" }}
+            />
+          </div>
         </div>
       </div>
 
