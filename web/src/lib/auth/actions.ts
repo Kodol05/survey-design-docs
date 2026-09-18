@@ -118,7 +118,24 @@ export async function login(
 
     await clearFailures(phone);
     await createSession(employee.id);
-    redirect("/survey");
+
+    /*
+      **어디로 보낼지는 그 사람이 어디까지 했느냐로 정한다** (2026-09-18 사용자 지적).
+
+      전에는 무조건 `/survey` 로 보냈다. 그러면 이미 끝낸 사람도 결과 대신
+      빈 새 설문 화면에 떨어지고, 그 자리에서 새 세션까지 하나 만들어진다.
+      기획은 「다시 들어오면 지난 결과를 보고, 거기서 다시 응시한다」였다.
+
+      끝낸 결과가 있으면 결과 화면(`/me`)으로 — 거기에 「다시 응시하기」가
+      있다. 아직 없으면(처음이거나 하던 중) `/survey` 로 가서 시작하거나 잇는다.
+      `/survey` 쪽에서 가르지 않는 이유는, 「다시 응시하기」도 `/survey` 로
+      오는데 거기서 완료자를 `/me` 로 돌려보내면 서로 튕기기 때문이다.
+    */
+    const done = await prisma.testSession.findFirst({
+      where: { employeeId: employee.id, status: "COMPLETED" },
+      select: { id: true },
+    });
+    redirect(done ? "/me" : "/survey");
   });
 }
 

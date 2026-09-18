@@ -2,7 +2,11 @@ import { prisma } from "../db";
 import { ABILITY_AXES, COMPOSITE_AXIS, TRAIT_SCALES } from "@/lib/items/types";
 import { abilityMean } from "@/components/analysis/TraitStrip";
 import { quantile } from "./spread";
-import type { StoredAbilities, StoredTraits } from "../survey/result";
+import {
+  displaySession,
+  type StoredAbilities,
+  type StoredTraits,
+} from "../survey/result";
 import type { Row } from "@/app/admin/(guarded)/employees/EmployeeList";
 
 /**
@@ -83,14 +87,15 @@ export async function loadRoster(qs: RosterQuery): Promise<Roster> {
     include: {
       testSessions: {
         orderBy: { startedAt: "desc" },
-        take: 1,
+        // 몇 개 더 가져와서 끝낸 것을 우선 집는다 — 빈 새 세션이 결과를 가리지 않게
+        take: 5,
         include: { result: true, qualityFlag: true },
       },
     },
   });
 
   const everyone: Row[] = employees.map((e) => {
-    const s = e.testSessions[0];
+    const s = displaySession(e.testSessions);
     const stored = (s?.result?.scoresJson ?? null) as StoredTraits | null;
     const ability = (s?.result?.abilityScoresJson ??
       null) as StoredAbilities | null;
@@ -178,19 +183,26 @@ export async function loadRoster(qs: RosterQuery): Promise<Roster> {
     });
 
   // ── 줄 세우기 ──
-  const fallbackDir: SortDir = sortKey ? "desc" : "asc";
+  /*
+    축을 고르지 않았을 때는 **최근에 끝낸 순**이다 (2026-09-18 사용자 요청).
+
+    전에는 가나다순이었다. 그런데 관리자가 목록을 여는 이유는 대개
+    「방금 누가 했나」라서, 새로 끝낸 사람이 맨 위에 와야 한다.
+    끝낸 시각은 화면용 문자열(`completedLabel`)과 별개로 숫자로 따로 둔다 —
+    문자열로 비교하면 날짜가 뒤섞인다.
+  */
+  const recentMs = new Map(
+    employees.map((e) => [
+      e.id,
+      displaySession(e.testSessions)?.completedAt?.getTime() ?? 0,
+    ]),
+  );
+
+  // 점수도 최근순도 「큰 값(최근)이 먼저」가 기본이다
+  const fallbackDir: SortDir = "desc";
   const sortDir: SortDir =
     qs.dir === "asc" || qs.dir === "desc" ? qs.dir : fallbackDir;
-
-  /*
-    ⚠️ 방향 부호가 **갈래마다 반대다.**
-
-    점수는 `desc`가 큰 값부터라 `b − a`를 그대로 쓴다(+1).
-    이름은 `asc`가 가나다순이라 `localeCompare`를 그대로 쓴다(+1).
-    하나로 묶으면 이름 정렬이 뒤집힌다 — 실제로 그렇게 났다.
-  */
   const valueFlip = sortDir === "asc" ? -1 : 1;
-  const nameFlip = sortDir === "asc" ? 1 : -1;
 
   /*
     무엇으로 정렬하든 **끝낸 사람이 먼저**다.
@@ -206,7 +218,13 @@ export async function loadRoster(qs: RosterQuery): Promise<Roster> {
   rows = [...rows].sort((a, b) => {
     const byStatus = statusRank(a.status) - statusRank(b.status);
     if (byStatus) return byStatus;
-    if (!sortKey) return byName(a, b) * nameFlip;
+
+    if (!sortKey) {
+      const ra = recentMs.get(a.id) ?? 0;
+      const rb = recentMs.get(b.id) ?? 0;
+      if (ra !== rb) return (rb - ra) * valueFlip;
+      return byName(a, b);
+    }
 
     const va = valueOf(a);
     const vb = valueOf(b);

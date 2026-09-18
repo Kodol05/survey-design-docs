@@ -11,6 +11,7 @@ import { averageOf, bandOf, loadDistribution } from "@/lib/admin/distribution";
 import { prisma } from "@/lib/db";
 import { loadResearchTable, relatedScales } from "@/lib/research/correlations";
 import {
+  displaySession,
   orderedAbilities,
   orderedTraits,
   type StoredAbilities,
@@ -32,14 +33,15 @@ export default async function EmployeeDetail(props: {
     include: {
       testSessions: {
         orderBy: { startedAt: "desc" },
-        take: 1,
+        // 끝낸 것을 우선 집는다 — 빈 새 세션이 결과를 가리지 않게 (displaySession)
+        take: 5,
         include: { result: true, qualityFlag: true },
       },
     },
   });
   if (!e || e.role !== "USER") notFound();
 
-  const session = e.testSessions[0];
+  const session = displaySession(e.testSessions);
   const result = session?.result;
 
   return (

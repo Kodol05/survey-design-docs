@@ -77,3 +77,27 @@ export function orderedAbilities(abilities: StoredAbilities) {
     ...abilities[a],
   }));
 }
+
+/**
+ * 한 사람의 여러 응시 중 **화면에 보일 하나**를 고른다 (2026-09-18).
+ *
+ * ## 무슨 일이 있었나
+ *
+ * 다시 로그인하면 `/survey` 로 보내던 탓에, 이미 끝낸 사람에게도 **빈 새
+ * 세션이 하나 더** 생겼다. 관리자 화면은 「가장 최근 세션」을 집었으므로 그
+ * 빈 세션이 위에 올라와 **끝낸 결과를 가리고 「진행중」으로** 보였다.
+ *
+ * ## 규칙
+ *
+ * 끝낸 세션이 있으면 그것을 보인다 — 결과가 거기 있다. 다시 응시 중이라도
+ * 지난 결과가 사라진 것은 아니다. 끝낸 것이 없을 때만 가장 최근 것(진행 중
+ * 또는 없음)을 보인다.
+ *
+ * ⚠️ `sessions` 는 **startedAt 내림차순**이어야 한다. 그래야 `find` 가 가장
+ *    최근에 끝낸 것을, `[0]` 이 가장 최근 것을 집는다.
+ */
+export function displaySession<T extends { status: string }>(
+  sessions: T[],
+): T | undefined {
+  return sessions.find((s) => s.status === "COMPLETED") ?? sessions[0];
+}
