@@ -180,41 +180,59 @@ export default async function MePage(props: {
         </div>
 
         <div>
-          {/*
-            척도 · 한 줄 특징 · 점수 · 구간. 가운데 구간까지 일곱 줄이 다 나오므로
-            사람마다 일곱 줄이 자기 구간에 맞게 조합된다 (`lines.ts`).
-          */}
-          <p className="eyebrow mb-2">척도별 점수와 특징</p>
+          <p className="eyebrow mb-2">척도별 점수</p>
           <ul className="flex flex-col">
-            {traits.map((t, n) => (
-              <li
-                key={t.scale}
-                className={`grid grid-cols-[6.5rem_minmax(0,1fr)_2.25rem_3.5rem] items-baseline gap-x-3 py-1.5 ${
-                  n === TEMPERAMENT.length ? "mt-1.5 border-t border-[--border] pt-3" : ""
-                }`}
-              >
-                <span className="flex items-baseline gap-1.5">
-                  <span
-                    aria-hidden
-                    className="size-2 shrink-0 translate-y-px rounded-[2px]"
-                    style={{ background: colorAt(t.percent) }}
-                  />
+            {traits.map((t, n) => {
+              const x = Math.max(0, Math.min(100, t.percent));
+              return (
+                <li
+                  key={t.scale}
+                  className={`grid grid-cols-[6.5rem_minmax(0,1fr)_2.25rem_3.5rem] items-center gap-x-3 py-1.5 ${
+                    n === TEMPERAMENT.length ? "mt-1.5 border-t border-[--border] pt-3" : ""
+                  }`}
+                >
                   {axisLink(t.scale)}
-                </span>
-                <span className="text-table lg:truncate" title={LINE[t.scale]?.[t.band]}>
-                  {LINE[t.scale]?.[t.band]}
-                </span>
-                <span className="tabular text-table text-right font-medium">
-                  {Math.round(t.percent)}
-                </span>
-                <span className="text-axis text-ink-muted">{BAND_LABEL[t.band]}</span>
-              </li>
-            ))}
+                  {/* 자리 눈금 — 가운데 눈금 하나, 내 자리에 점 */}
+                  <div className="relative h-1.5 rounded-full" style={{ background: "var(--grid)" }}>
+                    <span
+                      aria-hidden
+                      className="absolute inset-y-0 left-1/2 w-px"
+                      style={{ background: "var(--axis)" }}
+                    />
+                    <span
+                      aria-hidden
+                      className="absolute top-1/2 size-3 -translate-x-1/2 -translate-y-1/2 rounded-full ring-2"
+                      style={{
+                        left: `${x}%`,
+                        background: colorAt(t.percent),
+                        ["--tw-ring-color" as string]: "var(--sheet)",
+                      }}
+                    />
+                  </div>
+                  <span className="tabular text-table text-right font-medium">
+                    {Math.round(t.percent)}
+                  </span>
+                  <span className="text-axis text-ink-muted">{BAND_LABEL[t.band]}</span>
+                </li>
+              );
+            })}
           </ul>
           <p className="text-axis text-ink-muted mt-2">
             위 네 개는 기질 척도, 아래 세 개는 성격 척도입니다.
           </p>
         </div>
+      </section>
+
+      {/*
+        특징 — 일곱 척도의 문장을 **한 단락으로 이어** 보인다 (사용자 요청).
+        척도 이름을 앞에 달지 않는다. 사람마다 자기 구간의 문장 일곱 개가
+        척도 순서대로 조합되어, 짧은 소견처럼 읽힌다 (`lines.ts`).
+      */}
+      <section className="mt-6 border-t border-[--border] pt-5">
+        <p className="eyebrow mb-2">특징</p>
+        <p className="text-item max-w-[64rem]">
+          {traits.map((t) => LINE[t.scale]?.[t.band]).filter(Boolean).join(" ")}
+        </p>
       </section>
 
       {/* 일하는 방식 · 강점 · 유의할 점 */}

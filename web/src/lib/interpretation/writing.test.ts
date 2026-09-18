@@ -90,12 +90,13 @@ describe("빠짐없이 있는가", () => {
         expect(p.text[k], `${p.title} ${k}`).toBeTruthy();
   });
 
-  it("일곱 축 모두 세 구간의 한 줄 특징이 있고 한 줄에 들어간다", () => {
+  it("일곱 축 모두 세 구간의 특징 문장이 있고, 한 문장 길이다", () => {
     for (const s of TRAIT_SCALES)
       for (const b of ["lower", "middle", "upper"] as const) {
         expect(LINE[s]?.[b], `${s} ${b}`).toBeTruthy();
-        // 표 한 칸에 줄바꿈 없이 들어가야 한다
-        expect(LINE[s][b].length, `${s} ${b}`).toBeLessThanOrEqual(34);
+        // 일곱이 한 단락으로 이어지므로 하나가 너무 길면 단락이 무거워진다
+        expect(LINE[s][b].length, `${s} ${b}`).toBeLessThanOrEqual(90);
+        expect(LINE[s][b].endsWith("편입니다."), `${s} ${b}`).toBe(true);
       }
   });
 
