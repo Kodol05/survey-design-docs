@@ -25,8 +25,22 @@ import { colorAt } from "./scale";
 
 export type BarRow = { scale: string; percent: number };
 
-export function TraitBars({ rows, height = 280 }: { rows: BarRow[]; height?: number }) {
+export function TraitBars({
+  rows,
+  height = 280,
+  compact,
+}: {
+  rows: BarRow[];
+  height?: number;
+  /**
+   * 좁은 칸(목록의 펼침 패널 등)용 — 라벨을 작게, 넉 자 이름도 두 줄로.
+   * 일곱 칸이 60px 안팎으로 줄면 17px 이름이 옆 칸과 겹친다 (2026-09-18 신고).
+   */
+  compact?: boolean;
+}) {
   const data = rows.map((r) => ({ ...r, value: Math.round(r.percent) }));
+  const tickSize = compact ? 13 : 17;
+  const valueSize = compact ? 15 : 19;
 
   return (
     <div className="w-full" style={{ height }}>
@@ -42,9 +56,11 @@ export function TraitBars({ rows, height = 280 }: { rows: BarRow[]; height?: num
             dataKey="scale"
             tickLine={false}
             axisLine={{ stroke: "var(--axis)" }}
-            tick={(props: TickProps) => <AxisTick {...props} />}
+            tick={(props: TickProps) => (
+              <AxisTick {...props} fontSize={tickSize} wrapAll={compact} />
+            )}
             interval={0}
-            height={46}
+            height={compact ? 40 : 46}
           />
           {/* 중립선 — 전 문항에 "보통"으로 답하면 나오는 값 */}
           <ReferenceLine
@@ -78,7 +94,7 @@ export function TraitBars({ rows, height = 280 }: { rows: BarRow[]; height?: num
               dataKey="value"
               position="top"
               fill="var(--ink)"
-              fontSize={19}
+              fontSize={valueSize}
               fontWeight={600}
             />
           </Bar>
@@ -108,21 +124,26 @@ type TickProps = {
   x?: number | string;
   y?: number | string;
   payload?: { value?: string };
+  fontSize?: number;
+  /** 좁은 칸에서는 넉 자 이름(자극추구·위험회피·자기초월)도 두 자씩 접는다 */
+  wrapAll?: boolean;
 };
 
-function AxisTick({ x, y, payload }: TickProps) {
+function AxisTick({ x, y, payload, fontSize = 17, wrapAll }: TickProps) {
   const name = payload?.value ?? "";
-  const lines = WRAP[name] ?? [name];
+  const lines =
+    WRAP[name] ??
+    (wrapAll && name.length === 4 ? [name.slice(0, 2), name.slice(2)] : [name]);
   return (
     <text
       x={x}
-      y={Number(y ?? 0) + 18}
+      y={Number(y ?? 0) + fontSize + 1}
       textAnchor="middle"
       fill="var(--ink-secondary)"
-      fontSize={17}
+      fontSize={fontSize}
     >
       {lines.map((line, i) => (
-        <tspan key={line} x={x} dy={i === 0 ? 0 : 19}>
+        <tspan key={line} x={x} dy={i === 0 ? 0 : fontSize + 2}>
           {line}
         </tspan>
       ))}

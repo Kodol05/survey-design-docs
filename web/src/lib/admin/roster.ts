@@ -24,6 +24,8 @@ export type SortDir = "asc" | "desc";
 
 /** 정렬 축 이름 자리에 들어가는 특별한 열쇠 — 실제 축 이름과 겹치면 안 된다 */
 export const MEAN_KEY = COMPOSITE_AXIS;
+/** 이름순 정렬 열쇠 — 축 이름과 겹치지 않는 값 (2026-09-18 사용자 요청) */
+export const NAME_KEY = "이름";
 
 /**
  * 점수 구간 — **사분위로 자른다.**
@@ -71,6 +73,8 @@ export type Roster = {
   /** 화면이 다시 계산하지 않도록 판정 결과를 같이 넘긴다 */
   keyword: string;
   sortKey: string | null;
+  /** 이름순으로 보고 있는가 (sortKey 는 점수 축일 때만 있다) */
+  nameSort: boolean;
   sortDir: SortDir;
   fallbackDir: SortDir;
   onlyReview: boolean;
@@ -133,6 +137,7 @@ export async function loadRoster(qs: RosterQuery): Promise<Roster> {
   const isAbility = ABILITY_AXES.includes(qs.sort as never);
   const isMean = qs.sort === MEAN_KEY;
   const sortKey = isTrait || isAbility || isMean ? qs.sort! : null;
+  const isName = qs.sort === NAME_KEY;
 
   /** 값이 없는 사람은 방향과 무관하게 늘 아래로 */
   const valueOf = (r: Row): number | null =>
@@ -198,8 +203,8 @@ export async function loadRoster(qs: RosterQuery): Promise<Roster> {
     ]),
   );
 
-  // 점수도 최근순도 「큰 값(최근)이 먼저」가 기본이다
-  const fallbackDir: SortDir = "desc";
+  // 점수·최근순은 「큰 값(최근)이 먼저」, 이름순은 가나다순이 기본이다
+  const fallbackDir: SortDir = isName ? "asc" : "desc";
   const sortDir: SortDir =
     qs.dir === "asc" || qs.dir === "desc" ? qs.dir : fallbackDir;
   const valueFlip = sortDir === "asc" ? -1 : 1;
@@ -220,6 +225,8 @@ export async function loadRoster(qs: RosterQuery): Promise<Roster> {
     if (byStatus) return byStatus;
 
     if (!sortKey) {
+      // 이름순: asc 가 가나다순. 그 밖(기본)은 최근에 끝낸 순
+      if (isName) return byName(a, b) * (sortDir === "asc" ? 1 : -1);
       const ra = recentMs.get(a.id) ?? 0;
       const rb = recentMs.get(b.id) ?? 0;
       if (ra !== rb) return (rb - ra) * valueFlip;
@@ -239,6 +246,7 @@ export async function loadRoster(qs: RosterQuery): Promise<Roster> {
     rows,
     keyword,
     sortKey,
+    nameSort: isName,
     sortDir,
     fallbackDir,
     onlyReview,

@@ -316,14 +316,19 @@ function Panel({ row }: { row: Row }) {
         네 칸을 늘어놓으면 총 90rem이 넘어 어느 노트북에서도 한 줄에 안 들어간다.
         flex-wrap에 맡기면 화면 폭에 따라 3+1로 접혔다 2+2로 접혔다 해서
         열 때마다 배치가 달라진다. 2단·4단만 쓰도록 못 박는다.
+
+        4단일 때 넷을 똑같이 나누면 막대 그래프 칸이 270px 안팎이라 일곱 축
+        이름(축당 38px)이 서로 겹친다 (2026-09-18 신고). 막대에만 넉넉히 준다 —
+        레이더·직무능력은 각각 상한이 있어 좁혀도 그대로다.
       */}
-      <div className="grid items-start gap-x-10 gap-y-8 lg:grid-cols-2 2xl:grid-cols-4">
+      <div className="grid items-start gap-x-10 gap-y-8 lg:grid-cols-2 2xl:grid-cols-[minmax(0,1fr)_minmax(0,1.3fr)_minmax(0,0.7fr)_minmax(0,1fr)]">
         <div className="w-full max-w-[23rem]">
-          <TraitRadar data={ordered} showValues />
+          <TraitRadar data={ordered} showValues compact />
         </div>
 
         <div className="w-full max-w-[31rem]">
-          <TraitBars rows={ordered} height={280} />
+          {/* 펼침 패널은 칸이 좁다 — 라벨을 작게, 넉 자 이름은 두 줄로 (겹침 방지) */}
+          <TraitBars rows={ordered} height={280} compact />
         </div>
 
         {abilities.length > 0 && (

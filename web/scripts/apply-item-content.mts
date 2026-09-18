@@ -20,7 +20,7 @@ import { loadItemFile } from "../src/lib/items/load";
  *
  *   사용:  npx tsx scripts/apply-item-content.mts [env파일]
  *
- *   - env파일을 주면 그 파일을 읽는다(예: `vercel env pull` 로 받은 .env.production).
+ *   - env파일을 주면 그 파일을 읽는다(예: `vercel env pull .env.vercel` 로 받은 파일 — `.env.production` 이라는 이름은 쓰지 않는다. next start 가 자동으로 읽어 로컬 서버가 운영 DB 를 보게 된다).
  *     안 주면 기본 `.env`.
  *   - 접속 주소는 DATABASE_URL 을 쓰되, 그 값이 없거나 가려져 있으면
  *     (`vercel env pull` 은 URL 을 가리고 개별 값만 채워준다) DATABASE_PG* 개별

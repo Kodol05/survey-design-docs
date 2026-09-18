@@ -5,7 +5,7 @@ import { EmployeeList } from "./EmployeeList";
 import { ExportLink } from "./ExportLink";
 import { requireAdmin } from "@/lib/auth/guard";
 import { ABILITY_AXES, TRAIT_SCALES } from "@/lib/items/types";
-import { BANDS, MEAN_KEY, loadRoster, type SortDir } from "@/lib/admin/roster";
+import { BANDS, MEAN_KEY, NAME_KEY, loadRoster, type SortDir } from "@/lib/admin/roster";
 
 export const metadata = { title: "구성원 — 관리자" };
 
@@ -30,6 +30,7 @@ export default async function EmployeesPage(props: {
     rows,
     keyword,
     sortKey,
+    nameSort,
     sortDir,
     fallbackDir,
     onlyReview,
@@ -37,6 +38,8 @@ export default async function EmployeesPage(props: {
     band,
     cut,
   } = await loadRoster(qs);
+  /** 링크·검색 폼이 들고 다닐 정렬값 — 이름순은 sortKey 가 아니라 따로 표시된다 */
+  const activeSort = nameSort ? NAME_KEY : sortKey;
 
   const link = (params: Record<string, string | undefined>) => {
     const sp = new URLSearchParams();
@@ -72,7 +75,7 @@ export default async function EmployeesPage(props: {
             {onlyReview ? "검토가 필요한 응답만" : pickStatus!.label}
           </span>
           <Link
-            href={link({ sort: sortKey ?? undefined, q: keyword, clear: "1" })}
+            href={link({ sort: activeSort ?? undefined, q: keyword, clear: "1" })}
             className="underline"
           >
             전체 보기
@@ -88,7 +91,7 @@ export default async function EmployeesPage(props: {
             placeholder="이름"
             className="text-table h-12 w-48 rounded-lg border border-[--border] bg-surface px-3"
           />
-          {sortKey && <input type="hidden" name="sort" value={sortKey} />}
+          {activeSort && <input type="hidden" name="sort" value={activeSort} />}
           {sortDir !== fallbackDir && (
             <input type="hidden" name="dir" value={sortDir} />
           )}
@@ -105,11 +108,26 @@ export default async function EmployeesPage(props: {
       <div className="text-axis mb-8 flex flex-col gap-2">
         <SortRow label="정렬">
           <SortChip
-            href={link({ q: keyword, dir: sortDir === "asc" ? "desc" : "asc" })}
-            on={!sortKey}
-            dir={!sortKey ? sortDir : undefined}
+            href={link({
+              q: keyword,
+              // 켜져 있을 때만 방향을 뒤집고, 다른 정렬에서 넘어오면 기본(최근순)으로
+              dir: !sortKey && !nameSort ? (sortDir === "asc" ? "desc" : "asc") : undefined,
+            })}
+            on={!sortKey && !nameSort}
+            dir={!sortKey && !nameSort ? sortDir : undefined}
           >
             최근 응시순
+          </SortChip>
+          <SortChip
+            href={link({
+              sort: NAME_KEY,
+              q: keyword,
+              dir: nameSort && sortDir === "asc" ? "desc" : undefined,
+            })}
+            on={nameSort}
+            dir={nameSort ? sortDir : undefined}
+          >
+            이름순
           </SortChip>
         </SortRow>
 
