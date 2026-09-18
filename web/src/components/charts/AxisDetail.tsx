@@ -1,6 +1,7 @@
+import { APPLY } from "@/lib/interpretation/apply";
 import { BAND_TEXT, type BandKey } from "@/lib/interpretation/bands";
 import { POLES } from "@/lib/interpretation/poles";
-import { GRADIENT, HIGH_INK, LOW_INK, Marker } from "./scale";
+import { GRADIENT, HIGH_INK, LOW_INK, Marker, colorAt } from "./scale";
 
 /**
  * 축 하나의 상세 — 실제 결과지 2페이지(하위척도)를 여기로 합쳤다.
@@ -25,6 +26,7 @@ const BAND_LABEL = { lower: "낮은 편", middle: "보통", upper: "높은 편" 
 export function AxisDetail({ id, scale, percent, band, facets }: AxisDetailProps) {
   const x = Math.max(0, Math.min(100, percent));
   const poles = POLES[scale];
+  const apply = APPLY[scale]?.[band];
 
   return (
     <section id={id} className="scroll-mt-8 border-t border-[--border] py-10">
@@ -63,6 +65,27 @@ export function AxisDetail({ id, scale, percent, band, facets }: AxisDetailProps
           )}
 
           <p className="text-item mt-6">{BAND_TEXT[scale]?.[band]}</p>
+
+          {/*
+            **힘이 되는 점 · 살펴보면 좋은 점** — 실제 결과지가 축마다 주는 것을
+            훑어보기 좋게 두 줄로 끊는다. 위 문단의 뒷부분을 압축한 것이라
+            새 이야기가 아니다. 상자를 두르지 않는다 — 구분은 가는 선과 여백으로
+            (11 §1.1). 왼쪽 색선만 둘을 다르게 잡아준다.
+          */}
+          {apply && (
+            <dl className="mt-7 grid gap-x-10 gap-y-5 border-t border-[--border] pt-6 sm:grid-cols-2">
+              <div className="border-l-2 pl-4" style={{ borderColor: colorAt(x) }}>
+                <dt className="text-axis text-ink-muted mb-1.5">힘이 되는 점</dt>
+                <dd className="text-table">{apply.lift}</dd>
+              </div>
+              <div className="border-l-2 border-[--grid] pl-4">
+                <dt className="text-axis text-ink-muted mb-1.5">
+                  살펴보면 좋은 점
+                </dt>
+                <dd className="text-table">{apply.watch}</dd>
+              </div>
+            </dl>
+          )}
         </div>
 
         {/* 하위척도 — 실제 결과지 2페이지에 해당 */}

@@ -254,6 +254,16 @@
   padding-inline: clamp(1.5rem, 5vw, 4.5rem);
 }
 
+/* 결과지처럼 읽을 것이 많은 화면은 한 단 더 넓게 (개인 결과 페이지).
+   본문 글줄은 안에서 따로 폭을 제한하므로(11 §1.5) 넓혀도 글이 길어지지 않고
+   차트·눈금·나란한 칸이 숨 쉴 자리만 는다. */
+@utility page-wide {
+  width: 100%;
+  max-width: 96rem;
+  margin-inline: auto;
+  padding-inline: clamp(1.5rem, 5vw, 4.5rem);
+}
+
 body {
   background: var(--page);
   color: var(--ink);

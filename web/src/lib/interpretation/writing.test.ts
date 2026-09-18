@@ -1,4 +1,5 @@
 import { describe, expect, it } from "vitest";
+import { APPLY } from "./apply";
 import { BAND_TEXT } from "./bands";
 import { PAIRS } from "./pairs";
 import { POLES } from "./poles";
@@ -30,6 +31,10 @@ function allSentences(): { where: string; text: string }[] {
     for (const [k, text] of Object.entries(pair.text))
       out.push({ where: `pairs ${pair.title} ${k}`, text });
   }
+  for (const [scale, b] of Object.entries(APPLY))
+    for (const [band, a] of Object.entries(b))
+      for (const [field, text] of Object.entries(a))
+        out.push({ where: `apply ${scale} ${band} ${field}`, text });
   return out;
 }
 
@@ -79,6 +84,15 @@ describe("빠짐없이 있는가", () => {
     for (const p of PAIRS)
       for (const k of ["HH", "HL", "LH", "LL"] as const)
         expect(p.text[k], `${p.title} ${k}`).toBeTruthy();
+  });
+
+  it("일곱 축 모두 세 구간의 힘·살필·결이 다 차 있다", () => {
+    for (const s of TRAIT_SCALES)
+      for (const b of ["lower", "middle", "upper"] as const) {
+        expect(APPLY[s]?.[b]?.lift, `${s} ${b} lift`).toBeTruthy();
+        expect(APPLY[s]?.[b]?.watch, `${s} ${b} watch`).toBeTruthy();
+        expect(APPLY[s]?.[b]?.work, `${s} ${b} work`).toBeTruthy();
+      }
   });
 
   it("짝에 쓰인 축 이름이 실제 축이다", () => {

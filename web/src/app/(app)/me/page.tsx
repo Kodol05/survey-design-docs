@@ -7,6 +7,7 @@ import { TraitSummary } from "@/components/charts/TraitSummary";
 import { CHARACTER, TEMPERAMENT, colorAt } from "@/components/charts/scale";
 import { EmptyState } from "@/components/ui/Card";
 import { requireUser } from "@/lib/auth/guard";
+import { APPLY } from "@/lib/interpretation/apply";
 import { readPairs, type AxisInput } from "@/lib/interpretation/pairs";
 import { TRAIT_SCALES } from "@/lib/items/types";
 import { inProgress, latestResult, orderedTraits } from "@/lib/survey/result";
@@ -94,8 +95,27 @@ export default async function MePage() {
     .sort((a, b) => Math.abs(b.percent - 50) - Math.abs(a.percent - 50))
     .slice(0, 3);
 
+  /*
+    「일할 때 나는」에 올릴 결.
+
+    두드러진 축(가운데를 뺀 상위 세 축)의 `work` 문장을 모은다. 실제 직무용
+    보고서가 주는 「어떤 결의 일을 편하게 느끼는가」인데, 성향으로 결과를
+    점칠 수는 없으므로(07) 결과가 아니라 **편하게 느끼는 결**만 적힌 문장을
+    쓴다. 두루뭉술한 일곱 개를 다 늘어놓지 않고, 뚜렷한 것 몇 개만 보여준다.
+  */
+  const workNotes = standout
+    .map((t) => ({
+      scale: t.scale as string,
+      percent: t.percent,
+      text: APPLY[t.scale]?.[t.band]?.work,
+    }))
+    .filter((w): w is { scale: string; percent: number; text: string } =>
+      Boolean(w.text),
+    );
+
   const nav = [
     { id: "summary", label: "한눈에" },
+    ...(workNotes.length > 0 ? [{ id: "work", label: "일할 때" }] : []),
     ...TEMPERAMENT.map((x) => ({ id: anchor(x), label: x })),
     ...CHARACTER.map((x) => ({ id: anchor(x), label: x })),
     { id: "pairs", label: "두 축을 같이" },
@@ -103,7 +123,7 @@ export default async function MePage() {
   ];
 
   return (
-    <main className="page-column py-16">
+    <main className="page-wide py-16">
       {/*
         **머리 영역을 보고서처럼 둔다** (2026-08-25).
 
@@ -186,6 +206,43 @@ export default async function MePage() {
               }))}
             />
           </section>
+
+          {/*
+            ①-½ 일할 때 나는 — 두드러진 축을 「어떤 결을 편하게 느끼는가」로
+            묶어 먼저 한 번 짚는다. 실제 직무용 결과지가 앞쪽에 두는 요약이다.
+            축별 상세로 들어가기 전에 자기 이야기가 한 덩어리 잡힌다.
+          */}
+          {workNotes.length > 0 && (
+            <section id="work" className="scroll-mt-8 mt-20">
+              <h2 className="text-section-title mb-2">일할 때 나는</h2>
+              <p className="text-ink-secondary mb-8 max-w-[54rem]">
+                두드러진 축을 모아 어떤 결의 일을 편하게 느끼는지 적었습니다.
+                무엇을 잘한다거나 어떤 일에 맞다는 뜻은 아니고, 평소 편하게
+                여기는 방식이라고 보시면 됩니다.
+              </p>
+              <ul className="flex flex-col gap-5">
+                {workNotes.map((w) => (
+                  <li key={w.scale} className="flex gap-4">
+                    <span
+                      aria-hidden
+                      className="mt-2.5 size-2.5 shrink-0 rounded-[2px]"
+                      style={{ background: colorAt(w.percent) }}
+                    />
+                    <p className="text-item">
+                      <a
+                        href={`#${anchor(w.scale)}`}
+                        className="text-ink-secondary underline underline-offset-2"
+                      >
+                        {w.scale}
+                      </a>
+                      {" — "}
+                      {w.text}
+                    </p>
+                  </li>
+                ))}
+              </ul>
+            </section>
+          )}
 
           {/* ② 축별 상세 — 내 구간 설명 + 하위척도 */}
           <section className="mt-20">
