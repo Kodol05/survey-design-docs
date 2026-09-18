@@ -1,4 +1,4 @@
-import "dotenv/config";
+import { config as loadEnv } from "dotenv";
 import { PrismaPg } from "@prisma/adapter-pg";
 import { PrismaClient } from "../src/generated/prisma/client";
 import { loadItemFile } from "../src/lib/items/load";
@@ -18,12 +18,34 @@ import { loadItemFile } from "../src/lib/items/load";
  * ⚠️ 지난 결과지는 채점 시점 값으로 고정돼 그대로지만, 다시 채점하면 값이
  *    달라질 수 있다(문구만 바꾸면 대개 그대로).
  *
- *   사용:  DATABASE_URL 을 대상 DB 로 두고
- *          npx tsx scripts/apply-item-content.mts
+ *   사용:  npx tsx scripts/apply-item-content.mts [env파일]
+ *
+ *   - env파일을 주면 그 파일을 읽는다(예: `vercel env pull` 로 받은 .env.production).
+ *     안 주면 기본 `.env`.
+ *   - 접속 주소는 DATABASE_URL 을 쓰되, 그 값이 없거나 가려져 있으면
+ *     (`vercel env pull` 은 URL 을 가리고 개별 값만 채워준다) DATABASE_PG* 개별
+ *     값으로 **직접(unpooled)** 주소를 만들어 쓴다. 쓰기라서 직접 연결이 낫다.
  */
 
-const url = process.env.DATABASE_URL;
-if (!url) throw new Error("DATABASE_URL 이 없습니다");
+const envFile = process.argv[2];
+loadEnv(envFile ? { path: envFile } : {});
+
+const e = process.env;
+const looksLikeUrl = (v?: string) => !!v && /^postgres(ql)?:\/\//i.test(v);
+
+let url = e.DATABASE_URL;
+if (!looksLikeUrl(url)) {
+  const user = e.DATABASE_PGUSER;
+  const pass = e.DATABASE_PGPASSWORD;
+  const host = e.DATABASE_PGHOST_UNPOOLED ?? e.DATABASE_PGHOST;
+  const db = e.DATABASE_PGDATABASE;
+  if (user && pass && host && db)
+    url = `postgresql://${user}:${pass}@${host}/${db}?sslmode=require`;
+}
+if (!looksLikeUrl(url))
+  throw new Error(
+    "접속 주소를 찾지 못했습니다. env 파일에 DATABASE_URL 또는 DATABASE_PG* 값이 있어야 합니다.",
+  );
 
 const prisma = new PrismaClient({ adapter: new PrismaPg({ connectionString: url }) });
 
