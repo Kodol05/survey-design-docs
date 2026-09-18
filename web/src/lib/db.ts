@@ -1,5 +1,6 @@
 import { PrismaPg } from "@prisma/adapter-pg";
-import { PrismaNeonHttp } from "@prisma/adapter-neon";
+import { PrismaNeon } from "@prisma/adapter-neon";
+import { neonConfig } from "@neondatabase/serverless";
 import { PrismaClient } from "@/generated/prisma/client";
 
 /**
@@ -10,28 +11,27 @@ import { PrismaClient } from "@/generated/prisma/client";
  */
 
 /**
- * ## 두 가지 드라이버를 주소 보고 고른다 (2026-09-18)
+ * ## 드라이버를 주소 보고 고른다 (2026-09-18)
  *
- * 밖에서 열어 보다가 **가끔 서버가 끊기는** 증상이 있었다. DB 오류가 뜨고
- * 새로고침하면 되는 것, 그리고 오류 없이 멈추는 것. 원인은 하나다 —
+ * 밖에서 열어 보다가 **가끔 서버가 끊기는** 증상이 있었다. 원인 —
+ * Vercel 은 요청이 끝나면 컨테이너를 얼리고, Neon 무료 요금제는 5분이면
+ * 잠들며 TCP 커넥션을 끊는다. 다음 요청 때 `pg` 풀이 **죽은 커넥션**을 꺼내
+ * 쓰면 503 이 난다.
  *
- * Vercel 은 요청이 끝나면 컨테이너를 **얼린다.** 그 사이 Neon 무료 요금제는
- * 5분이면 잠들며 TCP 커넥션을 끊는다. 다음 요청 때 컨테이너가 깨면서 풀에
- * 남아 있던 **죽은 커넥션**을 꺼내 쓰면 503 이 난다. `pg` 풀은 커넥션을
- * 꺼낼 때 살아있는지 검사하지 않기 때문에 첫 요청이 실패한다.
+ * 처음엔 Neon 을 **HTTP 드라이버**로 붙였다. 매 질의가 새 HTTP 요청이라
+ * 죽은 소켓이 없어 503 은 사라졌는데, **트랜잭션을 아예 못 한다.** Prisma 는
+ * `upsert`·`updateMany`·`deleteMany` 같은 것을 내부적으로 트랜잭션으로 돌려서,
+ * 회원가입 뒤 첫 응시 화면부터 「Transactions are not supported in HTTP mode」로
+ * 깨졌다. 이 앱은 트랜잭션이 꼭 필요하다.
  *
- * 그래서 **Neon 에는 HTTP 드라이버**를 쓴다. 매 질의가 새 HTTP 요청이라
- * 오래 사는 소켓이 아예 없다 — 얼든 잠들든 상관이 없다. Vercel + Neon 조합의
- * 정석이다.
+ * 그래서 **Neon 에는 WebSocket 드라이버(`PrismaNeon`)**를 쓴다 — 트랜잭션을
+ * 지원한다. 대신 `poolQueryViaFetch` 를 켜서 **단발 질의는 stateless HTTP** 로
+ * 나가게 한다: 얼었다 깬 커넥션 때문에 503 나던 그 경로를 그대로 막으면서,
+ * 트랜잭션이 필요할 때만 WebSocket 을 연다. Vercel + Neon + Prisma(트랜잭션)
+ * 조합의 정석이다.
  *
- * 로컬 개발과 테스트는 Neon 이 아니라 **도커 PostgreSQL**(localhost)이다.
- * HTTP 드라이버는 Neon 전용이라 여기선 못 쓴다. 그래서 주소에 `neon.tech`
- * 가 있으면 HTTP, 아니면 기존 `pg` 로 간다.
- *
- * ⚠️ HTTP 드라이버는 **트랜잭션을 아예 지원하지 않는다**(배열 형·콜백 형 모두).
- * 그래서 `$transaction` 은 쓰지 않는다 — 대신 쓰기 순서를 안전하게 잡고
- * 각 쓰기를 idempotent upsert 로 둔다(`survey/actions.ts`·`survey/session.ts`
- * 참고). `$transaction` 을 새로 쓰려면 이 드라이버 선택을 다시 봐야 한다.
+ * 로컬 개발과 테스트는 Neon 이 아니라 **도커 PostgreSQL**(localhost)이라
+ * 기존 `pg` 로 간다. 주소에 `neon.tech` 가 있으면 Neon, 아니면 pg.
  *
  * ## 로컬 pg 풀 설정
  *
@@ -41,9 +41,17 @@ import { PrismaClient } from "@/generated/prisma/client";
 const url = process.env.DATABASE_URL ?? "";
 const isNeon = url.includes("neon.tech");
 
+if (isNeon) {
+  // 단발 질의는 HTTP fetch 로 (죽은 소켓 없음). 트랜잭션만 WebSocket 을 연다.
+  neonConfig.poolQueryViaFetch = true;
+  // Node 22+ 는 전역 WebSocket 이 있다. 드라이버가 이걸 쓰게 넘겨준다.
+  const g = globalThis as { WebSocket?: unknown };
+  if (g.WebSocket) neonConfig.webSocketConstructor = g.WebSocket as never;
+}
+
 const makeAdapter = () =>
   isNeon
-    ? new PrismaNeonHttp(url, {})
+    ? new PrismaNeon({ connectionString: url })
     : new PrismaPg({
         connectionString: url,
         max: 3,
