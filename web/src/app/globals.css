@@ -419,3 +419,25 @@ body {
   outline: 2px solid var(--series-1);
   outline-offset: 2px;
 }
+
+/*
+  결과지 장 넘김 (`charts/ResultBook`, 2026-09-18).
+  화면에서는 현재 장만 보이고, 인쇄에서는 전 장이 이어서 나온다.
+  넘김 UI(탭·양옆 화살표·아래 줄)는 종이에 찍지 않는다.
+*/
+@media screen {
+  .result-page[data-inactive="true"] {
+    display: none;
+  }
+}
+@media print {
+  .result-book-nav {
+    display: none !important;
+  }
+  .result-page {
+    break-before: page;
+  }
+  .result-page:first-of-type {
+    break-before: auto;
+  }
+}
