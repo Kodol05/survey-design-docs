@@ -1,14 +1,15 @@
 import type { ReactNode } from "react";
-import Link from "next/link";
 import { AxisDetail } from "@/components/charts/AxisDetail";
 import { PairReadings } from "@/components/charts/PairReadings";
 import { ResultBook, type BookPage } from "@/components/charts/ResultBook";
+import { RetakeButton } from "@/components/survey/RetakeButton";
 import { TraitRadar } from "@/components/charts/TraitRadar";
 import { CHARACTER, TEMPERAMENT, colorAt } from "@/components/charts/scale";
 import { ButtonLink } from "@/components/ui/Button";
 import { EmptyState } from "@/components/ui/Card";
 import { requireUser } from "@/lib/auth/guard";
 import { APPLY } from "@/lib/interpretation/apply";
+import { LINE } from "@/lib/interpretation/lines";
 import { readPairs, type AxisInput } from "@/lib/interpretation/pairs";
 import { inProgress, latestResult, orderedTraits } from "@/lib/survey/result";
 
@@ -28,7 +29,8 @@ const BAND_LABEL = { lower: "낮은 편", middle: "보통", upper: "높은 편" 
  *                 일하는 방식 · 강점 · 유의할 점 (세 단)
  *                 — 이 장이 **한 화면에 거의 다 들어오게** 짠다
  *   ② 척도별 결과  기질 척도 4 + 성격 척도 3, 한 열로. 사이는 가는 선 하나
- *   ③ 종합         척도 간 관계 · 결과 해석 시 유의사항 · 다시 응시하기
+ *   ③ 종합         척도 간 관계 · 결과 해석 시 유의사항
+ *   (「다시 응시하기」는 세 장 모두 오른쪽 아래 노란 버튼으로)
  *
  * 기질과 성격을 장으로 가르지 않는다 — 나누면 어색했다(사용자). 상자·격자를
  * 두지 않고, 덩어리는 **작은 머리표(eyebrow)와 가는 선**으로만 가른다.
@@ -177,42 +179,36 @@ export default async function MePage(props: {
         </div>
 
         <div>
-          <p className="eyebrow mb-2">척도별 점수</p>
+          {/*
+            척도 · 한 줄 특징 · 점수 · 구간. 가운데 구간까지 일곱 줄이 다 나오므로
+            사람마다 일곱 줄이 자기 구간에 맞게 조합된다 (`lines.ts`).
+          */}
+          <p className="eyebrow mb-2">척도별 점수와 특징</p>
           <ul className="flex flex-col">
-            {traits.map((t, n) => {
-              const x = Math.max(0, Math.min(100, t.percent));
-              return (
-                <li
-                  key={t.scale}
-                  className={`grid grid-cols-[6.5rem_minmax(0,1fr)_2.25rem_3.5rem] items-center gap-x-3 py-1.5 ${
-                    n === TEMPERAMENT.length ? "mt-1.5 border-t border-[--border] pt-3" : ""
-                  }`}
-                >
+            {traits.map((t, n) => (
+              <li
+                key={t.scale}
+                className={`grid grid-cols-[6.5rem_minmax(0,1fr)_2.25rem_3.5rem] items-baseline gap-x-3 py-1.5 ${
+                  n === TEMPERAMENT.length ? "mt-1.5 border-t border-[--border] pt-3" : ""
+                }`}
+              >
+                <span className="flex items-baseline gap-1.5">
+                  <span
+                    aria-hidden
+                    className="size-2 shrink-0 translate-y-px rounded-[2px]"
+                    style={{ background: colorAt(t.percent) }}
+                  />
                   {axisLink(t.scale)}
-                  {/* 자리 눈금 — 가운데 눈금 하나, 내 자리에 점 */}
-                  <div className="relative h-1.5 rounded-full" style={{ background: "var(--grid)" }}>
-                    <span
-                      aria-hidden
-                      className="absolute inset-y-0 left-1/2 w-px"
-                      style={{ background: "var(--axis)" }}
-                    />
-                    <span
-                      aria-hidden
-                      className="absolute top-1/2 size-3 -translate-x-1/2 -translate-y-1/2 rounded-full ring-2"
-                      style={{
-                        left: `${x}%`,
-                        background: colorAt(t.percent),
-                        ["--tw-ring-color" as string]: "var(--sheet)",
-                      }}
-                    />
-                  </div>
-                  <span className="tabular text-table text-right font-medium">
-                    {Math.round(t.percent)}
-                  </span>
-                  <span className="text-axis text-ink-muted">{BAND_LABEL[t.band]}</span>
-                </li>
-              );
-            })}
+                </span>
+                <span className="text-table truncate" title={LINE[t.scale]?.[t.band]}>
+                  {LINE[t.scale]?.[t.band]}
+                </span>
+                <span className="tabular text-table text-right font-medium">
+                  {Math.round(t.percent)}
+                </span>
+                <span className="text-axis text-ink-muted">{BAND_LABEL[t.band]}</span>
+              </li>
+            ))}
           </ul>
           <p className="text-axis text-ink-muted mt-2">
             위 네 개는 기질 척도, 아래 세 개는 성격 척도입니다.
@@ -320,11 +316,6 @@ export default async function MePage(props: {
           문항은 계속 다듬는 중입니다. 자기 이해를 돕는 참고 자료로 활용해
           주십시오.
         </p>
-        <p className="mt-4" data-print="hide">
-          <Link href="/survey" className="text-ink-secondary underline">
-            다시 응시하기
-          </Link>
-        </p>
       </section>
     </>
   );
@@ -349,7 +340,12 @@ export default async function MePage(props: {
   return (
     // 좁은 화면에선 아래 넘김 줄이 떠 있으므로 바닥 여백을 넉넉히 둔다
     <main className="page-column py-8 pb-24 lg:py-10 lg:pb-12">
-      <ResultBook key={initialPage} pages={pages} initial={initialPage} />
+      <ResultBook
+        key={initialPage}
+        pages={pages}
+        initial={initialPage}
+        action={<RetakeButton />}
+      />
     </main>
   );
 }

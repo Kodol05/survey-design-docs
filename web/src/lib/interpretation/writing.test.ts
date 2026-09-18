@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { APPLY } from "./apply";
 import { BAND_TEXT } from "./bands";
+import { LINE } from "./lines";
 import { PAIRS } from "./pairs";
 import { POLES } from "./poles";
 import { TRAIT_SCALES } from "@/lib/items/types";
@@ -35,6 +36,9 @@ function allSentences(): { where: string; text: string }[] {
     for (const [band, a] of Object.entries(b))
       for (const [field, text] of Object.entries(a))
         out.push({ where: `apply ${scale} ${band} ${field}`, text });
+  for (const [scale, b] of Object.entries(LINE))
+    for (const [band, text] of Object.entries(b))
+      out.push({ where: `line ${scale} ${band}`, text });
   return out;
 }
 
@@ -84,6 +88,15 @@ describe("빠짐없이 있는가", () => {
     for (const p of PAIRS)
       for (const k of ["HH", "HL", "LH", "LL"] as const)
         expect(p.text[k], `${p.title} ${k}`).toBeTruthy();
+  });
+
+  it("일곱 축 모두 세 구간의 한 줄 특징이 있고 한 줄에 들어간다", () => {
+    for (const s of TRAIT_SCALES)
+      for (const b of ["lower", "middle", "upper"] as const) {
+        expect(LINE[s]?.[b], `${s} ${b}`).toBeTruthy();
+        // 표 한 칸에 줄바꿈 없이 들어가야 한다
+        expect(LINE[s][b].length, `${s} ${b}`).toBeLessThanOrEqual(34);
+      }
   });
 
   it("일곱 축 모두 세 구간의 힘·살필·결이 다 차 있다", () => {

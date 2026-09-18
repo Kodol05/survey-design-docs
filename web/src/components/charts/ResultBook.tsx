@@ -7,8 +7,8 @@ import { useCallback, useEffect, useRef, useState, type ReactNode } from "react"
  *
  * ## 종이 한 장 위에
  *
- * 결과지는 화면 전체가 아니라 가운데 3/4 폭의 **종이**(`.result-sheet`)에 얹혀
- * 있다. 종이 위에는 장 탭과 본문, 아래에는 「이전 / 다음」 줄이 있고, 종이
+ * 결과지는 위 머리와 같은 폭의 **종이**(`.result-sheet`)에 얹혀 있다. 종이
+ * 위에는 장 탭과 본문, 아래에는 행동 버튼과 「이전 / 다음」 줄이 있고, 종이
  * 바깥 여백에 ‹ › 넘김 버튼이 떠 있다. 첫 장에 요약이 다 들어오고, 나머지는
  * 넘겨 본다.
  *
@@ -36,10 +36,13 @@ type Dir = "next" | "prev";
 export function ResultBook({
   pages,
   initial = 0,
+  action,
 }: {
   pages: BookPage[];
   /** 처음 펼 장(0부터). 서버가 `?p=` 를 읽어 넘겨준다 */
   initial?: number;
+  /** 모든 장 오른쪽 아래에 두는 행동 버튼 (예: 다시 응시하기) */
+  action?: ReactNode;
 }) {
   const count = pages.length;
   const wrap = (n: number) => ((n % count) + count) % count;
@@ -50,6 +53,32 @@ export function ResultBook({
 
   /** 방금 들어온 장과 방향 — 전환 효과를 한 번만 건다 */
   const [enter, setEnter] = useState<{ key: string; dir: Dir } | null>(null);
+
+  /*
+    양옆 ‹ › 는 **종이의 실제 위치를 재서** 놓는다 (2026-09-18 사용자 지적).
+    화면 폭(100vw)으로 계산하면 세로 스크롤바 폭과 안쪽 여백 차이 때문에
+    오른쪽이 어긋나 좌우가 달라 보였다. 종이 양끝에서 같은 거리에 두고,
+    여백이 모자라면 아예 숨긴다(아래 넘김 줄·탭·키보드가 남는다).
+  */
+  const sheetRef = useRef<HTMLDivElement>(null);
+  const [edges, setEdges] = useState<{ left: number; right: number } | null>(null);
+  useEffect(() => {
+    // 버튼 상자는 **고정 폭 96px** — 원과 이름표를 그 안에 가운데 놓는다.
+    // 이름표 글자 길이에 따라 상자 폭이 달라지면 장마다 위치가 밀렸다(사용자 지적).
+    const GAP = 12; // 종이 끝 ↔ 상자
+    const BOX = 96; // 상자 폭 (w-24)
+    const measure = () => {
+      const r = sheetRef.current?.getBoundingClientRect();
+      if (!r) return;
+      // `right:` 는 스크롤바를 뺀 레이아웃 폭 기준이므로 clientWidth 로 잰다
+      const vw = document.documentElement.clientWidth;
+      setEdges({ left: r.left - GAP - BOX, right: vw - r.right - GAP - BOX });
+    };
+    measure();
+    window.addEventListener("resize", measure);
+    return () => window.removeEventListener("resize", measure);
+  }, []);
+  const showEdges = !!edges && edges.left >= 8 && edges.right >= 8;
 
   const go = useCallback(
     (n: number, dir?: Dir) => {
@@ -90,22 +119,17 @@ export function ResultBook({
   const prev = pages[wrap(i - 1)];
   const next = pages[wrap(i + 1)];
 
-  /*
-    종이 바깥 여백에 놓는다 — 종이 왼쪽 끝은 `(100vw − 88rem)/2 + 4.5rem`
-    (page-column 의 폭과 안쪽 여백). 그보다 3.25rem 왼쪽. 여백이 없는 화면
-    (2xl 미만)에서는 숨기고 탭·아래 줄·키보드로 넘긴다.
-  */
-  const edge =
-    "result-book-nav fixed top-1/2 z-20 hidden -translate-y-1/2 flex-col items-center gap-1 2xl:flex";
-  const edgeLeft = "max(0.5rem, calc((100vw - 88rem) / 2 + 4.5rem - 3.25rem))";
+  const edge = `result-book-nav fixed top-1/2 z-20 w-24 -translate-y-1/2 flex-col items-center gap-1 ${
+    showEdges ? "flex" : "hidden"
+  }`;
   const circle =
     "flex size-10 items-center justify-center rounded-full text-xl leading-none shadow-md transition hover:scale-105";
   const circleStyle = { background: "var(--ink)", color: "var(--page)" } as const;
-  const edgeLabel = "text-axis text-ink-secondary max-w-[6rem] text-center leading-tight";
+  const edgeLabel = "text-axis text-ink-secondary w-full truncate text-center";
 
   return (
     <div className="result-book">
-      <div className="result-sheet">
+      <div className="result-sheet" ref={sheetRef}>
         {/* ── 장 탭 ── */}
         <nav
           className="result-book-nav mb-6 flex flex-wrap items-center justify-between gap-x-6 gap-y-2 border-b border-[--border] pb-3"
@@ -151,8 +175,15 @@ export function ResultBook({
           </section>
         ))}
 
+        {/* ── 행동 버튼 — 어느 장에서든 오른쪽 아래 (2026-09-18 사용자 요청) ── */}
+        {action && (
+          <div className="mt-8 flex justify-end" data-print="hide">
+            {action}
+          </div>
+        )}
+
         {/* ── 종이 아래 넘김 줄 — 읽고 내려오면 바로 다음 장 ── */}
-        <div className="result-book-nav text-table mt-8 flex items-center justify-between gap-4 border-t border-[--border] pt-4">
+        <div className="result-book-nav text-table mt-5 flex items-center justify-between gap-4 border-t border-[--border] pt-4">
           <button
             type="button"
             onClick={() => go(i - 1, "prev")}
@@ -185,7 +216,7 @@ export function ResultBook({
       <button
         type="button"
         className={edge}
-        style={{ left: edgeLeft }}
+        style={{ left: edges?.left ?? 0 }}
         onClick={() => go(i - 1, "prev")}
         aria-label={`이전 장: ${prev.label}`}
       >
@@ -197,7 +228,7 @@ export function ResultBook({
       <button
         type="button"
         className={edge}
-        style={{ right: edgeLeft }}
+        style={{ right: edges?.right ?? 0 }}
         onClick={() => go(i + 1, "next")}
         aria-label={`다음 장: ${next.label}`}
       >

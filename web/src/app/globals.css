@@ -520,3 +520,8 @@ body {
   letter-spacing: 0.04em;
   color: var(--ink-muted);
 }
+
+/* 결과지 안 확인창(`survey/RetakeButton`) — 뒤를 살짝 어둡게 */
+.result-dialog::backdrop {
+  background: rgb(34 32 29 / 0.35);
+}
