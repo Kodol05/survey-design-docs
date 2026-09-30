@@ -62,8 +62,8 @@ export async function createSession(employeeId: string) {
     httpOnly: true,
     sameSite: "lax",
     path: "/",
-    // 사내 서버가 HTTPS가 아닐 수 있어 개발/운영을 나눈다
-    secure: process.env.NODE_ENV === "production",
+    // 기본은 끔 — 사내 서버가 HTTP면 Secure 쿠키는 브라우저가 버려 로그인이 안 된다. HTTPS면 COOKIE_SECURE=1
+    secure: process.env.COOKIE_SECURE === "1",
     expires: s.expiresAt,
   });
 }
