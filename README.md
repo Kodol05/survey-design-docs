@@ -14,7 +14,7 @@ cd survey-design-docs/web
 
 cp .env.example .env      # 값은 그대로 두면 아래 docker compose 와 맞는다
 npm install               # prisma generate 까지 자동으로 돈다
-npm run db:up             # PostgreSQL 컨테이너 (포트 5432)
+npm run db:up             # PostgreSQL 컨테이너만 (포트 5432, 이 PC 안에서만)
 npm run db:migrate        # 표 만들기
 npm run db:seed           # 문항 120개 + 관리자 계정
 
@@ -33,8 +33,8 @@ npm run demo:clear        # 되돌리기
 ## 자주 쓰는 것
 
 ```bash
-npm test                  # 253개 · DB 없이 2초
-npm run test:db           # 17개 · 시험용 DB 필요 (docs/15-테스트.md)
+npm test                  # 255개 · DB 없이 2초
+npm run test:db           # 24개 · 시험용 DB 필요 (docs/15-테스트.md)
 npm run lint
 npm run build
 ```
@@ -66,7 +66,8 @@ npm run items                                                # 문항 파일 검
 | [00 설계 작업본](docs/00-design-notes.md) | 결정 기록 — 무엇을 왜 그렇게 정했는지 |
 | [15 테스트](docs/15-테스트.md) | 두 갈래 테스트와 시험용 DB |
 | [13 백업·복구](docs/13-backup-restore.md) | 덤프 받기와 되돌리기 |
-| [16 배포](docs/16-vercel-배포.md) | 밖에서 열 수 있게 올리기 |
+| [18 사내 서버 배포](docs/18-사내-서버-배포.md) | 도커로 사내 서버에 올리기 |
+| [16 Vercel 배포](docs/16-vercel-배포.md) | 밖에서 열 수 있게 올리기 (임시) |
 | [17 문항 다듬기](docs/17-문항-다듬기.md) | 문항을 실제 설문 말투로 고쳐 쓴 기록 (2026-09-18 완료) |
 | [12 남은 일](docs/12-backlog.md) | 아직 안 한 것 |
 
