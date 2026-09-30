@@ -36,6 +36,13 @@ export const QUALITY = {
 
 export type QualityFlag = "ok" | "review" | "poor";
 
+/** 화면·CSV 에 쓰는 이름. 「미달」이라 쓰지 않는다 — 사람이 아니라 응답의 값이다 */
+export const FLAG_LABEL: Record<QualityFlag, string> = {
+  ok: "정상",
+  review: "검토",
+  poor: "낮음",
+};
+
 export type ResponseRecord = {
   code: string;
   value: number;

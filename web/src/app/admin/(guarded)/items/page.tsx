@@ -143,7 +143,7 @@ export default async function ItemsPage(props: {
       <div className="overflow-x-auto">
         <table className="text-table w-full min-w-[48rem]">
           <thead>
-            <tr className="text-axis text-ink-muted border-b border-[--border]">
+            <tr className="text-axis text-ink-muted border-b border-(--border)">
               <th className="w-14 pb-2 text-right font-medium">순서</th>
               <th className="w-36 pb-2 pl-4 text-left font-medium">축</th>
               <th className="w-32 pb-2 text-left font-medium">세부 항목</th>
@@ -157,7 +157,7 @@ export default async function ItemsPage(props: {
             {shown.map((i) => (
               <tr
                 key={i.id}
-                className="border-b border-[--border] last:border-0"
+                className="border-b border-(--border) last:border-0"
               >
                 <td className="tabular text-ink-muted py-3 text-right">
                   {i.orderNo}

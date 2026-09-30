@@ -94,7 +94,7 @@ export function PredictionTab({
       </Note>
 
       {/* ── 2절 · 상관 하나하나를 맞대 본다 ── */}
-      <div className="border-t border-[--border] pt-14">
+      <div className="border-t border-(--border) pt-14">
         <h2 className="text-section-title mb-3">논문 값과 우리 값</h2>
         <p className="text-ink-secondary mb-6 max-w-[52rem]">
           막대 두 개가 한 쌍이고 위가 논문, 아래가 우리 회사입니다.{" "}

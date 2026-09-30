@@ -147,7 +147,7 @@ export function DistributionPanel({
         {groups.map((g) => (
           <div key={g.key}>
             {g.key !== "all" && (
-              <p className="text-table text-ink-secondary mb-5 border-b border-[--border] pb-2">
+              <p className="text-table text-ink-secondary mb-5 border-b border-(--border) pb-2">
                 {GROUP[g.key].label}
                 <span className="text-axis text-ink-muted ml-2">
                   {GROUP[g.key].note}

@@ -123,6 +123,7 @@ export async function loadRoster(qs: RosterQuery): Promise<Roster> {
       // 날짜는 **서버에서 문자열로 만든다.** 목록이 클라이언트 컴포넌트라
       // 브라우저에서 다시 포맷하면 시간대가 어긋나 하이드레이션이 깨진다
       completedLabel: s?.completedAt ? dayLabel(s.completedAt) : null,
+      completedDay: s?.completedAt ? isoDay(s.completedAt) : null,
       traits: stored
         ? Object.fromEntries(
             Object.entries(stored).map(([k, v]) => [k, v.percent]),
@@ -257,6 +258,15 @@ export async function loadRoster(qs: RosterQuery): Promise<Roster> {
 }
 
 /** "8/23" — 목록에서는 연도가 필요 없다. 전부 같은 해에 몰려 있다 */
+/** 서버 시간대와 무관하게 한국 날짜로 "2026-09-30" */
+export const isoDay = (d: Date) =>
+  new Intl.DateTimeFormat("en-CA", {
+    timeZone: "Asia/Seoul",
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+  }).format(d);
+
 const dayLabel = (d: Date) =>
   new Intl.DateTimeFormat("ko-KR", {
     timeZone: "Asia/Seoul",

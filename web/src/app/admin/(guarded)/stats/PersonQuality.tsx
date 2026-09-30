@@ -67,7 +67,7 @@ export function LowQualityList({ rows }: { rows: PersonQuality[] }) {
           return (
             <li
               key={r.employeeId}
-              className="grid grid-cols-[1fr_auto] items-baseline gap-x-4 border-b border-[--border] py-3 last:border-0"
+              className="grid grid-cols-[1fr_auto] items-baseline gap-x-4 border-b border-(--border) py-3 last:border-0"
             >
               <Link href={`/admin/employees/${r.employeeId}`} className="text-table underline">
                 {r.name}
@@ -140,14 +140,14 @@ export function QualityRanking({ rows }: { rows: PersonQuality[] }) {
         {shown.map(({ r, rank, gap }) => (
           <li key={r.employeeId}>
             {gap && (
-              <p className="text-axis text-ink-muted border-t border-[--border] py-2 text-center">
+              <p className="text-axis text-ink-muted border-t border-(--border) py-2 text-center">
                 가운데 {hidden}명 접힘 ·{" "}
                 <button type="button" onClick={() => setAll(true)} className="underline">
                   전부 보기
                 </button>
               </p>
             )}
-            <div className="grid grid-cols-[2rem_6rem_1fr_3rem] items-center gap-3 border-b border-[--border] py-2 sm:grid-cols-[2.5rem_9rem_1fr_3.5rem] sm:gap-4">
+            <div className="grid grid-cols-[2rem_6rem_1fr_3rem] items-center gap-3 border-b border-(--border) py-2 sm:grid-cols-[2.5rem_9rem_1fr_3.5rem] sm:gap-4">
               <span className="tabular text-axis text-ink-muted text-right">{rank}</span>
               <Link
                 href={`/admin/employees/${r.employeeId}`}

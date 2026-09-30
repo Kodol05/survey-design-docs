@@ -143,7 +143,7 @@ export function ScatterPlot({
               const p = payload[0].payload as Point;
               if (!p?.name) return null;
               return (
-                <div className="rounded-lg border border-[--border] bg-surface px-3 py-2 shadow-sm">
+                <div className="rounded-lg border border-(--border) bg-surface px-3 py-2 shadow-sm">
                   <p className="tabular font-medium">
                     {Math.round(p.x)} · {Math.round(p.y)}
                   </p>

@@ -49,7 +49,7 @@ export function DeleteEmployee({ employeeId, name }: { employeeId: string; name:
         <input
           value={typed}
           onChange={(e) => setTyped(e.target.value)}
-          className="text-table mt-1 block h-11 w-48 rounded-lg border border-[--border] bg-surface px-3"
+          className="text-table mt-1 block h-11 w-48 rounded-lg border border-(--border) bg-surface px-3"
           autoComplete="off"
         />
       </label>

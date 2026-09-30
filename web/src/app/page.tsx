@@ -134,7 +134,7 @@ export default async function Home() {
         **아직 시작도 안 한 사람에게 먼저 들이밀 것이 아니었다.** 화면도
         예뻐지지 않았다. 필요한 사람만 읽는 자리로 내린다.
       */}
-      <footer id="more" className="border-t border-[--border]">
+      <footer id="more" className="border-t border-(--border)">
         <div className="page-column py-14">
           <div className="flex flex-wrap items-start justify-between gap-x-12 gap-y-8">
             <div className="max-w-[34rem]">
@@ -159,7 +159,7 @@ export default async function Home() {
             </nav>
           </div>
 
-          <div className="mt-12 flex flex-wrap items-center justify-between gap-4 border-t border-[--border] pt-6">
+          <div className="mt-12 flex flex-wrap items-center justify-between gap-4 border-t border-(--border) pt-6">
             <p className="text-axis text-ink-muted">
               약 18분 · {EXPECTED.total}문항
             </p>

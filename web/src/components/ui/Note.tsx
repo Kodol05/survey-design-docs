@@ -47,7 +47,7 @@ export function Note({
         </span>
       </button>
       {open && (
-        <div className="text-axis text-ink-secondary mt-2 max-w-[52rem] border-l-2 border-[--border] pl-4 leading-relaxed">
+        <div className="text-axis text-ink-secondary mt-2 max-w-[52rem] border-l-2 border-(--border) pl-4 leading-relaxed">
           {children}
         </div>
       )}

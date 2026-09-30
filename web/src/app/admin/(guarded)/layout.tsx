@@ -17,7 +17,7 @@ export default async function AdminLayout({ children }: { children: React.ReactN
 
   return (
     <>
-      <header className="border-b border-[--border]">
+      <header className="border-b border-(--border)">
         {/*
           좁은 화면에서 **메뉴가 화면 밖으로 밀려났다** (2026-08-25).
           다섯 칸에 사용자 영역까지 하면 40rem이 필요한데 폰은 24rem이다.

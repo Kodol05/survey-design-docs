@@ -37,7 +37,7 @@ export function ResetPassword({ employeeId, name }: { employeeId: string; name: 
         <input
           value={temp}
           onChange={(e) => setTemp(e.target.value)}
-          className="h-11 rounded-lg border border-[--border] bg-surface px-3"
+          className="h-11 rounded-lg border border-(--border) bg-surface px-3"
           placeholder={`${PASSWORD_MIN}자 이상`}
         />
       </label>

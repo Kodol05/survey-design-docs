@@ -111,8 +111,9 @@ export async function submitAction(sessionId: string) {
         antonymPairId: true,
       },
     });
+    // 응시 도중 관리자가 내린(RETIRED) 문항의 답은 채점·품질에서 뺀다
     const responses = await prisma.response.findMany({
-      where: { sessionId },
+      where: { sessionId, item: { status: "ACTIVE" } },
       select: { itemId: true, value: true, elapsedMs: true },
     });
 

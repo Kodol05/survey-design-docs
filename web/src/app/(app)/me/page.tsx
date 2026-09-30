@@ -11,7 +11,12 @@ import { requireUser } from "@/lib/auth/guard";
 import { APPLY } from "@/lib/interpretation/apply";
 import { LINE } from "@/lib/interpretation/lines";
 import { readPairs, type AxisInput } from "@/lib/interpretation/pairs";
-import { inProgress, latestResult, orderedTraits } from "@/lib/survey/result";
+import {
+  completedResults,
+  inProgress,
+  latestResult,
+  orderedTraits,
+} from "@/lib/survey/result";
 
 export const metadata = { title: "내 결과 — 7차원 성향 설문" };
 
@@ -40,10 +45,17 @@ const BAND_LABEL = { lower: "낮은 편", middle: "보통", upper: "높은 편" 
  * 않는다 (00 D-35 · D-09).
  */
 export default async function MePage(props: {
-  searchParams: Promise<{ p?: string }>;
+  searchParams: Promise<{ p?: string; r?: string }>;
 }) {
   const me = await requireUser();
-  const result = await latestResult(me.id);
+  const { p, r } = await props.searchParams;
+  const [result, history] = await Promise.all([
+    latestResult(me.id, r),
+    completedResults(me.id),
+  ]);
+  /** 지금 보고 있는 것이 가장 최근 결과가 아니면 주소에 남긴다 */
+  const viewing = result && result.sessionId !== history[0]?.id ? result.sessionId : null;
+  const qs = (page: number) => `?${viewing ? `r=${viewing}&` : ""}p=${page}`;
 
   if (!result) {
     /*
@@ -88,6 +100,7 @@ export default async function MePage(props: {
     return (
       <AxisDetail
         key={scale}
+        id={`axis-${scale}`}
         scale={scale}
         percent={t.percent}
         band={t.band}
@@ -129,7 +142,10 @@ export default async function MePage(props: {
 
   /** 척도별 결과 장(2)으로 가는 링크 */
   const axisLink = (scale: string) => (
-    <a href="?p=2" className="text-ink-secondary underline underline-offset-2">
+    <a
+      href={`${qs(2)}#axis-${scale}`}
+      className="text-ink-secondary underline underline-offset-2"
+    >
       {scale}
     </a>
   );
@@ -162,15 +178,15 @@ export default async function MePage(props: {
           <h1 className="text-screen-title">{me.name} 님</h1>
         </div>
         <p className="text-axis text-ink-muted tabular">
-          {result.completedAt?.toLocaleDateString("ko-KR")} 응시
+          {result.completedAt?.toLocaleDateString("ko-KR", { timeZone: "Asia/Seoul" })} 응시
           {result.durationSec
-            ? ` · ${Math.round(result.durationSec / 60)}분 소요`
+            ? ` · ${Math.max(1, Math.round(result.durationSec / 60))}분 소요`
             : ""}
         </p>
       </header>
 
       {/* 프로필 도형 | 일곱 축 점수표 */}
-      <section className="mt-5 grid items-center gap-x-10 gap-y-6 border-t border-[--border] pt-5 lg:grid-cols-[minmax(0,5fr)_minmax(0,7fr)]">
+      <section className="mt-5 grid items-center gap-x-10 gap-y-6 border-t border-(--border) pt-5 lg:grid-cols-[minmax(0,5fr)_minmax(0,7fr)]">
         <div className="mx-auto w-full max-w-[21rem]">
           <TraitRadar
             data={traits.map((t) => ({ scale: t.scale, percent: t.percent }))}
@@ -188,7 +204,7 @@ export default async function MePage(props: {
                 <li
                   key={t.scale}
                   className={`grid grid-cols-[6.5rem_minmax(0,1fr)_2.25rem_3.5rem] items-center gap-x-3 py-1.5 ${
-                    n === TEMPERAMENT.length ? "mt-1.5 border-t border-[--border] pt-3" : ""
+                    n === TEMPERAMENT.length ? "mt-1.5 border-t border-(--border) pt-3" : ""
                   }`}
                 >
                   {axisLink(t.scale)}
@@ -228,7 +244,7 @@ export default async function MePage(props: {
         척도 이름을 앞에 달지 않는다. 사람마다 자기 구간의 문장 일곱 개가
         척도 순서대로 조합되어, 짧은 소견처럼 읽힌다 (`lines.ts`).
       */}
-      <section className="mt-6 border-t border-[--border] pt-5">
+      <section className="mt-6 border-t border-(--border) pt-5">
         <p className="eyebrow mb-2">특징</p>
         <p className="text-item max-w-[64rem]">
           {traits.map((t) => LINE[t.scale]?.[t.band]).filter(Boolean).join(" ")}
@@ -237,13 +253,13 @@ export default async function MePage(props: {
 
       {/* 일하는 방식 · 강점 · 유의할 점 */}
       {standout.length === 0 ? (
-        <p className="text-table text-ink-secondary mt-6 max-w-[54rem] border-t border-[--border] pt-5">
+        <p className="text-table text-ink-secondary mt-6 max-w-[54rem] border-t border-(--border) pt-5">
           일곱 척도가 모두 보통 범위입니다. 어느 쪽으로도 크게 기울지 않아
           상황에 따라 양쪽을 고르게 쓰는 편입니다. 척도별 내용은 다음 장에
           있습니다.
         </p>
       ) : (
-        <section className="mt-6 grid gap-x-10 gap-y-7 border-t border-[--border] pt-5 md:grid-cols-3">
+        <section className="mt-6 grid gap-x-10 gap-y-7 border-t border-(--border) pt-5 md:grid-cols-3">
           {column(
             "일하는 방식",
             notes.map((n) => ({
@@ -314,7 +330,7 @@ export default async function MePage(props: {
   // ── ③ 종합 ──
   const together = (
     <>
-      <div className="flex flex-wrap items-baseline gap-x-3 gap-y-1 border-b border-[--border] pb-3">
+      <div className="flex flex-wrap items-baseline gap-x-3 gap-y-1 border-b border-(--border) pb-3">
         <h2 className="text-section-title">척도 간 관계</h2>
         <p className="text-axis text-ink-muted">
           서로 다른 방향으로 작용하는 두 척도가 만났을 때의 해석입니다.
@@ -324,7 +340,7 @@ export default async function MePage(props: {
         <PairReadings readings={readPairs(scores)} scores={scores} />
       </div>
 
-      <section className="text-table text-ink-muted mt-10 max-w-[56rem] border-t border-[--border] pt-5">
+      <section className="text-table text-ink-muted mt-10 max-w-[56rem] border-t border-(--border) pt-5">
         <p className="eyebrow mb-2">결과 해석 시 유의사항</p>
         <p className="mb-1">
           점수는 우열이 아니라 경향의 정도입니다. 특정 상황의 결과를 예측하기보다
@@ -349,7 +365,6 @@ export default async function MePage(props: {
     처음 펼 장은 서버가 `?p=` 를 읽어 정한다 — 새로고침·공유 링크에도 그 장이
     바로 그려진다. `key` 로 `?p=` 만 바뀌는 이동에도 장이 새로 잡히게 한다.
   */
-  const { p } = await props.searchParams;
   const asked = Number(p);
   const initialPage =
     Number.isInteger(asked) && asked >= 1 && asked <= pages.length
@@ -359,12 +374,50 @@ export default async function MePage(props: {
   return (
     // 좁은 화면에선 아래 넘김 줄이 떠 있으므로 바닥 여백을 넉넉히 둔다
     <main className="page-column py-8 pb-24 lg:py-10 lg:pb-12">
+      {viewing && (
+        <p className="text-axis mb-4 rounded-lg px-4 py-3" style={{ background: "var(--wash)" }}>
+          지난 결과를 보고 계십니다.{" "}
+          <a href="/me" className="underline underline-offset-2">
+            가장 최근 결과로
+          </a>
+        </p>
+      )}
       <ResultBook
-        key={initialPage}
+        key={`${viewing ?? "latest"}-${initialPage}`}
         pages={pages}
         initial={initialPage}
         action={<RetakeButton />}
       />
+      {history.length > 1 && (
+        <nav aria-label="지난 결과" className="text-axis mt-10">
+          <p className="eyebrow mb-2">지난 결과</p>
+          <ul className="flex flex-wrap gap-2">
+            {history.map((h, i) => {
+              const current = h.id === result.sessionId;
+              const label = `${h.completedAt?.toLocaleDateString("ko-KR", { timeZone: "Asia/Seoul" })}${i === 0 ? " (최근)" : ""}`;
+              return (
+                <li key={h.id}>
+                  {current ? (
+                    <span
+                      aria-current="page"
+                      className="inline-flex h-9 items-center rounded-lg border border-(--ink) px-3 font-medium tabular"
+                    >
+                      {label}
+                    </span>
+                  ) : (
+                    <a
+                      href={i === 0 ? "/me" : `?r=${h.id}`}
+                      className="inline-flex h-9 items-center rounded-lg border border-(--border) px-3 tabular hover:bg-(--wash)"
+                    >
+                      {label}
+                    </a>
+                  )}
+                </li>
+              );
+            })}
+          </ul>
+        </nav>
+      )}
     </main>
   );
 }

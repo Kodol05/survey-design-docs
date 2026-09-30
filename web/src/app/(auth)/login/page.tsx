@@ -28,7 +28,7 @@ export default function LoginPage() {
       </p>
 
       {/* 아래 둘은 가끔 필요한 것이라 한 단 내려 둔다 */}
-      <div className="text-axis text-ink-muted mt-12 flex flex-col gap-2 border-t border-[--border] pt-6 text-center">
+      <div className="text-axis text-ink-muted mt-12 flex flex-col gap-2 border-t border-(--border) pt-6 text-center">
         <p>비밀번호를 잊으셨으면 관리자에게 초기화를 요청해 주세요.</p>
         <p>
           <Link href="/admin/login" className="underline">관리자 로그인</Link>

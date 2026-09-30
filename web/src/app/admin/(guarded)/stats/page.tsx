@@ -112,7 +112,7 @@ export default async function StatsPage(props: {
         />
       </div>
 
-      <nav className="mb-10 flex flex-wrap gap-1 border-b border-[--border]">
+      <nav className="mb-10 flex flex-wrap gap-1 border-b border-(--border)">
         {TABS.map((t) => (
           <Link
             key={t.key}

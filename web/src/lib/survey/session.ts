@@ -104,8 +104,12 @@ export async function getSection(sessionId: string, section: number) {
 export type DraftResponse = {
   itemId: string;
   value: number;
-  elapsedMs: number;
-  changedCount: number;
+  /**
+   * 이 화면에서 잰 값. 다시 열린 묶음의 답(이미 저장된 것)은 잰 것이 없어 비어
+   * 온다 — 그때는 저장된 값을 0 으로 덮지 않는다 (2026-09-30)
+   */
+  elapsedMs?: number;
+  changedCount?: number;
 };
 
 /**
@@ -150,6 +154,9 @@ export async function saveSection(sessionId: string, drafts: DraftResponse[]) {
   for (const d of drafts) {
     if (!Number.isInteger(d.value) || d.value < 1 || d.value > 7)
       throw new Error(`응답값이 ${d.value}입니다. 1~7이어야 합니다`);
+    for (const n of [d.elapsedMs, d.changedCount])
+      if (n !== undefined && (!Number.isInteger(n) || n < 0))
+        throw new Error("응답 기록 값이 올바르지 않습니다");
   }
   /*
     문항 id 가 **이 세션의 검사에 있는 살아 있는 문항**인지 본다 (2026-09-18 점검).
@@ -170,11 +177,18 @@ export async function saveSection(sessionId: string, drafts: DraftResponse[]) {
   for (const d of drafts) {
     await prisma.response.upsert({
       where: { sessionId_itemId: { sessionId, itemId: d.itemId } },
-      create: { sessionId, ...d },
+      create: {
+        sessionId,
+        itemId: d.itemId,
+        value: d.value,
+        elapsedMs: d.elapsedMs ?? 0,
+        changedCount: d.changedCount ?? 0,
+      },
       update: {
         value: d.value,
-        elapsedMs: d.elapsedMs,
-        changedCount: d.changedCount,
+        ...(d.elapsedMs === undefined
+          ? {}
+          : { elapsedMs: d.elapsedMs, changedCount: d.changedCount ?? 0 }),
       },
     });
   }

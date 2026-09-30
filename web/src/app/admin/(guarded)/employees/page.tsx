@@ -89,7 +89,7 @@ export default async function EmployeesPage(props: {
             name="q"
             defaultValue={keyword}
             placeholder="이름"
-            className="text-table h-12 w-48 rounded-lg border border-[--border] bg-surface px-3"
+            className="text-table h-12 w-48 rounded-lg border border-(--border) bg-surface px-3"
           />
           {activeSort && <input type="hidden" name="sort" value={activeSort} />}
           {sortDir !== fallbackDir && (
@@ -207,7 +207,12 @@ export default async function EmployeesPage(props: {
       )}
 
       <div className="mt-8 flex justify-end">
-        <ExportLink href="/admin/employees/export" count={rows.length} />
+        <ExportLink
+          href={`/admin/employees/export?${new URLSearchParams(
+            Object.entries(qs).filter((e): e is [string, string] => typeof e[1] === "string"),
+          )}`}
+          count={rows.length}
+        />
       </div>
 
       {/*

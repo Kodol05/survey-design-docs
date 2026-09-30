@@ -16,7 +16,7 @@ export function ExportLink({ href, count }: { href: string; count: number }) {
     <div className="text-axis text-right">
       <a
         href={href}
-        className="text-table inline-flex h-11 items-center rounded-lg border border-[--border] px-4 font-medium"
+        className="text-table inline-flex h-11 items-center rounded-lg border border-(--border) px-4 font-medium"
       >
         CSV로 내보내기
       </a>

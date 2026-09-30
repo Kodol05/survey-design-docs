@@ -121,7 +121,7 @@ export function LikertScale({
                 />
                 <span
                   aria-hidden
-                  className="flex items-center justify-center rounded-full transition-all duration-150 group-hover:scale-110 group-has-[:focus-visible]:outline-2 group-has-[:focus-visible]:outline-offset-4 group-has-[:focus-visible]:outline-[--ink]"
+                  className="flex items-center justify-center rounded-full transition-all duration-150 group-hover:scale-110 group-has-[:focus-visible]:outline-2 group-has-[:focus-visible]:outline-offset-4 group-has-[:focus-visible]:outline-(--ink)"
                   style={{
                     width: size,
                     height: size,
@@ -172,7 +172,7 @@ export function LikertScale({
           return (
             <label
               key={v}
-              className="flex min-h-14 cursor-pointer items-center gap-3 rounded-xl px-4 transition-all has-[:focus-visible]:outline-2 has-[:focus-visible]:outline-offset-2 has-[:focus-visible]:outline-[--ink]"
+              className="flex min-h-14 cursor-pointer items-center gap-3 rounded-xl px-4 transition-all has-[:focus-visible]:outline-2 has-[:focus-visible]:outline-offset-2 has-[:focus-visible]:outline-(--ink)"
               style={{
                 border: on ? `2.5px solid ${COLOR[i]}` : "1.5px solid var(--border)",
                 background: on ? `color-mix(in oklab, ${COLOR[i]} 16%, transparent)` : "transparent",

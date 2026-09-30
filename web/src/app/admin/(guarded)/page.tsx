@@ -101,7 +101,7 @@ export default async function AdminHome() {
       <div className="mb-14 grid gap-x-16 gap-y-14 lg:grid-cols-2">
         {/* ── 응시 현황 ── */}
         <section>
-          <div className="mb-4 flex items-baseline justify-between border-b border-[--border] pb-2">
+          <div className="mb-4 flex items-baseline justify-between border-b border-(--border) pb-2">
             <h2 className="text-section-title">응시 현황</h2>
             <span className="text-axis text-ink-muted">한 칸이 한 사람</span>
           </div>
@@ -110,7 +110,7 @@ export default async function AdminHome() {
 
         {/* ── 좌하 · 관련 ── */}
         <section>
-          <div className="mb-4 flex items-baseline justify-between border-b border-[--border] pb-2">
+          <div className="mb-4 flex items-baseline justify-between border-b border-(--border) pb-2">
             <h2 className="text-section-title">가장 뚜렷한 관련</h2>
             <Link
               href="/admin/stats"
@@ -140,7 +140,7 @@ export default async function AdminHome() {
 
         {/* ── 우하 · 지금 할 일 ── */}
         <section>
-          <h2 className="text-section-title mb-4 border-b border-[--border] pb-2">
+          <h2 className="text-section-title mb-4 border-b border-(--border) pb-2">
             지금 볼 것
           </h2>
           {needsReview.length === 0 &&
@@ -197,7 +197,7 @@ export default async function AdminHome() {
         볼 것이 있는 칸만 눌러도 되니 화면을 헤매지 않는다.
       */}
       <section>
-        <h2 className="text-section-title mb-4 border-b border-[--border] pb-2">
+        <h2 className="text-section-title mb-4 border-b border-(--border) pb-2">
           바로 가기
         </h2>
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
@@ -270,7 +270,7 @@ export default async function AdminHome() {
         멈춰도 아무도 모른다** — 그래서 시각은 늘 보이게 둔다.
       */}
       <section className="mt-14">
-        <h2 className="text-section-title mb-4 border-b border-[--border] pb-2">
+        <h2 className="text-section-title mb-4 border-b border-(--border) pb-2">
           데이터 백업
         </h2>
         {backupSupported() ? (
@@ -355,7 +355,7 @@ function BackupCard({
       <div className="text-axis text-right">
         <a
           href="/admin/backup"
-          className="text-table inline-flex h-11 items-center rounded-lg border border-[--border] px-4 font-medium"
+          className="text-table inline-flex h-11 items-center rounded-lg border border-(--border) px-4 font-medium"
         >
           백업 파일 받기
         </a>
@@ -405,7 +405,7 @@ function TodoItem({
     <li>
       <Link
         href={href}
-        className="-mx-2 block rounded-lg px-2 py-2 transition hover:bg-[--wash]"
+        className="-mx-2 block rounded-lg px-2 py-2 transition hover:bg-(--wash)"
       >
         <p>
           <span className="mr-2" style={{ color }} aria-hidden>

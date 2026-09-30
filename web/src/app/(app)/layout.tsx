@@ -20,7 +20,7 @@ export default async function AppLayout({ children }: { children: React.ReactNod
   const me = await requireUser();
   return (
     <>
-      <header className="border-b border-[--border]">
+      <header className="border-b border-(--border)">
         {/*
           폰 폭(390px)에서 제목·「다크」·이름·「로그아웃」이 제각기 두 줄로 접혔다
           (2026-09-18). 머리의 글자는 **절대 접지 않는다** — 좁으면 사이를 좁히고

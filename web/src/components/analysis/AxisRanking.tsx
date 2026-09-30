@@ -64,7 +64,7 @@ export function AxisRanking({
 
   return (
     <div>
-      <p className="text-section-title mb-3 border-b border-[--border] pb-2">
+      <p className="text-section-title mb-3 border-b border-(--border) pb-2">
         {axis}
       </p>
 
@@ -99,7 +99,7 @@ export function AxisRanking({
           const expanded = open === r.scale;
           const pts = scatter?.[r.scale] ?? [];
           return (
-            <li key={r.scale} className="border-b border-[--border] last:border-0">
+            <li key={r.scale} className="border-b border-(--border) last:border-0">
               <div
                 role="button"
                 tabIndex={0}
@@ -111,7 +111,7 @@ export function AxisRanking({
                     setOpen(expanded ? null : r.scale);
                   }
                 }}
-                className="-mx-2 grid cursor-pointer grid-cols-[minmax(0,12rem)_minmax(0,1fr)_3.5rem_5rem_1.25rem] items-center gap-x-5 rounded-lg px-2 py-2.5 hover:bg-[--wash]"
+                className="-mx-2 grid cursor-pointer grid-cols-[minmax(0,12rem)_minmax(0,1fr)_3.5rem_5rem_1.25rem] items-center gap-x-5 rounded-lg px-2 py-2.5 hover:bg-(--wash)"
               >
                 <span className="flex items-baseline gap-2">
                   <span

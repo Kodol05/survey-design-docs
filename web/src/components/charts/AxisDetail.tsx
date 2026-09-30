@@ -34,7 +34,7 @@ export function AxisDetail({ id, scale, percent, band, facets }: AxisDetailProps
   const apply = APPLY[scale]?.[band];
 
   return (
-    <section id={id} className="@container border-t border-[--border] py-6">
+    <section id={id} className="@container border-t border-(--border) py-6">
       <div className="mb-3 flex items-baseline gap-2.5">
         <h3 className="text-lg font-semibold">{scale}</h3>
         <span className="tabular text-base font-medium">{Math.round(percent)}</span>

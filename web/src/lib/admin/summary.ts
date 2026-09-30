@@ -20,7 +20,12 @@ import { prisma } from "../db";
 export async function loadSummary() {
   const [people, quality] = await Promise.all([
     loadAttendance(),
-    prisma.qualityFlag.groupBy({ by: ["flag"], _count: true }),
+    // 사원만 센다 — 관리자가 시험 삼아 한 응시는 빼고
+    prisma.qualityFlag.groupBy({
+      by: ["flag"],
+      _count: true,
+      where: { session: { employee: { role: "USER" } } },
+    }),
   ]);
   const byFlag = Object.fromEntries(quality.map((q) => [q.flag, q._count]));
   const count = (k: Attendee["status"]) =>

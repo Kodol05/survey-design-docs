@@ -173,7 +173,7 @@ export function CorrelationPanel({
                     쓰지 않는다. 넷을 상자로 묶으면 그래프보다 상자가 먼저 보인다.
                     구분은 여백과 제목으로만 한다.
                   */
-                  className="-mx-2 rounded-xl px-2 py-1 text-left transition hover:bg-[--wash]"
+                  className="-mx-2 rounded-xl px-2 py-1 text-left transition hover:bg-(--wash)"
                 >
                   {/*
                     ⚠️ 이름·값·등급을 **한 줄에 두면 넷의 높이가 어긋난다.**

@@ -55,7 +55,7 @@ export function TopRelations({ items }: { items: Relation[] }) {
         {shown.map((it, i) => (
           <li
             key={`${it.scale}-${it.axis}`}
-            className="border-b border-[--border] py-3 last:border-0"
+            className="border-b border-(--border) py-3 last:border-0"
           >
             {/*
               **막대를 먼저 둔다.** 전에는 문장과 숫자 넷이 줄줄이 있어서

@@ -9,22 +9,36 @@ import {
   getSection,
   sessionProgress,
 } from "@/lib/survey/session";
+import { inProgress, latestResult } from "@/lib/survey/result";
 
 export const metadata = { title: "응시 — 7차원 성향 설문" };
 
 export default async function SurveyPage(props: {
-  searchParams: Promise<{ section?: string; rest?: string }>;
+  searchParams: Promise<{ section?: string; rest?: string; retake?: string }>;
 }) {
   const me = await requireUser();
+  const { section: raw, rest, retake } = await props.searchParams;
+
+  /*
+    제출 뒤 뒤로 가기로 여기 오면 **빈 새 응시가 몰래 생겼다** (2026-09-30).
+    하던 응시가 없고 끝낸 결과가 있으면, 「다시 응시하기」(`?retake=1`)로 온
+    것이 아닌 한 결과 화면으로 보낸다.
+  */
+  if (retake !== "1") {
+    const [open, done] = await Promise.all([
+      inProgress(me.id),
+      latestResult(me.id),
+    ]);
+    if (!open && done) redirect("/me");
+  }
+
   const session = await getOrCreateSession(me.id);
 
-  const { section: raw, rest } = await props.searchParams;
   const asked = Number(raw);
   const resume = (await firstUnansweredSection(session.id)) ?? SECTION_COUNT;
+  // 아직 안 온 묶음으로 건너뛰지 못하게 — 앞 묶음이 비어 있으면 거기서 막힌다
   const section =
-    Number.isInteger(asked) && asked >= 1 && asked <= SECTION_COUNT
-      ? asked
-      : resume;
+    Number.isInteger(asked) && asked >= 1 && asked <= resume ? asked : resume;
 
   /*
     ⚠️ **중간에 화면을 끊지 않는다** (2026-08-25 사용자 결정).

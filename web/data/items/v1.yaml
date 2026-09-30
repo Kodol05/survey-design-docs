@@ -969,26 +969,35 @@ items:
   #   자율적실행 시작·판단·챙김은 있는데 **막혔을 때 뚫는 것**이 없었다
   #
   # 문항이 늘면 설문이 114 → 120문항, 시간이 17분 → 18분쯤이 된다.
+  #
+  # ══ 2026-09-30 · 문장 다시 쓰기 ═════════════════════════════════════
+  #
+  # 구성 요소(협력: 맞추기·공유·도움·조율·약속 / 조직생활: 융화·동료·잔류·
+  # 회복·조직 이해 / 자율: 주도·판단·계획·자력 해결·완결)는 그대로 두고,
+  # 문항마다 **그 요소 하나만** 묻게 고쳤다. 협력 01 은 「내 몫」(성실성)을
+  # 묻고 있어 협력 자체를 묻게 바꿨고, 자율 02 의 「나중에 확인받는다」
+  # 같은 두 번째 내용은 뺐다. 조직생활 03 은 잔류 의도를 돌려 말하지 않고
+  # 곧게 묻는다.
 
   - kind: ability
     code: AB-COOP-01
     axis: 협력
     direct: true
-    content: 여러 사람이 함께하는 일에서 내 몫을 제대로 해내는 편이다.
+    content: 다른 사람과 함께 일할 때 손발을 잘 맞추는 편이다.
     sourceRef: 07-job-ability.md 직접형
 
   - kind: ability
     code: AB-COOP-02
     axis: 협력
     direct: false
-    content: 일정이 늦어질 것 같으면 미리 동료에게 알린다.
+    content: 내 일의 진행 상황을 함께 일하는 사람들과 자주 공유한다.
     sourceRef: 07-job-ability.md 간접형 — 능력이 아니라 행동을 묻는다
 
   - kind: ability
     code: AB-COOP-03
     axis: 협력
     direct: false
-    content: 내 담당이 아니더라도 옆에서 막히면 한 번은 살펴본다.
+    content: 동료가 일로 곤란해하면 먼저 도울 방법을 찾는다.
     sourceRef: 07-job-ability.md 간접형
 
   # 조율 — 의견이 갈릴 때. 협력의 핵심인데 셋일 때 빠져 있었다
@@ -996,7 +1005,7 @@ items:
     code: AB-COOP-04
     axis: 협력
     direct: false
-    content: 방식이 갈릴 때 내 것만 고집하지 않고 맞춰 가는 편이다.
+    content: 의견이 다를 때 상대의 방식도 받아들여 절충점을 찾는다.
     sourceRef: 07-job-ability.md 간접형 — 조율 (2026-08-25 추가)
 
   # 약속 지키기 — 같이 하는 일에서 신뢰의 바탕
@@ -1004,7 +1013,7 @@ items:
     code: AB-COOP-05
     axis: 협력
     direct: false
-    content: 함께 하기로 한 일은 늦더라도 끝내서 넘긴다.
+    content: 함께 하기로 한 일은 정한 때까지 내 몫을 마친다.
     sourceRef: 07-job-ability.md 간접형 — 약속 (2026-08-25 추가)
 
   # ── 조직생활 ──
@@ -1021,14 +1030,14 @@ items:
     code: AB-ORG-02
     axis: 조직생활
     direct: false
-    content: 점심시간이나 쉬는 시간에 편하게 이야기를 나누는 동료가 여럿 있다.
+    content: 회사에 편하게 이야기를 나누는 동료가 여럿 있다.
     sourceRef: 07-job-ability.md 간접형 — 대인 융화
 
   - kind: ability
     code: AB-ORG-03
     axis: 조직생활
     direct: false
-    content: 힘든 일이 있어도 그만두는 것까지는 생각하지 않는다.
+    content: 지금 회사에서 앞으로도 계속 일하고 싶다.
     sourceRef: 07-job-ability.md 간접형 — 오래 다닌다. 근속 기록과 대조할 수 있는 축
 
   # 회복 — 부딪친 뒤에 어떻게 되는가. 오래 다니는 것의 실제 조건이다
@@ -1036,7 +1045,7 @@ items:
     code: AB-ORG-04
     axis: 조직생활
     direct: false
-    content: 껄끄러운 일이 있었더라도 얼마 지나면 예전처럼 지낸다.
+    content: 동료와 불편한 일이 있어도 오래 담아 두지 않는다.
     sourceRef: 07-job-ability.md 간접형 — 관계 회복 (2026-08-25 추가)
 
   # 조직에 맞추기 — 대인 융화와 다른 축. 「따라온다」가 아니라 「알아본다」로 쓴다
@@ -1044,7 +1053,7 @@ items:
     code: AB-ORG-05
     axis: 조직생활
     direct: false
-    content: 우리 회사에서 일이 진행되는 방식을 잘 아는 편이다.
+    content: 우리 회사에서 일이 돌아가는 방식을 잘 알고 있다.
     sourceRef: 07-job-ability.md 간접형 — 조직 이해 (2026-08-25 추가)
 
   # ── 자율적 실행 ──
@@ -1052,21 +1061,21 @@ items:
     code: AB-AUTO-01
     axis: 자율적실행
     direct: true
-    content: 별도의 지시가 없어도 스스로 일을 진행하는 편이다.
+    content: 지시가 없어도 스스로 할 일을 찾아서 하는 편이다.
     sourceRef: 07-job-ability.md 직접형
 
   - kind: ability
     code: AB-AUTO-02
     axis: 자율적실행
     direct: false
-    content: 방법이 애매할 때는 우선 내 판단대로 진행하고 나중에 확인받는다.
+    content: 방법이 정해져 있지 않으면 스스로 판단해서 진행한다.
     sourceRef: 07-job-ability.md 간접형
 
   - kind: ability
     code: AB-AUTO-03
     axis: 자율적실행
     direct: false
-    content: 맡은 일의 다음 단계를 누가 말해 주지 않아도 스스로 챙긴다.
+    content: 맡은 일의 다음 단계를 스스로 정해서 움직인다.
     sourceRef: 07-job-ability.md 간접형
 
   # 막혔을 때 — 스스로 한다는 것의 진짜 시험대는 잘 풀릴 때가 아니다
@@ -1074,7 +1083,7 @@ items:
     code: AB-AUTO-04
     axis: 자율적실행
     direct: false
-    content: 막히면 물어보기 전에 몇 가지 방법을 먼저 시도해 본다.
+    content: 일이 막히면 도움을 청하기 전에 스스로 방법을 찾아본다.
     sourceRef: 07-job-ability.md 간접형 — 자력 해결 (2026-08-25 추가)
 
   # 마무리 — 시작만 스스로 하고 끝을 안 맺으면 자율적 실행이 아니다
@@ -1082,5 +1091,5 @@ items:
     code: AB-AUTO-05
     axis: 자율적실행
     direct: false
-    content: 시작한 일은 누가 챙기지 않아도 마무리까지 해낸다.
+    content: 시작한 일은 누가 챙기지 않아도 끝까지 마무리한다.
     sourceRef: 07-job-ability.md 간접형 — 완결 (2026-08-25 추가)
