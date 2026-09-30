@@ -36,8 +36,13 @@ import { PrismaClient } from "@/generated/prisma/client";
  * ## 로컬 pg 풀 설정
  *
  * 사내 서버(도커)로 옮기면 컨테이너가 얼지도 DB 가 잠들지도 않아 아래 값은
- * 굳이 필요 없지만 해롭지도 않다. `max` 만 사람 수에 맞춰 올리면 된다.
+ * 굳이 필요 없지만 해롭지도 않다.
+ *
+ * `max` 는 3 → **10** (2026-09-30). 공지 직후 50명이 한꺼번에 응시하면 구간
+ * 저장이 몰리는데, 3개로는 줄을 선다. PostgreSQL 기본 `max_connections` 가
+ * 100 이라 10 은 넉넉히 안쪽이다. 서버 사정에 따라 `DB_POOL_MAX` 로 바꾼다.
  */
+const poolMax = Number(process.env.DB_POOL_MAX) || 10;
 const url = process.env.DATABASE_URL ?? "";
 const isNeon = url.includes("neon.tech");
 
@@ -54,7 +59,7 @@ const makeAdapter = () =>
     ? new PrismaNeon({ connectionString: url })
     : new PrismaPg({
         connectionString: url,
-        max: 3,
+        max: poolMax,
         connectionTimeoutMillis: 8_000,
         idleTimeoutMillis: 5_000,
         allowExitOnIdle: true,
