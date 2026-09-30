@@ -8,7 +8,7 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
-    "db:up": "docker compose -f ../docker-compose.yml up -d",
+    "db:up": "docker compose -f ../docker-compose.yml up -d db",
     "db:down": "docker compose -f ../docker-compose.yml down",
     "db:test:up": "docker compose -f ../docker-compose.yml up -d db-test",
     "db:test:migrate": "dotenv -e .env.test -- prisma migrate deploy",

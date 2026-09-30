@@ -343,7 +343,7 @@ function BackupCard({
         </p>
         <p className="text-ink-secondary mt-1 leading-snug">
           {latest
-            ? `서버 안에 ${backups.length}벌 · 하루 한 벌씩 최근 ${KEEP_COUNT}벌만 남습니다.`
+            ? `서버 안에 관리자 백업 ${backups.filter((b) => b.kind === "admin").length}벌(최근 ${KEEP_COUNT.admin}벌까지) · 설문 제출 백업 ${backups.filter((b) => b.kind === "submit").length}벌(최근 ${KEEP_COUNT.submit}벌까지)`
             : "이 화면을 열면 하루 한 벌씩 자동으로 뜹니다. 아직 한 벌도 없습니다."}
         </p>
         <p className="text-ink-muted mt-2 max-w-[30rem] leading-snug">

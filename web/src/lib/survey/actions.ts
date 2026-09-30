@@ -1,6 +1,8 @@
 "use server";
 
 import { redirect, unstable_rethrow } from "next/navigation";
+import { after } from "next/server";
+import { backupAfterSubmit } from "../admin/backup";
 import { prisma } from "../db";
 import { requireUser } from "../auth/guard";
 import {
@@ -208,6 +210,9 @@ export async function submitAction(sessionId: string) {
       where: { id: sessionId },
       data: { status: "COMPLETED", completedAt: new Date(), durationSec },
     });
+
+    // 응답을 보낸 뒤에 백업한다 — 사람을 기다리게 하지 않는다 (한 시간에 한 벌까지)
+    after(backupAfterSubmit);
 
     redirect("/me");
   });

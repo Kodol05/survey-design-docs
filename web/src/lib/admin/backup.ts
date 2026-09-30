@@ -34,11 +34,20 @@ import { createGzip } from "node:zlib";
  * 다른 환경에서는 `BACKUP_DUMP_CMD`로 통째로 바꿀 수 있다.
  */
 
-/** 몇 벌 남길지 — 하루 한 벌이니 2주치 */
-export const KEEP_COUNT = 14;
+/**
+ * 백업 종류 (2026-09-30). 관리자 쪽과 설문 제출 쪽을 **따로 센다** —
+ * 응시가 몰린 날 제출 백업이 관리자 백업을 밀어내지 않게.
+ */
+export type BackupKind = "admin" | "submit";
 
-/** 이 시간이 안 지났으면 새로 뜨지 않는다 */
+/** 몇 벌 남길지 */
+export const KEEP_COUNT: Record<BackupKind, number> = { admin: 15, submit: 30 };
+
+/** 관리자 화면: 이 시간이 안 지났으면 새로 뜨지 않는다 */
 export const INTERVAL_HOURS = 24;
+
+/** 설문 제출: 한 시간에 한 벌까지만 */
+export const SUBMIT_INTERVAL_HOURS = 1;
 
 export const BACKUP_DIR =
   process.env.BACKUP_DIR ?? path.join(process.cwd(), "backups");
@@ -66,14 +75,20 @@ export function backupSupported(): boolean {
 
 export type Backup = {
   name: string;
+  kind: BackupKind;
   path: string;
   /** 압축된 크기 (바이트) */
   size: number;
   at: Date;
 };
 
-/** 새것부터. 백업 폴더가 아직 없으면 빈 배열 */
-export async function listBackups(): Promise<Backup[]> {
+/** 이름으로 종류를 안다. 예전 이름(`survey-…`)은 관리자 백업이다 */
+export function backupKind(name: string): BackupKind {
+  return name.startsWith("submit-") ? "submit" : "admin";
+}
+
+/** 새것부터. 백업 폴더가 아직 없으면 빈 배열. `kind` 를 주면 그 종류만 */
+export async function listBackups(kind?: BackupKind): Promise<Backup[]> {
   let names: string[];
   try {
     names = await readdir(BACKUP_DIR);
@@ -84,10 +99,11 @@ export async function listBackups(): Promise<Backup[]> {
   const found = await Promise.all(
     names
       .filter((n) => n.endsWith(".sql.gz"))
+      .filter((n) => !kind || backupKind(n) === kind)
       .map(async (name) => {
         const full = path.join(BACKUP_DIR, name);
         const s = await stat(full);
-        return { name, path: full, size: s.size, at: s.mtime };
+        return { name, kind: backupKind(name), path: full, size: s.size, at: s.mtime };
       }),
   );
   return found.sort((a, b) => b.at.getTime() - a.at.getTime());
@@ -100,10 +116,10 @@ export async function listBackups(): Promise<Backup[]> {
  * `.sql.gz`로 남으면 목록에서는 멀쩡한 백업으로 보이고, 정작 복구할 때
  * 반쪽짜리인 것을 알게 된다.
  */
-export async function createBackup(): Promise<Backup> {
+export async function createBackup(kind: BackupKind = "admin"): Promise<Backup> {
   await mkdir(BACKUP_DIR, { recursive: true });
 
-  const name = backupName(new Date());
+  const name = backupName(new Date(), kind);
   const full = path.join(BACKUP_DIR, name);
   const part = `${full}.part`;
 
@@ -139,10 +155,10 @@ export async function createBackup(): Promise<Backup> {
   }
 
   await rename(part, full);
-  await pruneOld();
+  await pruneOld(kind);
 
   const s = await stat(full);
-  return { name, path: full, size: s.size, at: s.mtime };
+  return { name, kind, path: full, size: s.size, at: s.mtime };
 }
 
 /**
@@ -158,27 +174,59 @@ export async function createBackup(): Promise<Backup> {
 export async function ensureBackup(): Promise<Backup | null> {
   if (!backupSupported()) return null;
   try {
-    const [latest] = await listBackups();
+    const [latest] = await listBackups("admin");
     if (
       latest &&
       Date.now() - latest.at.getTime() < INTERVAL_HOURS * 3_600_000
     ) {
       return latest;
     }
-    return await createBackup();
+    return await createBackup("admin");
   } catch {
     return null;
   }
 }
 
-/** 오래된 것부터 지운다 */
-async function pruneOld(keep = KEEP_COUNT): Promise<void> {
-  const all = await listBackups();
-  await Promise.all(all.slice(keep).map((b) => rm(b.path, { force: true })));
+/** 한 프로세스 안에서 제출 백업이 겹쳐 뜨지 않게 */
+let submitRunning = false;
+
+/**
+ * 설문 제출 뒤 백업 (2026-09-30). 관리자가 한동안 안 들어와도 응답이 백업에
+ * 남게 한다. 마지막 제출 백업이 한 시간 안이면 건너뛴다. `ensureBackup` 처럼
+ * **절대 던지지 않는다** — 제출은 이미 끝났다.
+ */
+export async function backupAfterSubmit(): Promise<void> {
+  if (!backupSupported() || submitRunning) return;
+  submitRunning = true;
+  try {
+    const [latest] = await listBackups("submit");
+    if (
+      latest &&
+      Date.now() - latest.at.getTime() < SUBMIT_INTERVAL_HOURS * 3_600_000
+    ) {
+      return;
+    }
+    await createBackup("submit");
+  } catch {
+    // 다음 제출 때 다시 시도된다
+  } finally {
+    submitRunning = false;
+  }
 }
 
-/** "survey-2026-08-25-2313.sql.gz" — 어느 시점 것인지 이름만 보고 안다 */
-export function backupName(d: Date): string {
+/** 같은 종류 안에서 오래된 것부터 지운다 */
+async function pruneOld(kind: BackupKind): Promise<void> {
+  const all = await listBackups(kind);
+  await Promise.all(
+    all.slice(KEEP_COUNT[kind]).map((b) => rm(b.path, { force: true })),
+  );
+}
+
+/**
+ * "survey-2026-08-25-2313.sql.gz" (관리자) · "submit-2026-08-25-2313.sql.gz"
+ * (설문 제출) — 어느 시점, 어느 쪽 것인지 이름만 보고 안다
+ */
+export function backupName(d: Date, kind: BackupKind = "admin"): string {
   const p = new Intl.DateTimeFormat("en-CA", {
     timeZone: "Asia/Seoul",
     year: "numeric",
@@ -193,7 +241,8 @@ export function backupName(d: Date): string {
       (a, x) => ({ ...a, [x.type]: x.value }),
       {},
     );
-  return `survey-${p.year}-${p.month}-${p.day}-${p.hour}${p.minute}.sql.gz`;
+  const prefix = kind === "submit" ? "submit" : "survey";
+  return `${prefix}-${p.year}-${p.month}-${p.day}-${p.hour}${p.minute}.sql.gz`;
 }
 
 /**

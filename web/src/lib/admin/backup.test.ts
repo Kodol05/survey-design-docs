@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { INTERVAL_HOURS, KEEP_COUNT, backupName } from "./backup";
+import { KEEP_COUNT, backupKind, backupName } from "./backup";
 
 /*
   실제 덤프는 여기서 뜨지 않는다 — Docker가 돌고 있어야 하고, 테스트가
@@ -45,8 +45,19 @@ describe("백업 파일 이름", () => {
   });
 });
 
-describe("보관 규칙", () => {
-  it("하루 한 벌 · 14벌이면 2주치가 남는다", () => {
-    expect((KEEP_COUNT * INTERVAL_HOURS) / 24).toBe(14);
+describe("두 종류 백업 (2026-09-30)", () => {
+  it("설문 제출 백업은 submit- 으로 시작한다", () => {
+    expect(backupName(new Date("2026-08-25T14:09:00Z"), "submit")).toBe(
+      "submit-2026-08-25-2309.sql.gz",
+    );
+  });
+
+  it("이름으로 종류를 가른다 — 예전 이름은 관리자 백업", () => {
+    expect(backupKind("survey-2026-08-25-2309.sql.gz")).toBe("admin");
+    expect(backupKind("submit-2026-08-25-2309.sql.gz")).toBe("submit");
+  });
+
+  it("관리자 15벌 · 설문 제출 30벌을 따로 남긴다", () => {
+    expect(KEEP_COUNT).toEqual({ admin: 15, submit: 30 });
   });
 });
