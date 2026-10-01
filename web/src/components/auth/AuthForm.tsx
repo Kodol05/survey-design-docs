@@ -1,6 +1,6 @@
 "use client";
 
-import { useActionState } from "react";
+import { startTransition, useActionState } from "react";
 import { Button } from "../ui/Button";
 import type { FormState } from "@/lib/auth/actions";
 
@@ -22,7 +22,19 @@ export function AuthForm({
   );
 
   return (
-    <form action={formAction} className="flex flex-col gap-5">
+    <form
+      /*
+        `action=` 으로 넘기면 React 19 가 제출 뒤 입력칸을 **전부 비운다.**
+        「비밀번호가 서로 다릅니다」 한 번에 이름·번호까지 다시 쳐야 했다
+        (2026-09-30). 제출을 직접 받아 칸을 그대로 둔다.
+      */
+      onSubmit={(e) => {
+        e.preventDefault();
+        const data = new FormData(e.currentTarget);
+        startTransition(() => formAction(data));
+      }}
+      className="flex flex-col gap-5"
+    >
       {children}
       {state?.error && (
         <p
@@ -73,7 +85,7 @@ export function Field({
       <input
         name={name}
         type={type}
-        className="text-item h-14 rounded-lg border border-[--border] bg-surface px-4 transition-colors focus:border-[--series-1]"
+        className="text-item h-14 rounded-lg border border-(--border) bg-surface px-4 transition-colors focus:border-(--series-1)"
         {...rest}
       />
       {hint && <span className="text-axis text-ink-muted">{hint}</span>}

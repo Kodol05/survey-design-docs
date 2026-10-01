@@ -36,7 +36,8 @@ export type Person = {
  */
 export async function loadPeople(excludePoor = false): Promise<Person[]> {
   const rows = await prisma.testSession.findMany({
-    where: { status: "COMPLETED", result: { isNot: null } },
+    // 사원만 — 관리자가 시험 삼아 한 응시는 분석에 넣지 않는다
+    where: { status: "COMPLETED", result: { isNot: null }, employee: { role: "USER" } },
     orderBy: { completedAt: "desc" },
     include: { result: true, qualityFlag: true, employee: true },
   });
@@ -168,7 +169,7 @@ export async function loadReliability(): Promise<ScaleReliability[]> {
     },
   });
   const responses = await prisma.response.findMany({
-    where: { session: { status: "COMPLETED" } },
+    where: { session: { status: "COMPLETED", employee: { role: "USER" } } },
     select: { sessionId: true, itemId: true, value: true },
   });
 
@@ -310,7 +311,7 @@ export type PersonQuality = {
  */
 export async function loadPersonQuality(): Promise<PersonQuality[]> {
   const rows = await prisma.testSession.findMany({
-    where: { status: "COMPLETED" },
+    where: { status: "COMPLETED", employee: { role: "USER" } },
     orderBy: { completedAt: "desc" },
     include: { qualityFlag: true, employee: true },
   });

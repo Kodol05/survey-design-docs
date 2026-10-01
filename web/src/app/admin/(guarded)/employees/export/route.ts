@@ -1,9 +1,9 @@
 import { requireAdmin } from "@/lib/auth/guard";
-import { prisma } from "@/lib/db";
 import { formatPhone } from "@/lib/auth/phone";
 import { ABILITY_AXES, TRAIT_SCALES } from "@/lib/items/types";
 import { abilityMean } from "@/components/analysis/TraitStrip";
-import type { StoredAbilities, StoredTraits } from "@/lib/survey/result";
+import { isoDay, loadRoster } from "@/lib/admin/roster";
+import { FLAG_LABEL, type QualityFlag } from "@/lib/scoring/quality";
 
 /**
  * 구성원 CSV (2026-08-25 사용자 결정).
@@ -24,20 +24,16 @@ import type { StoredAbilities, StoredTraits } from "@/lib/survey/result";
  * 이유가 없고, 문항별 응답은 이 파일의 목적(사람을 훑는 것)과 다르다 —
  * 그건 나가면 「누가 몇 번 문항에 뭐라 답했는지」가 통째로 나가는 것이다.
  */
-export async function GET() {
+export async function GET(req: Request) {
   await requireAdmin();
 
-  const employees = await prisma.employee.findMany({
-    where: { role: "USER" },
-    orderBy: { name: "asc" },
-    include: {
-      testSessions: {
-        orderBy: { startedAt: "desc" },
-        take: 1,
-        include: { result: true, qualityFlag: true },
-      },
-    },
-  });
+  /*
+    **화면 목록과 같은 사람을 같은 순서로** 내보낸다 (2026-09-30).
+    전에는 검색·거르개를 무시하고 전원을 뽑았고, 재응시를 시작한 사람은
+    끝낸 결과 대신 빈 새 세션이 나갔다. 목록과 같은 `loadRoster` 를 쓴다.
+  */
+  const params = Object.fromEntries(new URL(req.url).searchParams);
+  const { rows } = await loadRoster(params);
 
   const STATUS: Record<string, string> = {
     COMPLETED: "완료",
@@ -57,50 +53,41 @@ export async function GET() {
     "세 능력 평균(직원 설문)",
   ];
 
-  const body = employees.map((e) => {
-    const s = e.testSessions[0];
-    const stored = (s?.result?.scoresJson ?? null) as StoredTraits | null;
-    const ability = (s?.result?.abilityScoresJson ??
-      null) as StoredAbilities | null;
+  const num = (v: number | null | undefined) =>
+    typeof v === "number" ? String(Math.round(v)) : "";
 
-    const abilities = ability
-      ? Object.fromEntries(
-          Object.entries(ability).map(([k, v]) => [k, v.percent]),
-        )
-      : {};
-
+  const body = rows.map((r) => {
+    const done = r.status === "COMPLETED";
     return [
-      e.name,
-      e.phone ? formatPhone(e.phone) : "",
-      s ? (STATUS[s.status] ?? s.status) : "미응시",
-      s?.completedAt ? isoDay(s.completedAt) : "",
-      s?.qualityFlag
-        ? String(Math.round(s.qualityFlag.antonymAgreement * 100))
-        : "",
-      s?.qualityFlag?.flag ?? "",
-      ...TRAIT_SCALES.map((t) =>
-        stored?.[t] ? String(Math.round(stored[t].percent)) : "",
-      ),
-      ...ABILITY_AXES.map((a) =>
-        typeof abilities[a] === "number" ? String(Math.round(abilities[a])) : "",
-      ),
+      r.name,
+      r.phone ? formatPhone(r.phone) : "",
+      r.status ? (STATUS[r.status] ?? r.status) : "미응시",
+      r.completedDay ?? "",
+      done && r.agreement !== null ? num(r.agreement * 100) : "",
+      done ? (FLAG_LABEL[r.flag as QualityFlag] ?? r.flag) : "",
+      ...TRAIT_SCALES.map((t) => num(r.traits?.[t])),
+      ...ABILITY_AXES.map((a) => num(r.abilities?.[a])),
       // 한 축이라도 없으면 비워 둔다 — 있는 것만 평균 내면 다른 잣대가 된다
-      (() => {
-        const m = abilityMean(abilities);
-        return m === null ? "" : String(Math.round(m));
-      })(),
+      num(abilityMean(r.abilities)),
     ];
   });
 
   const csv =
-    "﻿" +
+    "\uFEFF" +
     [head, ...body].map((r) => r.map(quote).join(",")).join("\r\n") +
     "\r\n";
+
+  /*
+    파일 이름에 한글을 그대로 넣으면 헤더가 깨져 **내보내기가 500 으로 죽는다**
+    (헤더는 ASCII 만 받는다). 한글 이름은 `filename*` 로 따로 싣는다.
+  */
+  const day = isoDay(new Date());
+  const korean = encodeURIComponent(`구성원_${day}.csv`);
 
   return new Response(csv, {
     headers: {
       "Content-Type": "text/csv; charset=utf-8",
-      "Content-Disposition": `attachment; filename="${filename()}"`,
+      "Content-Disposition": `attachment; filename="members_${day}.csv"; filename*=UTF-8''${korean}`,
       // 사람 정보다. 중간 어디에도 남지 않게 한다
       "Cache-Control": "no-store, private",
     },
@@ -116,19 +103,4 @@ export async function GET() {
  */
 function quote(v: string): string {
   return /[",\r\n]/.test(v) ? `"${v.replace(/"/g, '""')}"` : v;
-}
-
-/** 서버 시간대와 무관하게 한국 날짜로 적는다 */
-function isoDay(d: Date): string {
-  return new Intl.DateTimeFormat("en-CA", {
-    timeZone: "Asia/Seoul",
-    year: "numeric",
-    month: "2-digit",
-    day: "2-digit",
-  }).format(d);
-}
-
-/** 언제 뽑은 파일인지 이름에 남긴다 — 여러 벌이 돌아다니면 어느 것이 최신인지 모른다 */
-function filename(): string {
-  return `구성원_${isoDay(new Date())}.csv`;
 }

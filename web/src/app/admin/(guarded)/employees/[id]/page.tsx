@@ -19,6 +19,7 @@ import {
 } from "@/lib/survey/result";
 import { DeleteEmployee } from "./DeleteEmployee";
 import { ResetPassword } from "./ResetPassword";
+import { FLAG_LABEL, type QualityFlag } from "@/lib/scoring/quality";
 
 export const metadata = { title: "구성원 상세 — 관리자" };
 
@@ -55,14 +56,18 @@ export default async function EmployeeDetail(props: {
       <p className="text-axis text-ink-muted mb-8 tabular">
         {e.phone ? formatPhone(e.phone) : "번호 없음"}
         {session?.completedAt &&
-          ` · ${session.completedAt.toLocaleDateString("ko-KR")} 응시`}
+          ` · ${session.completedAt.toLocaleDateString("ko-KR", { timeZone: "Asia/Seoul" })} 응시`}
       </p>
 
       {!result ? (
         <div className="mb-14">
           <EmptyState
             message={
-              session ? "응시가 진행 중입니다." : "아직 응시하지 않았습니다."
+              !session
+                ? "아직 응시하지 않았습니다."
+                : session.status === "ABANDONED"
+                  ? "응시를 마치지 않고 중단했습니다."
+                  : "응시가 진행 중입니다."
             }
           />
         </div>
@@ -79,7 +84,10 @@ export default async function EmployeeDetail(props: {
         <Card title="응답 신뢰도" className="mb-14">
           <dl className="text-table grid grid-cols-2 gap-y-2 sm:grid-cols-4">
             <dt className="text-ink-secondary">판정</dt>
-            <dd className="tabular">{session.qualityFlag.flag}</dd>
+            <dd className="tabular">
+              {FLAG_LABEL[session.qualityFlag.flag as QualityFlag] ??
+                session.qualityFlag.flag}
+            </dd>
             <dt className="text-ink-secondary">반대 문항 일치도</dt>
             <dd className="tabular">
               {session.qualityFlag.antonymAgreement.toFixed(2)}
@@ -107,7 +115,7 @@ export default async function EmployeeDetail(props: {
         손이 미끄러진다. 되돌릴 수 없는 것은 되돌릴 수 있는 것과 같은 줄에
         놓지 않는다.
       */}
-      <div className="mt-16 border-t border-[--border] pt-8">
+      <div className="mt-16 border-t border-(--border) pt-8">
         <DeleteEmployee employeeId={e.id} name={e.name} />
       </div>
     </>
@@ -159,7 +167,7 @@ async function ResultBlocks({
         <div className="overflow-x-auto">
           <table className="w-full text-table">
             <thead>
-              <tr className="text-ink-secondary border-b border-[--border]">
+              <tr className="text-ink-secondary border-b border-(--border)">
                 <th className="py-2 text-left font-medium">능력</th>
                 <th className="py-2 pr-2 text-right font-medium">점수</th>
                 <th className="py-2 pl-6 text-left font-medium">사내 위치</th>
@@ -175,7 +183,7 @@ async function ResultBlocks({
                 return (
                   <tr
                     key={x.axis}
-                    className="border-b border-[--border] last:border-0"
+                    className="border-b border-(--border) last:border-0"
                   >
                     <th scope="row" className="py-3 text-left font-normal">
                       {x.axis}

@@ -23,7 +23,7 @@ const STATUS_LABEL: Record<string, string> = {
   RETIRED: "폐기",
 };
 
-const field = "h-11 rounded-lg border border-[--border] bg-surface px-3";
+const field = "h-11 rounded-lg border border-(--border) bg-surface px-3";
 const label = "text-table font-medium";
 
 /**
@@ -105,7 +105,7 @@ export function ItemEditForm({
           value={content}
           onChange={(e) => setContent(e.target.value)}
           rows={3}
-          className="rounded-lg border border-[--border] bg-surface px-3 py-2 leading-relaxed"
+          className="rounded-lg border border-(--border) bg-surface px-3 py-2 leading-relaxed"
         />
       </label>
 

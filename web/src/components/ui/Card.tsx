@@ -17,7 +17,7 @@ export function Card({
   return (
     <section className={className}>
       {title && (
-        <h2 className="text-section-title mb-5 border-b border-[--border] pb-2">
+        <h2 className="text-section-title mb-5 border-b border-(--border) pb-2">
           {title}
         </h2>
       )}

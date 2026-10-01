@@ -21,9 +21,22 @@ export type PersonResult = {
 /** 가장 최근에 마친 응시. 없으면 null. */
 export async function latestResult(
   employeeId: string,
+  /** 지난 결과를 볼 때. 본인 것이 아니거나 끝나지 않은 것이면 최신으로 */
+  sessionId?: string,
+): Promise<PersonResult | null> {
+  if (sessionId) {
+    const picked = await resultOf(employeeId, sessionId);
+    if (picked) return picked;
+  }
+  return resultOf(employeeId);
+}
+
+async function resultOf(
+  employeeId: string,
+  sessionId?: string,
 ): Promise<PersonResult | null> {
   const s = await prisma.testSession.findFirst({
-    where: { employeeId, status: "COMPLETED" },
+    where: { employeeId, status: "COMPLETED", ...(sessionId ? { id: sessionId } : {}) },
     orderBy: { completedAt: "desc" },
     include: { result: true },
   });
@@ -35,6 +48,18 @@ export async function latestResult(
     traits: s.result.scoresJson as unknown as StoredTraits,
     abilities: (s.result.abilityScoresJson ?? {}) as unknown as StoredAbilities,
   };
+}
+
+/**
+ * 끝낸 응시 목록, 최신부터 (2026-09-30). 다시 응시한 사람이 지난 결과도 볼 수
+ * 있게 한다 — 비교 화면이 아니라 날짜를 골라 그때 결과지를 여는 것이다.
+ */
+export async function completedResults(employeeId: string) {
+  return prisma.testSession.findMany({
+    where: { employeeId, status: "COMPLETED", result: { isNot: null } },
+    orderBy: { completedAt: "desc" },
+    select: { id: true, completedAt: true },
+  });
 }
 
 /**

@@ -1,8 +1,10 @@
 # Vercel 에 올리기
 
 > **올라가 있습니다 (2026-09-08).** 주소는 바뀌지 않고, 이 PC 가 꺼져 있어도 열립니다.
-> 실제 주소는 저장소에 적지 않습니다 — 가입이 아직 열려 있어서, 주소가 알려지면
-> 모르는 사람의 응답이 평균과 상관에 섞입니다.
+> 저장소는 **일부러 공개**로 둡니다 (2026-09-30). 그래서 주소도 숨겨져 있지 않습니다 —
+> 가입이 열려 있으므로 모르는 사람이 가입하면 그 응답이 평균과 상관에 섞일 수 있습니다.
+> 지금은 가입 상한 200명(`lib/auth/signupCap.ts`)으로 폭주만 막아 둡니다.
+> 비밀번호·DB 주소 같은 값은 저장소가 아니라 Vercel 환경변수에만 둡니다.
 
 PC 를 꺼도 열리는 주소를 만드는 방법입니다. **사내 서버로 옮기기 전까지 쓰는 임시 자리**입니다.
 
@@ -54,14 +56,14 @@ Vercel 대시보드의 Settings → Environment Variables 에서 넣습니다.
 cd web
 vercel env pull .env.vercel        # Neon 주소를 받아온다
 # 마이그레이션은 연결 풀을 거치지 않는 주소(DATABASE_URL_UNPOOLED)로 — 아래 「겪은 것」 참고
-npx dotenv -e .env.vercel -- sh -c 'DATABASE_URL=$DATABASE_URL_UNPOOLED npx prisma migrate deploy'
-npx dotenv -e .env.vercel -- npx tsx scripts/seed.mts
+sh -c 'set -a; . ./.env.vercel; set +a; DATABASE_URL=$DATABASE_URL_UNPOOLED npx prisma migrate deploy'
+npx tsx --env-file=.env.vercel scripts/seed.mts
 ```
 
 화면을 채워 보시려면 가짜 데이터도 넣을 수 있습니다.
 
 ```bash
-npx dotenv -e .env.vercel -- npx tsx scripts/seed-demo.mts
+npx tsx --env-file=.env.vercel scripts/seed-demo.mts
 ```
 
 > ⚠️ `.env.vercel` 은 실제 DB 주소라 **커밋되지 않습니다** (`.env*` 가 막혀 있음). 다 쓰면 지우세요.
@@ -133,4 +135,4 @@ Vercel 때문에 더한 것들은 **전부 환경변수로 갈리거나 있어�
 | `robots.ts` · `X-Robots-Tag` | 그대로 두면 됩니다 |
 | `outputFileTracingIncludes` | `output: standalone` 으로 이미지를 줄일 때 **필요합니다** |
 
-사내 배포 자체는 [13 백업·복구](13-backup-restore.md)를 보세요.
+사내 배포 자체는 [18 사내 서버 배포](18-사내-서버-배포.md)를 보세요.

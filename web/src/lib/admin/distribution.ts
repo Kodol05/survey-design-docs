@@ -46,9 +46,25 @@ export type CompanyDistribution = {
 
 /** 완료된 결과를 모아 축별 점수 목록을 만든다. */
 export async function loadDistribution(): Promise<CompanyDistribution> {
-  const results = await prisma.result.findMany({
-    where: { session: { status: "COMPLETED" } },
-    select: { scoresJson: true, abilityScoresJson: true },
+  /*
+    **사람 한 명당 가장 최근 결과 하나**, 사원만 센다 (2026-09-30).
+    전에는 끝낸 응시를 전부 세서, 다시 응시한 사람은 두 번 들어가고 관리자가
+    시험 삼아 한 응시도 섞였다. 그러면 「N명 기준」이 부풀고 평균이 쏠린다.
+  */
+  const rows = await prisma.result.findMany({
+    where: { session: { status: "COMPLETED", employee: { role: "USER" } } },
+    orderBy: { session: { completedAt: "desc" } },
+    select: {
+      scoresJson: true,
+      abilityScoresJson: true,
+      session: { select: { employeeId: true } },
+    },
+  });
+  const seen = new Set<string>();
+  const results = rows.filter((r) => {
+    if (seen.has(r.session.employeeId)) return false;
+    seen.add(r.session.employeeId);
+    return true;
   });
 
   const traits = new Map<string, number[]>();

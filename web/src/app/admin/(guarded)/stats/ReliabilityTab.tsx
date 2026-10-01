@@ -83,7 +83,7 @@ export function ReliabilityTab({
                     </p>
                     <table className="text-table w-full min-w-[22rem]">
                       <thead>
-                        <tr className="text-axis text-ink-muted border-b border-[--border]">
+                        <tr className="text-axis text-ink-muted border-b border-(--border)">
                           <th className="py-1.5 text-left font-medium">척도</th>
                           <th className="w-16 py-1.5 text-right font-medium">
                             문항
@@ -100,7 +100,7 @@ export function ReliabilityTab({
                         {part.map((r) => (
                           <tr
                             key={r.scale}
-                            className="border-b border-[--border] last:border-0"
+                            className="border-b border-(--border) last:border-0"
                           >
                             <th
                               scope="row"

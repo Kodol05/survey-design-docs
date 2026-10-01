@@ -60,7 +60,7 @@ export function SplitList({
       {splits.map((s, i) => {
         const expanded = open === s.scale;
         return (
-          <li key={s.scale} className="border-b border-[--border] last:border-0">
+          <li key={s.scale} className="border-b border-(--border) last:border-0">
           <div
             role="button"
             tabIndex={0}
@@ -72,7 +72,7 @@ export function SplitList({
                 setOpen(expanded ? null : s.scale);
               }
             }}
-            className="-mx-2 grid cursor-pointer grid-cols-[minmax(0,12rem)_minmax(0,1fr)_4rem_7rem_1.25rem] items-center gap-x-5 rounded-lg px-2 py-2.5 hover:bg-[--wash]"
+            className="-mx-2 grid cursor-pointer grid-cols-[minmax(0,12rem)_minmax(0,1fr)_4rem_7rem_1.25rem] items-center gap-x-5 rounded-lg px-2 py-2.5 hover:bg-(--wash)"
           >
             <span className="flex items-baseline gap-2">
               <span

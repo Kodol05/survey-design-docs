@@ -27,7 +27,7 @@ const base =
 const variants: Record<Variant, string> = {
   primary: "bg-series-1 text-white hover:brightness-110",
   // 세로는 작아도 터치 영역은 44px를 유지한다 (01 §2.4)
-  secondary: "border border-[--border] bg-surface text-ink hover:bg-page",
+  secondary: "border border-(--border) bg-surface text-ink hover:bg-page",
   quiet: "text-ink-secondary hover:text-ink",
 };
 

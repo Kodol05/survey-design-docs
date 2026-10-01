@@ -217,7 +217,7 @@ function InHouseSection({
       />
 
       {/* ── 2절 · 능력마다 어떤 성향이 ── */}
-      <div className="mt-20 border-t border-[--border] pt-12">
+      <div className="mt-20 border-t border-(--border) pt-12">
         <h2 className="text-section-title mb-2">
           능력마다 어떤 성향이 뚜렷한가
         </h2>
@@ -248,7 +248,7 @@ function InHouseSection({
 
       {/* ── 3절 · 셋을 합쳐서 ── */}
       {composite && (
-        <div className="mt-20 border-t border-[--border] pt-12">
+        <div className="mt-20 border-t border-(--border) pt-12">
           <h2 className="text-section-title mb-6">
             직무능력이 높으려면 — 무엇이 가장 크게 가르나
           </h2>

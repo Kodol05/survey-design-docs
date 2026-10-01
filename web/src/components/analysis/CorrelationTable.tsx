@@ -128,13 +128,13 @@ export function CorrelationTable({
               따라가지지 않는다. 위쪽 선은 두지 않는다 — 표 바깥을 가두면
               감싸는 테두리가 된다 (11 §2).
             */}
-            <th className="text-axis text-ink-muted border-r border-b border-[--border] px-2 pb-2 text-left font-medium">
+            <th className="text-axis text-ink-muted border-r border-b border-(--border) px-2 pb-2 text-left font-medium">
               성향 축
             </th>
             {cols.map((c) => (
               <th
                 key={c}
-                className="text-table border-r border-b border-[--border] px-1 pb-2 text-center font-medium last:border-r-0"
+                className="text-table border-r border-b border-(--border) px-1 pb-2 text-center font-medium last:border-r-0"
               >
                 {c}
               </th>
@@ -148,7 +148,7 @@ export function CorrelationTable({
                 <th
                   scope="colgroup"
                   colSpan={cols.length + 1}
-                  className="text-axis border-b border-[--border] px-2 pt-5 pb-1 text-left font-medium"
+                  className="text-axis border-b border-(--border) px-2 pt-5 pb-1 text-left font-medium"
                 >
                   <span className="text-ink-secondary">{g.label}</span>
                   {g.note && (
@@ -161,7 +161,7 @@ export function CorrelationTable({
               <tr key={r}>
                 <th
                   scope="row"
-                  className="text-table border-r border-b border-[--border] px-2 text-left font-normal"
+                  className="text-table border-r border-b border-(--border) px-2 text-left font-normal"
                 >
                   {r}
                 </th>
@@ -172,7 +172,7 @@ export function CorrelationTable({
                   return (
                     <td
                       key={c}
-                      className="border-r border-b border-[--border] p-0 last:border-r-0"
+                      className="border-r border-b border-(--border) p-0 last:border-r-0"
                     >
                       <button
                         type="button"

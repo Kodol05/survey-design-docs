@@ -90,7 +90,10 @@ export function ResultBook({
       const d: Dir = dir ?? (c > iRef.current ? "next" : "prev");
       setI(c);
       setEnter({ key: pages[c].key, dir: d });
-      history.replaceState(null, "", `?p=${c + 1}`);
+      // `?p=` 만 바꾸고 다른 값(지난 결과 `r`)은 그대로 둔다
+      const q = new URLSearchParams(location.search);
+      q.set("p", String(c + 1));
+      history.replaceState(null, "", `?${q}`);
       window.scrollTo({ top: 0, behavior: "smooth" });
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -135,7 +138,7 @@ export function ResultBook({
       <div className="result-sheet" ref={sheetRef}>
         {/* ── 장 탭 ── */}
         <nav
-          className="result-book-nav mb-6 flex flex-wrap items-center justify-between gap-x-6 gap-y-2 border-b border-[--border] pb-3"
+          className="result-book-nav mb-6 flex flex-wrap items-center justify-between gap-x-6 gap-y-2 border-b border-(--border) pb-3"
           aria-label="결과지 장"
         >
           <div role="tablist" className="text-axis flex flex-wrap gap-1">
@@ -191,7 +194,7 @@ export function ResultBook({
         )}
 
         {/* ── 종이 아래 넘김 줄 — 읽고 내려오면 바로 다음 장 ── */}
-        <div className="result-book-nav text-table mt-5 flex items-center justify-between gap-4 border-t border-[--border] pt-4">
+        <div className="result-book-nav text-table mt-5 flex items-center justify-between gap-4 border-t border-(--border) pt-4">
           <button
             type="button"
             onClick={() => go(i - 1, "prev")}
@@ -248,7 +251,7 @@ export function ResultBook({
 
       {/* ── 아래 고정 줄 (좁은 화면) ── */}
       <div
-        className="result-book-nav fixed inset-x-0 bottom-0 z-20 flex items-center justify-between gap-3 border-t border-[--border] px-4 py-2.5 lg:hidden"
+        className="result-book-nav fixed inset-x-0 bottom-0 z-20 flex items-center justify-between gap-3 border-t border-(--border) px-4 py-2.5 lg:hidden"
         style={{ background: "var(--page)" }}
       >
         <button

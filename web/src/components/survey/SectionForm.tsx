@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useRef, useState, useTransition } from "react";
+import { useCallback, useEffect, useRef, useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { Button } from "../ui/Button";
 import { LikertScale } from "./LikertScale";
@@ -41,13 +41,20 @@ export function SectionForm({
   const router = useRouter();
 
   // 응답시간·수정횟수는 품질 지표의 원자료다. 응시자에게는 알리지 않는다.
-  const shownAt = useRef<Record<string, number>>({});
+  /*
+    한 문항의 응답시간은 **바로 앞 답을 고른 때부터** 잰다 (2026-09-30).
+    전에는 화면이 열린 때부터 재서 뒤 문항일수록 시간이 쌓였고, 빨리 찍어도
+    「너무 빠름」에 안 걸렸다.
+  */
+  const lastPickAt = useRef<number | null>(null);
   const meta = useRef<
     Record<string, { elapsedMs: number; changedCount: number }>
   >({});
   const nodes = useRef<Record<string, HTMLDivElement | null>>({});
 
-  for (const it of items) shownAt.current[it.id] ??= Date.now();
+  useEffect(() => {
+    lastPickAt.current = Date.now();
+  }, []);
 
   const answered = items.filter((i) => answers[i.id] !== undefined).length;
 
@@ -72,9 +79,10 @@ export function SectionForm({
       meta.current[itemId] = prev
         ? { elapsedMs: prev.elapsedMs, changedCount: prev.changedCount + 1 }
         : {
-            elapsedMs: Math.max(0, now - (shownAt.current[itemId] ?? now)),
+            elapsedMs: Math.max(0, now - (lastPickAt.current ?? now)),
             changedCount: 0,
           };
+      lastPickAt.current = now;
 
       setAnswers((a) => {
         const next = { ...a, [itemId]: value };
@@ -113,8 +121,9 @@ export function SectionForm({
       const drafts = items.map((i) => ({
         itemId: i.id,
         value: answers[i.id],
-        elapsedMs: meta.current[i.id]?.elapsedMs ?? 0,
-        changedCount: meta.current[i.id]?.changedCount ?? 0,
+        // 이 화면에서 새로 고르지 않은 답(이미 저장된 것)은 비워 보낸다
+        elapsedMs: meta.current[i.id]?.elapsedMs,
+        changedCount: meta.current[i.id]?.changedCount,
       }));
       /*
         저장이 실패하면 **여기서 멈추고 알린다.**
@@ -200,7 +209,7 @@ export function SectionForm({
             ref={(el) => {
               nodes.current[item.id] = el;
             }}
-            className="scroll-mt-32 border-b border-[--border] py-16 last:border-0"
+            className="scroll-mt-32 border-b border-(--border) py-16 last:border-0"
           >
             {/* 답한 문항인지 아직인지도 읽어준다. 화면에서는 흐리기로 표시한다 */}
             <span className="sr-only">

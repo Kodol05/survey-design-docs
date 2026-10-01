@@ -30,7 +30,7 @@ export function RetakeButton() {
 
       <dialog
         ref={ref}
-        className="result-dialog m-auto w-[min(92vw,26rem)] rounded-2xl border border-[--border] p-6 shadow-xl"
+        className="result-dialog m-auto w-[min(92vw,26rem)] rounded-2xl border border-(--border) p-6 shadow-xl"
         style={{ background: "var(--page)", color: "var(--ink)" }}
         onClick={(e) => {
           // 바깥(배경)을 누르면 닫는다
@@ -55,7 +55,7 @@ export function RetakeButton() {
             type="button"
             onClick={() => {
               ref.current?.close();
-              router.push("/survey");
+              router.push("/survey?retake=1");
             }}
             className="text-table rounded-lg px-4 py-2 font-semibold transition hover:brightness-95"
             style={{ background: "var(--status-warn)", color: "#22201d" }}

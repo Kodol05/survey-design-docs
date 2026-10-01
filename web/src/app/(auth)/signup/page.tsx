@@ -41,7 +41,7 @@ export default function SignupPage() {
       </AuthForm>
 
       {/* 개인정보 고지는 동의를 받는 자리인 가입 화면에 둔다 (00 D-14) */}
-      <section className="text-axis text-ink-secondary mt-12 border-t border-[--border] pt-6">
+      <section className="text-axis text-ink-secondary mt-12 border-t border-(--border) pt-6">
         <h2 className="mb-3 font-medium text-ink">개인정보 안내</h2>
         <dl className="flex flex-col gap-1">
           <div><dt className="inline font-medium">수집 항목 </dt><dd className="inline">이름, 휴대폰번호, 설문 응답</dd></div>

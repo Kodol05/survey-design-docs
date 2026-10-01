@@ -131,6 +131,9 @@ export async function login(
       `/survey` 쪽에서 가르지 않는 이유는, 「다시 응시하기」도 `/survey` 로
       오는데 거기서 완료자를 `/me` 로 돌려보내면 서로 튕기기 때문이다.
     */
+    // 관리자가 비밀번호를 초기화해 준 사람은 먼저 새 비밀번호를 정한다
+    if (!employee.passwordChangedAt) redirect("/password");
+
     const done = await prisma.testSession.findFirst({
       where: { employeeId: employee.id, status: "COMPLETED" },
       select: { id: true },

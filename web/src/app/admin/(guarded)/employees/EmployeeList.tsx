@@ -49,6 +49,8 @@ export type Row = {
   agreement: number | null;
   fastCount: number | null;
   completedLabel: string | null;
+  /** CSV 용 "2026-09-30" (한국 날짜) */
+  completedDay: string | null;
   traits: Record<string, number> | null;
   abilities: Record<string, number> | null;
 };
@@ -146,7 +148,7 @@ export function EmployeeList({ rows }: { rows: Row[] }) {
                   }
                 }}
                 className={`${LAYOUT} ${MIN_H} px-5 py-4 pr-6 ${
-                  canExpand ? "cursor-pointer hover:bg-[--wash]" : ""
+                  canExpand ? "cursor-pointer hover:bg-(--wash)" : ""
                 } ${expanded ? "rounded-t-xl" : "rounded-xl"}`}
               >
                 {/* ── 누구인가 ── */}
@@ -213,7 +215,7 @@ export function EmployeeList({ rows }: { rows: Row[] }) {
               </div>
 
               {expanded && r.traits && (
-                <div className="border-t border-[--border] px-5 py-8 sm:px-6">
+                <div className="border-t border-(--border) px-5 py-8 sm:px-6">
                   <Panel row={r} />
                 </div>
               )}
@@ -371,7 +373,7 @@ function Panel({ row }: { row: Row }) {
         삭제는 **맨 아래 오른쪽 구석**에 둔다. 「상세 보기」 버튼은 위쪽에
         있으니 되돌릴 수 있는 것과 없는 것이 서로 멀리 떨어진다.
       */}
-      <div className="mt-8 flex justify-end border-t border-[--border] pt-5">
+      <div className="mt-8 flex justify-end border-t border-(--border) pt-5">
         <DeleteInline employeeId={row.id} name={row.name} />
       </div>
     </div>
