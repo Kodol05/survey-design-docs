@@ -147,7 +147,7 @@ export function CorrelationTable({
                             ? `${v.n}명 · 95% 구간 ${formatR(v.ci[0])}~${formatR(v.ci[1])}`
                             : undefined
                         }
-                        className={`flex h-11 w-full items-center justify-center gap-1.5 rounded-md px-1 whitespace-nowrap focus-visible:outline-2 focus-visible:outline-offset-[-2px] focus-visible:outline-(--ink) ${
+                        className={`flex h-11 w-full items-center justify-center gap-1.5 overflow-hidden rounded-md px-1 whitespace-nowrap focus-visible:outline-2 focus-visible:outline-offset-[-2px] focus-visible:outline-(--ink) ${
                           clickable
                             ? "cursor-pointer hover:outline-1 hover:outline-offset-[-1px] hover:outline-(--ink-muted)"
                             : "cursor-default"
@@ -211,8 +211,12 @@ function Body({ cell }: { cell: Cell }) {
       >
         {formatR(cell.r)}
       </span>
+      {/*
+        폰 폭에서는 칸이 60px 남짓이라 숫자와 등급 말이 겹쳤다 (2026-10-08 점검).
+        좁을 때는 숫자만 둔다 — 등급은 칸 색과 아래 범례가 말한다.
+      */}
       <span
-        className="text-[0.8125rem] leading-none"
+        className="hidden text-[0.8125rem] leading-none sm:inline"
         style={{ opacity: soft ? 0.7 : 0.85 }}
       >
         {grade}

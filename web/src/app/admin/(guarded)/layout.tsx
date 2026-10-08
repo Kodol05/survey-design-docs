@@ -54,9 +54,10 @@ export default async function AdminLayout({ children }: { children: React.ReactN
     <div className="admin-shell flex min-h-full flex-1 flex-col">
       <header className="bg-card sticky top-0 z-30 border-b border-(--border)">
         <div className="flex h-15 items-center justify-between gap-4 px-5 lg:px-6">
-          <Link href="/admin" className="flex items-baseline gap-2.5">
+          {/* 폰에서 제목이 「설 / 문」으로 쪼개졌다 — 한 줄로 묶고 작은 「관리자」는 넓을 때만 (2026-10-08) */}
+          <Link href="/admin" className="flex min-w-0 items-baseline gap-2.5 whitespace-nowrap">
             <span className="text-card-title">7차원 성향 설문</span>
-            <span className="text-axis text-ink-muted">관리자</span>
+            <span className="text-axis text-ink-muted hidden sm:inline">관리자</span>
           </Link>
           <div className="text-axis text-ink-secondary flex shrink-0 items-center gap-4">
             <ThemeToggle />

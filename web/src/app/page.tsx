@@ -74,13 +74,21 @@ export default async function Home() {
             <span className="text-axis" style={{ color: "#5a5249" }}>
               7차원 성향 설문
             </span>
-            <Link
-              href="/login"
-              className="text-axis underline"
-              style={{ color: "#5a5249" }}
-            >
-              로그인
-            </Link>
+            {/*
+              다크 스위치를 맨 위에도 둔다 (2026-10-08 사용자 결정). 다른 직원
+              화면은 모두 머리 오른쪽에 있는데 첫 화면만 맨 아래에 있었다.
+              아래 것도 그대로 둔다 — 두 스위치는 서로 따라 움직인다.
+            */}
+            <div className="flex items-center gap-4">
+              <ThemeToggle labelClassName="hidden sm:inline" />
+              <Link
+                href="/login"
+                className="text-axis underline"
+                style={{ color: "#5a5249" }}
+              >
+                로그인
+              </Link>
+            </div>
           </header>
 
           <div className="flex flex-1 flex-col justify-center pb-28">
