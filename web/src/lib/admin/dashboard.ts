@@ -51,6 +51,9 @@ export type Relation = {
   ci: [number, number];
 };
 
+/** 대시보드 「가장 뚜렷한 관련」에 싣는 개수 — 다섯 개씩 두 쪽 */
+export const TOP_RELATIONS = 10;
+
 export async function loadDashboard() {
   /*
     백업은 **여기서 걸린다.** 별도 스케줄러를 두지 않고, 관리자가 이 화면을
@@ -83,14 +86,12 @@ export async function loadDashboard() {
   const alpha = traitAlpha(reliability);
 
   /*
-    가장 뚜렷한 관련 — **자르지 않고 다 넘긴다.**
+    가장 뚜렷한 관련 — **관련이 큰 순서로 열 개** (2026-10-07 사용자 결정).
 
-    전에는 상위 셋에서 끊었는데, 넷째가 셋째와 거의 같은 값이면 끊긴 자리를
-    모르는 채로 셋만 특별해 보인다. 화면에서 세 개씩 넘겨 보게 하고 전체
-    개수를 같이 보여준다.
-
-    거르는 기준은 **신뢰구간이 0을 벗어난 조합만**이다. 방향조차 확정 안 된
-    것을 「뚜렷한 관련」이라 부를 수는 없다.
+    전에는 신뢰구간이 0을 벗어난 조합만 다 넘겼다. 대시보드에서 다섯 개씩
+    두 쪽(1/2 · 2/2)을 늘 채워 보이게 해 달라는 요청이라, 거르지 않고 크기
+    순으로 열 개를 자른다. 방향이 아직 확정되지 않은 조합이 섞이면 화면에서
+    옅게 그리고 「아직 확정 아님」을 붙인다 — 크기 순이라 대개 끝쪽에 온다.
   */
   const relations: Relation[] = TRAIT_SCALES.flatMap((scale) =>
     ABILITY_AXES.map((axis) => ({
@@ -99,8 +100,9 @@ export async function loadDashboard() {
       c: cellOf(matrix, scale, axis),
     })),
   )
-    .filter((x) => x.c && !(x.c.ci[0] <= 0 && x.c.ci[1] >= 0))
+    .filter((x) => x.c)
     .sort((a, b) => Math.abs(b.c!.r) - Math.abs(a.c!.r))
+    .slice(0, TOP_RELATIONS)
     .map((x) => ({
       scale: x.scale,
       axis: x.axis,

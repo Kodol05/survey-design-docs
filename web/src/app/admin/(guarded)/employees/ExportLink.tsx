@@ -8,25 +8,27 @@
  * 남아 있는다. 지금까지 이 시스템이 지킨 것(퇴사자 완전 삭제, D-48)이
  * 파일 하나로 무너질 수 있다.
  *
- * 막지는 않는다. 필요하니까 만든 기능이다. 다만 **무엇이 나가는지 한 줄로
- * 말하고** 파일 이름에 날짜를 박아 어느 시점 것인지 남긴다.
+ * 막지는 않는다. 필요하니까 만든 기능이다. 다만 **무엇이 나가는지 말하고**
+ * 파일 이름에 날짜를 박아 어느 시점 것인지 남긴다.
+ *
+ * ## 제목 줄 오른쪽으로 (2026-10-07 사용자 결정)
+ *
+ * 목록 맨 아래에 있던 것을 제목 줄 오른쪽으로 올렸다. 설명 문장은 줄인다 —
+ * 몇 명이 나가는지는 단추에, 무엇이 들어가는지는 맨 아래 접힌 설명에 둔다.
+ * **경고 한 줄만은 남긴다.** 설명이 아니라 조심하라는 말이라, 접어 두면
+ * 정작 누르는 순간에 안 보인다.
  */
 export function ExportLink({ href, count }: { href: string; count: number }) {
   return (
-    <div className="text-axis text-right">
+    <div className="text-axis flex flex-wrap items-center justify-end gap-x-4 gap-y-1">
+      <p className="text-ink-muted">파일로 나가면 이 화면의 잠금이 따라가지 않습니다</p>
       <a
         href={href}
-        className="text-table inline-flex h-11 items-center rounded-lg border border-(--border) px-4 font-medium"
+        className="bg-card hover:border-(--ink-muted) inline-flex h-10 items-center gap-1.5 rounded-lg border border-(--border) px-4 font-medium transition-colors"
       >
-        CSV로 내보내기
+        CSV 내보내기
+        <span className="text-ink-muted tabular font-normal">{count}명</span>
       </a>
-      <p className="text-ink-muted mt-2 max-w-[26rem] leading-snug">
-        지금 목록의 <span className="tabular">{count}</span>명 · 이름·번호·성향
-        7축·직무능력이 들어갑니다.{" "}
-        <strong className="text-ink-secondary">
-          파일로 나가면 이 화면의 잠금이 따라가지 않습니다.
-        </strong>
-      </p>
     </div>
   );
 }

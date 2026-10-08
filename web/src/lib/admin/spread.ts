@@ -17,22 +17,18 @@
  * 만들어졌다는 뜻에 가깝다. 그래서 중앙값과 사분위, 그리고 **퍼진 정도**를
  * 앞세운다. 사내에서 서로 견주는 것만 말이 된다.
  *
- * ## 점을 쌓아서 그린다
+ * ## 그림은 언덕, 사람은 눈금 (2026-10-07 사용자 결정)
  *
- * 값 하나를 점 하나로 두되 **같은 구간에 들어온 점은 위로 쌓는다.** 겹쳐
- * 그리면 세 명이 몰린 자리와 한 명뿐인 자리가 똑같아 보인다. 쌓으면 그
- * 높이가 곧 몇 명인지가 된다 — 막대 히스토그램과 같은 정보를 주면서
- * **한 사람 한 사람이 남는다.**
+ * 처음에는 값을 4점 칸에 넣고 같은 칸의 점을 위로 쌓아 그렸다(그래서 칸
+ * 번호·쌓인 높이·양끝 사람까지 여기서 냈다). 지금은 밀도 곡선(언덕)으로
+ * 그리고 한 사람은 곡선 아래 눈금 하나로 남긴다 — 곡선 계산은
+ * `density.ts`가 맡는다. 그래서 여기서는 **요약 숫자와 사람 목록만** 낸다.
  */
 
 export type Dot = {
   employeeId: string;
   name: string;
   value: number;
-  /** 0~1. 왼쪽 끝이 0, 오른쪽 끝이 100점 */
-  x: number;
-  /** 같은 구간에 몇 번째로 들어왔는지. 0이 맨 아래 */
-  level: number;
 };
 
 export type Spread = {
@@ -46,16 +42,9 @@ export type Spread = {
   q3: number;
   mean: number;
   sd: number;
+  /** 값이 낮은 사람부터 (동점이면 이름 순). 곡선 아래 눈금 하나가 한 사람 */
   dots: Dot[];
-  /** 한 구간에 가장 많이 쌓인 수. 그림 높이를 정하는 데 쓴다 */
-  peak: number;
-  /** 가장 낮은 쪽·높은 쪽 사람 (동점이면 이름 순) */
-  lowest: Dot[];
-  highest: Dot[];
 };
-
-/** 0~100을 몇 칸으로 자를지. 4점 단위 — 40명이면 칸당 평균 한둘이 된다 */
-export const BINS = 25;
 
 /**
  * 사분위 — 순위 사이를 직선으로 잇는 방식(R의 type 7).
@@ -77,7 +66,9 @@ export function spreadOf(
   kind: Spread["kind"],
   people: { employeeId: string; name: string; value: number }[],
 ): Spread | null {
-  const usable = people.filter((p) => typeof p.value === "number" && !Number.isNaN(p.value));
+  const usable = people.filter(
+    (p) => typeof p.value === "number" && !Number.isNaN(p.value),
+  );
   if (usable.length < 2) return null;
 
   const sorted = usable.map((p) => p.value).sort((a, b) => a - b);
@@ -88,33 +79,13 @@ export function spreadOf(
   );
 
   /*
-    쌓는 순서는 **값이 낮은 사람부터**로 못 박는다. 들어온 순서대로 쌓으면
-    화면을 새로 고칠 때마다 같은 칸 안에서 점이 위아래로 바뀐다 — 바뀔
-    이유가 없는 것이 바뀌면 데이터가 바뀐 줄 안다.
+    순서는 **값이 낮은 사람부터**로 못 박는다. 들어온 순서대로 두면 화면을
+    새로 고칠 때마다 겹친 눈금 중 어느 것이 위에 그려지는지(마우스를 먼저
+    받는지)가 바뀐다 — 바뀔 이유가 없는 것이 바뀌면 데이터가 바뀐 줄 안다.
   */
-  const ordered = [...usable].sort(
-    (a, b) => a.value - b.value || a.name.localeCompare(b.name, "ko"),
-  );
-
-  const filled = new Map<number, number>();
-  const dots: Dot[] = ordered.map((p) => {
-    const v = Math.max(0, Math.min(100, p.value));
-    // 100점은 마지막 칸에 넣는다. 안 그러면 저 혼자 칸을 하나 더 만든다
-    const bin = Math.min(BINS - 1, Math.floor((v / 100) * BINS));
-    const level = filled.get(bin) ?? 0;
-    filled.set(bin, level + 1);
-    return {
-      employeeId: p.employeeId,
-      name: p.name,
-      value: p.value,
-      // 칸의 **가운데**에 찍는다. 왼쪽 끝에 찍으면 칸끼리 붙어 보인다
-      x: (bin + 0.5) / BINS,
-      level,
-    };
-  });
-
-  const peak = Math.max(...filled.values());
-  const EDGE = 3;
+  const dots: Dot[] = [...usable]
+    .sort((a, b) => a.value - b.value || a.name.localeCompare(b.name, "ko"))
+    .map(({ employeeId, name, value }) => ({ employeeId, name, value }));
 
   return {
     scale,
@@ -128,8 +99,5 @@ export function spreadOf(
     mean,
     sd,
     dots,
-    peak,
-    lowest: dots.slice(0, Math.min(EDGE, dots.length)),
-    highest: dots.slice(-Math.min(EDGE, dots.length)).reverse(),
   };
 }

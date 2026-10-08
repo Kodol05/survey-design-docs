@@ -64,9 +64,5 @@ export function SpreadTab({
       : null,
   ].filter((x): x is Spread => x !== null);
 
-  return (
-    <div>
-      <DistributionPanel spreads={spreads} reliability={reliability} />
-    </div>
-  );
+  return <DistributionPanel spreads={spreads} reliability={reliability} />;
 }

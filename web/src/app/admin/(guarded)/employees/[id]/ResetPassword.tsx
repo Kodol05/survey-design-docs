@@ -8,6 +8,9 @@ import { PASSWORD_MIN } from "@/lib/auth/password";
 /**
  * 비밀번호 초기화 (F-43).
  * 임시 비밀번호를 알려주고, 본인이 다음 로그인 때 바꾸게 한다.
+ *
+ * 구성원 상세 아래 「관리」 한 줄에 들어간다 (2026-10-07 사용자 결정) —
+ * 그래서 이름표 · 칸 · 버튼을 가로 한 줄로 둔다. 하는 일은 그대로다.
  */
 export function ResetPassword({ employeeId, name }: { employeeId: string; name: string }) {
   const [temp, setTemp] = useState("");
@@ -17,28 +20,27 @@ export function ResetPassword({ employeeId, name }: { employeeId: string; name: 
 
   if (done)
     return (
-      <div>
-        <p className="mb-2">
-          초기화했습니다. {name} 님께 임시 비밀번호를 전해 주세요.
-        </p>
-        <p className="tabular rounded-lg px-3 py-2 font-mono" style={{ background: "var(--wash)" }}>
+      <div className="text-table flex flex-wrap items-center gap-x-3 gap-y-1">
+        <p>초기화했습니다. {name} 님께 임시 비밀번호를 전해 주세요.</p>
+        <p className="tabular rounded-lg px-3 py-1.5 font-mono" style={{ background: "var(--wash)" }}>
           {temp}
         </p>
-        <p className="text-axis text-ink-muted mt-2">
+        <p className="text-axis text-ink-muted">
           다음 로그인 때 본인이 새 비밀번호를 정하게 됩니다.
         </p>
       </div>
     );
 
   return (
-    <div className="flex flex-col gap-3 sm:flex-row sm:items-end">
-      <label className="flex flex-1 flex-col gap-1.5">
-        <span className="text-table font-medium">임시 비밀번호</span>
+    <div className="flex flex-wrap items-center gap-x-3 gap-y-2">
+      <label className="flex items-center gap-3">
+        <span className="text-table text-ink-secondary">비밀번호 초기화</span>
         <input
           value={temp}
           onChange={(e) => setTemp(e.target.value)}
-          className="h-11 rounded-lg border border-(--border) bg-surface px-3"
-          placeholder={`${PASSWORD_MIN}자 이상`}
+          className="text-table bg-card h-11 w-60 rounded-lg border border-(--border) px-3"
+          placeholder={`임시 비밀번호 ${PASSWORD_MIN}자 이상`}
+          aria-label="임시 비밀번호"
         />
       </label>
       <Button

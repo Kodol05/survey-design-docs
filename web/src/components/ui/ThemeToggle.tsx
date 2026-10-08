@@ -44,9 +44,17 @@ export function ThemeToggle({
 
   // 서버에서는 무엇이 걸렸는지 알 수 없다. 붙고 나서 실제 값을 읽는다
   useEffect(() => {
-    const now = document.documentElement.dataset.theme;
-    // eslint-disable-next-line react-hooks/set-state-in-effect -- 위 주석 참고
-    setTheme(now === "dark" ? "dark" : "light");
+    const root = document.documentElement;
+    const read = () => setTheme(root.dataset.theme === "dark" ? "dark" : "light");
+    read();
+    /*
+      관리자 화면에는 스위치가 **두 개** 있다 — 위쪽 줄과 사이드바 (2026-10-07).
+      한쪽을 누르면 다른 쪽 손잡이도 따라 움직여야 한다. 상태를 따로 들고
+      있으면 어긋나므로 `<html>`의 속성을 지켜보다가 다시 읽는다.
+    */
+    const watch = new MutationObserver(read);
+    watch.observe(root, { attributes: true, attributeFilter: ["data-theme"] });
+    return () => watch.disconnect();
   }, []);
 
   const flip = () => {

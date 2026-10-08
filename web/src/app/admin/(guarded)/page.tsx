@@ -1,11 +1,12 @@
 import Link from "next/link";
+import { Panel } from "@/components/ui/Panel";
 import { Tile } from "@/components/ui/Tile";
-import { WarningBadge } from "@/components/ui/WarningBadge";
+import { Note } from "@/components/ui/Note";
 import { MIN_N } from "@/components/ui/NBadge";
 import { Attendance } from "@/components/charts/Attendance";
 import { ALPHA } from "@/lib/admin/stats";
 import { requireAdmin } from "@/lib/auth/guard";
-import { formatRatio } from "@/components/analysis/correlationColor";
+import { formatReliability } from "@/components/analysis/reliability";
 import { EXPECTED } from "@/lib/items/types";
 import { loadDashboard } from "@/lib/admin/dashboard";
 import {
@@ -48,86 +49,120 @@ export default async function AdminHome() {
   } = await loadDashboard();
   const { mean: meanAlpha, poor: poorScales } = alpha;
   const poorNames = poorScales.map((r) => r.scale);
+  const reviewCount = s.quality.review + s.quality.poor;
+
+  const canBackup = backupSupported();
+  const backupStale =
+    backupAgeHours === null || backupAgeHours >= INTERVAL_HOURS * 2;
 
   return (
     <>
-      <h1 className="text-screen-title mb-8">대시보드</h1>
+      <h1 className="text-screen-title mb-4">대시보드</h1>
 
-      <div className="mb-14 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+      {/*
+        ## 한 화면에 더 많이 (2026-10-07 사용자 결정)
+
+        「한눈에 들어오는 것이 너무 적다」는 말에 따라 다시 짰다. 전에는
+        숫자 네 칸 아래 두 칸짜리 구역이 세로로 길게 이어져, 첫 화면에는
+        숫자와 응시 현황 정도만 들어왔다.
+
+          맨 위      숫자 카드 여섯 — 한 줄로 촘촘히
+          왼쪽 2/3   가장 뚜렷한 관련(제일 크게) → 그 아래 바로 가기 · 백업
+          오른쪽 1/3 응시 현황 → 살펴볼 것
+
+        「기준 아래 성향 축」 카드는 분석 화면 맨 위에 있던 것을 이리 옮겼다 —
+        숫자 카드는 대시보드에만 둔다. 「마지막 백업」도 숫자 카드로 올렸다.
+        백업이 멈추면 맨 위에서 바로 눈에 걸려야 한다.
+
+        좁은 화면에서는 같은 순서로 위에서 아래로 쌓인다.
+      */}
+      <div className="mb-4 grid grid-cols-2 gap-3 sm:grid-cols-3 xl:grid-cols-6">
         <Tile
           label="응시 완료"
           value={s.completed}
           href="/admin/employees?status=completed"
-          hint="누가 했는지 보기"
+          hint={`가입 ${attendance.length}명 중`}
         />
         <Tile
           label="진행 중"
           value={s.inProgress}
           href="/admin/employees?status=inprogress"
-          hint={s.inProgress ? "누구인지 보기" : undefined}
+          hint={s.inProgress ? "누구인지 보기" : "없음"}
         />
         <Tile
-          label="검토가 필요한 응답"
-          value={s.quality.review + s.quality.poor}
+          label="검토 필요"
+          value={reviewCount}
           href="/admin/employees?flag=review"
-          hint={
-            s.quality.poor ? `그중 ${s.quality.poor}건은 낮음` : "누구인지 보기"
-          }
+          warn={reviewCount > 0}
+          hint={s.quality.poor ? `그중 낮음 ${s.quality.poor}건` : "누구인지 보기"}
         />
         <Tile
           label="검사 신뢰도"
-          value={meanAlpha === null ? "—" : formatRatio(meanAlpha)}
+          // α를 %로 적는다 (2026-10-07 사용자 결정, components/analysis/reliability)
+          value={meanAlpha === null ? "—" : formatReliability(meanAlpha)}
           href="/admin/stats?tab=reliability"
+          warn={poorScales.length > 0}
+          hint="성향 7축 평균"
+        />
+        <Tile
+          label="기준 아래 성향 축"
+          value={poorScales.length}
+          href="/admin/stats?tab=reliability"
+          warn={poorScales.length > 0}
           hint={
-            poorScales.length
-              ? `${poorScales.length}개 축이 ${formatRatio(ALPHA.poor)} 아래`
-              : "성향 7축 평균 α · 1.00 에 가까울수록 좋음"
+            poorNames.length === 0
+              ? `모두 ${formatReliability(ALPHA.poor)} 이상`
+              : poorNames.length === 1
+                ? poorNames[0]
+                : `${poorNames[0]} 외 ${poorNames.length - 1}`
           }
+        />
+        <Tile
+          label="마지막 백업"
+          value={
+            !canBackup
+              ? "—"
+              : backupAgeHours === null
+                ? "없음"
+                : agoLabel(backupAgeHours)
+          }
+          href="#backup"
+          warn={canBackup && backupStale}
+          hint={canBackup ? "하루 한 벌 자동" : "올린 곳에서 백업"}
         />
       </div>
 
       {/*
-        **세 칸을 둔다.**
-
-          왼쪽 위   응시 현황       오른쪽 위   가장 뚜렷한 관련
-          왼쪽 아래 지금 볼 것
-
-        「사람이 갈리는 축」은 뺐다 — 최소~최대 폭만 그려서 **폭이 같아도
-        모양이 다른 축을 구분하지 못했다.** 그 물음의 제대로 된 답은
-        분석의 「분포」 탭에 있다(D-54).
-
-        테두리를 두르지 않는다 (11 §2). 구분은 열 간격과 제목 아래 선으로만.
+        세 덩어리를 격자에 앉힌다. 오른쪽 덩어리가 두 줄에 걸쳐 있어서
+        왼쪽 아래(바로 가기 · 백업)가 관련 카드 바로 밑에 붙는다 — 왼쪽과
+        오른쪽 높이가 달라도 빈 줄이 생기지 않는다.
       */}
-      <div className="mb-14 grid gap-x-16 gap-y-14 lg:grid-cols-2">
-        {/* ── 응시 현황 ── */}
-        <section>
-          <div className="mb-4 flex items-baseline justify-between border-b border-(--border) pb-2">
-            <h2 className="text-section-title">응시 현황</h2>
-            <span className="text-axis text-ink-muted">한 칸이 한 사람</span>
-          </div>
-          <Attendance people={attendance} />
-        </section>
-
-        {/* ── 좌하 · 관련 ── */}
-        <section>
-          <div className="mb-4 flex items-baseline justify-between border-b border-(--border) pb-2">
-            <h2 className="text-section-title">가장 뚜렷한 관련</h2>
-            <Link
-              href="/admin/stats"
-              className="text-table text-ink-secondary underline"
-            >
-              자세히
-            </Link>
-          </div>
-
-          {!matrix.enough ? (
+      <div className="grid gap-4 xl:grid-cols-3">
+        {/* ── 가장 뚜렷한 관련 · 이 화면의 주인공 ── */}
+        <Panel
+          title="가장 뚜렷한 관련"
+          className="xl:col-span-2"
+          bodyClassName="pt-2! pb-4!"
+          aside={
             <>
-              <WarningBadge kind="smallSample" />
-              <p className="text-ink-secondary mt-3">
-                응시 완료 {matrix.n}명입니다. {MIN_N}명이 넘어야 사내 관련도를
-                보여드립니다.
-              </p>
+              {matrix.enough && (
+                <span className="tabular">응시 완료 {matrix.n}명 기준</span>
+              )}
+              <Link href="/admin/stats" className="underline">
+                자세히
+              </Link>
             </>
+          }
+        >
+          {!matrix.enough ? (
+            /*
+              경고 배지(⚠)를 뺐다 — 아이콘을 쓰지 않는다 (2026-10-07 사용자
+              결정). 같은 말을 한 줄로 적는다.
+            */
+            <p className="text-ink-secondary pt-3">
+              응시 완료 {matrix.n}명 — {MIN_N}명이 넘어야 사내 관련도를
+              보여드립니다.
+            </p>
           ) : (
             /*
               경고 배지와 두 문장을 뺐다 (2026-08-24 사용자 요청).
@@ -136,149 +171,116 @@ export default async function AdminHome() {
             */
             <TopRelations items={top} />
           )}
-        </section>
+        </Panel>
 
-        {/* ── 우하 · 지금 할 일 ── */}
-        <section>
-          <h2 className="text-section-title mb-4 border-b border-(--border) pb-2">
-            지금 볼 것
-          </h2>
-          {needsReview.length === 0 &&
-          poorNames.length === 0 &&
-          s.inProgress === 0 ? (
-            <p className="text-ink-muted text-table">
-              손볼 것이 없습니다. 신뢰도가 낮은 응답도, 끝내지 않은 사람도
-              없습니다.
-            </p>
-          ) : (
-            <ul className="flex flex-col gap-1">
-              {needsReview.length > 0 && (
-                <TodoItem
-                  href="/admin/employees?flag=review"
-                  color="var(--status-warn)"
-                  headline={`응답 신뢰도를 확인할 사람 ${needsReview.length}명`}
-                  detail={
-                    needsReview
-                      .slice(0, 6)
-                      .map((p) => p.name)
-                      .join(", ") +
-                    (needsReview.length > 6
-                      ? ` 외 ${needsReview.length - 6}명`
-                      : "")
-                  }
-                />
-              )}
-              {poorNames.length > 0 && (
-                <TodoItem
-                  href="/admin/stats?tab=reliability"
-                  color="var(--status-critical)"
-                  headline="문항이 아직 안 맞물리는 성향 축"
-                  detail={poorNames.join(", ")}
-                />
-              )}
-              {s.inProgress > 0 && (
-                <TodoItem
-                  href="/admin/employees?status=inprogress"
-                  color="var(--ink-muted)"
-                  headline={`응시를 시작하고 끝내지 않은 사람 ${s.inProgress}명`}
-                  detail="시작한 지 14일이 지나면 중단으로 정리됩니다"
-                />
-              )}
-            </ul>
-          )}
-        </section>
-      </div>
+        {/* ── 오른쪽 · 응시 현황 → 살펴볼 것 ── */}
+        <div className="grid content-start gap-4 md:grid-cols-2 xl:col-start-3 xl:row-span-2 xl:row-start-1 xl:grid-cols-1">
+          <Panel title="응시 현황" aside="한 칸이 한 사람">
+            <Attendance people={attendance} />
+          </Panel>
 
-      {/*
-        바로 가기 — **밑줄 친 낱말 세 개**였다. 어디로 가는지는 알겠는데
-        가서 무엇을 볼지 모르니 누를 이유가 없었다.
-
-        지금은 각 칸이 **그 화면의 지금 상태를 한 줄로 미리 보여준다.**
-        볼 것이 있는 칸만 눌러도 되니 화면을 헤매지 않는다.
-      */}
-      <section>
-        <h2 className="text-section-title mb-4 border-b border-(--border) pb-2">
-          바로 가기
-        </h2>
-        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-          <Shortcut
-            href="/admin/employees"
-            title="구성원 목록"
-            lines={[
-              `${s.completed}명 완료 · ${s.inProgress}명 진행 중`,
-              needsReview.length
-                ? `검토가 필요한 응답 ${needsReview.length}명`
-                : "검토가 필요한 응답 없음",
-            ]}
-          />
-          <Shortcut
-            href="/admin/stats"
-            title="분석"
-            lines={[
-              matrix.enough
-                ? `성향 7축 × 직무능력 3축 · ${matrix.n}명`
-                : `${MIN_N}명이 넘어야 열립니다 (지금 ${matrix.n}명)`,
-              top.length
-                ? `값이 0을 확실히 벗어난 조합 ${top.length}개`
-                : "아직 확정된 조합 없음",
-            ]}
-          />
-          <Shortcut
-            href="/admin/stats?tab=spread"
-            title="분포"
-            lines={[
-              "각 축에서 사람들이 어떻게 퍼져 있는지 봅니다",
-              "점 하나가 한 사람 · 몰린 축과 갈린 축을 가릅니다",
-            ]}
-          />
-          <Shortcut
-            href="/admin/stats?tab=reliability"
-            title="검사 신뢰도"
-            lines={[
-              meanAlpha === null
-                ? "아직 계산할 수 없습니다"
-                : `성향 7축 평균 α ${formatRatio(meanAlpha)}`,
-              poorScales.length
-                ? `기준 아래 축 ${poorScales.length}개 — ${poorScales.map((r) => r.scale).join(" · ")}`
-                : "기준 아래 축 없음",
-            ]}
-          />
-          <Shortcut
-            href="/admin/stats?tab=prediction"
-            title="예측 대 실제"
-            lines={[
-              "논문 값으로 본 예측과 실제를 맞대 봅니다",
-              "누가 예측보다 높고 낮은지 이름으로 나옵니다",
-            ]}
-          />
-          <Shortcut
-            href="/admin/items"
-            title="문항 목록"
-            lines={[
-              `실제로 나가는 ${EXPECTED.total}문항을 그대로 봅니다`,
-              "역채점 여부와 묶음 순서까지",
-            ]}
-          />
+          <Panel title="살펴볼 것" bodyClassName="py-3!">
+            {needsReview.length === 0 &&
+            poorNames.length === 0 &&
+            s.inProgress === 0 ? (
+              <p className="text-ink-muted text-table py-1">없습니다.</p>
+            ) : (
+              <ul className="flex flex-col gap-1">
+                {needsReview.length > 0 && (
+                  <TodoItem
+                    href="/admin/employees?flag=review"
+                    color="var(--status-warn)"
+                    headline={`응답 신뢰도 확인 ${needsReview.length}명`}
+                    detail={
+                      needsReview
+                        .slice(0, 6)
+                        .map((p) => p.name)
+                        .join(", ") +
+                      (needsReview.length > 6
+                        ? ` 외 ${needsReview.length - 6}명`
+                        : "")
+                    }
+                  />
+                )}
+                {poorNames.length > 0 && (
+                  <TodoItem
+                    href="/admin/stats?tab=reliability"
+                    color="var(--status-critical)"
+                    headline={`기준 아래 성향 축 ${poorNames.length}개`}
+                    detail={poorNames.join(", ")}
+                  />
+                )}
+                {s.inProgress > 0 && (
+                  <TodoItem
+                    href="/admin/employees?status=inprogress"
+                    color="var(--ink-muted)"
+                    headline={`끝내지 않은 응시 ${s.inProgress}명`}
+                    detail="시작 14일 뒤 중단으로 정리"
+                  />
+                )}
+              </ul>
+            )}
+          </Panel>
         </div>
-      </section>
 
-      {/*
-        백업 — **바로 가기 아래**에 둔다.
+        {/* ── 왼쪽 아래 · 바로 가기 · 백업 ── */}
+        <div className="grid content-start gap-4 md:grid-cols-2 xl:col-span-2">
+          {/*
+            바로 가기 — 칸 여섯 개(카드 안의 카드)였던 것을 **카드 하나 안의
+            목록**으로 줄였다 (2026-10-07 사용자 결정). 줄마다 그 화면의 지금
+            상태를 한 줄 붙여 두는 것은 그대로다 — 볼 것이 있는 줄만 누르면
+            된다. 「예측 대 실제」는 탭이 지워져 같이 뺐다.
+          */}
+          <Panel title="바로 가기" flush>
+            <ul className="divide-y divide-(--border)">
+              <Shortcut
+                href="/admin/employees"
+                title="구성원 목록"
+                line={`${s.completed}명 완료 · ${s.inProgress}명 진행 중`}
+              />
+              <Shortcut
+                href="/admin/stats"
+                title="분석"
+                line={
+                  matrix.enough
+                    ? `성향 7축 × 직무능력 3축 · ${matrix.n}명`
+                    : `${MIN_N}명이 넘어야 열림 · 지금 ${matrix.n}명`
+                }
+              />
+              <Shortcut
+                href="/admin/stats?tab=spread"
+                title="분포"
+                line="축마다 사람들이 퍼진 모양"
+              />
+              <Shortcut
+                href="/admin/stats?tab=reliability"
+                title="검사 신뢰도"
+                line={
+                  meanAlpha === null
+                    ? "아직 계산할 수 없음"
+                    : `평균 ${formatReliability(meanAlpha)} · 기준 아래 ${poorScales.length}개`
+                }
+              />
+              <Shortcut
+                href="/admin/items"
+                title="문항 목록"
+                line={`${EXPECTED.total}문항 · 역채점 · 묶음 순서`}
+              />
+            </ul>
+          </Panel>
 
-        평소에 볼 것이 아니라 「마지막이 언제였나」만 확인하면 되는 칸이라
-        위쪽 숫자 타일에 끼워 넣지 않았다. 다만 **아무 표시도 없으면 백업이
-        멈춰도 아무도 모른다** — 그래서 시각은 늘 보이게 둔다.
-      */}
-      <section className="mt-14">
-        <h2 className="text-section-title mb-4 border-b border-(--border) pb-2">
-          데이터 백업
-        </h2>
-        {backupSupported() ? (
-          <BackupCard backups={backups} hours={backupAgeHours} />
-        ) : (
-          <BackupElsewhere />
-        )}
-      </section>
+          {/*
+            백업 — 평소에 볼 것이 아니라 「마지막이 언제였나」만 확인하면 되는
+            칸이라 아래쪽에 둔다. 시각은 맨 위 숫자 카드에도 올려 두었다 —
+            **아무 표시도 없으면 백업이 멈춰도 아무도 모른다.**
+          */}
+          {canBackup ? (
+            <BackupCard backups={backups} hours={backupAgeHours} />
+          ) : (
+            <BackupElsewhere />
+          )}
+        </div>
+      </div>
     </>
   );
 }
@@ -291,18 +293,12 @@ export default async function AdminHome() {
  */
 function BackupElsewhere() {
   return (
-    <div
-      className="text-axis rounded-xl p-5"
-      style={{ background: "var(--wash)", color: "var(--ink-secondary)" }}
-    >
-      <p className="text-table font-medium" style={{ color: "var(--ink)" }}>
-        이 서버에서는 백업을 받지 않습니다
+    <Panel title="데이터 백업" id="backup">
+      <p className="text-table">이 서버에서는 받지 않습니다</p>
+      <p className="text-axis text-ink-secondary mt-1 leading-snug">
+        올린 곳에서 자동으로 백업합니다. 사내 서버로 옮기면 여기서 직접 받습니다.
       </p>
-      <p className="mt-2 leading-relaxed">
-        올린 곳에서 데이터베이스를 자동으로 백업하고 있습니다. 사내 서버로
-        옮기면 여기서 직접 받는 방식으로 돌아갑니다.
-      </p>
-    </div>
+    </Panel>
   );
 }
 
@@ -314,6 +310,10 @@ function BackupElsewhere() {
  * 서버 안 덤프는 **디스크가 죽는 경우를 못 막는다** — 백업도 같이 죽는다.
  * 그게 가장 흔한 사고다. 실질적인 방어는 파일을 서버 밖에 두는 것뿐이라
  * 버튼이 주인공이고 자동 덤프는 그 옆의 참고 사항이다.
+ *
+ * 버튼은 카드 머리줄 오른쪽에 둔다 (2026-10-07). 왜 받아 두어야 하는지는
+ * 접힌 설명으로 내렸고, **무엇이 들어가는지(전화번호·비밀번호 해시)만은**
+ * 누르기 전에 읽혀야 해서 펼쳐 둔다.
  */
 function BackupCard({
   backups,
@@ -325,48 +325,48 @@ function BackupCard({
 }) {
   const [latest] = backups;
   const stale = hours === null || hours >= INTERVAL_HOURS * 2;
+  const admin = backups.filter((b) => b.kind === "admin").length;
+  const submit = backups.filter((b) => b.kind === "submit").length;
 
   return (
-    <div
-      className="flex flex-wrap items-start justify-between gap-6 rounded-xl p-5"
-      style={{ background: "var(--wash)" }}
-    >
-      <div className="text-axis">
-        <p className="text-table font-medium">
-          마지막 백업{" "}
-          <span
-            className="tabular"
-            style={stale ? { color: "var(--status-warn)" } : undefined}
-          >
-            {latest ? agoLabel(hours!) : "아직 없음"}
-          </span>
-        </p>
-        <p className="text-ink-secondary mt-1 leading-snug">
-          {latest
-            ? `서버 안에 관리자 백업 ${backups.filter((b) => b.kind === "admin").length}벌(최근 ${KEEP_COUNT.admin}벌까지) · 설문 제출 백업 ${backups.filter((b) => b.kind === "submit").length}벌(최근 ${KEEP_COUNT.submit}벌까지)`
-            : "이 화면을 열면 하루 한 벌씩 자동으로 뜹니다. 아직 한 벌도 없습니다."}
-        </p>
-        <p className="text-ink-muted mt-2 max-w-[30rem] leading-snug">
-          서버 안 백업은 <strong>디스크가 죽으면 같이 사라집니다.</strong> 가끔
-          받아서 서버 밖에 한 벌 두시는 편이 실제 방어가 됩니다.
-        </p>
-      </div>
-
-      <div className="text-axis text-right">
+    <Panel
+      title="데이터 백업"
+      id="backup"
+      aside={
         <a
           href="/admin/backup"
-          className="text-table inline-flex h-11 items-center rounded-lg border border-(--border) px-4 font-medium"
+          className="text-table text-ink inline-flex h-9 items-center rounded-lg border border-(--border) px-3 font-medium"
         >
           백업 파일 받기
         </a>
-        <p className="text-ink-muted mt-2 max-w-[24rem] leading-snug">
-          누르면 지금 상태로 새로 뜹니다.{" "}
-          <strong className="text-ink-secondary">
-            전화번호와 비밀번호 해시까지 전부 들어갑니다.
-          </strong>
+      }
+    >
+      <p className="text-table">
+        마지막 백업{" "}
+        <span
+          className="tabular font-medium"
+          style={stale ? { color: "var(--status-warn)" } : undefined}
+        >
+          {latest ? agoLabel(hours!) : "아직 없음"}
+        </span>
+      </p>
+      <p className="text-axis text-ink-secondary tabular mt-1 leading-snug">
+        {latest
+          ? `서버 안 관리자 백업 ${admin}벌(최근 ${KEEP_COUNT.admin}벌) · 제출 백업 ${submit}벌(최근 ${KEEP_COUNT.submit}벌)`
+          : "이 화면을 열면 하루 한 벌씩 자동으로 뜹니다"}
+      </p>
+      <p className="text-axis text-ink-muted mt-2 leading-snug">
+        받는 파일에는 전화번호와 비밀번호 해시까지 전부 들어갑니다.
+      </p>
+      <Note label="서버 밖에 한 벌 두는 이유" className="mt-3">
+        <p>
+          서버 안 백업은 <strong>디스크가 죽으면 같이 사라집니다.</strong> 가끔
+          받아서 서버 밖에 한 벌 두시는 편이 실제 방어가 됩니다. 버튼을 누르면
+          지금 상태로 새로 뜹니다. 서버 안 백업은 이 화면을 열 때 하루 한 벌씩
+          자동으로 뜹니다.
         </p>
-      </div>
-    </div>
+      </Note>
+    </Panel>
   );
 }
 
@@ -379,16 +379,16 @@ function agoLabel(hours: number): string {
 }
 
 /**
- * 지금 볼 것 한 줄.
+ * 살펴볼 것 한 줄.
  *
  * ## 왜 줄 전체가 링크인가
  *
  * 전에는 문장 끝에 「목록」 한 낱말만 링크였다. 줄이 넘치면 **그 낱말만
  * 다음 줄에 홀로 떨어져** 무엇에 붙은 링크인지 알기 어려웠고, 누를 자리도
- * 글자 두 개뿐이었다. 그리고 셋 중 하나(끝내지 않은 사람)는 **갈 곳이 아예
- * 없어서** 읽고 나서 직접 찾아 들어가야 했다.
+ * 글자 두 개뿐이었다. 지금은 줄마다 그 사람들만 걸러진 화면으로 바로 간다.
  *
- * 지금은 세 줄 모두 그 사람들만 걸러진 화면으로 바로 간다.
+ * 색 점(●)은 왼쪽 색선으로 바꿨다 — 아이콘을 쓰지 않는다 (2026-10-07
+ * 사용자 결정). 숫자 카드의 주황 띠와 같은 말투다.
  */
 function TodoItem({
   href,
@@ -405,18 +405,16 @@ function TodoItem({
     <li>
       <Link
         href={href}
-        className="-mx-2 block rounded-lg px-2 py-2 transition hover:bg-(--wash)"
+        className="block border-l-2 py-1.5 pl-3 transition hover:bg-(--wash)"
+        style={{ borderColor: color }}
       >
-        <p>
-          <span className="mr-2" style={{ color }} aria-hidden>
-            ●
-          </span>
+        <p className="text-table font-medium">
           {headline}
-          <span aria-hidden className="text-ink-muted ml-2">
+          <span aria-hidden className="text-ink-muted ml-2 font-normal">
             →
           </span>
         </p>
-        <p className="text-axis text-ink-secondary mt-0.5 pl-5 leading-snug">
+        <p className="text-axis text-ink-secondary mt-0.5 leading-snug">
           {detail}
         </p>
       </Link>
@@ -425,37 +423,29 @@ function TodoItem({
 }
 
 /**
- * 바로 가기 한 칸 — 제목 + 그 화면의 지금 상태 두 줄.
+ * 바로 가기 한 줄 — 화면 이름 + 그 화면의 지금 상태 한 줄.
  *
  * 링크만 있으면 "가서 뭘 보지?"가 남는다. 숫자를 미리 보여주면
- * **볼 것이 있는 칸만 눌러도 된다.**
+ * **볼 것이 있는 줄만 눌러도 된다.**
  */
 function Shortcut({
   href,
   title,
-  lines,
+  line,
 }: {
   href: string;
   title: string;
-  lines: string[];
+  line: string;
 }) {
   return (
-    <Link
-      href={href}
-      className="block rounded-xl p-5 transition hover:brightness-95"
-      style={{ background: "var(--wash)" }}
-    >
-      <p className="text-table font-medium">
-        {title}
-        <span aria-hidden className="text-ink-muted ml-2">
-          →
-        </span>
-      </p>
-      {lines.map((l) => (
-        <p key={l} className="text-axis text-ink-secondary mt-1 leading-snug">
-          {l}
-        </p>
-      ))}
-    </Link>
+    <li>
+      <Link
+        href={href}
+        className="grid grid-cols-[6.5rem_1fr] items-baseline gap-3 px-5 py-2.5 transition hover:bg-(--wash)"
+      >
+        <span className="text-table font-medium">{title}</span>
+        <span className="text-axis text-ink-secondary truncate">{line}</span>
+      </Link>
+    </li>
   );
 }

@@ -1,8 +1,12 @@
 "use client";
 
 import { useState } from "react";
-import { DotStrip } from "@/components/analysis/DotStrip";
+import {
+  DensityRidge,
+  type RidgeGroup,
+} from "@/components/analysis/DensityRidge";
 import { Note } from "@/components/ui/Note";
+import { Panel } from "@/components/ui/Panel";
 import { COMPOSITE_AXIS } from "@/lib/items/types";
 import type { Spread } from "@/lib/admin/spread";
 import type { ScaleReliability } from "@/lib/admin/analysis";
@@ -17,10 +21,20 @@ import type { ScaleReliability } from "@/lib/admin/analysis";
  * 먼저 궁금한 것이 자연스럽다. 그동안 그 답이 대시보드의 최소~최대 막대
  * 하나뿐이었다.
  *
+ * ## 카드 하나, 언덕 그림 하나 (2026-10-07 사용자 결정)
+ *
+ * 축마다 점을 쌓던 그림을 **축마다 언덕 한 줄**로 바꾸고, 열 줄을 카드
+ * 하나에 포개 가로 눈금 하나를 함께 쓰게 했다. 줄마다 눈금을 따로 달면
+ * 같은 50이 줄마다 다른 자리처럼 보인다.
+ *
+ * 그림 위의 글은 모두 걷었다 — 「가장 많이 갈리는 축은…」 요약 문장, 「점
+ * 하나가 한 사람」 안내, 색 열쇠. 언덕 모양이 요약을 대신하고, 읽는 법은
+ * 맨 아래 접힌 설명으로 내렸다.
+ *
  * ## 두 가지 순서로 볼 수 있다
  *
  *   묶음 순서   기질 4 → 성격 3 → 직무능력 3. 검사 구조대로 읽을 때
- *   갈리는 순서  퍼진 정도가 큰 축부터. 「무엇이 사람을 가르나」를 볼 때
+ *   갈리는 순서  퍼진 정도(표준편차)가 큰 축부터. 「무엇이 사람을 가르나」를 볼 때
  *
  * 둘 중 하나만 두면 나머지 물음에 답할 수 없다. 순서를 바꾸는 것뿐이라
  * 주소를 건드리지 않는다 — 화면 안에서 바로 바뀐다.
@@ -29,17 +43,19 @@ import type { ScaleReliability } from "@/lib/admin/analysis";
  *
  * 「가장 낮은 사람」을 글자로 박아 두지 않는다. 성향은 높고 낮음이 있어도
  * 좋고 나쁨이 없는데(첫 화면에 그렇게 적어 두었다), 이름을 꼴찌 자리에
- * 적어 두면 그 약속이 깨진다. 점에 마우스를 올리면 누구인지 나오고,
+ * 적어 두면 그 약속이 깨진다. 눈금에 마우스를 올리면 누구인지 나오고,
  * 직무능력의 순서는 「순위」 탭이 따로 맡는다.
  */
 
-/** 묶어 만든 값의 이름. 요약 문장에서 뺄 때 쓴다 */
+const TITLE = "성향·직무능력 분포";
+
+/** 묶어 만든 값의 이름 */
 const COMPOSITE = COMPOSITE_AXIS;
 
 const GROUP = {
-  temperament: { label: "기질", note: "타고나는 쪽 · TCI 4축" },
-  character: { label: "성격", note: "살면서 만들어지는 쪽 · TCI 3축" },
-  ability: { label: "직무능력", note: "우리가 만든 3축" },
+  temperament: "기질",
+  character: "성격",
+  ability: "직무능력",
 } as const;
 
 export function DistributionPanel({
@@ -53,128 +69,91 @@ export function DistributionPanel({
 
   if (spreads.length === 0)
     return (
-      <p className="text-ink-secondary">
-        아직 그려 볼 값이 없습니다. 응시가 끝난 사람이 두 명은 넘어야 합니다.
-      </p>
+      <Panel title={TITLE}>
+        <p className="text-ink-secondary">
+          아직 그려 볼 값이 없습니다. 응시가 끝난 사람이 두 명은 넘어야 합니다.
+        </p>
+      </Panel>
     );
 
-  const ranked = [...spreads].sort((a, b) => b.sd - a.sd);
+  const row = (s: Spread) => ({
+    s,
+    dim: s.kind !== "ability" && reliability[s.scale]?.verdict === "poor",
+  });
 
   /*
-    **묶어 만든 값은 요약 문장에서 뺀다** (2026-08-25 사용자 지적).
+    **묶어 만든 값은 갈리는 순서에 끼우지 않고 맨 아래에 둔다** (2026-10-07
+    사용자 결정).
 
-    「세 능력 묶음」은 평균이라 **자동으로 좁게 모인다** — 각 축의 흔들림이
-    상쇄되기 때문이다. 그것을 「가장 비슷한 축」이라 부르면 발견처럼 읽히는데,
-    사실은 만드는 방식이 만들어낸 모양이다 (D-45와 같은 함정).
+    「세 능력 평균」은 평균이라 **자동으로 좁게 모인다** — 각 축의 흔들림이
+    상쇄되기 때문이다 (2026-08-25 사용자 지적, D-45와 같은 함정). 퍼진
+    정도로 줄 세우면 늘 맨 끝에 가서 「가장 비슷한 축」처럼 읽히는데, 그건
+    발견이 아니라 만드는 방식이 만든 모양이다. 두 순서 모두 맨 아래 따로 둔다.
   */
-  const usable = ranked.filter((s) => s.scale !== COMPOSITE);
-  const widest = usable[0];
-  const tightest = usable[usable.length - 1];
+  const composite = spreads.find((s) => s.scale === COMPOSITE);
+  const axes = spreads.filter((s) => s.scale !== COMPOSITE);
 
-  const groups = bySpread
-    ? [{ key: "all" as const, rows: ranked }]
+  const groups: RidgeGroup[] = bySpread
+    ? [
+        {
+          key: "all",
+          rows: [...axes].sort((a, b) => b.sd - a.sd).map(row),
+        },
+        ...(composite
+          ? [{ key: "composite", label: "묶은 값", rows: [row(composite)] }]
+          : []),
+      ]
     : (["temperament", "character", "ability"] as const)
-        .map((k) => ({ key: k, rows: spreads.filter((s) => s.kind === k) }))
+        .map((k) => ({
+          key: k,
+          label: GROUP[k],
+          // 세 능력 평균은 직무능력 묶음의 맨 끝 (spreads가 이미 그 순서다)
+          rows: spreads.filter((s) => s.kind === k).map(row),
+        }))
         .filter((g) => g.rows.length > 0);
 
+  const toggle = (
+    <div className="flex gap-1.5" role="group" aria-label="줄 순서">
+      {[
+        { on: false, label: "묶음 순서" },
+        { on: true, label: "갈리는 순서" },
+      ].map((b) => (
+        <button
+          key={b.label}
+          type="button"
+          aria-pressed={bySpread === b.on}
+          onClick={() => setBySpread(b.on)}
+          className="rounded-md px-3 py-1"
+          style={{
+            background: bySpread === b.on ? "var(--ink)" : "var(--wash)",
+            color: bySpread === b.on ? "var(--page)" : "var(--ink-secondary)",
+            fontWeight: bySpread === b.on ? 600 : 400,
+          }}
+        >
+          {b.label}
+        </button>
+      ))}
+    </div>
+  );
+
   return (
-    <section>
-      <div className="mb-8 flex flex-wrap items-end justify-between gap-x-8 gap-y-4">
-        <div>
-          <h2 className="text-section-title mb-1">어떻게 퍼져 있는가</h2>
-          <p className="text-ink-secondary max-w-[52rem]">
-            <strong>점 하나가 한 사람</strong>입니다. 겹치면 위로 쌓입니다.
-          </p>
-          {/*
-            색 열쇠 — **이 화면에만 없었다.**
+    <Panel title={TITLE} aside={toggle}>
+      <DensityRidge groups={groups} label={TITLE} />
 
-            구성원 목록에는 「■ 낮음 ■ 높음」이 적혀 있는데 여기는 같은 색을
-            쓰면서 아무 말이 없었다. 게다가 이 화면은 성향과 직무능력이
-            **서로 다른 색 언어**를 쓴다 — 성향은 양쪽으로 갈라지고, 직무능력은
-            높을수록 좋은 값이라 한 색의 진하기로만 말한다. 열쇠가 없으면
-            같은 화면의 두 색을 같은 뜻으로 읽게 된다.
-          */}
-          <p className="text-axis text-ink-muted mt-2">
-            성향은{" "}
-            <span style={{ color: "var(--diverge-pos)" }} aria-hidden>
-              ■
-            </span>{" "}
-            낮음{" "}
-            <span style={{ color: "var(--diverge-neg)" }} aria-hidden>
-              ■
-            </span>{" "}
-            높음으로 갈라지고, 직무능력은 높을수록 진해집니다.
-          </p>
-        </div>
-
-        <div className="text-axis flex shrink-0 gap-1.5">
-          {[
-            { on: false, label: "묶음 순서" },
-            { on: true, label: "갈리는 순서" },
-          ].map((b) => (
-            <button
-              key={b.label}
-              type="button"
-              onClick={() => setBySpread(b.on)}
-              className="rounded-md px-3 py-1.5"
-              style={{
-                background: bySpread === b.on ? "var(--ink)" : "var(--wash)",
-                color:
-                  bySpread === b.on ? "var(--page)" : "var(--ink-secondary)",
-                fontWeight: bySpread === b.on ? 600 : 400,
-              }}
-            >
-              {b.label}
-            </button>
-          ))}
-        </div>
-      </div>
-
-      {/* 한 줄 요약 — 훑기 전에 결론부터 */}
-      {widest && tightest && widest !== tightest && (
-        <p className="text-ink-secondary mb-10 max-w-[52rem]">
-          사람이 가장 많이 갈리는 축은{" "}
-          <strong className="text-ink">{widest.scale}</strong> (
-          <span className="tabular">
-            {Math.round(widest.min)}~{Math.round(widest.max)}
-          </span>
-          ), 가장 비슷한 축은{" "}
-          <strong className="text-ink">{tightest.scale}</strong>입니다.
-        </p>
-      )}
-
-      <div className="flex flex-col gap-12">
-        {groups.map((g) => (
-          <div key={g.key}>
-            {g.key !== "all" && (
-              <p className="text-table text-ink-secondary mb-5 border-b border-(--border) pb-2">
-                {GROUP[g.key].label}
-                <span className="text-axis text-ink-muted ml-2">
-                  {GROUP[g.key].note}
-                </span>
-              </p>
-            )}
-            <div className="flex flex-col gap-8">
-              {g.rows.map((s) => (
-                <Row
-                  key={s.scale}
-                  s={s}
-                  dim={
-                    s.kind !== "ability" &&
-                    reliability[s.scale]?.verdict === "poor"
-                  }
-                />
-              ))}
-            </div>
-          </div>
-        ))}
-      </div>
-
-      <Note label="이 그림을 어떻게 읽는지" className="mt-12">
+      <Note label="이 그림을 어떻게 읽는지" className="mt-6">
         <p className="mb-2">
-          <strong>상자는 가운데 절반</strong>, 세로선은 중앙값입니다. 상자가
-          좁으면 다들 비슷하고 넓으면 많이 다릅니다. 점이 두 덩어리로 갈라져
-          있으면 회사가 두 무리로 나뉜다는 뜻입니다.
+          <strong>봉우리</strong>가 높은 곳에 사람이 많이 몰려 있습니다.
+          봉우리가 둘이면 회사가 두 무리로 나뉜다는 뜻입니다.{" "}
+          <strong>진한 구간</strong>은 가운데 절반, <strong>세로선</strong>은
+          중앙값입니다. 진한 구간이 좁으면 다들 비슷하고 넓으면 많이 다릅니다.
+        </p>
+        <p className="mb-2">
+          바닥의 <strong>눈금 하나가 한 사람</strong>입니다. 마우스를 올리면
+          이름과 점수가 나옵니다.
+        </p>
+        <p className="mb-2">
+          줄마다 봉우리 높이를 맞춰 그렸으므로 줄끼리 높이를 견주지 않습니다.
+          퍼진 정도는 폭으로 봅니다. 흐린 줄은 문항끼리 잘 맞지 않은 축입니다.
         </p>
         <p>
           <strong>점수 자체는 높고 낮음을 뜻하지 않습니다.</strong> 눈금이 문항
@@ -182,52 +161,6 @@ export function DistributionPanel({
           말이 됩니다.
         </p>
       </Note>
-    </section>
-  );
-}
-
-function Row({ s, dim }: { s: Spread; dim: boolean }) {
-  return (
-    <div className="grid gap-x-6 gap-y-2 xl:grid-cols-[9rem_minmax(0,1fr)] xl:items-end">
-      <div className="xl:pb-1">
-        <p className="text-table font-medium">{s.scale}</p>
-        {/*
-          여기는 「어떻게 퍼져 있나」를 보는 자리다. α는 문항 이야기라
-          곁다리이고, 직무능력에는 애초에 대지 않는 잣대다 (D-93).
-          인원만 적는다.
-        */}
-        <span className="text-axis text-ink-muted tabular">{s.n}명</span>
-      </div>
-
-      <div>
-        <DotStrip s={s} dim={dim} />
-        <p className="text-axis text-ink-muted mt-1.5 flex flex-wrap gap-x-4">
-          <span>
-            중앙{" "}
-            <span className="tabular text-ink-secondary">
-              {Math.round(s.median)}
-            </span>
-          </span>
-          <span>
-            가운데 절반{" "}
-            <span className="tabular text-ink-secondary">
-              {Math.round(s.q1)}–{Math.round(s.q3)}
-            </span>
-          </span>
-          <span>
-            전체{" "}
-            <span className="tabular text-ink-secondary">
-              {Math.round(s.min)}–{Math.round(s.max)}
-            </span>
-          </span>
-          <span title="표준편차 — 클수록 사람마다 많이 다릅니다">
-            퍼진 정도{" "}
-            <span className="tabular text-ink-secondary">
-              {s.sd.toFixed(1)}
-            </span>
-          </span>
-        </p>
-      </div>
-    </div>
+    </Panel>
   );
 }

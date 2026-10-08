@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { TraitBars } from "@/components/charts/TraitBars";
 import { TraitRadar } from "@/components/charts/TraitRadar";
 import {
@@ -12,6 +12,7 @@ import {
 import { CHARACTER, TEMPERAMENT, abilityColorAt } from "@/components/charts/scale";
 import { QuickRead } from "@/components/analysis/QuickRead";
 import { ButtonLink } from "@/components/ui/Button";
+import { panelClass } from "@/components/ui/Panel";
 import { DeleteInline } from "./DeleteInline";
 import { ABILITY_AXES } from "@/lib/items/types";
 import { formatPhone } from "@/lib/auth/phone";
@@ -36,8 +37,16 @@ import { formatPhone } from "@/lib/auth/phone";
  * 자꾸 걸린다. 그래서 왼쪽 글자 블록을 두 줄로 못 박고, 값이 없는 자리도
  * 빈 줄로 두지 않고 `—`를 적는다.
  *
- * 바탕은 칠하지 않는다. 마흔 칸을 색으로 채우면 화면이 무거워진다 —
- * 테두리 한 줄이면 「감싸고 있다」는 말은 이미 다 한 것이다.
+ * ## 칸도 카드 모양으로 (2026-10-07 사용자 결정)
+ *
+ * 관리자 화면이 카드(`Panel`)로 바뀌면서 바탕(`--canvas`)이 한 단 어두워졌다.
+ * 테두리만 두른 칸은 그 바탕 위에서 구멍처럼 보였다. 그래서 칸도 카드와
+ * 같은 겉모양(`panelClass` — 밝은 바탕 · 가는 테두리 · 옅은 그림자)을 쓴다.
+ * 칸 하나가 한 사람이라는 것은 그대로다.
+ *
+ * 열 머리글은 이제 이 파일이 아니라 위에 붙어 다니는 도구줄(`StickyToolbar`)
+ * 아래 끝에 들어간다 — `EmployeeListHeader`. 자리는 `COLUMNS` 하나를 같이
+ * 써서 맞춘다.
  */
 
 export type Row = {
@@ -72,14 +81,22 @@ const STATUS = {
 } as const;
 
 /*
-  칸 안의 자리 배분.
+  칸 안의 자리 배분 — **머리글과 줄이 이 한 줄을 같이 쓴다.**
 
   왼쪽 글자 블록은 **고정폭**이다 — 이름 길이에 따라 오른쪽 스트립이 밀리면
   칸끼리 축이 안 맞아서 세로로 훑을 수가 없다. 성향만 남는 폭을 가져간다.
+
+  직무능력 칸도 폭을 못 박는다 (2026-10-07). 전에는 `auto`라 그 칸의 폭이
+  **내용에 따라** 정해졌다. 머리글이 도구줄 카드로 옮겨 가 줄과 다른 격자에
+  있게 되면서, 직무능력 값이 없는 사람(`—` 한 글자)은 그 칸이 좁아지고 성향
+  칸이 넓어져 머리글과 어긋날 수 있다. 네 칸(4.25rem) + 사이 셋 + 세로선이
+  20rem 남짓이라 넉넉히 20.25rem으로 둔다.
 */
 const COLUMNS =
   "gap-x-6 gap-y-4 " +
-  "xl:grid-cols-[minmax(11rem,13rem)_5rem_minmax(0,1fr)_auto] xl:items-center";
+  "xl:grid-cols-[minmax(11rem,13rem)_5rem_minmax(0,1fr)_20.25rem] xl:items-center";
+/** 머리글·줄이 같이 쓰는 좌우 여백 — 이것까지 같아야 자리가 맞는다 */
+const PAD_X = "px-5 pr-6";
 /*
   칸마다 **키를 같게 잡는다** (2026-08-25 화면에서 확인).
 
@@ -92,138 +109,187 @@ const MIN_H = "xl:min-h-[4.5rem]";
 const LAYOUT = `grid grid-cols-1 ${COLUMNS}`;
 /*
   머리글 줄 — **`grid`를 붙이지 않는다.** `hidden`과 `grid`를 같이 주면
-  어느 쪽이 이기는지가 Tailwind가 규칙을 찍어내는 순서에 달린다. 지금은
-  `.hidden`이 뒤에 있어 우연히 맞게 동작하지만, 기댈 것이 못 된다.
-  `xl:grid`만 주면 좁은 화면에서는 `hidden`만 남는다.
+  어느 쪽이 이기는지가 Tailwind가 규칙을 찍어내는 순서에 달린다.
+  `xl:grid`만 주면 좁은 화면에서는 `hidden`만 남는다. 좁은 화면에서는
+  칸 안에 이름표가 따로 붙으므로 머리글이 필요 없다.
 */
-const HEAD = `hidden px-5 pr-6 xl:grid ${COLUMNS}`;
+const HEAD = `hidden ${PAD_X} xl:grid ${COLUMNS}`;
 
-export function EmployeeList({ rows }: { rows: Row[] }) {
-  const [openId, setOpenId] = useState<string | null>(null);
-
+/**
+ * 열 머리글 — 도구줄 카드 아래 끝에 들어간다 (2026-10-07 사용자 결정).
+ *
+ * 위에 **갈래 이름 줄**을 하나 더 둔다. 「자극 위험 민감 …」 일곱과 「협력
+ * 조직 실행 평균」 넷이 나란히 있으면 어디까지가 성향인지 머리글만 봐서는
+ * 안 보인다. 갈래 이름 아래 가는 선을 그 갈래 폭만큼 그어 묶는다.
+ *
+ * 성향 쪽 끝에는 색 범례를 붙인다 — 색이 어느 쪽이 높음인지는 표를 훑는
+ * 내내 필요해서, 맨 아래 접힌 설명에 넣으면 안 된다.
+ */
+export function EmployeeListHeader() {
   return (
-    <div>
-      {/*
-        머리글은 칸 **바깥에** 한 번만 둔다. 칸마다 넣으면 마흔 번 반복되고,
-        빼면 어느 네모가 어느 축인지 알 수 없다. 자리는 아래 칸과 같은
-        격자를 써서 맞춘다 (좌우 여백 `px-5`까지 같이).
-      */}
-      <div
-        className={`text-axis text-ink-muted mb-2 ${HEAD}`}
-        aria-hidden
-      >
+    <div aria-hidden className="text-axis text-ink-muted">
+      <div className={`${HEAD} pt-2.5`}>
+        <span />
+        <span />
+        <GroupLabel max="max-w-[56rem]">
+          <span>성향</span>
+          <span className="flex items-center gap-2" style={{ fontSize: 14 }}>
+            <span className="flex items-center gap-1">
+              <span className="size-2.5 rounded-[2px]" style={{ background: "var(--scale-0)" }} />
+              낮음
+            </span>
+            <span className="flex items-center gap-1">
+              <span className="size-2.5 rounded-[2px]" style={{ background: "var(--scale-100)" }} />
+              높음
+            </span>
+          </span>
+        </GroupLabel>
+        <GroupLabel max="max-w-[33rem]">
+          <span>직무능력</span>
+        </GroupLabel>
+      </div>
+      <div className={`${HEAD} pt-1.5 pb-2.5`}>
         <span>이름</span>
         <span>신뢰도</span>
         <TraitStripHeader />
         <AbilityStripHeader />
       </div>
+    </div>
+  );
+}
 
-      <ul className="flex flex-col gap-2.5">
-        {rows.map((r) => {
-          const expanded = openId === r.id;
-          const canExpand = Boolean(r.traits);
-          return (
-            <li
-              key={r.id}
-              className="rounded-xl border transition-colors"
-              style={{
-                borderColor: expanded ? "var(--ink-muted)" : "var(--border)",
-                background: expanded ? "var(--wash)" : undefined,
+function GroupLabel({ max, children }: { max: string; children: React.ReactNode }) {
+  return (
+    <div
+      className={`text-ink-secondary flex w-full items-baseline justify-between gap-3 border-b border-(--border) pb-1 ${max}`}
+    >
+      {children}
+    </div>
+  );
+}
+
+function prefersReducedMotion() {
+  return window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+}
+
+export function EmployeeList({ rows }: { rows: Row[] }) {
+  const [openId, setOpenId] = useState<string | null>(null);
+  const itemRefs = useRef(new Map<string, HTMLLIElement>());
+
+  /*
+    펼치면 **그 사람 칸의 윗변을 도구줄 바로 아래로** 끌어온다 (2026-10-07
+    사용자 결정). 아래쪽 사람을 펼치면 패널이 화면 밖에서 자라서, 눌렀는데
+    아무 일도 없는 것처럼 보였다. 위로 밀어 올릴 자리는 `scroll-margin-top`
+    (머리줄 + 도구줄 접힌 키)이 정한다. 접을 때는 움직이지 않는다 — 보던
+    자리를 잃는다.
+  */
+  useEffect(() => {
+    if (!openId) return;
+    itemRefs.current.get(openId)?.scrollIntoView({
+      behavior: prefersReducedMotion() ? "auto" : "smooth",
+      block: "start",
+    });
+  }, [openId]);
+
+  return (
+    <ul className="flex flex-col gap-2.5">
+      {rows.map((r) => {
+        const expanded = openId === r.id;
+        const canExpand = Boolean(r.traits);
+        return (
+          <li
+            key={r.id}
+            ref={(el) => {
+              if (el) itemRefs.current.set(r.id, el);
+              else itemRefs.current.delete(r.id);
+            }}
+            className={`${panelClass} overflow-hidden transition-[border-color,box-shadow]`}
+            style={{
+              borderColor: expanded ? "var(--ink-muted)" : undefined,
+              scrollMarginTop:
+                "calc(var(--admin-top) + 0.5rem + var(--sticky-toolbar-h, 0px) + 0.75rem)",
+            }}
+          >
+            {/*
+              칸 전체가 누르는 자리다. `<button>`으로 감싸면 안쪽 그래프의
+              `title`과 겹치므로 `<div>`에 역할을 준다.
+            */}
+            <div
+              role={canExpand ? "button" : undefined}
+              tabIndex={canExpand ? 0 : undefined}
+              aria-expanded={canExpand ? expanded : undefined}
+              onClick={() => canExpand && setOpenId(expanded ? null : r.id)}
+              onKeyDown={(e) => {
+                if (!canExpand) return;
+                if (e.key === "Enter" || e.key === " ") {
+                  e.preventDefault();
+                  setOpenId(expanded ? null : r.id);
+                }
               }}
+              className={`${LAYOUT} ${MIN_H} ${PAD_X} py-4 transition-colors ${
+                canExpand ? "hover:bg-card-head cursor-pointer" : ""
+              } ${expanded ? "bg-card-head" : ""}`}
             >
-              {/*
-                칸 전체가 누르는 자리다. `<button>`으로 감싸면 안쪽 그래프의
-                `title`과 겹치므로 `<div>`에 역할을 준다.
-              */}
-              <div
-                role={canExpand ? "button" : undefined}
-                tabIndex={canExpand ? 0 : undefined}
-                aria-expanded={canExpand ? expanded : undefined}
-                onClick={() => canExpand && setOpenId(expanded ? null : r.id)}
-                onKeyDown={(e) => {
-                  if (!canExpand) return;
-                  if (e.key === "Enter" || e.key === " ") {
-                    e.preventDefault();
-                    setOpenId(expanded ? null : r.id);
-                  }
-                }}
-                className={`${LAYOUT} ${MIN_H} px-5 py-4 pr-6 ${
-                  canExpand ? "cursor-pointer hover:bg-(--wash)" : ""
-                } ${expanded ? "rounded-t-xl" : "rounded-xl"}`}
-              >
-                {/* ── 누구인가 ── */}
-                <div className="min-w-0">
-                  <p className="flex items-baseline gap-2">
-                    <span className="text-table truncate font-medium">
-                      {r.name}
-                    </span>
-                    <span className="text-axis text-ink-muted shrink-0">
-                      {r.status
-                        ? STATUS[r.status as keyof typeof STATUS]
-                        : "미응시"}
-                    </span>
-                    {/*
-                      화살표는 **이름 바로 옆**에 둔다. `ml-auto`로 칸 오른쪽
-                      끝에 붙였더니 이름과 멀어져서 옆 열(신뢰도)에 딸린
-                      것처럼 보였다.
-                    */}
-                    {canExpand && (
-                      <span aria-hidden className="text-ink-muted -ml-0.5">
-                        {expanded ? "▾" : "▸"}
-                      </span>
-                    )}
-                  </p>
-                  <p className="text-axis text-ink-secondary tabular mt-0.5 truncate">
-                    {r.phone ? formatPhone(r.phone) : "번호 없음"}
-                    <span className="text-ink-muted">
-                      {" · "}
-                      {r.completedLabel ?? "—"}
-                    </span>
-                  </p>
-                </div>
-
-                {/* ── 이 응답을 믿을 수 있는가 ── */}
-                <div>
-                  <span className="text-axis text-ink-muted mr-2 xl:hidden">
-                    신뢰도
+              {/* ── 누구인가 ── */}
+              <div className="min-w-0">
+                <p className="flex items-baseline gap-2">
+                  <span className="text-table truncate font-medium">{r.name}</span>
+                  <span className="text-axis text-ink-muted shrink-0">
+                    {r.status ? STATUS[r.status as keyof typeof STATUS] : "미응시"}
                   </span>
-                  <Quality
-                    flag={r.flag}
-                    agreement={r.agreement}
-                    fastCount={r.fastCount}
-                  />
-                </div>
-
-                {/* ── 어떤 사람인가 ── */}
-                <div className="min-w-0">
-                  {r.traits && (
-                    <span className="text-axis text-ink-muted mb-1 block xl:hidden">
-                      성향
+                  {/*
+                    펼침 표시는 **이름 바로 옆**에 둔다. `ml-auto`로 칸 오른쪽
+                    끝에 붙였더니 이름과 멀어져서 옆 열(신뢰도)에 딸린
+                    것처럼 보였다.
+                  */}
+                  {canExpand && (
+                    <span aria-hidden className="text-ink-muted -ml-0.5">
+                      {expanded ? "▾" : "▸"}
                     </span>
                   )}
-                  <TraitStrip traits={r.traits} />
-                </div>
-
-                <div className="min-w-0">
-                  {r.abilities && (
-                    <span className="text-axis text-ink-muted mb-1 block xl:hidden">
-                      직무능력
-                    </span>
-                  )}
-                  <AbilityStrip abilities={r.abilities} />
-                </div>
+                </p>
+                <p className="text-axis text-ink-secondary tabular mt-0.5 truncate">
+                  {r.phone ? formatPhone(r.phone) : "번호 없음"}
+                  <span className="text-ink-muted">
+                    {" · "}
+                    {r.completedLabel ?? "—"}
+                  </span>
+                </p>
               </div>
 
-              {expanded && r.traits && (
-                <div className="border-t border-(--border) px-5 py-8 sm:px-6">
-                  <Panel row={r} />
-                </div>
-              )}
-            </li>
-          );
-        })}
-      </ul>
-    </div>
+              {/* ── 이 응답을 믿을 수 있는가 ── */}
+              <div>
+                <span className="text-axis text-ink-muted mr-2 xl:hidden">신뢰도</span>
+                <Quality flag={r.flag} agreement={r.agreement} fastCount={r.fastCount} />
+              </div>
+
+              {/* ── 어떤 사람인가 ── */}
+              <div className="min-w-0">
+                {r.traits && (
+                  <span className="text-axis text-ink-muted mb-1 block xl:hidden">성향</span>
+                )}
+                <TraitStrip traits={r.traits} />
+              </div>
+
+              <div className="min-w-0">
+                {r.abilities && (
+                  <span className="text-axis text-ink-muted mb-1 block xl:hidden">
+                    직무능력
+                  </span>
+                )}
+                <AbilityStrip abilities={r.abilities} />
+              </div>
+            </div>
+
+            {expanded && r.traits && (
+              <div className="border-t border-(--border) px-5 py-8 sm:px-6">
+                <Detail row={r} />
+              </div>
+            )}
+          </li>
+        );
+      })}
+    </ul>
   );
 }
 
@@ -292,8 +358,10 @@ function Quality({
  *  1. **한 줄 3단**으로 늘어놓는다 — 레이더·막대·직무능력을 세로로 쌓지 않는다.
  *  2. **레이더에 상한을 둔다.** `aspectRatio`가 걸려 있어 폭이 곧 높이다.
  *     상한이 없으면 넓은 화면일수록 패널이 커진다 (1920에서 806px까지 갔다).
+ *
+ * 칸이 이미 카드라 안에 카드를 또 두르지 않는다 — 가는 선과 여백으로만 나눈다.
  */
-function Panel({ row }: { row: Row }) {
+function Detail({ row }: { row: Row }) {
   const traits = row.traits!;
   const ordered = [...TEMPERAMENT, ...CHARACTER]
     .filter((s) => typeof traits[s] === "number")
@@ -308,7 +376,7 @@ function Panel({ row }: { row: Row }) {
       <div className="mb-10 flex flex-wrap items-center justify-between gap-4">
         <h3 className="text-section-title">{row.name}</h3>
         <ButtonLink href={`/admin/employees/${row.id}`} size="lg">
-          상세 보기 →
+          상세 보기
         </ButtonLink>
       </div>
 
@@ -361,11 +429,9 @@ function Panel({ row }: { row: Row }) {
           </div>
         )}
 
+        {/* 「사내 위치는 상세 보기에」 안내 문장은 뺐다 — 위 단추가 이미 말한다 (2026-10-07) */}
         <div className="w-full max-w-[23rem]">
           <QuickRead traits={traits} />
-          <p className="text-axis text-ink-muted mt-4">
-            사내 위치와 관련 성향 축은 상세 보기에 있습니다.
-          </p>
         </div>
       </div>
 

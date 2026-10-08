@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { BINS, quantile, spreadOf } from "./spread";
+import { quantile, spreadOf } from "./spread";
 
 const P = (vals: number[]) =>
   vals.map((v, i) => ({ employeeId: `e${i}`, name: `사람${i}`, value: v }));
@@ -22,42 +22,25 @@ describe("spreadOf", () => {
     expect(spreadOf("인내력", "temperament", P([50]))).toBeNull();
   });
 
-  it("같은 칸에 들어온 사람은 위로 쌓인다", () => {
-    // 4점 칸이므로 40·41·42는 같은 칸
-    const s = spreadOf("인내력", "temperament", P([40, 41, 42, 80]))!;
-    const stacked = s.dots.filter((d) => d.value < 50);
-    expect(stacked.map((d) => d.level)).toEqual([0, 1, 2]);
-    expect(s.peak).toBe(3);
-  });
-
-  it("같은 칸의 점은 x가 똑같다 — 칸 가운데", () => {
-    const s = spreadOf("인내력", "temperament", P([40, 41, 42]))!;
-    const xs = new Set(s.dots.map((d) => d.x));
-    expect(xs.size).toBe(1);
-  });
-
-  it("100점이 저 혼자 칸을 만들지 않는다", () => {
-    const s = spreadOf("인내력", "temperament", P([96, 100]))!;
-    expect(new Set(s.dots.map((d) => d.x)).size).toBe(1);
-    expect(s.dots[0].x).toBeCloseTo((BINS - 0.5) / BINS);
-  });
-
-  it("눈금 밖 값도 그림 안에 머문다", () => {
-    const s = spreadOf("인내력", "temperament", P([-5, 105]))!;
-    for (const d of s.dots) expect(d.x).toBeGreaterThanOrEqual(0);
-    for (const d of s.dots) expect(d.x).toBeLessThanOrEqual(1);
-  });
-
-  it("쌓는 순서가 값에만 달렸다 — 넣는 순서가 달라도 같은 그림", () => {
+  it("사람 목록은 값이 낮은 쪽부터 — 넣는 순서가 달라도 같다", () => {
     const a = spreadOf("인내력", "temperament", P([42, 40, 41]))!;
     const b = spreadOf("인내력", "temperament", P([41, 42, 40]))!;
-    expect(a.dots.map((d) => d.value)).toEqual(b.dots.map((d) => d.value));
+    expect(a.dots.map((d) => d.value)).toEqual([40, 41, 42]);
+    expect(b.dots.map((d) => d.value)).toEqual([40, 41, 42]);
   });
 
-  it("양끝 사람은 값 순서대로, 높은 쪽은 큰 값부터", () => {
-    const s = spreadOf("인내력", "temperament", P([10, 20, 30, 80, 90]))!;
-    expect(s.lowest.map((d) => d.value)).toEqual([10, 20, 30]);
-    expect(s.highest.map((d) => d.value)).toEqual([90, 80, 30]);
+  it("동점이면 이름 순", () => {
+    const s = spreadOf("인내력", "temperament", [
+      { employeeId: "b", name: "나", value: 50 },
+      { employeeId: "a", name: "가", value: 50 },
+    ])!;
+    expect(s.dots.map((d) => d.name)).toEqual(["가", "나"]);
+  });
+
+  it("값이 없는 사람은 뺀다", () => {
+    const s = spreadOf("인내력", "temperament", P([10, NaN, 30]))!;
+    expect(s.n).toBe(2);
+    expect(s.dots).toHaveLength(2);
   });
 
   it("사분위와 표준편차를 낸다", () => {

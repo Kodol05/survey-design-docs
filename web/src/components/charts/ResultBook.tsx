@@ -37,12 +37,19 @@ export function ResultBook({
   pages,
   initial = 0,
   action,
+  sideNav = true,
 }: {
   pages: BookPage[];
   /** 처음 펼 장(0부터). 서버가 `?p=` 를 읽어 넘겨준다 */
   initial?: number;
   /** 모든 장 오른쪽 아래에 두는 행동 버튼 (예: 다시 응시하기) */
   action?: ReactNode;
+  /**
+   * 종이 바깥 양옆에 떠 있는 ‹ › (기본 켬). 관리자 구성원 상세는 끈다
+   * (2026-10-07) — 왼쪽에 사이드바가 있어 종이 왼쪽 여백에 띄우면 메뉴 위에
+   * 겹친다. 그쪽은 장 탭 · 아래 넘김 줄 · 키보드로 넘긴다.
+   */
+  sideNav?: boolean;
 }) {
   const count = pages.length;
   const wrap = (n: number) => ((n % count) + count) % count;
@@ -81,7 +88,7 @@ export function ResultBook({
     window.addEventListener("resize", measure);
     return () => window.removeEventListener("resize", measure);
   }, []);
-  const showEdges = !!edges && edges.left >= 8 && edges.right >= 8;
+  const showEdges = sideNav && !!edges && edges.left >= 8 && edges.right >= 8;
 
   const go = useCallback(
     (n: number, dir?: Dir) => {

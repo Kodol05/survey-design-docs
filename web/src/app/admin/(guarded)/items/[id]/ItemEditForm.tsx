@@ -32,12 +32,14 @@ const label = "text-table font-medium";
  * 저장 직전 `validateItemPatch` 로 화면에서 먼저 걸러 사람에게 바로 알려주고,
  * 서버 액션이 같은 검사를 한 번 더 한다 (우회 방지). 성공하면 액션이 목록으로
  * 돌려보내므로 여기서는 따로 성공 화면을 그리지 않는다.
+ *
+ * 카드 안에 들어간다 (2026-10-07 사용자 결정). 문항 번호는 카드 머리줄이
+ * 보여주므로 저장 버튼 옆에 같은 번호를 다시 적지 않는다. 칸 사이도 조금
+ * 좁혔다 — 카드 테두리가 이미 덩어리를 묶어 준다.
  */
 export function ItemEditForm({
   id,
   kind,
-  code,
-  orderNo,
   content: content0,
   section: section0,
   isReverse: isReverse0,
@@ -50,8 +52,6 @@ export function ItemEditForm({
 }: {
   id: string;
   kind: "TRAIT" | "ABILITY";
-  code: string;
-  orderNo: number;
   content: string;
   section: number;
   isReverse: boolean;
@@ -97,7 +97,7 @@ export function ItemEditForm({
   };
 
   return (
-    <div className="flex max-w-[48rem] flex-col gap-6">
+    <div className="flex flex-col gap-5">
       {/* 문항 */}
       <label className="flex flex-col gap-1.5">
         <span className={label}>문항 내용</span>
@@ -111,7 +111,7 @@ export function ItemEditForm({
 
       {/* 축 · 세부 / 직무능력 축 · 직접여부 */}
       {kind === "TRAIT" ? (
-        <div className="grid gap-6 sm:grid-cols-2">
+        <div className="grid gap-5 sm:grid-cols-2">
           <label className="flex flex-col gap-1.5">
             <span className={label}>성향 축</span>
             <select
@@ -143,7 +143,7 @@ export function ItemEditForm({
           </label>
         </div>
       ) : (
-        <div className="grid gap-6 sm:grid-cols-2">
+        <div className="grid gap-5 sm:grid-cols-2">
           <label className="flex flex-col gap-1.5">
             <span className={label}>직무능력 축</span>
             <select
@@ -173,7 +173,7 @@ export function ItemEditForm({
       )}
 
       {/* 묶음 · 상태 */}
-      <div className="grid gap-6 sm:grid-cols-2">
+      <div className="grid gap-5 sm:grid-cols-2">
         <label className="flex flex-col gap-1.5">
           <span className={label}>묶음</span>
           <select
@@ -218,19 +218,15 @@ export function ItemEditForm({
         <span>
           <span className={label}>역채점 문항</span>
           <span className="text-axis text-ink-muted block">
-            답을 뒤집어 계산합니다. 반대 방향으로 물어 대충 찍는 응답을
-            걸러내는 데 씁니다.
+            답을 뒤집어 계산합니다
           </span>
         </span>
       </label>
 
-      <div className="mt-2 flex items-center gap-4">
+      <div className="mt-1 flex items-center gap-4">
         <Button onClick={save} disabled={pending}>
           {pending ? "저장 중…" : "저장"}
         </Button>
-        <span className="text-axis text-ink-muted tabular">
-          {code} · {orderNo}번
-        </span>
         {error && (
           <p
             role="alert"

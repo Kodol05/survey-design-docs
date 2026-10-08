@@ -48,13 +48,15 @@ export function Attendance({ people }: { people: Attendee[] }) {
 
   return (
     <div>
-      <p className="mb-4">
-        <span className="tabular text-4xl font-semibold">{done}</span>
-        <span className="text-ink-secondary tabular ml-1 text-2xl">
-          {" / "}
-          {people.length}
-        </span>
-        <span className="text-axis text-ink-muted ml-3">가입한 사람 기준</span>
+      {/*
+        큰 「42 / 48」은 뺐다 (2026-10-07). 대시보드 맨 위 숫자 카드(응시 완료)와
+        같은 말을 두 번 하고 있었다 — 여기는 한 줄로만 남긴다.
+      */}
+      <p className="text-axis text-ink-muted mb-3">
+        <span className="tabular text-ink font-medium">
+          {done} / {people.length}
+        </span>{" "}
+        가입한 사람 기준
       </p>
 
       {/*
@@ -97,7 +99,7 @@ export function Attendance({ people }: { people: Attendee[] }) {
       </ul>
 
       {pending.length > 0 && (
-        <p className="text-axis text-ink-secondary mt-5 leading-relaxed">
+        <p className="text-axis text-ink-secondary mt-4 leading-relaxed">
           <span className="text-ink-muted">아직 답하는 중인 사람 — </span>
           {pending.map((p, i) => (
             <span key={p.id}>

@@ -10,7 +10,7 @@ import { QUALITY } from "@/lib/scoring/quality";
  *
  * α는 「문항이 잘 만들어졌는가」, 이쪽은 「이 사람 답을 믿을 수 있는가」.
  * 척도 α가 아무리 높아도 서둘러 넘긴 응답의 값은 쓰기 어렵다. 두 가지를 같은
- * 화면에 두되 절을 나눠 둔다.
+ * 화면에 두되 카드를 나눠 둔다.
  *
  * 잣대는 **반대 문항 일치도**다. 서로 반대인 문항에 같은 방향으로 답했는지를
  * 재는데, 무작위로 답하면 .60 근처가 나온다 (모의로 확인, 00 §2.3).
@@ -40,27 +40,25 @@ const toneOf = (a: number) =>
   같은 이유로 「미달」·「성실」 같은 낱말도 화면에서 뺐다.
 */
 
-/** 오른쪽 칸 — 위험 표시가 붙은 사람만 짧게 */
+/**
+ * 오른쪽 카드 — 위험 표시가 붙은 사람만 짧게.
+ *
+ * 제목(「신뢰도 위험」)과 인원은 카드 머리줄이 단다 (2026-10-07). 여기는
+ * 목록만 그린다. 「분석에서 뺄지 정하실 수 있습니다」 한 줄은 지웠다 — 빼는
+ * 손잡이는 분석 첫 탭에 그대로 있다.
+ */
 export function LowQualityList({ rows }: { rows: PersonQuality[] }) {
   const flagged = rows.filter((r) => r.flag !== "ok");
 
   if (flagged.length === 0)
     return (
-      <div>
-        <h3 className="text-section-title mb-1">신뢰도 위험</h3>
-        <p className="text-ink-secondary">
-          없습니다. 응답이 전부 기준 안에 들어옵니다.
-        </p>
-      </div>
+      <p className="text-ink-secondary py-3">
+        없습니다. 응답이 전부 기준 안입니다.
+      </p>
     );
 
   return (
     <div>
-      <h3 className="text-section-title mb-1">신뢰도 위험</h3>
-      <p className="text-axis text-ink-muted mb-5">
-        {flagged.length}명 · 분석에서 뺄지 정하실 수 있습니다
-      </p>
-
       <ul className="flex flex-col">
         {flagged.map((r) => {
           const bySpeed = r.agreement !== null && r.agreement >= QUALITY.agreementReview;
@@ -94,7 +92,7 @@ export function LowQualityList({ rows }: { rows: PersonQuality[] }) {
 const HEAD = 8;
 
 /**
- * 아래 절 — 사람별 순위.
+ * 아래 카드 — 사람별 순위. 평균은 카드 머리줄이 단다 (2026-10-07).
  *
  * **전원을 펼쳐 두지 않는다.** 이 목록에서 실제로 볼 일이 있는 것은 양 끝이다.
  * 낮은 쪽 몇 명은 값을 쓸지 정해야 하고, 높은 쪽 몇 명은 기준선이 된다.
@@ -105,11 +103,6 @@ export function QualityRanking({ rows }: { rows: PersonQuality[] }) {
 
   if (rows.length === 0)
     return <p className="text-ink-muted">아직 응시를 끝낸 사람이 없습니다.</p>;
-
-  const scored = rows.filter((r) => r.agreement !== null);
-  const mean = scored.length
-    ? scored.reduce((n, r) => n + (r.agreement ?? 0), 0) / scored.length
-    : null;
 
   // rows는 낮은 순으로 들어온다. 화면에는 높은 쪽부터 세운다
   const high = [...rows].reverse();
@@ -127,15 +120,6 @@ export function QualityRanking({ rows }: { rows: PersonQuality[] }) {
 
   return (
     <div>
-      <p className="text-ink-secondary mb-6">
-        {mean !== null && (
-          <>
-            평균 <strong className="tabular">{Math.round(mean * 100)}</strong>점.{" "}
-          </>
-        )}
-        위가 앞뒤가 맞게 답한 쪽입니다.
-      </p>
-
       <ul className="flex flex-col">
         {shown.map(({ r, rank, gap }) => (
           <li key={r.employeeId}>

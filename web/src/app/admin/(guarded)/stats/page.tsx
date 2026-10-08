@@ -1,6 +1,4 @@
-import { formatRatio } from "@/components/analysis/correlationColor";
 import Link from "next/link";
-import { Tile } from "@/components/ui/Tile";
 import { requireAdmin } from "@/lib/auth/guard";
 import {
   loadPeople,
@@ -8,29 +6,24 @@ import {
   loadReliability,
   traitAbilityMatrix,
 } from "@/lib/admin/analysis";
-import { ALPHA } from "@/lib/admin/stats";
-import { traitAlpha } from "@/lib/admin/dashboard";
 import { MatrixTab } from "./MatrixTab";
 import { SpreadTab } from "./SpreadTab";
-import { PredictionTab } from "./PredictionTab";
 import { ReliabilityTab } from "./ReliabilityTab";
 
 export const metadata = { title: "분석 — 관리자" };
 
 /*
-  탭 순서 — **우리 데이터 → 바깥과 맞대기 → 사람** (2026-08-25 사용자 결정).
+  탭 순서 — **우리 데이터 안의 관계 → 사람들의 모양 → 문항** (2026-08-25).
 
     직무능력과 기질·성격   우리 데이터 안의 관계. 이 화면의 뼈대
-    예측 대 실제          논문 값과 맞대 본다
     분포                  우리 사람들이 어떻게 퍼져 있나
     검사 신뢰도           문항이 제대로 만들어졌나
 
-  「예측 대 실제」를 「분포」 앞으로 올렸다 — 앞의 두 탭이 **바깥 기준과
-  맞대는 이야기**로 이어지고, 분포부터는 우리 안을 들여다보는 이야기다.
+  「예측 대 실제」(논문 값과 맞대 보기) 탭은 지웠다 (2026-10-07 사용자 결정 —
+  쓸 일이 없었다). 그 탭에서만 쓰던 계산과 부품도 같이 지웠다.
 */
 const TABS = [
   { key: "matrix", label: "직무능력과 기질·성격" },
-  { key: "prediction", label: "예측 대 실제" },
   { key: "spread", label: "분포" },
   { key: "reliability", label: "검사 신뢰도" },
 ] as const;
@@ -59,9 +52,6 @@ export default async function StatsPage(props: {
     loadPersonQuality(),
   ]);
   const matrix = traitAbilityMatrix(people);
-  // α는 성향 축만 센다 — 대시보드와 같은 함수를 쓴다 (D-93)
-  const { mean: meanAlpha, poor } = traitAlpha(reliability);
-  const poorCount = poor.length;
   /*
     척도 이름으로 찾아 쓰는 표. 상관 화면과 순위 화면이 **α를 알아야**
     한다 — 문항이 안 맞물리는 축의 상관은 축소 편향되어 있어 그대로 읽으면
@@ -74,45 +64,17 @@ export default async function StatsPage(props: {
     켜기 전에 알려줘야 누를지 말지 정할 수 있다.
   */
   const poorN = personQuality.filter((q) => q.flag === "poor").length;
-  const reviewCount = people.filter((p) => p.quality !== "ok").length;
 
   return (
     <>
-      <h1 className="text-screen-title mb-6">분석</h1>
+      <h1 className="text-screen-title mb-5">분석</h1>
 
-      {/* 먼저 읽히는 것 — 이 검사가 지금 쓸 만한 상태인가 */}
-      <div className="mb-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-        <Tile
-          label="응시 완료"
-          value={people.length}
-          href="/admin/employees?status=completed"
-          hint="누가 했는지 보기"
-        />
-        <Tile
-          label="검토가 필요한 응답"
-          value={reviewCount}
-          href="/admin/employees?flag=review"
-          hint={reviewCount ? "누구인지 보기" : undefined}
-        />
-        <Tile
-          label="검사 신뢰도"
-          value={meanAlpha === null ? "—" : formatRatio(meanAlpha)}
-          href="/admin/stats?tab=reliability"
-          // 예측 대 실제의 「0.00 → 1.00」과 같은 꼴로 적는다 — 화면이 달라도
-          // 0~1 값을 읽는 법은 하나여야 한다 (2026-08-26)
-          hint="성향 7축 평균 α · 1.00 에 가까울수록 좋음"
-        />
-        <Tile
-          label="기준 아래 성향 축"
-          value={poorCount}
-          href="/admin/stats?tab=reliability"
-          hint={
-            poorCount ? `α ${formatRatio(ALPHA.poor)} 아래` : "전부 기준 안"
-          }
-        />
-      </div>
-
-      <nav className="mb-10 flex flex-wrap gap-1 border-b border-(--border)">
+      {/*
+        숫자 카드(응시 완료·검토 필요·검사 신뢰도·기준 아래 축)는 대시보드에만
+        둔다 (2026-10-07 사용자 결정). 같은 것이 두 화면 맨 위에 똑같이 떠
+        있었다 — 분석에 들어오면 바로 표가 보여야 한다.
+      */}
+      <nav className="mb-6 flex flex-wrap gap-1 border-b border-(--border)">
         {TABS.map((t) => (
           <Link
             key={t.key}
@@ -139,9 +101,6 @@ export default async function StatsPage(props: {
       )}
       {tab === "spread" && (
         <SpreadTab people={people} reliability={byScale} />
-      )}
-      {tab === "prediction" && (
-        <PredictionTab people={people} matrix={matrix} />
       )}
       {tab === "reliability" && (
         <ReliabilityTab rows={reliability} quality={personQuality} />
