@@ -24,7 +24,8 @@ export function ExportLink({ href, count }: { href: string; count: number }) {
       <p className="text-ink-muted">파일로 나가면 이 화면의 잠금이 따라가지 않습니다</p>
       <a
         href={href}
-        className="bg-card hover:border-(--ink-muted) inline-flex h-10 items-center gap-1.5 rounded-lg border border-(--border) px-4 font-medium transition-colors"
+        // 테두리 없이 옅은 바탕, 올리면 한 단 진한 바탕 (2026-10-30 — 테두리 강조를 쓰지 않는다)
+        className="inline-flex h-10 items-center gap-1.5 rounded-lg bg-(--wash)/70 px-4 font-medium transition-colors hover:bg-(--wash)"
       >
         CSV 내보내기
         <span className="text-ink-muted tabular font-normal">{count}명</span>

@@ -166,9 +166,20 @@ export function CorrelationTable({
                             ? `${v.n}명 · 95% 구간 ${formatR(v.ci[0])}~${formatR(v.ci[1])}`
                             : undefined
                         }
-                        className={`grid h-11 w-full grid-cols-1 items-center overflow-hidden rounded-md px-1 whitespace-nowrap sm:grid-cols-2 focus-visible:outline-2 focus-visible:outline-offset-[-2px] focus-visible:outline-(--ink) ${
+                        /*
+                          **고른 칸만 제 색, 나머지는 흑백** (2026-10-30 사용자 결정 —
+                          전에는 고른 칸에 2px 테두리를 둘렀다). 아무것도 안 골랐으면
+                          전부 제 색이다.
+
+                          마우스를 올리면 **테두리 대신 살짝 어두워진다** (2026-10-30
+                          사용자 요청 — 테두리 강조는 쓰지 않는다). 흑백이 된 칸은
+                          올렸을 때 제 색이 잠깐 돌아와 무엇인지 미리 보인다.
+                        */
+                        className={`grid h-11 w-full grid-cols-1 items-center overflow-hidden rounded-md px-1 whitespace-nowrap transition-[filter] duration-300 sm:grid-cols-2 focus-visible:outline-2 focus-visible:outline-offset-[-2px] focus-visible:outline-(--ink) ${
+                          selected && !on ? "grayscale" : ""
+                        } ${
                           clickable
-                            ? "cursor-pointer hover:outline-1 hover:outline-offset-[-1px] hover:outline-(--ink-muted)"
+                            ? "cursor-pointer hover:brightness-95 hover:grayscale-0"
                             : "cursor-default"
                         }`}
                         style={{
@@ -183,20 +194,6 @@ export function CorrelationTable({
                               ? correlationFill(v.r, isUncertain(v.ci))
                               : "transparent",
                           color: v.kind === "value" ? "var(--ink)" : undefined,
-                          /*
-                            **고른 칸에는 2px 테두리를 두른다** (2026-10-07 사용자
-                            결정). 한때(2026-08-25) 검은 네모가 칸 안의 막대보다
-                            먼저 보인다고 빼고 채도만 올렸는데, 막대가 빠진 지금은
-                            채도 차이로는 어느 칸이 오른쪽 그림인지 안 보였다.
-                          */
-                          /*
-                            **고른 칸만 제 색, 나머지는 흑백** (2026-10-30 사용자 결정).
-                            전에는 고른 칸에 2px 테두리를 둘렀는데, 테두리·바탕 없이
-                            「지금 이 칸을 보고 있다」를 말하려고 나머지 칸의 색을 빼고
-                            밝기만 남긴다. 아무것도 안 골랐으면 전부 제 색이다.
-                          */
-                          filter: selected && !on ? "grayscale(1)" : undefined,
-                          transition: "filter 0.3s ease",
                         }}
                       >
                         <Body cell={v} />
