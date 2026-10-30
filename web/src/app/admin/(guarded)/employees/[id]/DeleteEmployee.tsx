@@ -27,7 +27,7 @@ export function DeleteEmployee({ employeeId, name }: { employeeId: string; name:
         onClick={() => setOpen(true)}
         className="text-axis text-ink-muted underline"
       >
-        이 사람 기록 완전 삭제
+        구성원 기록 삭제
       </button>
     );
 
@@ -65,7 +65,7 @@ export function DeleteEmployee({ employeeId, name }: { employeeId: string; name:
             });
           }}
         >
-          {pending ? "지우는 중…" : "완전히 지우기"}
+          {pending ? "삭제 중…" : "삭제"}
         </Button>
         <Button
           variant="quiet"

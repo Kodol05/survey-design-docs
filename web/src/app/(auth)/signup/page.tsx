@@ -20,7 +20,7 @@ export default function SignupPage() {
         <div>
           <h1 className="mb-1.5 text-[1.75rem] leading-tight font-semibold">회원가입</h1>
           <p className="text-table text-ink-secondary mb-7">
-            처음 한 번만 만들면 됩니다. 다음부터는 이 번호로 들어오시면 됩니다.
+            처음 한 번만 가입하면 됩니다. 다음부터는 이 번호로 로그인합니다.
           </p>
 
           <AuthForm action={signup} submitLabel="가입하고 시작하기">

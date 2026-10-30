@@ -57,7 +57,7 @@ export function AuthForm({
         className="text-item mt-2 h-13 w-full rounded-lg font-semibold transition hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-50"
         style={{ background: "var(--ink)", color: "var(--page)" }}
       >
-        {pending ? "잠시만요…" : submitLabel}
+        {pending ? "처리 중…" : submitLabel}
       </button>
     </form>
   );

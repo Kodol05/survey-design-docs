@@ -130,7 +130,7 @@ export function AbilityStrip({ abilities }: { abilities: Record<string, number> 
         style={{ background: "var(--border)" }}
       />
       <span
-        title={mean === null ? "세 축이 다 있어야 냅니다" : `평균 ${Math.round(mean)}`}
+        title={mean === null ? "세 축 값이 모두 있어야 계산합니다" : `평균 ${Math.round(mean)}`}
         className={`${A_CELL} block`}
       >
         <span className="tabular text-table block text-right leading-none font-medium">

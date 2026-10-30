@@ -40,12 +40,12 @@ export function QuickRead({ traits }: { traits: Record<string, number> }) {
 
   return (
     <div>
-      <p className="text-table text-ink-secondary mb-3">한눈에</p>
+      <p className="text-table text-ink-secondary mb-3">요약</p>
 
       {shown.length === 0 ? (
         <p className="text-ink-secondary leading-relaxed">
-          일곱 축이 모두 가운데 범위입니다. 어느 축에서도 한쪽으로 크게 기울지
-          않아, 상황에 따라 양쪽을 골라 쓰는 편입니다.
+          일곱 축 모두 보통 범위입니다. 어느 쪽으로도 크게 치우치지 않아 상황에
+          따라 양쪽을 고르게 쓰는 편입니다.
         </p>
       ) : (
         <ul className="flex flex-col gap-3">
@@ -74,10 +74,10 @@ export function QuickRead({ traits }: { traits: Record<string, number> }) {
         <p className="text-axis text-ink-muted mt-4 leading-snug">
           {standout.length > LIMIT && (
             <>
-              두드러지는 축 {standout.length}개 중 위 {LIMIT}개입니다.{" "}
+              두드러진 축 {standout.length}개 중 상위 {LIMIT}개입니다.{" "}
             </>
           )}
-          {middle > 0 && <>나머지 {middle}개 축은 가운데 범위입니다.</>}
+          {middle > 0 && <>나머지 {middle}개 축은 보통 범위입니다.</>}
         </p>
       )}
     </div>

@@ -174,9 +174,9 @@ export default async function Home() {
             <div className="max-w-[34rem]">
               <p className="text-table mb-2 font-medium">7가지 성향 검사</p>
               <p className="text-axis text-ink-muted leading-relaxed">
-                클로닝거의 기질·성격 이론을 참고해 사내에서 만들었습니다. 공개된
-                검사를 그대로 쓴 것이 아니라 문항을 직접 썼고, 아직 다듬는
-                중입니다. 자기 이해를 돕는 참고 자료로 봐 주시면 됩니다.
+                클로닝거의 기질·성격 이론을 바탕으로 사내에서 자체 제작한
+                검사입니다. 문항은 계속 보완하고 있으며, 자기 이해를 위한 참고
+                자료로 활용해 주세요.
               </p>
             </div>
 

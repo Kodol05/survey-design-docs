@@ -53,7 +53,7 @@ export function LowQualityList({ rows }: { rows: PersonQuality[] }) {
   if (flagged.length === 0)
     return (
       <p className="text-ink-secondary py-3">
-        없습니다. 응답이 전부 기준 안입니다.
+        해당하는 사람이 없습니다.
       </p>
     );
 
@@ -137,9 +137,9 @@ export function QualityRanking({ rows }: { rows: PersonQuality[] }) {
           <li key={r.employeeId}>
             {gap && (
               <p className="text-axis text-ink-muted border-t border-(--border) py-2 text-center">
-                가운데 {hidden}명 접힘 ·{" "}
+                중간 {hidden}명 숨김 ·{" "}
                 <button type="button" onClick={() => setAll(true)} className="underline">
-                  전부 보기
+                  모두 보기
                 </button>
               </p>
             )}
@@ -171,7 +171,7 @@ export function QualityRanking({ rows }: { rows: PersonQuality[] }) {
       {all && hidden > 0 && (
         <p className="text-axis text-ink-muted mt-3 text-center">
           <button type="button" onClick={() => setAll(false)} className="underline">
-            가운데 접기
+            중간 숨기기
           </button>
         </p>
       )}

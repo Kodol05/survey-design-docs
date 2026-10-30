@@ -302,9 +302,9 @@ export function buildResultBook(
 
   const axes = (
     <>
-      {group("기질 척도", "타고난 부분. 바꾸기보다 알고 쓰는 쪽에 가깝습니다.", TEMPERAMENT)}
+      {group("기질 척도", "타고난 경향으로, 쉽게 바뀌지 않습니다.", TEMPERAMENT)}
       <div className="mt-10">
-        {group("성격 척도", "살면서 형성된 부분. 시간이 지나며 달라질 수 있습니다.", CHARACTER)}
+        {group("성격 척도", "경험을 통해 형성되며, 시간이 지나면서 달라질 수 있습니다.", CHARACTER)}
       </div>
     </>
   );
@@ -315,7 +315,7 @@ export function buildResultBook(
       <div className="flex flex-wrap items-baseline gap-x-3 gap-y-1 border-b border-(--border) pb-3">
         <h2 className="text-section-title">척도 간 관계</h2>
         <p className="text-axis text-ink-muted">
-          서로 다른 방향으로 작용하는 두 척도가 만났을 때의 해석입니다.
+          두 척도를 함께 볼 때의 해석입니다.
         </p>
       </div>
       <div className="mt-6">
@@ -325,13 +325,12 @@ export function buildResultBook(
       <section className="text-table text-ink-muted mt-10 max-w-[56rem] border-t border-(--border) pt-5">
         <p className="eyebrow mb-2">결과 해석 시 유의사항</p>
         <p className="mb-1">
-          점수는 우열이 아니라 경향의 정도입니다. 특정 상황의 결과를 예측하기보다
-          평소의 일하는 방식을 이해하는 데 맞습니다.
+          점수는 우열이 아니라 경향의 정도를 나타냅니다. 특정 상황의 결과를
+          예측하기보다 평소 일하는 방식을 이해하는 데 활용해 주세요.
         </p>
         <p>
-          자기보고 검사이므로 응답 당시의 상태에 따라 결과가 달라질 수 있고,
-          문항은 계속 다듬는 중입니다. 자기 이해를 돕는 참고 자료로 활용해
-          주십시오.
+          본인이 직접 답하는 검사라 응답할 때의 상태에 따라 결과가 달라질 수
+          있습니다. 문항은 계속 보완하고 있으니 참고 자료로 봐 주세요.
         </p>
       </section>
     </>

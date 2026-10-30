@@ -51,11 +51,11 @@ export default async function MePage(props: {
         {doing ? (
           <>
             <EmptyState
-              message={`아직 응시 중입니다 — ${doing.total}문항 중 ${doing.answered}문항 답하셨습니다.`}
+              message={`설문 진행 중입니다. ${doing.total}문항 중 ${doing.answered}문항에 답했습니다.`}
             />
             <p className="text-ink-muted text-axis mb-8 text-center">
-              답하신 것은 그대로 저장돼 있습니다. 끝내시면 여기에 결과가
-              나옵니다.
+              지금까지의 답은 저장되어 있습니다. 설문을 마치면 여기에 결과가
+              표시됩니다.
             </p>
           </>
         ) : (
@@ -89,9 +89,9 @@ export default async function MePage(props: {
     <main className="page-column py-8 pb-24 lg:py-10 lg:pb-12">
       {viewing && (
         <p className="text-axis mb-4 rounded-lg px-4 py-3" style={{ background: "var(--wash)" }}>
-          지난 결과를 보고 계십니다.{" "}
+          지난 결과입니다.{" "}
           <a href="/me" className="underline underline-offset-2">
-            가장 최근 결과로
+            최근 결과 보기
           </a>
         </p>
       )}

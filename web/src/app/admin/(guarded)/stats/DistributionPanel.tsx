@@ -78,7 +78,7 @@ export function DistributionPanel({
     return (
       <Panel title={TITLE}>
         <p className="text-ink-secondary">
-          아직 그려 볼 값이 없습니다. 응시가 끝난 사람이 두 명은 넘어야 합니다.
+          표시할 데이터가 없습니다. 응시 완료가 2명 이상이어야 합니다.
         </p>
       </Panel>
     );
@@ -107,7 +107,7 @@ export function DistributionPanel({
           rows: [...axes].sort((a, b) => b.sd - a.sd).map(row),
         },
         ...(composite
-          ? [{ key: "composite", label: "묶은 값", rows: [row(composite)] }]
+          ? [{ key: "composite", label: "세 능력 평균", rows: [row(composite)] }]
           : []),
       ]
     : (["temperament", "character", "ability"] as const)
@@ -122,8 +122,8 @@ export function DistributionPanel({
   const toggle = (
     <div className="flex gap-1.5" role="group" aria-label="줄 순서">
       {[
-        { on: false, label: "묶음 순서" },
-        { on: true, label: "갈리는 순서" },
+        { on: false, label: "기본 순서" },
+        { on: true, label: "차이가 큰 순서" },
       ].map((b) => (
         <button
           key={b.label}
@@ -157,25 +157,24 @@ export function DistributionPanel({
       <Panel title={TITLE} aside={toggle}>
         <DensityRidge groups={groups} label={TITLE} focus={focus} />
 
-        <Note label="이 그림을 어떻게 읽는지" className="mt-6">
+        <Note label="그래프 보는 법" className="mt-6">
           <p className="mb-2">
-            <strong>봉우리</strong>가 높은 곳에 사람이 많이 몰려 있습니다.
-            봉우리가 둘이면 회사가 두 무리로 나뉜다는 뜻입니다.{" "}
-            <strong>진한 구간</strong>은 가운데 절반, <strong>세로선</strong>은
-            중앙값입니다. 진한 구간이 좁으면 다들 비슷하고 넓으면 많이 다릅니다.
+            곡선이 높은 곳에 사람이 많이 모여 있습니다. 봉우리가 둘이면 두 무리로
+            나뉜다는 뜻입니다. <strong>진한 부분</strong>은 가운데 50%,{" "}
+            <strong>세로선</strong>은 중앙값입니다. 진한 부분이 좁을수록 서로
+            비슷합니다.
           </p>
           <p className="mb-2">
-            바닥의 <strong>눈금 하나가 한 사람</strong>입니다. 마우스를 올리면
+            아래쪽 <strong>짧은 선 하나가 한 사람</strong>입니다. 마우스를 올리면
             이름과 점수가 나옵니다.
           </p>
           <p className="mb-2">
-            줄마다 봉우리 높이를 맞춰 그렸으므로 줄끼리 높이를 견주지 않습니다.
-            퍼진 정도는 폭으로 봅니다. 흐린 줄은 문항끼리 잘 맞지 않은 축입니다.
+            줄마다 봉우리 높이를 맞춰 그렸으니 줄끼리 높이는 비교하지 않고, 퍼진
+            폭으로 비교합니다. 흐린 줄은 문항 신뢰도가 낮은 축입니다.
           </p>
           <p>
-            <strong>점수 자체는 높고 낮음을 뜻하지 않습니다.</strong> 눈금이 문항
-            가운데를 50으로 잡은 것이라 <strong>사내에서 서로 견주는 것만</strong>{" "}
-            말이 됩니다.
+            점수는 사내에서 서로 비교하는 데만 의미가 있습니다. 50은 문항의 가운데
+            값일 뿐 평균이나 기준점이 아닙니다.
           </p>
         </Note>
       </Panel>

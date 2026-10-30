@@ -128,7 +128,7 @@ export function CorrelationPanel({
       <div className="min-w-0">
         {ranked.length === 0 ? (
           <p className="text-ink-muted py-16 text-center">
-            아직 그려 볼 값이 없습니다.
+            표시할 데이터가 없습니다.
           </p>
         ) : !cur ? (
           /* 큰 순 넷 — 제목을 누르면 그 조합 하나를 크게 본다 */
@@ -208,23 +208,23 @@ export function CorrelationPanel({
       표 아래 범례에 있던 「흐린 칸」 뜻 · 등급 기준 · 칸마다 인원을 여기로 모았다
       (2026-10-30 사용자 요청). 위의 가는 선은 뺐다.
     */}
-    <Note label="지금 보는 값이 무엇인지" className="mt-5">
+    <Note label="표 설명" className="mt-5">
       <p className="mb-2">
-        직무능력은 직원분이 설문에서 스스로 답한 값입니다. 성향과 같은
-        설문이라 관련도가 실제보다 다소 높게 나올 수 있습니다.
+        직무능력은 직원 본인이 설문에 답한 값입니다. 성향과 같은 설문에서 나온
+        값이라 관련도가 실제보다 조금 높게 나올 수 있습니다.
       </p>
       <p className="mb-2">
-        <strong>흐린 칸</strong>은 방향이 아직 확정되지 않은 칸입니다.
+        <strong>흐린 칸</strong>은 방향(+/−)이 아직 확정되지 않은 칸입니다.
       </p>
       <p className={nRange ? "mb-2" : undefined}>
-        등급 기준 — <span className="tabular">0.10</span> 약함 ·{" "}
+        등급 기준: <span className="tabular">0.10</span> 약함 ·{" "}
         <span className="tabular">0.20</span> 약간 뚜렷함 ·{" "}
         <span className="tabular">0.30</span> 뚜렷함 ·{" "}
         <span className="tabular">0.50</span> 매우 뚜렷함
       </p>
       {nRange && (
         <p>
-          칸마다 인원이 다릅니다 (
+          칸마다 인원이 다릅니다(
           <span className="tabular">
             {nRange[0]}~{nRange[1]}
           </span>

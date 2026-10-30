@@ -72,7 +72,7 @@ export function DeleteInline({ employeeId, name }: { employeeId: string; name: s
           className="text-axis h-10 rounded-lg px-4 font-medium disabled:opacity-50"
           style={{ background: "var(--status-critical)", color: "#fff" }}
         >
-          {pending ? "지우는 중…" : "지웁니다"}
+          {pending ? "삭제 중…" : "삭제"}
         </button>
         <button
           type="button"

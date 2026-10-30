@@ -77,8 +77,7 @@ function InHouseSection({
       <Panel title="성향 축과 직무능력 세 가지">
         <WarningBadge kind="smallSample" />
         <p className="text-ink-secondary mt-4">
-          응시 완료 {matrix.n}명입니다. {MIN_N}명이 넘어야 사내 관련도를
-          보여드립니다.
+          응시 완료 {matrix.n}명 · {MIN_N}명 이상부터 표시됩니다.
         </p>
       </Panel>
     );

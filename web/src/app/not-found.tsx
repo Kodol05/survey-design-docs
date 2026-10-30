@@ -11,7 +11,7 @@ export default function NotFound() {
     <main className="reading-column flex flex-1 flex-col justify-center py-32">
       <h1 className="text-screen-title mb-4">찾는 화면이 없습니다</h1>
       <p className="text-ink-secondary text-item mb-10">
-        주소가 바뀌었거나, 지워진 사람일 수 있습니다.
+        주소가 바뀌었거나 삭제된 화면입니다.
       </p>
       <p className="text-table">
         <Link href="/" className="underline">

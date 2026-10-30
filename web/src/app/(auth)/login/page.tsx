@@ -13,7 +13,7 @@ export default function LoginPage() {
   return (
     <div className={`${authCard} max-w-md`}>
       <h1 className="mb-1.5 text-[1.75rem] leading-tight font-semibold">로그인</h1>
-      <p className="text-table text-ink-secondary mb-7">가입할 때 쓴 휴대폰번호로 들어오시면 됩니다.</p>
+      <p className="text-table text-ink-secondary mb-7">가입한 휴대폰번호로 로그인해 주세요.</p>
 
       <AuthForm action={login} submitLabel="로그인">
         <Field

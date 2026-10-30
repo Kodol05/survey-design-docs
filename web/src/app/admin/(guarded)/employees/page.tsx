@@ -114,7 +114,7 @@ export default async function EmployeesPage(props: {
       {(onlyReview || pickStatus) && (
         <p className="text-axis text-ink-secondary mb-4 flex flex-wrap items-center gap-3">
           <span className="rounded-md px-3 py-1" style={{ background: "var(--wash)" }}>
-            {onlyReview ? "검토가 필요한 응답만" : pickStatus!.label}
+            {onlyReview ? "신뢰도 검토 필요" : pickStatus!.label}
           </span>
           <Link
             href={link({ sort: activeSort ?? undefined, q: keyword, clear: "1" })}
@@ -224,37 +224,35 @@ export default async function EmployeesPage(props: {
         칸 뜻풀이는 **맨 아래에 접어 둔다** (2026-10-07 사용자 결정).
         늘 보여야 하는 색 방향은 머리글의 「성향」 옆 범례로 옮겼다.
       */}
-      <Note label="칸마다 무슨 뜻인지" className="mt-8">
+      <Note label="목록 설명" className="mt-8">
         <p>
-          <strong>성향</strong>은 축을 왼쪽부터 늘어놓은 것입니다. 어느 쪽도
-          좋고 나쁜 것이 아니라 색으로 모양을 먼저 보고 숫자로 값을 확인하는
-          칸입니다. <strong>직무능력</strong> 세 칸은 직원 설문 값이고, 높을수록
-          좋은 값이라 갈라지는 색을 쓰지 않고 한 가지 색의 길이로만 표시합니다.
-          줄을 누르면 그래프가 펼쳐집니다.
+          <strong>성향</strong> 숫자는 50보다 낮으면 파란색, 높으면 주황색으로
+          조금씩 물듭니다. 높고 낮음일 뿐 좋고 나쁨이 아닙니다.{" "}
+          <strong>직무능력</strong>은 직원 본인이 설문에 답한 값이고, 막대
+          길이로 표시합니다. 줄을 누르면 그래프가 펼쳐집니다.
         </p>
         <p className="mt-2">
-          <strong>신뢰도</strong> 숫자는 서로 반대인 문항에 같은 방향으로
-          답했는지를 100점으로 잰 값입니다. 아무렇게나 답하면 60 근처가
-          나옵니다. 성격에 대한 판정이 아니라 이 응답을 믿을 수 있는지에 대한
-          값입니다. <span style={{ color: "var(--status-warn)" }}>검토</span>
+          <strong>신뢰도</strong>는 서로 반대인 문항에 앞뒤가 맞게 답했는지를
+          100점으로 나타낸 값입니다. 아무렇게나 답하면 60 안팎이 나옵니다.{" "}
+          <span style={{ color: "var(--status-warn)" }}>검토</span>
           {" · "}
-          <span style={{ color: "var(--status-critical)" }}>낮음</span>은 값이
-          낮은 경우, <span style={{ color: "var(--status-warn)" }}>속도</span>
-          는 일치도는 괜찮지만 문항을 너무 빨리 넘긴 경우입니다.
+          <span style={{ color: "var(--status-critical)" }}>낮음</span>은 점수가
+          낮은 경우, <span style={{ color: "var(--status-warn)" }}>속도</span>는
+          점수는 괜찮지만 너무 빨리 답한 경우입니다.
         </p>
         <p className="mt-2">
-          정렬을 무엇으로 바꾸든 완료한 사람이 먼저 나오고, 진행 중·미응시는
-          아래에 모입니다. 고른 칩을 다시 누르면 순서가 뒤집힙니다.
+          어떤 정렬이든 완료한 사람이 먼저 나오고, 진행 중·미응시는 아래에
+          모입니다. 같은 칩을 다시 누르면 순서가 바뀝니다.
           {cut && sortKey && (
             <>
               {" "}
-              구간 경계는 {sortKey} 기준 사분위입니다.
+              구간은 {sortKey} 기준 사분위로 나눴습니다.
             </>
           )}
         </p>
         <p className="mt-2">
-          CSV에는 지금 목록의 <span className="tabular">{rows.length}</span>명의
-          이름·번호·성향 7축·직무능력이 들어갑니다.
+          CSV에는 지금 목록의 <span className="tabular">{rows.length}</span>명에
+          대한 이름·번호·성향 7축·직무능력이 들어갑니다.
         </p>
       </Note>
     </>

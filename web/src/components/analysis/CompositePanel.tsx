@@ -47,7 +47,7 @@ export function CompositePanel({
     <div>
       {rows.length === 0 ? (
         <p className="text-axis text-ink-muted">
-          아직 견줘 볼 만큼 모이지 않았습니다.
+          비교할 만큼 응답이 모이지 않았습니다.
         </p>
       ) : (
         <ShareList
@@ -71,29 +71,25 @@ export function CompositePanel({
         것들이라 늘 펴 두면 목록보다 설명이 길어진다.
       */}
       <div className="mt-6 flex flex-col gap-2">
-        <Note label="어떻게 잰 것인지">
+        <Note label="계산 방법">
           <p className="mb-2">
-            협력·조직생활·자율적 실행 <strong>세 값의 평균</strong>을 직무능력
-            점수로 보고, 성향 축마다 그 점수와의 관련도(r)를 냈습니다.
-          </p>
-          <p className="mb-2">
-            <strong>%는 r을 제곱한 값</strong>입니다. 직무능력 점수가 사람마다
-            다른 정도 가운데 <strong>그 성향과 같이 움직이는 몫</strong>이
-            몇 %인지를 뜻합니다. 앞의 <span className="tabular">+</span>·
-            <span className="tabular">−</span>는 방향입니다 — +면 성향이 높을수록
-            직무능력도 높고, −면 낮습니다.
+            협력 · 조직생활 · 자율적 실행 세 값의 평균을 직무능력 점수로 보고, 성향
+            축마다 이 점수와의 관련도(r)를 계산했습니다.
           </p>
           <p className="mb-2">
-            <span className="tabular">{c.values.length}</span>명 규모에서는
-            관계가 없어도 몇 %쯤은 우연히 나옵니다. 옅게 그린 줄은 방향이 아직
-            확정되지 않은 것입니다.
+            %는 r을 제곱한 값으로, 사람마다 다른 직무능력 점수 중 그 성향과 함께
+            움직이는 부분이 몇 %인지를 뜻합니다. +는 성향이 높을수록 직무능력도
+            높고, −는 낮다는 뜻입니다.
           </p>
-          <p>
-            같이 움직인다는 뜻이지 <strong>원인이라는 뜻은 아닙니다.</strong>
+          <p className="mb-2">
+            <span className="tabular">{c.values.length}</span>명 규모에서는 관계가
+            없어도 몇 % 정도는 우연히 나옵니다. 흐린 줄은 방향이 아직 확정되지
+            않은 것입니다.
           </p>
+          <p>함께 나타나는 관계일 뿐 원인은 아닙니다.</p>
         </Note>
 
-        <Note label="평균을 낼 만한가">
+        <Note label="세 능력을 평균 내도 되는지">
           <ul className="mb-3 flex flex-col gap-1.5">
             {c.pairs.map((p) => (
               <li key={`${p.a}${p.b}`} className="flex items-center gap-3">
@@ -110,7 +106,7 @@ export function CompositePanel({
             ))}
           </ul>
           <p>
-            세 능력이 서로 같이 움직여야 평균이 뜻을 갖습니다. 묶으면{" "}
+            세 능력이 서로 함께 움직여야 평균에 의미가 있습니다. 평균의{" "}
             {c.alpha !== null && (
               <strong
                 className="tabular"
@@ -122,18 +118,17 @@ export function CompositePanel({
             {shaky ? (
               <>
                 {" "}
-                — <strong>아직 묶을 만하지 않습니다.</strong>
+                로 아직 평균 내기에는 이릅니다.
               </>
             ) : (
               <>
                 {" "}
-                입니다. 뜻밖에도 <strong>개별 축보다 안정적입니다</strong> —
-                평균을 내면 각 축의 잡음이 서로 상쇄되기 때문입니다.
+                로, 각 축의 오차가 서로 상쇄되어 개별 축보다 안정적입니다.
               </>
             )}{" "}
             <span className="text-ink-muted">
-              세 축이 다 있는 <span className="tabular">{c.values.length}</span>
-              명만 셉니다.
+              세 축 값이 모두 있는 <span className="tabular">{c.values.length}</span>
+              명 기준입니다.
             </span>
           </p>
         </Note>

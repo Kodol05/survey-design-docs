@@ -21,7 +21,7 @@
 export function ExportLink({ href, count }: { href: string; count: number }) {
   return (
     <div className="text-axis flex flex-wrap items-center justify-end gap-x-4 gap-y-1">
-      <p className="text-ink-muted">파일로 나가면 이 화면의 잠금이 따라가지 않습니다</p>
+      <p className="text-ink-muted">내려받은 파일에는 로그인 보호가 적용되지 않습니다</p>
       <a
         href={href}
         // 테두리 없이 옅은 바탕, 올리면 한 단 진한 바탕 (2026-10-30 — 테두리 강조를 쓰지 않는다)

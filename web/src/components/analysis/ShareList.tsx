@@ -186,7 +186,7 @@ function Detail({
           yLabel={target}
         />
       ) : (
-        <p className="text-axis text-ink-muted">그려 볼 점이 없습니다.</p>
+        <p className="text-axis text-ink-muted">표시할 데이터가 없습니다.</p>
       )}
 
       <div className="flex flex-col gap-1.5 leading-relaxed">

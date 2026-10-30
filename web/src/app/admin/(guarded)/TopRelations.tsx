@@ -44,7 +44,7 @@ export function TopRelations({ items }: { items: Relation[] }) {
   if (items.length === 0)
     return (
       <p className="text-ink-secondary">
-        아직 확정된 조합이 없습니다.
+        방향이 확정된 관계가 아직 없습니다.
       </p>
     );
 
@@ -101,7 +101,7 @@ export function TopRelations({ items }: { items: Relation[] }) {
             <p className="text-axis text-ink-secondary mt-1 pl-[2.25rem] leading-snug">
               {describeCorrelation(it.scale, it.axis, it.r)}
               {isUncertain(it.ci) && (
-                <span className="text-ink-muted ml-2">아직 확정 아님</span>
+                <span className="text-ink-muted ml-2">방향 미확정</span>
               )}
             </p>
           </li>

@@ -56,7 +56,7 @@ export function Attendance({ people }: { people: Attendee[] }) {
         <span className="tabular text-ink font-medium">
           {done} / {people.length}
         </span>{" "}
-        가입한 사람 기준
+        가입자 기준
       </p>
 
       {/*
@@ -100,7 +100,7 @@ export function Attendance({ people }: { people: Attendee[] }) {
 
       {pending.length > 0 && (
         <p className="text-axis text-ink-secondary mt-4 leading-relaxed">
-          <span className="text-ink-muted">아직 답하는 중인 사람 — </span>
+          <span className="text-ink-muted">아직 끝내지 않은 사람: </span>
           {pending.map((p, i) => (
             <span key={p.id}>
               {i > 0 && ", "}
