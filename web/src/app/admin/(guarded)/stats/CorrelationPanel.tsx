@@ -36,7 +36,7 @@ import { Note } from "@/components/ui/Note";
  * 아무것도 안 골랐을 때는 |r| 큰 순 **넷을 2×2로** 깔아 둔다. 표의 칸은 어느
  * 것도 고른 상태로 두지 않는다 — 전에는 가장 큰 칸(예: 0.55)이 처음부터
  * 테두리를 두르고 있어 누른 것처럼 보였다. 칸이나 작은 그림 제목을 누르면
- * 그 조합 하나를 크게 보고, 「큰 순 4개」를 누르면 다시 넷으로 돌아온다.
+ * 그 조합 하나를 크게 보고, 「뒤로가기」나 같은 칸을 다시 누르면 넷으로 돌아온다.
  */
 
 /** 처음 화면에 깔아 둘 조합 수 */
@@ -110,7 +110,15 @@ export function CorrelationPanel({
           cols={cols}
           cell={(r, c) => cells[`${r}|${c}`] ?? { kind: "unstudied" }}
           selected={cur ? { row: cur.row, col: cur.col } : null}
-          onSelect={setSel}
+          /*
+            **고른 칸을 다시 누르면 풀린다** (2026-10-30 사용자 요청) — 큰 순
+            넷으로 돌아간다.
+          */
+          onSelect={(x) =>
+            setSel(
+              cur && x.row === cur.row && x.col === cur.col ? null : x,
+            )
+          }
           groups={groups}
           colsLabel="직무능력"
         />
@@ -155,14 +163,19 @@ export function CorrelationPanel({
             ))}
           </div>
         ) : (
-          <>
+          /*
+            하나를 크게 볼 때는 **카드 하나로 묶는다** (2026-10-30 사용자 요청) —
+            테두리·다른 바탕 없이 그림자로만 떠 보이게. 왼쪽 위 「뒤로가기」나
+            표에서 같은 칸을 다시 누르면 큰 순 넷으로 돌아간다.
+          */
+          <div className="bg-card rounded-xl px-5 pt-4 pb-3 shadow-(--card-shadow-hover)">
             <div className="mb-2 flex flex-wrap items-center gap-x-4 gap-y-2">
               <button
                 type="button"
                 onClick={() => setSel(null)}
                 className="text-axis rounded-full bg-(--wash)/70 px-3 py-1 transition hover:bg-(--wash)"
               >
-                큰 순 {OVERVIEW}개
+                뒤로가기
               </button>
               <h3 className="text-table font-semibold">
                 {cur.row} <span className="text-ink-muted font-normal">×</span>{" "}
@@ -186,7 +199,7 @@ export function CorrelationPanel({
               xLabel={cur.row}
               yLabel={cur.col}
             />
-          </>
+          </div>
         )}
       </div>
     </div>
