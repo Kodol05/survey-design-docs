@@ -11,6 +11,7 @@ import { ScatterPlot, type Point } from "@/components/analysis/ScatterPlot";
 import { formatR } from "@/components/analysis/correlationColor";
 import { GradeTag } from "@/components/analysis/GradeTag";
 import { rankByAbs } from "@/components/analysis/share";
+import { Note } from "@/components/ui/Note";
 
 /**
  * 관련도 표 + 산점도 하나.
@@ -97,10 +98,11 @@ export function CorrelationPanel({
       : null;
 
   return (
-    /*
+    <>
+    {/*
       표와 그림을 **비슷한 무게로** 나눈다 (2026-10-30 사용자 요청 — 오른쪽 그림이
       너무 커서 표가 먹혀 보였다). 그림 쪽에 상한을 두고 남는 폭은 표에 준다.
-    */
+    */}
     <div className="grid gap-8 xl:grid-cols-[minmax(32rem,1fr)_minmax(0,46rem)]">
       <div>
         <CorrelationTable
@@ -112,7 +114,7 @@ export function CorrelationPanel({
           groups={groups}
           colsLabel="직무능력"
         />
-        <CorrelationLegend nRange={nRange} />
+        <CorrelationLegend />
       </div>
 
       <div className="min-w-0">
@@ -188,6 +190,36 @@ export function CorrelationPanel({
         )}
       </div>
     </div>
+
+    {/*
+      표 아래 범례에 있던 「흐린 칸」 뜻 · 등급 기준 · 칸마다 인원을 여기로 모았다
+      (2026-10-30 사용자 요청). 위의 가는 선은 뺐다.
+    */}
+    <Note label="지금 보는 값이 무엇인지" className="mt-5">
+      <p className="mb-2">
+        직무능력은 직원분이 설문에서 스스로 답한 값입니다. 성향과 같은
+        설문이라 관련도가 실제보다 다소 높게 나올 수 있습니다.
+      </p>
+      <p className="mb-2">
+        <strong>흐린 칸</strong>은 방향이 아직 확정되지 않은 칸입니다.
+      </p>
+      <p className={nRange ? "mb-2" : undefined}>
+        등급 기준 — <span className="tabular">0.10</span> 약함 ·{" "}
+        <span className="tabular">0.20</span> 약간 뚜렷함 ·{" "}
+        <span className="tabular">0.30</span> 뚜렷함 ·{" "}
+        <span className="tabular">0.50</span> 매우 뚜렷함
+      </p>
+      {nRange && (
+        <p>
+          칸마다 인원이 다릅니다 (
+          <span className="tabular">
+            {nRange[0]}~{nRange[1]}
+          </span>
+          명).
+        </p>
+      )}
+    </Note>
+    </>
   );
 }
 

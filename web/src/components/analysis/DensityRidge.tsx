@@ -316,15 +316,15 @@ function Ridge({
               );
             })}
 
-            {/* 견줘 보는 사람 — 진한 세로선 */}
+            {/* 견줘 보는 사람 — 가는 세로선 (2026-10-30 사용자 요청으로 3 → 1.75) */}
             {mine && (
               <line
                 x1={inside(mine.value)}
                 x2={inside(mine.value)}
-                y1={LANE - 2}
+                y1={LANE}
                 y2={RUG_BOTTOM + 2}
                 stroke={FOCUS}
-                strokeWidth={3}
+                strokeWidth={1.75}
                 strokeLinecap="round"
                 vectorEffect="non-scaling-stroke"
               />
@@ -354,23 +354,33 @@ function Ridge({
           흐린 줄에서도 또렷하게 흐림 밖에 둔다. 양 끝에서는 그림 밖으로
           나가지 않게 한쪽으로 붙인다.
         */}
+        {/*
+          딱지는 **채운 알약 대신 주황 숫자만** (2026-10-30 사용자 요청 — 굵은
+          알약이 무거워 보였다). 선 꼭대기에 작은 점 하나를 두어 숫자와 선을 잇는다.
+        */}
         {mine && (
-          <span
-            className="text-axis tabular pointer-events-none absolute top-0 rounded-full px-2 leading-5 font-semibold whitespace-nowrap"
-            style={{
-              left: pct(mine.value),
-              transform:
-                mine.value < 6
-                  ? "translateX(-4px)"
-                  : mine.value > 94
-                    ? "translateX(calc(-100% + 4px))"
-                    : "translateX(-50%)",
-              background: FOCUS,
-              color: "var(--page)",
-            }}
-          >
-            {Math.round(mine.value)}
-          </span>
+          <>
+            <span
+              aria-hidden
+              className="pointer-events-none absolute size-[7px] -translate-x-1/2 -translate-y-1/2 rounded-full"
+              style={{ left: pct(mine.value), top: LANE, background: FOCUS }}
+            />
+            <span
+              className="tabular pointer-events-none absolute top-0 text-[0.8125rem] leading-4 font-semibold whitespace-nowrap"
+              style={{
+                left: pct(mine.value),
+                transform:
+                  mine.value < 6
+                    ? "translateX(-2px)"
+                    : mine.value > 94
+                      ? "translateX(calc(-100% + 2px))"
+                      : "translateX(-50%)",
+                color: FOCUS,
+              }}
+            >
+              {Math.round(mine.value)}
+            </span>
+          </>
         )}
 
         {hovered && (

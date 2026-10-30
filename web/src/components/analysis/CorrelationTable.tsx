@@ -271,12 +271,9 @@ function describe(row: string, col: string, c: Cell) {
  * 「막대 길이」 항목도 뺐다. 색 띠는 실제 칸과 같은 함수로 칠한다 — 숫자로
  * 박아 두면 토큰을 바꿀 때 범례만 옛 색으로 남는다.
  */
-export function CorrelationLegend({
-  nRange,
-}: {
-  /** 칸마다 인원이 다를 때만 `[최소, 최대]`. 다 같으면 머리줄의 N명으로 충분하다 */
-  nRange?: [number, number] | null;
-}) {
+export function CorrelationLegend() {
+  // 흐린 칸 뜻 · 등급 기준 · 칸마다 인원은 카드 아래 「지금 보는 값이 무엇인지」로
+  // 옮겼다 (2026-10-30 사용자 요청). 여기엔 색 띠만 둔다.
   return (
     <div className="text-axis text-ink-muted mt-3 flex flex-wrap items-center gap-x-5 gap-y-1">
       <span className="flex items-center gap-2">
@@ -289,22 +286,6 @@ export function CorrelationLegend({
         />
         <span>양</span>
       </span>
-      <span>흐린 칸 = 방향 아직 확정 아님</span>
-      <span>
-        <span className="tabular">0.10</span> 약함 ·{" "}
-        <span className="tabular">0.20</span> 약간 뚜렷함 ·{" "}
-        <span className="tabular">0.30</span> 뚜렷함 ·{" "}
-        <span className="tabular">0.50</span> 매우 뚜렷함
-      </span>
-      {nRange && (
-        <span>
-          칸마다 인원{" "}
-          <span className="tabular">
-            {nRange[0]}~{nRange[1]}
-          </span>
-          명
-        </span>
-      )}
     </div>
   );
 }

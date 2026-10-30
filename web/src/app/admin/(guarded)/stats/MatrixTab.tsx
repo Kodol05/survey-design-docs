@@ -1,5 +1,4 @@
 import { WarningBadge } from "@/components/ui/WarningBadge";
-import { Note } from "@/components/ui/Note";
 import { MIN_N } from "@/components/ui/NBadge";
 import { AxisRanking, type AxisRow } from "@/components/analysis/AxisRanking";
 import { CompositePanel } from "@/components/analysis/CompositePanel";
@@ -32,7 +31,7 @@ type People = Awaited<ReturnType<typeof loadPeople>>;
  *
  *   1. 성향 축과 직무능력 세 가지      7×3 상관표 + 큰 산점도 하나
  *   2. 직무능력별 상관관계              능력마다 일곱 축 순위
- *   3. 직무능력에 긍정적인 영향을 끼치는 성향  세 능력 평균과 일곱 축
+ *   3. 직무능력과 연관된 성향  세 능력 평균과 일곱 축
  *
  * 2·3은 같은 줄 모양(`ShareList`)과 같은 막대 눈금을 쓴다.
  */
@@ -158,15 +157,6 @@ function InHouseSection({
           trends={trends}
           groups={TRAIT_GROUPS}
         />
-        <Note
-          label="지금 보는 값이 무엇인지"
-          className="mt-5 border-t border-(--border) pt-3"
-        >
-          <p>
-            직무능력은 직원분이 설문에서 스스로 답한 값입니다. 성향과 같은
-            설문이라 관련도가 실제보다 다소 높게 나올 수 있습니다.
-          </p>
-        </Note>
       </Panel>
 
       <Panel title="직무능력별 상관관계">
@@ -185,7 +175,7 @@ function InHouseSection({
       </Panel>
 
       {composite && (
-        <Panel title="직무능력에 긍정적인 영향을 끼치는 성향">
+        <Panel title="직무능력과 연관된 성향">
           <CompositePanel
             c={composite}
             full={full}

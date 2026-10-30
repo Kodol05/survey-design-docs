@@ -70,7 +70,7 @@ export function CompositePanel({
         해설은 접어 둔다 (2026-08-25 사용자 요청). 처음 한 번 읽으면 되는
         것들이라 늘 펴 두면 목록보다 설명이 길어진다.
       */}
-      <div className="mt-6 flex flex-col gap-2 border-t border-(--border) pt-4">
+      <div className="mt-6 flex flex-col gap-2">
         <Note label="어떻게 잰 것인지">
           <p className="mb-2">
             협력·조직생활·자율적 실행 <strong>세 값의 평균</strong>을 직무능력
