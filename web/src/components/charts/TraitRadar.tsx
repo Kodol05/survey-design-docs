@@ -103,8 +103,10 @@ export function TraitRadar({
             )}
           />
           <PolarRadiusAxis domain={[0, 100]} tick={false} axisLine={false} />
+          {/* 윈도우 「애니메이션 끄기」와 상관없이 움직인다 — Recharts 기본값 auto는 그 설정을 따른다 (2026-10-30 사용자 결정) */}
           {showAverage && (
             <Radar
+              isAnimationActive
               name="사내 평균"
               dataKey="average"
               stroke="var(--series-2)"
@@ -114,6 +116,7 @@ export function TraitRadar({
             />
           )}
           <Radar
+            isAnimationActive
             name="본인"
             dataKey="percent"
             stroke="var(--series-1)"

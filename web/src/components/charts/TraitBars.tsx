@@ -75,7 +75,9 @@ export function TraitBars({
             }}
           />
           {/* 값을 짚어 볼 수단이 막대 위 라벨뿐이었다. 좁은 화면에서 라벨이 겹치면 읽을 방법이 없다 */}
+          {/* 말풍선 움직임도 윈도우 「애니메이션 끄기」와 상관없이 (2026-10-30) */}
           <Tooltip
+            isAnimationActive
             cursor={{ fill: "var(--wash)" }}
             contentStyle={{
               background: "var(--page)",

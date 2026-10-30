@@ -73,10 +73,9 @@ export function Chip({
       scroll={false}
       aria-current={on ? "true" : undefined}
       title={title}
-      className={`inline-flex h-8 items-center gap-1 rounded-md border px-2.5 whitespace-nowrap transition-colors ${
-        on
-          ? "border-transparent font-semibold"
-          : "text-ink-secondary hover:text-ink border-(--border) hover:border-(--ink-muted)"
+      // 테두리 대신 옅은 바탕으로 칩을 세운다 (2026-10-28 — 정안 시안의 태그 모양)
+      className={`inline-flex h-8 items-center gap-1 rounded-full px-3 whitespace-nowrap transition-colors ${
+        on ? "font-semibold" : "text-ink-secondary hover:text-ink bg-(--wash)/70 hover:bg-(--wash)"
       }`}
       style={on ? { background: "var(--ink)", color: "var(--page)" } : undefined}
     >
@@ -114,7 +113,7 @@ export function ToolbarSearch({
         defaultValue={defaultValue}
         placeholder={placeholder}
         aria-label={placeholder}
-        className="text-table h-10 w-52 rounded-lg border border-(--border) bg-(--page) px-3"
+        className="text-table h-10 w-52 rounded-lg bg-(--wash)/60 px-3 placeholder:text-(--ink-muted) focus:bg-(--wash)"
       />
       {Object.entries(hidden ?? {}).map(([k, v]) =>
         v ? <input key={k} type="hidden" name={k} value={v} /> : null,

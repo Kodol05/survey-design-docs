@@ -1,4 +1,3 @@
-import Link from "next/link";
 import { WarningBadge } from "@/components/ui/WarningBadge";
 import { Note } from "@/components/ui/Note";
 import { MIN_N } from "@/components/ui/NBadge";
@@ -32,30 +31,19 @@ type People = Awaited<ReturnType<typeof loadPeople>>;
  * 카드 셋을 세로로 쌓는다 (2026-10-07 사용자 결정).
  *
  *   1. 성향 축과 직무능력 세 가지      7×3 상관표 + 큰 산점도 하나
- *   2. 각 직무능력별 정리              능력마다 일곱 축 순위
- *   3. 모든 직무능력과 가장 연관된 성향  세 능력 평균과 일곱 축
+ *   2. 직무능력별 상관관계              능력마다 일곱 축 순위
+ *   3. 직무능력에 긍정적인 영향을 끼치는 성향  세 능력 평균과 일곱 축
  *
  * 2·3은 같은 줄 모양(`ShareList`)과 같은 막대 눈금을 쓴다.
  */
 export function MatrixTab({
   people,
   matrix,
-  clean,
-  poorN,
 }: {
   people: People;
   matrix: ReturnType<typeof traitAbilityMatrix>;
-  clean: boolean;
-  poorN: number;
 }) {
-  return (
-    <InHouseSection
-      people={people}
-      matrix={matrix}
-      clean={clean}
-      poorN={poorN}
-    />
-  );
+  return <InHouseSection people={people} matrix={matrix} />;
 }
 
 /**
@@ -66,58 +54,24 @@ export function MatrixTab({
  * 생긴다 — 숫자를 더 만들지 않고 줄만 나눠서 눈으로 답하게 한다.
  */
 const TRAIT_GROUPS = [
-  { label: "기질", note: "타고나는 쪽", rows: [...TEMPERAMENT] },
-  { label: "성격", note: "살면서 만들어지는 쪽", rows: [...CHARACTER] },
+  // 「타고나는 쪽 / 살면서 만들어지는 쪽」 설명은 뺐다 (2026-10-30 사용자 요청)
+  { label: "기질", rows: [...TEMPERAMENT] },
+  { label: "성격", rows: [...CHARACTER] },
 ];
 
-/**
- * 응답 신뢰도가 낮은 사람을 빼고 다시 보는 손잡이. 첫 카드 머리줄에 둔다.
- * 켜짐은 진한 바탕으로만 말한다 — 체크 상자 글리프는 뺐다 (2026-10-07, 아이콘 안 씀).
- *
- * 「이 결과가 대충 찍은 몇 명 때문인가」는 늘 남는 물음이다. 그동안
- * `loadPeople(excludePoor)`가 코드에만 있고 화면에는 없었다. **켜고 끄면서
- * 숫자가 얼마나 움직이는지 보는 것**이 답이다 — 안 움직이면 걱정 안 해도
- * 되고, 크게 움직이면 그 자체가 발견이다.
- *
- * 켠 상태를 기본으로 두지 않는다. 사람을 빼고 시작하면 뺐다는 사실을
- * 잊는다.
- */
-function CleanToggle({ clean, poorN }: { clean: boolean; poorN: number }) {
-  if (poorN === 0) return null;
-  const sp = new URLSearchParams();
-  if (!clean) sp.set("clean", "1");
-  const q = sp.toString();
-
-  return (
-    <Link
-      href={`/admin/stats${q ? `?${q}` : ""}`}
-      scroll={false}
-      className="text-axis inline-flex items-center rounded-lg px-3 py-1"
-      style={{
-        background: clean ? "var(--ink)" : "var(--wash)",
-        color: clean ? "var(--page)" : "var(--ink-secondary)",
-        fontWeight: clean ? 600 : 400,
-      }}
-      title="응답 신뢰도가 「낮음」인 사람을 빼고 다시 계산합니다"
-      aria-pressed={clean}
-    >
-      신뢰도 낮은 응답 {poorN}명 빼기
-    </Link>
-  );
-}
+/*
+  「신뢰도 낮은 응답 N명 빼기」 손잡이는 뺐다 (2026-10-30 사용자 결정).
+  분석은 늘 전원으로 본다. 응답이 낮은 사람은 「검사 신뢰도」 탭에서 따로 본다.
+*/
 
 // ── 카드 셋 ──────────────────────────────────────────
 
 function InHouseSection({
   people,
   matrix,
-  clean,
-  poorN,
 }: {
   people: People;
   matrix: ReturnType<typeof traitAbilityMatrix>;
-  clean: boolean;
-  poorN: number;
 }) {
   if (!matrix.enough)
     return (
@@ -194,12 +148,7 @@ function InHouseSection({
     <div className="flex flex-col gap-6">
       <Panel
         title="성향 축과 직무능력 세 가지"
-        aside={
-          <>
-            <span className="tabular">{matrix.n}명</span>
-            <CleanToggle clean={clean} poorN={poorN} />
-          </>
-        }
+        aside={<span className="tabular">{matrix.n}명</span>}
       >
         <CorrelationPanel
           rows={[...TRAIT_SCALES]}
@@ -220,7 +169,7 @@ function InHouseSection({
         </Note>
       </Panel>
 
-      <Panel title="각 직무능력별 정리">
+      <Panel title="직무능력별 상관관계">
         <div className="flex flex-col gap-8">
           {ABILITY_AXES.map((axis) => (
             <AxisRanking
@@ -236,7 +185,7 @@ function InHouseSection({
       </Panel>
 
       {composite && (
-        <Panel title="모든 직무능력과 가장 연관된 성향">
+        <Panel title="직무능력에 긍정적인 영향을 끼치는 성향">
           <CompositePanel
             c={composite}
             full={full}

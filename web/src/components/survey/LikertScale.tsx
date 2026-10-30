@@ -21,7 +21,8 @@ export const LABELS = [
 ] as const;
 
 /** 양 끝이 크고 가운데가 작다. 눈으로 척도의 방향과 세기가 읽힌다. */
-const SIZE = [88, 72, 58, 46, 58, 72, 88] as const;
+// 2026-10-30 두 번 줄임 (사용자 요청 — 응시 영역이 너무 컸다)
+const SIZE = [62, 52, 42, 34, 42, 52, 62] as const;
 
 /**
  * 왼쪽 청회색 ↔ 오른쪽 테라코타. 가운데는 중립 회색.
@@ -42,15 +43,8 @@ const SIZE = [88, 72, 58, 46, 58, 72, 88] as const;
   일곱 단계가 성향 눈금의 일곱 단계와 정확히 같은 자리다. 같은 토큰을 쓰면
   다크 모드가 따라오고, **응시 화면과 결과 화면이 같은 색 언어**를 쓰게 된다.
 */
-const COLOR = [
-  "var(--scale-0)",
-  "var(--scale-20)",
-  "var(--scale-38)",
-  "var(--scale-50)",
-  "var(--scale-62)",
-  "var(--scale-80)",
-  "var(--scale-100)",
-] as const;
+// 2026-10-30 응시 전용 토큰으로 — 같은 쪽 세 칸의 색 차이를 줄였다 (globals.css --likert-*)
+const COLOR = [1, 2, 3, 4, 5, 6, 7].map((n) => `var(--likert-${n})`);
 
 /**
  * 고른 칸의 글자색.
@@ -108,7 +102,7 @@ export function LikertScale({
               <label
                 key={v}
                 className="group flex cursor-pointer flex-col items-center gap-2"
-                style={{ minWidth: 96 }}
+                style={{ minWidth: 72 }}
               >
                 <input
                   type="radio"
@@ -131,9 +125,9 @@ export function LikertScale({
                       전에는 채우기 말고는 안 고른 것과 차이가 적었다.
                       테두리를 굵히고 후광을 진하게 넓혀 둔다.
                     */
-                    border: `${on ? 4 : 2.5}px solid ${on ? color : `color-mix(in oklab, ${color} 60%, transparent)`}`,
+                    border: `${on ? 3.5 : 2}px solid ${on ? color : `color-mix(in oklab, ${color} 60%, transparent)`}`,
                     background: on ? color : "transparent",
-                    boxShadow: on ? `0 0 0 9px color-mix(in oklab, ${color} 22%, transparent)` : undefined,
+                    boxShadow: on ? `0 0 0 7px color-mix(in oklab, ${color} 22%, transparent)` : undefined,
                     transform: on ? "scale(1.06)" : undefined,
                   }}
                 >
@@ -150,9 +144,10 @@ export function LikertScale({
                   )}
                 </span>
                 <span
-                  className="text-table text-center leading-tight whitespace-nowrap transition-all"
+                  className="text-center text-base leading-tight whitespace-nowrap transition-all"
                   style={{
-                    color: on ? PICKED_INK : "var(--ink-muted)",
+                    // 안 고른 칸도 검정으로 (2026-10-30 사용자 요청 — 회색이 흐려 보였다). 고른 칸은 굵기로 갈린다
+                    color: PICKED_INK,
                     fontWeight: on ? 700 : 400,
                   }}
                 >
@@ -199,7 +194,7 @@ export function LikertScale({
               />
               <span
                 style={{
-                  color: on ? PICKED_INK : "var(--ink-secondary)",
+                  color: PICKED_INK,
                   fontWeight: on ? 700 : 400,
                 }}
               >

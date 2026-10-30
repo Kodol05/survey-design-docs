@@ -1,7 +1,6 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { currentUser } from "@/lib/auth/session";
-import { ButtonLink } from "@/components/ui/Button";
 import { ThemeToggle } from "@/components/ui/ThemeToggle";
 /*
   ⚠️ 문항 수를 **글자로 박지 않는다.**
@@ -12,7 +11,7 @@ import { ThemeToggle } from "@/components/ui/ThemeToggle";
 */
 import { EXPECTED } from "@/lib/items/types";
 
-export const metadata = { title: "7차원 성향 설문" };
+export const metadata = { title: "7가지 성향 검사" };
 
 /**
  * 첫 화면.
@@ -41,7 +40,7 @@ export default async function Home() {
   return (
     <>
       {/* ── 첫 눈 ── */}
-      <section className="relative flex min-h-[100svh] flex-col">
+      <section className="relative flex min-h-[calc(100svh/var(--z,1))] flex-col">
         {/*
           **사진을 어둡게 덮지 않는다.**
 
@@ -72,7 +71,7 @@ export default async function Home() {
         <div className="page-column relative flex flex-1 flex-col">
           <header className="flex items-center justify-between py-8">
             <span className="text-axis" style={{ color: "#5a5249" }}>
-              7차원 성향 설문
+              7가지 성향 검사
             </span>
             {/*
               다크 스위치를 맨 위에도 둔다 (2026-10-08 사용자 결정). 다른 직원
@@ -93,7 +92,7 @@ export default async function Home() {
 
           <div className="flex flex-1 flex-col justify-center pb-28">
             <h1
-              className="mb-6 max-w-[26rem] font-semibold"
+              className="mb-10 max-w-[26rem] font-semibold"
               style={{
                 fontSize: "clamp(2.5rem, 1.8rem + 3vw, 4.25rem)",
                 lineHeight: 1.16,
@@ -101,26 +100,53 @@ export default async function Home() {
                 color: "#241f1a",
               }}
             >
-              일하는 방식을
+              {/*
+                「일하는 방식을 일곱 갈래로 봅니다」를 바꿨다 (2026-10-28 사용자 결정).
+                검사 결과를 풀이하는 말이 아니라 **설문에 참여하라는 안내**여야 한다.
+              */}
+              성향 설문에
               <br />
-              일곱 갈래로 봅니다
+              참여해 주세요
             </h1>
 
-            <p
-              className="text-item mb-12 max-w-[26rem]"
-              style={{ color: "#4a433b" }}
-            >
-              높고 낮음은 있지만 좋고 나쁨은 없습니다.
-            </p>
+            {/* 제목 아래 설명 줄은 뺐다 (2026-10-28 사용자 결정) — 제목과 시작하기만 */}
 
-            <div className="flex flex-wrap items-center gap-x-8 gap-y-4">
-              <ButtonLink href="/signup" size="lg">
-                시작하기
-              </ButtonLink>
-              <p className="text-table" style={{ color: "#5a5249" }}>
-                약 18분 · {EXPECTED.total}문항
-              </p>
-            </div>
+            {/*
+              시작하기는 **버튼 모양 없이 큰 글씨**로 (2026-10-28 사용자 결정).
+              파란 상자는 사진 위에서 겉돌았다. 글씨를 크게 하고 오른쪽에 동그라미
+              꺾쇠 아이콘 하나로 「누르는 곳」임을 알린다(밑줄·화살표는 뺐다 —
+              사용자). 누르는 영역은 위아래로 넉넉히 잡는다. 마우스를 올리면 아이콘이
+              오른쪽으로 조금 밀린다.
+              시간·문항 수는 그 아래 작은 한 줄로 내렸다.
+            */}
+            <Link
+              href="/signup"
+              className="group -mx-2 inline-flex items-center gap-4 px-2 py-3 font-bold"
+              style={{
+                fontSize: "clamp(2rem, 1.6rem + 1.4vw, 2.75rem)",
+                lineHeight: 1.1,
+                letterSpacing: "-0.02em",
+                color: "#241f1a",
+              }}
+            >
+              시작하기
+              <svg
+                aria-hidden
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth={1.6}
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                className="size-[0.85em] shrink-0 transition-transform duration-200 group-hover:translate-x-1.5"
+              >
+                <circle cx="12" cy="12" r="10.5" />
+                <path d="M10.5 8l4 4-4 4" />
+              </svg>
+            </Link>
+            <p className="text-table mt-5" style={{ color: "#5a5249" }}>
+              약 18분 · {EXPECTED.total}문항
+            </p>
           </div>
 
           <a
@@ -146,7 +172,7 @@ export default async function Home() {
         <div className="page-column py-14">
           <div className="flex flex-wrap items-start justify-between gap-x-12 gap-y-8">
             <div className="max-w-[34rem]">
-              <p className="text-table mb-2 font-medium">7차원 성향 설문</p>
+              <p className="text-table mb-2 font-medium">7가지 성향 검사</p>
               <p className="text-axis text-ink-muted leading-relaxed">
                 클로닝거의 기질·성격 이론을 참고해 사내에서 만들었습니다. 공개된
                 검사를 그대로 쓴 것이 아니라 문항을 직접 썼고, 아직 다듬는

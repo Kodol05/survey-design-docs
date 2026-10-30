@@ -16,6 +16,7 @@ import { panelClass } from "@/components/ui/Panel";
 import { DeleteInline } from "./DeleteInline";
 import { ABILITY_AXES } from "@/lib/items/types";
 import { formatPhone } from "@/lib/auth/phone";
+import { smoothScrollIntoView } from "@/lib/smoothScroll";
 
 /**
  * 구성원 목록.
@@ -118,37 +119,13 @@ const HEAD = `hidden ${PAD_X} xl:grid ${COLUMNS}`;
 /**
  * 열 머리글 — 도구줄 카드 아래 끝에 들어간다 (2026-10-07 사용자 결정).
  *
- * 위에 **갈래 이름 줄**을 하나 더 둔다. 「자극 위험 민감 …」 일곱과 「협력
- * 조직 실행 평균」 넷이 나란히 있으면 어디까지가 성향인지 머리글만 봐서는
- * 안 보인다. 갈래 이름 아래 가는 선을 그 갈래 폭만큼 그어 묶는다.
- *
- * 성향 쪽 끝에는 색 범례를 붙인다 — 색이 어느 쪽이 높음인지는 표를 훑는
- * 내내 필요해서, 맨 아래 접힌 설명에 넣으면 안 된다.
+ * 한때 위에 「성향 · 낮음 높음 · 직무능력」 갈래 줄을 따로 두었는데 뺐다
+ * (2026-10-30 사용자 요청). 열 이름 한 줄만 남긴다.
  */
 export function EmployeeListHeader() {
   return (
     <div aria-hidden className="text-axis text-ink-muted">
-      <div className={`${HEAD} pt-2.5`}>
-        <span />
-        <span />
-        <GroupLabel max="max-w-[56rem]">
-          <span>성향</span>
-          <span className="flex items-center gap-2" style={{ fontSize: 14 }}>
-            <span className="flex items-center gap-1">
-              <span className="size-2.5 rounded-[2px]" style={{ background: "var(--scale-0)" }} />
-              낮음
-            </span>
-            <span className="flex items-center gap-1">
-              <span className="size-2.5 rounded-[2px]" style={{ background: "var(--scale-100)" }} />
-              높음
-            </span>
-          </span>
-        </GroupLabel>
-        <GroupLabel max="max-w-[33rem]">
-          <span>직무능력</span>
-        </GroupLabel>
-      </div>
-      <div className={`${HEAD} pt-1.5 pb-2.5`}>
+      <div className={`${HEAD} pt-2.5 pb-2.5`}>
         <span>이름</span>
         <span>신뢰도</span>
         <TraitStripHeader />
@@ -156,20 +133,6 @@ export function EmployeeListHeader() {
       </div>
     </div>
   );
-}
-
-function GroupLabel({ max, children }: { max: string; children: React.ReactNode }) {
-  return (
-    <div
-      className={`text-ink-secondary flex w-full items-baseline justify-between gap-3 border-b border-(--border) pb-1 ${max}`}
-    >
-      {children}
-    </div>
-  );
-}
-
-function prefersReducedMotion() {
-  return window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 }
 
 export function EmployeeList({ rows }: { rows: Row[] }) {
@@ -185,10 +148,8 @@ export function EmployeeList({ rows }: { rows: Row[] }) {
   */
   useEffect(() => {
     if (!openId) return;
-    itemRefs.current.get(openId)?.scrollIntoView({
-      behavior: prefersReducedMotion() ? "auto" : "smooth",
-      block: "start",
-    });
+    const el = itemRefs.current.get(openId);
+    if (el) smoothScrollIntoView(el, "start");
   }, [openId]);
 
   return (
@@ -203,9 +164,10 @@ export function EmployeeList({ rows }: { rows: Row[] }) {
               if (el) itemRefs.current.set(r.id, el);
               else itemRefs.current.delete(r.id);
             }}
-            className={`${panelClass} overflow-hidden transition-[border-color,box-shadow]`}
+            // 펼친 사람은 테두리 대신 그림자를 한 단 깊게 (2026-10-28 — 테두리 없는 카드)
+            className={`${panelClass} overflow-hidden transition-shadow hover:shadow-(--card-shadow-hover)`}
             style={{
-              borderColor: expanded ? "var(--ink-muted)" : undefined,
+              boxShadow: expanded ? "var(--card-shadow-hover)" : undefined,
               scrollMarginTop:
                 "calc(var(--admin-top) + 0.5rem + var(--sticky-toolbar-h, 0px) + 0.75rem)",
             }}

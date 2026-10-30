@@ -5,6 +5,7 @@ import {
   DensityRidge,
   type RidgeGroup,
 } from "@/components/analysis/DensityRidge";
+import { PersonFinder, type FinderPerson } from "./PersonFinder";
 import { Note } from "@/components/ui/Note";
 import { Panel } from "@/components/ui/Panel";
 import { COMPOSITE_AXIS } from "@/lib/items/types";
@@ -61,11 +62,17 @@ const GROUP = {
 export function DistributionPanel({
   spreads,
   reliability,
+  persons,
 }: {
   spreads: Spread[];
   reliability: Record<string, ScaleReliability>;
+  /** 오른쪽 「개인 검색」에 늘어놓을 사람 (이름순) */
+  persons: FinderPerson[];
 }) {
   const [bySpread, setBySpread] = useState(false);
+  /** 견줘 볼 한 사람 (2026-10-30 사용자 요청) */
+  const [focusId, setFocusId] = useState<string | null>(null);
+  const focus = persons.find((p) => p.employeeId === focusId) ?? null;
 
   if (spreads.length === 0)
     return (
@@ -136,31 +143,48 @@ export function DistributionPanel({
     </div>
   );
 
-  return (
-    <Panel title={TITLE} aside={toggle}>
-      <DensityRidge groups={groups} label={TITLE} />
+  /*
+    **오른쪽에 「개인 검색」 카드** (2026-10-30 사용자 요청). 한 사람을 고르면
+    왼쪽 언덕마다 그 사람 자리에 진한 선과 점수가 얹혀, 회사 분포 안에서
+    어디쯤인지 견줘 볼 수 있다. 다시 누르면 풀린다.
 
-      <Note label="이 그림을 어떻게 읽는지" className="mt-6">
-        <p className="mb-2">
-          <strong>봉우리</strong>가 높은 곳에 사람이 많이 몰려 있습니다.
-          봉우리가 둘이면 회사가 두 무리로 나뉜다는 뜻입니다.{" "}
-          <strong>진한 구간</strong>은 가운데 절반, <strong>세로선</strong>은
-          중앙값입니다. 진한 구간이 좁으면 다들 비슷하고 넓으면 많이 다릅니다.
-        </p>
-        <p className="mb-2">
-          바닥의 <strong>눈금 하나가 한 사람</strong>입니다. 마우스를 올리면
-          이름과 점수가 나옵니다.
-        </p>
-        <p className="mb-2">
-          줄마다 봉우리 높이를 맞춰 그렸으므로 줄끼리 높이를 견주지 않습니다.
-          퍼진 정도는 폭으로 봅니다. 흐린 줄은 문항끼리 잘 맞지 않은 축입니다.
-        </p>
-        <p>
-          <strong>점수 자체는 높고 낮음을 뜻하지 않습니다.</strong> 눈금이 문항
-          가운데를 50으로 잡은 것이라 <strong>사내에서 서로 견주는 것만</strong>{" "}
-          말이 됩니다.
-        </p>
-      </Note>
-    </Panel>
+    위에 「이름을 글로 적지 않는다」고 적어 두었다 — 이건 그 약속을 깨지
+    않는다. 순위 자리에 이름을 박아 두는 것이 아니라, 보는 사람이 **한 사람을
+    골라서** 들여다보는 것이다.
+  */
+  return (
+    <div className="grid items-start gap-4 xl:grid-cols-[minmax(0,1fr)_17rem]">
+      <Panel title={TITLE} aside={toggle}>
+        <DensityRidge groups={groups} label={TITLE} focus={focus} />
+
+        <Note label="이 그림을 어떻게 읽는지" className="mt-6">
+          <p className="mb-2">
+            <strong>봉우리</strong>가 높은 곳에 사람이 많이 몰려 있습니다.
+            봉우리가 둘이면 회사가 두 무리로 나뉜다는 뜻입니다.{" "}
+            <strong>진한 구간</strong>은 가운데 절반, <strong>세로선</strong>은
+            중앙값입니다. 진한 구간이 좁으면 다들 비슷하고 넓으면 많이 다릅니다.
+          </p>
+          <p className="mb-2">
+            바닥의 <strong>눈금 하나가 한 사람</strong>입니다. 마우스를 올리면
+            이름과 점수가 나옵니다.
+          </p>
+          <p className="mb-2">
+            줄마다 봉우리 높이를 맞춰 그렸으므로 줄끼리 높이를 견주지 않습니다.
+            퍼진 정도는 폭으로 봅니다. 흐린 줄은 문항끼리 잘 맞지 않은 축입니다.
+          </p>
+          <p>
+            <strong>점수 자체는 높고 낮음을 뜻하지 않습니다.</strong> 눈금이 문항
+            가운데를 50으로 잡은 것이라 <strong>사내에서 서로 견주는 것만</strong>{" "}
+            말이 됩니다.
+          </p>
+        </Note>
+      </Panel>
+
+      <PersonFinder
+        persons={persons}
+        selected={focusId}
+        onSelect={(id) => setFocusId((cur) => (cur === id ? null : id))}
+      />
+    </div>
   );
 }

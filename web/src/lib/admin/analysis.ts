@@ -25,6 +25,8 @@ import {
 export type Person = {
   employeeId: string;
   name: string;
+  /** 휴대폰번호 뒤 네 자리 — 이름이 같은 사람을 가려 보이려고 (분포 화면 개인 검색) */
+  phoneTail: string;
   traits: Record<string, number>;
   abilities: Record<string, number>;
   quality: string;
@@ -53,6 +55,7 @@ export async function loadPeople(excludePoor = false): Promise<Person[]> {
     people.push({
       employeeId: s.employeeId,
       name: s.employee.name,
+      phoneTail: (s.employee.phone ?? "").slice(-4),
       traits: Object.fromEntries(
         Object.entries((s.result!.scoresJson ?? {}) as StoredTraits).map(
           ([k, v]) => [k, v.percent],

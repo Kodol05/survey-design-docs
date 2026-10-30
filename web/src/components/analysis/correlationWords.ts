@@ -20,7 +20,7 @@ export function subjectParticle(word: string): string {
   return (c - 0xac00) % 28 === 0 ? "가" : "이";
 }
 
-export type Strength = "매우 뚜렷함" | "뚜렷함" | "어느 정도" | "약함" | "없음";
+export type Strength = "매우 뚜렷함" | "뚜렷함" | "약간 뚜렷함" | "약함" | "없음";
 
 /**
  * 세기 구분 — 기준선을 **Cohen이 아니라 Funder·Ozer로 잡는다.**
@@ -41,7 +41,7 @@ export type Strength = "매우 뚜렷함" | "뚜렷함" | "어느 정도" | "약
 export const BANDS: { min: number; label: Strength }[] = [
   { min: 0.5, label: "매우 뚜렷함" },
   { min: 0.3, label: "뚜렷함" },
-  { min: 0.2, label: "어느 정도" },
+  { min: 0.2, label: "약간 뚜렷함" }, // 2026-10-30 「어느 정도」에서 바꿈 (사용자 결정 — 뜻이 흐렸다)
   { min: 0.1, label: "약함" },
   { min: 0, label: "없음" },
 ];
@@ -60,8 +60,8 @@ export function isNotable(r: number): boolean {
  * 화면에 붙일 등급 — **크기와 확실함은 따로 말한다.**
  *
  * 처음에는 신뢰구간이 0을 걸치면 등급 자리에 `불확실`을 대신 넣었다.
- * 그랬더니 **「어느 정도」가 화면에 아예 안 나왔다.** 사람이 37명일 때
- * 구간이 0을 벗어나려면 |r|이 .32는 넘어야 하는데, 「어느 정도」는
+ * 그랬더니 **「약간 뚜렷함」이 화면에 아예 안 나왔다.** 사람이 37명일 때
+ * 구간이 0을 벗어나려면 |r|이 .32는 넘어야 하는데, 「약간 뚜렷함」은
  * .20~.29 구간이라 정의상 항상 0을 걸친다. 등급이 하나 죽어 있는 것처럼
  * 보여서 고장으로 읽혔다.
  *

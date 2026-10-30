@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import { currentZoom } from "@/lib/pageZoom";
 
 /**
  * 목록 화면의 도구줄 — 검색 · 고르개 칩 · 열 머리글을 **카드 하나**로 묶고
@@ -24,7 +25,7 @@ import { useEffect, useRef, useState } from "react";
  *  - 키보드로 안에 들어오면(`:focus-visible`) 펼친다. 접힌 칩은 `inert`라
  *    탭이 건너뛰므로, 요약 단추에 닿는 순간 펼쳐지고 다음 탭이 칩으로 간다.
  *  - 터치에는 「다가감」이 없다. 요약을 누르면 펴고, 다시 누르면 접는다.
- *  - `prefers-reduced-motion`이면 움직임 없이 바로 바뀐다.
+ *  - 윈도우의 「애니메이션 끄기」는 따르지 않는다 (2026-10-30 사용자 결정, globals.css).
  *
  * ## 접어도 아래 목록이 튀지 않게
  *
@@ -90,7 +91,8 @@ export function StickyToolbar({
     const watch = () => {
       io?.disconnect();
       // 붙는 높이(`--admin-top` + 틈)는 화면 폭마다 다르다 — 계산된 `top`을 그대로 읽는다
-      const top = parseFloat(getComputedStyle(sticky).top) || 0;
+      // 큰 모니터에서 화면을 키웠으면(lib/pageZoom) CSS 길이를 화면 px로 바꿔야 한다
+      const top = (parseFloat(getComputedStyle(sticky).top) || 0) * currentZoom();
       io = new IntersectionObserver(
         ([e]) => {
           const past =
@@ -156,7 +158,7 @@ export function StickyToolbar({
       <div ref={sentinelRef} aria-hidden className="h-px -mb-px" />
       <div
         ref={stickyRef}
-        className="sticky z-20 transition-[margin-bottom] duration-200 ease-out motion-reduce:transition-none"
+        className="sticky z-20 transition-[margin-bottom] duration-200 ease-out"
         style={{
           top: "calc(var(--admin-top) + 0.5rem)",
           // 접힌 만큼 바깥 여백으로 채워 아래 목록이 움직이지 않게 한다
@@ -200,7 +202,7 @@ export function StickyToolbar({
           ref={cardRef}
           role="region"
           aria-label={label}
-          className="bg-card overflow-hidden rounded-xl border border-(--border) shadow-(--card-shadow)"
+          className="bg-card overflow-hidden rounded-xl shadow-(--card-shadow)"
         >
           {/* ── 늘 보이는 줄: 검색 · 요약 · 끝 ── */}
           <div className="flex flex-wrap items-center gap-x-5 gap-y-2 px-5 py-3">
@@ -228,7 +230,7 @@ export function StickyToolbar({
           <div
             ref={regionRef}
             inert={!expanded}
-            className="grid transition-[grid-template-rows] duration-200 ease-out motion-reduce:transition-none"
+            className="grid transition-[grid-template-rows] duration-200 ease-out"
             style={{ gridTemplateRows: expanded ? "1fr" : "0fr" }}
           >
             <div className="min-h-0 overflow-hidden">

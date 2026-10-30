@@ -6,7 +6,7 @@ describe("strengthOf", () => {
     expect(strengthOf(0.09)).toBe("없음");
     expect(strengthOf(0.1)).toBe("약함");
     expect(strengthOf(0.19)).toBe("약함");
-    expect(strengthOf(0.2)).toBe("어느 정도");
+    expect(strengthOf(0.2)).toBe("약간 뚜렷함");
     expect(strengthOf(0.3)).toBe("뚜렷함");
     expect(strengthOf(0.49)).toBe("뚜렷함");
     expect(strengthOf(0.5)).toBe("매우 뚜렷함");
@@ -22,12 +22,12 @@ describe("gradeOf · isUncertain", () => {
   it("등급은 언제나 크기로만 말한다", () => {
     expect(gradeOf(0.35)).toBe("뚜렷함");
     // 구간이 0을 걸쳐도 등급 자리를 빼앗기지 않는다
-    expect(gradeOf(0.24)).toBe("어느 정도");
+    expect(gradeOf(0.24)).toBe("약간 뚜렷함");
   });
 
-  it("「어느 정도」가 화면에서 사라지지 않는다", () => {
+  it("「약간 뚜렷함」이 화면에서 사라지지 않는다", () => {
     // .20~.29는 37명에서 반드시 0을 걸친다. 등급을 덮어쓰면 영영 안 나온다
-    for (const r of [0.2, 0.24, 0.29]) expect(gradeOf(r)).toBe("어느 정도");
+    for (const r of [0.2, 0.24, 0.29]) expect(gradeOf(r)).toBe("약간 뚜렷함");
   });
 
   it("확실함은 따로 잰다", () => {

@@ -43,17 +43,34 @@ import { densityCurve, sliceCurve, type Curve } from "@/lib/admin/density";
  */
 
 export type RidgeRow = { s: Spread; dim: boolean };
+
+/**
+ * 견줘 볼 한 사람 (2026-10-30 사용자 요청 — 분포 화면 오른쪽 「개인 검색」).
+ * 고르면 줄마다 그 사람 자리에 진한 세로선과 점수를 얹어, 회사 분포 안에서
+ * 어디쯤인지 한눈에 본다.
+ */
+export type RidgeFocus = { employeeId: string; name: string } | null;
+
+/** 견줘 보는 사람의 색 — 곡선(파랑·직무능력색)과 겹치지 않는 주황 (`--focus`) */
+const FOCUS = "var(--focus)";
 export type RidgeGroup = { key: string; label?: string; rows: RidgeRow[] };
 
+/*
+  줄 맨 위에 **글자 띠**(LANE)를 따로 둔다 (2026-10-30 사용자 요청). 견줘 보는
+  사람의 점수 딱지가 선 바로 위 이 띠에 앉아, 곡선·중앙값선과 겹치지 않는다.
+  중앙값 숫자는 그림 안에서 빼서 왼쪽 이름 칸으로 옮겼다.
+*/
+/** 줄 위 글자 띠 높이 */
+const LANE = 24;
 /** 줄 높이(px). viewBox 세로도 같은 값이라 세로 단위가 곧 px다 */
-const ROW_H = 76;
+const ROW_H = 100;
 /** 곡선 바닥선 */
-const BASE = 56;
-/** 봉우리 높이 — 바닥선에서 위로 (줄 높이의 약 90% 자리까지) */
-const PEAK_H = 50;
+const BASE = 80;
+/** 봉우리 높이 — 바닥선에서 위로 (글자 띠 바로 아래까지) */
+const PEAK_H = 52;
 /** 눈금(러그) 띠 — 바닥선 아래 */
-const RUG_TOP = 60;
-const RUG_BOTTOM = 70;
+const RUG_TOP = 84;
+const RUG_BOTTOM = 94;
 /** 눈금 하나가 마우스를 받는 폭의 반 (점수 단위) */
 const HIT_HALF = 2.5;
 
@@ -77,10 +94,13 @@ const pct = (v: number) => `${inside(v)}%`;
 export function DensityRidge({
   groups,
   label,
+  focus = null,
 }: {
   groups: RidgeGroup[];
   /** 그림 전체 이름 — 읽기 도구가 맨 앞에 읽는다 */
   label: string;
+  /** 견줘 볼 한 사람 */
+  focus?: RidgeFocus;
 }) {
   const [hover, setHover] = useState<{ scale: string; at: number } | null>(
     null,
@@ -132,6 +152,7 @@ export function DensityRidge({
               <Ridge
                 key={r.s.scale}
                 row={r}
+                focusId={focus?.employeeId ?? null}
                 hoverAt={hover?.scale === r.s.scale ? hover.at : null}
                 onHover={(at) =>
                   setHover(at === null ? null : { scale: r.s.scale, at })
@@ -163,10 +184,12 @@ export function DensityRidge({
 
 function Ridge({
   row: { s, dim },
+  focusId,
   hoverAt,
   onHover,
 }: {
   row: RidgeRow;
+  focusId: string | null;
   /** 지금 마우스가 올라간 눈금 묶음의 점수 (없으면 null) */
   hoverAt: number | null;
   onHover: (at: number | null) => void;
@@ -204,9 +227,11 @@ function Ridge({
 
   const hovered = bunches.find((b) => b.at === hoverAt) ?? null;
   const median = Math.round(s.median);
+  const mine = focusId ? s.dots.find((d) => d.employeeId === focusId) : undefined;
 
   return (
-    <div className="relative grid grid-cols-[var(--label-w)_minmax(0,1fr)]">
+    // 줄과 줄 사이를 조금 띄운다 (2026-10-30 사용자 요청 — 언덕끼리 붙어 보였다)
+    <div className="relative mb-3 grid grid-cols-[var(--label-w)_minmax(0,1fr)]">
       {/*
         믿을 만하지 않은 축(신뢰도 낮음)은 줄 전체를 흐리게 둔다. 다만 마우스를
         올렸을 때 뜨는 이름 상자는 흐리게 하지 않는다 — 그것까지 흐리면
@@ -215,10 +240,12 @@ function Ridge({
       */}
       <div
         className="flex flex-col justify-center pr-3"
-        style={{ height: ROW_H, opacity: dim ? 0.5 : 1 }}
+        style={{ height: ROW_H, paddingTop: LANE, opacity: dim ? 0.5 : 1 }}
       >
         <p className="text-table leading-tight font-medium">{s.scale}</p>
-        <span className="text-axis text-ink-muted tabular">{s.n}명</span>
+        <span className="text-axis text-ink-muted tabular">
+          {s.n}명 · 중앙값 <span className="text-ink-secondary font-medium">{median}</span>
+        </span>
       </div>
 
       <div className="relative" style={{ height: ROW_H }}>
@@ -265,7 +292,7 @@ function Ridge({
             <line
               x1={inside(s.median)}
               x2={inside(s.median)}
-              y1={2}
+              y1={LANE}
               y2={BASE}
               stroke="var(--ink-secondary)"
               strokeWidth={1.5}
@@ -289,6 +316,20 @@ function Ridge({
               );
             })}
 
+            {/* 견줘 보는 사람 — 진한 세로선 */}
+            {mine && (
+              <line
+                x1={inside(mine.value)}
+                x2={inside(mine.value)}
+                y1={LANE - 2}
+                y2={RUG_BOTTOM + 2}
+                stroke={FOCUS}
+                strokeWidth={3}
+                strokeLinecap="round"
+                vectorEffect="non-scaling-stroke"
+              />
+            )}
+
             {/* 마우스를 받는 칸 — 보이지 않는다 */}
             {bunches.map((b) => (
               <rect
@@ -305,28 +346,32 @@ function Ridge({
               />
             ))}
           </svg>
+        </div>
 
-          {/*
-          중앙값 숫자 — 줄 맨 위, 선의 오른쪽. 오른쪽 끝에 가까우면 왼쪽으로
-          돌린다. 봉우리와 겹칠 수 있어 카드 바탕색으로 글자 둘레를 두른다.
+        {/*
+          견줘 보는 사람의 점수 — 세로선 **바로 위** 글자 띠에 딱지로 앉힌다
+          (2026-10-30 사용자 요청 — 선 옆에 두니 중앙값·곡선과 겹쳤다).
+          흐린 줄에서도 또렷하게 흐림 밖에 둔다. 양 끝에서는 그림 밖으로
+          나가지 않게 한쪽으로 붙인다.
         */}
+        {mine && (
           <span
-            className="text-axis text-ink-muted pointer-events-none absolute top-0 whitespace-nowrap"
+            className="text-axis tabular pointer-events-none absolute top-0 rounded-full px-2 leading-5 font-semibold whitespace-nowrap"
             style={{
-              left: pct(s.median),
+              left: pct(mine.value),
               transform:
-                s.median > 80
-                  ? "translateX(calc(-100% - 6px))"
-                  : "translateX(6px)",
-              textShadow:
-                "0 0 3px var(--card), 0 0 3px var(--card), 0 0 2px var(--card)",
-              lineHeight: 1.2,
+                mine.value < 6
+                  ? "translateX(-4px)"
+                  : mine.value > 94
+                    ? "translateX(calc(-100% + 4px))"
+                    : "translateX(-50%)",
+              background: FOCUS,
+              color: "var(--page)",
             }}
           >
-            중앙값{" "}
-            <span className="tabular text-ink font-medium">{median}</span>
+            {Math.round(mine.value)}
           </span>
-        </div>
+        )}
 
         {hovered && (
           <span

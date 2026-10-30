@@ -136,7 +136,9 @@ export function ScatterPlot({
             strokeWidth={2}
             isAnimationActive={false}
           />
+          {/* 말풍선 움직임도 윈도우 「애니메이션 끄기」와 상관없이 (2026-10-30) */}
           <Tooltip
+            isAnimationActive
             cursor={{ strokeDasharray: "3 3", stroke: "var(--axis)" }}
             content={({ active, payload }) => {
               if (!active || !payload?.length) return null;

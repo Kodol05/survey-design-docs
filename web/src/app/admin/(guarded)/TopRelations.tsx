@@ -191,8 +191,10 @@ function MiniBar({
         style={{ background: "var(--ink-muted)" }}
       />
       <div
-        className="absolute inset-y-1 rounded-sm"
+        className="absolute inset-y-1"
         style={{
+          // 0 쪽 끝은 각지게, 바깥 끝만 둥글게 (2026-10-30 — DivergingBar와 같게)
+          borderRadius: r < 0 ? "3px 0 0 3px" : "0 3px 3px 0",
           background: correlationFill(r, uncertain),
           left: r < 0 ? `${50 - w}%` : "50%",
           width: `${w}%`,

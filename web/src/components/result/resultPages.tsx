@@ -3,7 +3,7 @@ import { AxisDetail } from "@/components/charts/AxisDetail";
 import { PairReadings } from "@/components/charts/PairReadings";
 import type { BookPage } from "@/components/charts/ResultBook";
 import { TraitRadar } from "@/components/charts/TraitRadar";
-import { CHARACTER, TEMPERAMENT, colorAt } from "@/components/charts/scale";
+import { CHARACTER, Marker, TEMPERAMENT, colorAt } from "@/components/charts/scale";
 import { RetakeButton } from "@/components/survey/RetakeButton";
 import { APPLY } from "@/lib/interpretation/apply";
 import { LINE } from "@/lib/interpretation/lines";
@@ -152,7 +152,7 @@ export function buildResultBook(
       {/* 한 줄 헤더 */}
       <header className="flex flex-wrap items-end justify-between gap-x-6 gap-y-1">
         <div>
-          <p className="eyebrow mb-1">7차원 성향 검사 · 결과 보고서</p>
+          <p className="eyebrow mb-1">7가지 성향 검사 · 결과 보고서</p>
           <h1 className="text-screen-title">{name} 님</h1>
         </div>
         <p className="text-axis text-ink-muted tabular">
@@ -190,18 +190,17 @@ export function buildResultBook(
                   <div className="relative h-1.5 rounded-full" style={{ background: "var(--grid)" }}>
                     <span
                       aria-hidden
-                      className="absolute inset-y-0 left-1/2 w-px"
+                      className="absolute inset-y-0 left-1/2 w-px -translate-x-1/2"
                       style={{ background: "var(--axis)" }}
                     />
+                    {/* 표식은 척도별 결과 장과 같은 구슬 모양 (2026-10-30) */}
                     <span
                       aria-hidden
-                      className="absolute top-1/2 size-3 -translate-x-1/2 -translate-y-1/2 rounded-full ring-2"
-                      style={{
-                        left: `${x}%`,
-                        background: colorAt(t.percent),
-                        ["--tw-ring-color" as string]: "var(--sheet)",
-                      }}
-                    />
+                      className="absolute top-1/2 -translate-x-1/2 -translate-y-1/2"
+                      style={{ left: `${x}%` }}
+                    >
+                      <Marker percent={t.percent} size={14} />
+                    </span>
                   </div>
                   <span className="tabular text-table text-right font-medium">
                     {Math.round(t.percent)}

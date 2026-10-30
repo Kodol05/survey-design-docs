@@ -107,7 +107,7 @@ export function EmployeeSwitcher({
             setOpen(false);
           }
         }}
-        className="text-table bg-card h-10 w-56 rounded-lg border border-(--border) px-3"
+        className="text-table h-10 w-56 rounded-lg bg-(--wash)/60 px-3 placeholder:text-(--ink-muted) focus:bg-(--wash)"
       />
 
       {shown && (
@@ -115,7 +115,7 @@ export function EmployeeSwitcher({
           id={listId}
           role="listbox"
           aria-label="찾은 구성원"
-          className="bg-card text-table absolute top-full left-0 z-40 mt-1 w-72 overflow-hidden rounded-lg border border-(--border) py-1 shadow-(--card-shadow)"
+          className="bg-card text-table absolute top-full left-0 z-40 mt-1 w-72 overflow-hidden rounded-lg py-1 shadow-(--card-shadow-hover)"
         >
           {matches.length === 0 ? (
             <li className="text-axis text-ink-muted px-3 py-2">맞는 사람이 없습니다</li>

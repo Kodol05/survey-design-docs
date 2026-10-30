@@ -28,7 +28,7 @@ export default async function AppLayout({ children }: { children: React.ReactNod
         */}
         <div className="page-column flex h-16 items-center justify-between gap-3">
           <Link href="/me" className="shrink-0 font-medium whitespace-nowrap">
-            7차원 성향 설문
+            7가지 성향 검사
           </Link>
           <div className="text-axis text-ink-secondary flex items-center gap-3 whitespace-nowrap sm:gap-4">
             {me.role === "ADMIN" && (

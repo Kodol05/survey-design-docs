@@ -59,6 +59,19 @@
   --scale-62: #e0c8b3;
   --scale-80: #cb9a7c;
   --scale-100: #b3623f;
+  /* 응시 화면 일곱 칸 (2026-10-30 사용자 요청): 같은 쪽 세 칸은 색 차이를 줄인다 — 세기는 원 크기가 이미 말한다.
+     「약간 아니다」「약간 그렇다」도 파랑·주황으로 또렷하게. 결과 화면의 --scale-* 와는 따로 둔다 */
+  --likert-1: #5576ae;
+  --likert-2: #6a89bd;
+  --likert-3: #86a0cb;
+  --likert-4: #cfc9be;
+  --likert-5: #d39c7c;
+  --likert-6: #c7845f;
+  --likert-7: #ba6e4c;
+  /* 응시 화면에서 강조된 문항 카드 바탕 — 아주 옅은 아이보리 (2026-10-30 사용자 요청) */
+  --survey-focus: #fffdf6;
+  /* 분석 「개인 검색」에서 고른 사람 표시 — 주황 (2026-10-30 사용자 요청) */
+  --focus: #c8601a;
   /* 라벨용은 바 색보다 진하다. 옅은 색을 작은 글자에 쓰면 대비가 모자란다 */
   --scale-ink-low: #33507a;
   --scale-ink-high: #8f4c2d;
@@ -95,7 +108,13 @@
   --canvas: #ebe8e1;
   --card: #faf9f6;
   --card-head: #f3f1ec;
-  --card-shadow: 0 1px 2px rgb(34 32 29 / 0.05), 0 6px 16px -10px rgb(34 32 29 / 0.18);
+  /*
+    카드는 **테두리 없이** 아주 옅은 그림자 하나로만 바탕과 가른다 (2026-10-28
+    사용자 결정 — 법무법인 정안 시안의 방식). 마우스를 올리는 카드는 `-hover`로
+    한 단 깊게.
+  */
+  --card-shadow: 0 1px 3px rgb(34 32 29 / 0.08);
+  --card-shadow-hover: 0 8px 20px rgb(34 32 29 / 0.1);
 }
 
 /*
@@ -141,6 +160,19 @@
   --scale-62: #5d4535;
   --scale-80: #94603c;
   --scale-100: #cb7a46;
+  /* 응시 화면 일곱 칸 (2026-10-30 사용자 요청): 같은 쪽 세 칸은 색 차이를 줄인다 — 세기는 원 크기가 이미 말한다.
+     「약간 아니다」「약간 그렇다」도 파랑·주황으로 또렷하게. 결과 화면의 --scale-* 와는 따로 둔다 */
+  --likert-1: #7097d8;
+  --likert-2: #6487c6;
+  --likert-3: #5878b0;
+  --likert-4: #57524a;
+  --likert-5: #a9704a;
+  --likert-6: #ba7a4e;
+  --likert-7: #cb8452;
+  /* 응시 화면에서 강조된 문항 카드 바탕 — 아주 옅은 아이보리 (2026-10-30 사용자 요청) */
+  --survey-focus: #24221d;
+  /* 분석 「개인 검색」에서 고른 사람 표시 — 주황 (2026-10-30 사용자 요청) */
+  --focus: #f08c3c;
   --scale-ink-low: #8ab0e8;
   --scale-ink-high: #e2a071;
 
@@ -159,7 +191,8 @@
   --canvas: #131210;
   --card: #1e1c19;
   --card-head: #24221e;
-  --card-shadow: 0 1px 2px rgb(0 0 0 / 0.35), 0 8px 20px -12px rgb(0 0 0 / 0.6);
+  --card-shadow: 0 1px 3px rgb(0 0 0 / 0.4);
+  --card-shadow-hover: 0 8px 20px rgb(0 0 0 / 0.45);
 }
 
 :root {
@@ -285,6 +318,12 @@ body {
   /* 기본 글자 21px. 16px도 17px도 계속 작다는 말이 나와 한 번 더 올렸다 */
   font-size: 1.3125rem;
   line-height: 1.6;
+  /*
+    한국어는 **낱말 단위로만** 줄을 바꾼다 (2026-10-28). 「가까 / 운」처럼
+    낱말 한가운데가 끊기던 것을 사이트 전체에서 막는다. 너무 긴 낱말만 예외로 끊는다.
+  */
+  word-break: keep-all;
+  overflow-wrap: break-word;
 }
 
 /* 키보드 초점은 항상 보이게 (01 §2.4 — 접근성은 타협하지 않는다) */
@@ -292,17 +331,12 @@ body {
   화면을 옮길 때 톡 끊기지 않게 (2026-08-24).
 
   브라우저가 지원하면 옛 화면을 살짝 흐려 보내고 새 화면을 받는다.
-  **움직임을 줄이도록 설정한 사람에게는 걸지 않는다** — 전환 효과는
-  어지럼증을 유발할 수 있어서 접근성 설정이 우선이다.
+  윈도우의 「애니메이션 효과 끄기」(prefers-reduced-motion)는 **따르지 않는다**
+  (2026-10-30 사용자 결정). 회사 PC가 기본으로 꺼 둔 경우가 많아 사이트의
+  움직임이 통째로 사라졌다. 이 사이트의 움직임은 모두 짧고 작다.
 */
 @view-transition {
   navigation: auto;
-}
-
-@media (prefers-reduced-motion: reduce) {
-  @view-transition {
-    navigation: none;
-  }
 }
 
 ::view-transition-old(root) {
@@ -403,17 +437,7 @@ body {
   }
 }
 
-@media (prefers-reduced-motion: reduce) {
-  .reveal,
-  .reveal .rule {
-    animation: none;
-  }
-}
 
-/* 어두운 화면에서는 밝은 사진을 깔지 않는다 — 배경만 밝아져 겉돈다 */
-:root[data-theme="dark"] .dark-hide {
-  display: none;
-}
 
 /*
   ── 초점 표시 ───────────────────────────────────────────────────────
@@ -436,45 +460,87 @@ body {
 }
 
 /*
-  결과지 장 넘김 (`charts/ResultBook`, 2026-09-18).
-  화면에서는 현재 장만 보이고, 인쇄에서는 전 장이 이어서 나온다.
-  넘김 UI(탭·양옆 화살표·아래 줄)는 종이에 찍지 않는다.
+  결과지 장 넘김 (`charts/ResultBook`, 2026-09-18 → 2026-10-30 옆으로 넘기는 종이).
+
+  화면에서는 장마다 종이를 옆으로 늘어놓고 지금 장만 가운데에 또렷하게 둔다.
+  옆 종이는 양옆 여백에 가장자리만 보이고, 화면 밖으로 나간 부분은 잘라
+  가로 스크롤이 생기지 않게 한다. 지금 장보다 긴 옆 종이는 아래를 자른다
+  (그림자가 잘리지 않게 아래로 여유를 둔다).
+
+  인쇄에서는 종이를 위아래로 이어 찍고, 넘김 UI(탭·양옆 화살표·아래 줄)는
+  찍지 않는다.
 */
-@media screen {
-  .result-page[data-inactive="true"] {
-    display: none;
-  }
+body:has(.result-stage[data-peek]) {
+  overflow-x: clip;
+}
+.result-stage {
+  overflow-x: visible;
+  overflow-y: clip;
+  padding-bottom: 3rem;
+  margin-bottom: -3rem;
 }
 @media print {
   .result-book-nav {
     display: none !important;
   }
-  .result-page {
-    break-before: page;
+  .result-stage {
+    overflow: visible !important;
+    padding-bottom: 0;
+    margin-bottom: 0;
   }
-  .result-page:first-of-type {
-    break-before: auto;
+  .result-slide {
+    position: static !important;
+    transform: none !important;
+    opacity: 1 !important;
+  }
+  .result-slide + .result-slide {
+    break-before: page;
   }
 }
 
 /*
-  장이 밀려 들어오는 전환 (`charts/ResultBook`, 2026-09-18 사용자 요청).
-  다음 장은 오른쪽에서, 이전 장은 왼쪽에서. 책장을 넘기는 느낌만 주고
-  길게 끌지 않는다. 움직임을 줄이도록 설정한 사람에게는 걸지 않는다.
+  분석 탭 아래 첫 카드 — 지금 탭이 붙는 왼쪽 위 모서리를 각지게 (2026-10-30).
+  탭(`stats/page.tsx`)과 카드가 한 덩어리로 이어져 보인다.
 */
-@keyframes page-in-next {
-  from { opacity: 0; transform: translateX(32px); }
-  to   { opacity: 1; transform: none; }
+.tab-body > .admin-card:first-child,
+.tab-body > :first-child > .admin-card:first-child {
+  border-top-left-radius: 0;
 }
-@keyframes page-in-prev {
-  from { opacity: 0; transform: translateX(-32px); }
-  to   { opacity: 1; transform: none; }
+
+/*
+  가늘고 둥근 스크롤바 (2026-10-30 사용자 요청 — 분석 「개인 검색」 목록).
+  기본 회색 굵은 막대가 카드 안에서 튀었다. 바탕과 같은 결로 옅게 둔다.
+*/
+.soft-scroll {
+  scrollbar-width: thin;
+  scrollbar-color: color-mix(in oklab, var(--ink-muted) 45%, transparent) transparent;
 }
-.result-page-enter-next { animation: page-in-next 0.32s cubic-bezier(0.2, 0.7, 0.2, 1) both; }
-.result-page-enter-prev { animation: page-in-prev 0.32s cubic-bezier(0.2, 0.7, 0.2, 1) both; }
-@media (prefers-reduced-motion: reduce) {
-  .result-page-enter-next,
-  .result-page-enter-prev { animation: none; }
+.soft-scroll:hover {
+  scrollbar-color: color-mix(in oklab, var(--focus) 55%, transparent) transparent;
+}
+
+/*
+  척도별 결과 접고 펴기 (`charts/AxisDetail`, 2026-10-30).
+  펼칠 때·접을 때 높이가 부드럽게 바뀐다. 인쇄에서는 모두 펼친다.
+*/
+.axis-detail {
+  interpolate-size: allow-keywords;
+}
+.axis-detail::details-content {
+  block-size: 0;
+  overflow: clip;
+  transition:
+    block-size 0.35s cubic-bezier(0.22, 1, 0.36, 1),
+    content-visibility 0.35s allow-discrete;
+}
+.axis-detail[open]::details-content {
+  block-size: auto;
+}
+@media print {
+  .axis-detail::details-content {
+    block-size: auto;
+    content-visibility: visible;
+  }
 }
 
 /*
@@ -486,7 +552,7 @@ body {
 */
 .result-sheet {
   background: var(--sheet);
-  border: 1px solid var(--border);
+  /* 테두리 없이 그림자로만 (2026-10-28 — 정안 시안처럼) */
   border-radius: 1rem;
   box-shadow:
     0 1px 2px rgb(34 32 29 / 0.04),

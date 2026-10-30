@@ -56,7 +56,7 @@ export default async function AdminLayout({ children }: { children: React.ReactN
         <div className="flex h-15 items-center justify-between gap-4 px-5 lg:px-6">
           {/* 폰에서 제목이 「설 / 문」으로 쪼개졌다 — 한 줄로 묶고 작은 「관리자」는 넓을 때만 (2026-10-08) */}
           <Link href="/admin" className="flex min-w-0 items-baseline gap-2.5 whitespace-nowrap">
-            <span className="text-card-title">7차원 성향 설문</span>
+            <span className="text-card-title">7가지 성향 검사</span>
             <span className="text-axis text-ink-muted hidden sm:inline">관리자</span>
           </Link>
           <div className="text-axis text-ink-secondary flex shrink-0 items-center gap-4">
@@ -75,7 +75,7 @@ export default async function AdminLayout({ children }: { children: React.ReactN
       <div className="flex flex-1">
         <aside
           className="bg-card sticky hidden w-56 shrink-0 flex-col justify-between border-r border-(--border) lg:flex"
-          style={{ top: "var(--admin-top)", height: "calc(100vh - var(--admin-top))" }}
+          style={{ top: "var(--admin-top)", height: "calc(100vh / var(--z, 1) - var(--admin-top))" }}
         >
           <nav className="flex flex-col gap-1 p-3">
             {NAV.map((n) => (

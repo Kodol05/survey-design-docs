@@ -49,6 +49,7 @@ export function CorrelationTable({
   selected,
   onSelect,
   groups,
+  colsLabel,
 }: {
   rows: string[];
   cols: string[];
@@ -62,10 +63,17 @@ export function CorrelationTable({
    * 평평하게 늘어놓으면 표에서 그게 사라진다. 묶어 두면 「직무능력과 관련
    * 있는 것은 어느 쪽인가」를 눈으로 답할 수 있다.
    *
+   * 묶음 이름은 **그 행들 앞(왼쪽)에 세로로 걸쳐** 둔다 (2026-10-30 사용자
+   * 요청). 전에는 묶음마다 위에 이름 줄과 가는 선을 따로 두었다.
+   *
    * 주지 않으면 `rows` 순서대로 평평하게 그린다.
    */
   groups?: { label: string; note?: string; rows: string[] }[];
+  /** 열 묶음 이름 — 열 이름들 위에 한 줄로 (예: 「직무능력」) */
+  colsLabel?: string;
 }) {
+  const grouped = Boolean(groups?.length);
+  const lead = grouped ? 2 : 1; // 값 열 앞의 이름 열 수
   return (
     <div className="overflow-x-auto">
       {/*
@@ -81,14 +89,27 @@ export function CorrelationTable({
       */}
       <table className="w-full table-fixed border-separate border-spacing-[3px]">
         <colgroup>
+          {grouped && <col style={{ width: "3rem" }} />}
           <col style={{ width: "7.5rem" }} />
           {cols.map((c) => (
             <col key={c} />
           ))}
         </colgroup>
         <thead>
+          {colsLabel && (
+            <tr>
+              <th colSpan={lead} />
+              <th
+                scope="colgroup"
+                colSpan={cols.length}
+                className="text-axis text-ink-secondary pb-0.5 text-center font-semibold"
+              >
+                {colsLabel}
+              </th>
+            </tr>
+          )}
           <tr>
-            <th />
+            <th colSpan={lead} />
             {cols.map((c) => (
               <th
                 key={c}
@@ -100,28 +121,26 @@ export function CorrelationTable({
             ))}
           </tr>
         </thead>
-        {(groups ?? [{ label: "", rows }]).map((g) => (
-          <tbody key={g.label}>
-            {g.label && (
-              <tr>
-                <th
-                  scope="colgroup"
-                  colSpan={cols.length + 1}
-                  className="border-b border-(--border) px-1 pt-3 pb-1 text-left font-normal"
-                >
-                  <span className="text-axis text-ink-secondary font-semibold">
-                    {g.label}
-                  </span>
-                  {g.note && (
-                    <span className="text-axis text-ink-muted ml-2">
-                      {g.note}
-                    </span>
-                  )}
-                </th>
+        {(groups ?? [{ label: "", rows }]).map((g, gi) => (
+          <tbody key={g.label || gi}>
+            {/* 묶음 사이는 선 대신 조금 띄운다 */}
+            {grouped && gi > 0 && (
+              <tr aria-hidden>
+                <td colSpan={cols.length + lead} className="h-2 p-0" />
               </tr>
             )}
-            {g.rows.map((r) => (
+            {g.rows.map((r, ri) => (
               <tr key={r}>
+                {grouped && ri === 0 && (
+                  <th
+                    scope="rowgroup"
+                    rowSpan={g.rows.length}
+                    // 바탕 없이 글자만 (2026-10-30 사용자 요청)
+                    className="text-axis text-ink-secondary px-1 text-center align-middle font-semibold"
+                  >
+                    {g.label}
+                  </th>
+                )}
                 <th
                   scope="row"
                   className="text-table truncate px-1 text-left font-normal"
@@ -147,7 +166,7 @@ export function CorrelationTable({
                             ? `${v.n}명 · 95% 구간 ${formatR(v.ci[0])}~${formatR(v.ci[1])}`
                             : undefined
                         }
-                        className={`flex h-11 w-full items-center justify-center gap-1.5 overflow-hidden rounded-md px-1 whitespace-nowrap focus-visible:outline-2 focus-visible:outline-offset-[-2px] focus-visible:outline-(--ink) ${
+                        className={`grid h-11 w-full grid-cols-1 items-center overflow-hidden rounded-md px-1 whitespace-nowrap sm:grid-cols-2 focus-visible:outline-2 focus-visible:outline-offset-[-2px] focus-visible:outline-(--ink) ${
                           clickable
                             ? "cursor-pointer hover:outline-1 hover:outline-offset-[-1px] hover:outline-(--ink-muted)"
                             : "cursor-default"
@@ -170,8 +189,14 @@ export function CorrelationTable({
                             먼저 보인다고 빼고 채도만 올렸는데, 막대가 빠진 지금은
                             채도 차이로는 어느 칸이 오른쪽 그림인지 안 보였다.
                           */
-                          outline: on ? "2px solid var(--ink)" : undefined,
-                          outlineOffset: on ? -2 : undefined,
+                          /*
+                            **고른 칸만 제 색, 나머지는 흑백** (2026-10-30 사용자 결정).
+                            전에는 고른 칸에 2px 테두리를 둘렀는데, 테두리·바탕 없이
+                            「지금 이 칸을 보고 있다」를 말하려고 나머지 칸의 색을 빼고
+                            밝기만 남긴다. 아무것도 안 골랐으면 전부 제 색이다.
+                          */
+                          filter: selected && !on ? "grayscale(1)" : undefined,
+                          transition: "filter 0.3s ease",
                         }}
                       >
                         <Body cell={v} />
@@ -189,24 +214,29 @@ export function CorrelationTable({
 }
 
 function Body({ cell }: { cell: Cell }) {
+  /*
+    칸을 **반으로 나눠** 왼쪽 반 가운데에 숫자, 오른쪽 반 가운데에 등급 말
+    (2026-10-30 사용자 요청 — 둘이 칸 가운데에 붙어 있어 열마다 자리가
+    들쭉날쭉했다). 숫자만 있는 칸은 칸 전체 가운데에 둔다.
+  */
+  const whole = "text-center sm:col-span-2";
   if (cell.kind === "unstudied")
-    return <span className="text-ink-muted">—</span>;
+    return <span className={`text-ink-muted ${whole}`}>—</span>;
   if (cell.kind === "none")
-    return <span className="text-axis text-ink-muted">없음</span>;
+    return <span className={`text-axis text-ink-muted ${whole}`}>없음</span>;
   if (cell.kind === "tooFew")
-    return <span className="text-axis text-ink-muted">n 부족</span>;
+    return <span className={`text-axis text-ink-muted ${whole}`}>n 부족</span>;
 
   const grade = gradeOf(cell.r);
   /*
-    방향이 아직 확정 안 된 칸 — 숫자를 한 단 흐린 잉크로, 등급 뒤에 `?`.
-    「없음」에는 `?`를 달지 않는다 (`GradeTag`와 같은 규칙 — 「없음?」은
-    「없는 것이 확실치 않다」로 뒤집혀 읽힌다).
+    방향이 아직 확정 안 된 칸 — 숫자와 등급을 한 단 흐리게만 둔다. 등급 뒤에
+    붙이던 `?`는 뺐다 (2026-10-30 사용자 요청).
   */
   const soft = isUncertain(cell.ci);
   return (
     <>
       <span
-        className="tabular text-[1.0625rem] leading-none font-semibold"
+        className="tabular text-center text-[1.0625rem] leading-none font-semibold"
         style={{ color: soft ? "var(--ink-secondary)" : undefined }}
       >
         {formatR(cell.r)}
@@ -216,11 +246,10 @@ function Body({ cell }: { cell: Cell }) {
         좁을 때는 숫자만 둔다 — 등급은 칸 색과 아래 범례가 말한다.
       */}
       <span
-        className="hidden text-[0.8125rem] leading-none sm:inline"
+        className="hidden text-center text-[0.8125rem] leading-none sm:block"
         style={{ opacity: soft ? 0.7 : 0.85 }}
       >
         {grade}
-        {soft && grade !== "없음" && <span aria-hidden>?</span>}
       </span>
     </>
   );
@@ -260,10 +289,10 @@ export function CorrelationLegend({
         />
         <span>양</span>
       </span>
-      <span>흐린 칸 · ? = 방향 아직 확정 아님</span>
+      <span>흐린 칸 = 방향 아직 확정 아님</span>
       <span>
         <span className="tabular">0.10</span> 약함 ·{" "}
-        <span className="tabular">0.20</span> 어느 정도 ·{" "}
+        <span className="tabular">0.20</span> 약간 뚜렷함 ·{" "}
         <span className="tabular">0.30</span> 뚜렷함 ·{" "}
         <span className="tabular">0.50</span> 매우 뚜렷함
       </span>

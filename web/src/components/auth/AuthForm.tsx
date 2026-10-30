@@ -1,7 +1,6 @@
 "use client";
 
 import { startTransition, useActionState } from "react";
-import { Button } from "../ui/Button";
 import type { FormState } from "@/lib/auth/actions";
 
 type Action = (prev: FormState, form: FormData) => Promise<FormState>;
@@ -33,7 +32,7 @@ export function AuthForm({
         const data = new FormData(e.currentTarget);
         startTransition(() => formAction(data));
       }}
-      className="flex flex-col gap-5"
+      className="flex flex-col gap-4"
     >
       {children}
       {state?.error && (
@@ -48,10 +47,18 @@ export function AuthForm({
           {state.error}
         </p>
       )}
-      {/* 이 화면의 유일한 동작이라 폭을 다 쓴다. 옆에 다른 버튼이 없다 */}
-      <Button type="submit" size="lg" disabled={pending} className="mt-2 w-full">
+      {/*
+        이 화면의 유일한 동작이라 폭을 다 쓴다. 먹색으로 (2026-10-28) — 테두리
+        없는 카드와 옅은 칸 사이에서 파랑 상자만 겉돌았다.
+      */}
+      <button
+        type="submit"
+        disabled={pending}
+        className="text-item mt-2 h-13 w-full rounded-lg font-semibold transition hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-50"
+        style={{ background: "var(--ink)", color: "var(--page)" }}
+      >
         {pending ? "잠시만요…" : submitLabel}
-      </Button>
+      </button>
     </form>
   );
 }
@@ -79,13 +86,17 @@ export function Field({
       테두리 하나보다 분명하게 보인다.
     */
     <label className="group flex flex-col gap-1.5">
-      <span className="text-table text-ink-secondary font-medium group-focus-within:text-ink">
+      <span className="text-axis text-ink-secondary font-medium group-focus-within:text-ink">
         {label}
       </span>
+      {/*
+        칸은 테두리 대신 옅은 바탕으로 (2026-10-28 — 정안 시안처럼). 초점이 오면
+        바탕이 한 단 진해지고 바깥에 먹색 고리가 둘린다.
+      */}
       <input
         name={name}
         type={type}
-        className="text-item h-14 rounded-lg border border-(--border) bg-surface px-4 transition-colors focus:border-(--series-1)"
+        className="text-table h-12 rounded-lg bg-(--wash)/60 px-4 transition-colors placeholder:text-(--ink-muted) focus:bg-(--wash) focus:outline-2 focus:outline-offset-0 focus:outline-(--ink)/30"
         {...rest}
       />
       {hint && <span className="text-axis text-ink-muted">{hint}</span>}

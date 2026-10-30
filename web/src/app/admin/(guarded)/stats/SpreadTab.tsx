@@ -64,5 +64,12 @@ export function SpreadTab({
       : null,
   ].filter((x): x is Spread => x !== null);
 
-  return <DistributionPanel spreads={spreads} reliability={reliability} />;
+  // 오른쪽 「개인 검색」 목록 — 이름순, 같은 이름은 번호 끝자리로 가른다
+  const persons = people
+    .map((p) => ({ employeeId: p.employeeId, name: p.name, tail: p.phoneTail }))
+    .sort((a, b) => a.name.localeCompare(b.name, "ko") || a.tail.localeCompare(b.tail));
+
+  return (
+    <DistributionPanel spreads={spreads} reliability={reliability} persons={persons} />
+  );
 }

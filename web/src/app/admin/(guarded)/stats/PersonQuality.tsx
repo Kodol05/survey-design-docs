@@ -59,13 +59,17 @@ export function LowQualityList({ rows }: { rows: PersonQuality[] }) {
 
   return (
     <div>
-      <ul className="flex flex-col">
+      {/*
+        넓은 카드에 **여러 단으로** 채운다 (2026-10-30 사용자 요청 — 한 사람이
+        한 줄씩 길게 내려갔다). 까닭 글도 짧게 줄였다.
+      */}
+      <ul className="grid gap-x-10 sm:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4">
         {flagged.map((r) => {
           const bySpeed = r.agreement !== null && r.agreement >= QUALITY.agreementReview;
           return (
             <li
               key={r.employeeId}
-              className="grid grid-cols-[1fr_auto] items-baseline gap-x-4 border-b border-(--border) py-3 last:border-0"
+              className="grid grid-cols-[1fr_auto] items-baseline gap-x-4 border-b border-(--border) py-3"
             >
               <Link href={`/admin/employees/${r.employeeId}`} className="text-table underline">
                 {r.name}
@@ -77,8 +81,8 @@ export function LowQualityList({ rows }: { rows: PersonQuality[] }) {
               </span>
               <span className="text-axis text-ink-muted col-span-2 leading-snug">
                 {bySpeed
-                  ? `일치도는 괜찮지만 ${r.fastCount ?? 0}문항을 1.5초 안에 넘겼습니다`
-                  : `반대 문항에 서로 어긋나게 답한 곳이 많습니다`}
+                  ? `1.5초 안에 넘긴 문항 ${r.fastCount ?? 0}개`
+                  : "반대 문항에 어긋난 답이 많음"}
               </span>
             </li>
           );

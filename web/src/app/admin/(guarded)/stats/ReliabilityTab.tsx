@@ -8,10 +8,14 @@ import { LowQualityList, QualityRanking } from "./PersonQuality";
 /**
  * 검사 신뢰도 탭.
  *
- * ## 카드 셋으로 (2026-10-07 사용자 결정)
+ * ## 카드 셋을 위에서부터 (2026-10-07 사용자 결정 → 2026-10-30 배치 바꿈)
  *
- *   문항 일관성(α 표)  ·  신뢰도 위험(이름)
+ *   문항 일관성 — 넓게, 왼쪽 기질 · 오른쪽 성격
+ *   신뢰도 위험 — 넓게, 이름을 여러 단으로
  *   사람별 응답 신뢰도(순위)
+ *
+ * 전에는 문항 일관성과 신뢰도 위험이 한 줄에 나란히 있어 둘 다 좁았고,
+ * 신뢰도 위험은 한 사람이 한 줄씩 길게 내려갔다.
  *
  * 제목을 물음(「문항이 맞물리는가」)에서 짧은 이름으로 바꿨다. 제목 밑에
  * 붙어 있던 설명 줄은 지우거나 카드 맨 아래 접힌 설명으로 내렸다 — 표가
@@ -80,115 +84,113 @@ export function ReliabilityTab({
 
   return (
     <div className="flex flex-col gap-4">
-      <div className="grid gap-4 xl:grid-cols-[minmax(0,1fr)_24rem]">
-        <Panel title="문항 일관성" aside="척도별 신뢰도">
-          <div className="flex flex-col gap-6">
-            {GROUPS.map((g) => {
-              const part = rows.filter((r) => g.has(r));
-              if (part.length === 0) return null;
-              return (
-                <div key={g.label} className="overflow-x-auto">
-                  <p className="text-table text-ink-secondary mb-1.5">
-                    {g.label}
-                    <span className="text-axis text-ink-muted ml-2">
-                      {g.note}
-                    </span>
-                  </p>
-                  <table className="text-table w-full min-w-[22rem]">
-                    <thead>
-                      <tr className="text-axis text-ink-muted border-b border-(--border)">
-                        <th className="py-1.5 text-left font-medium">척도</th>
-                        <th className="w-16 py-1.5 text-right font-medium">
-                          문항
-                        </th>
-                        <th className="w-20 py-1.5 text-right font-medium">
-                          신뢰도
-                        </th>
-                        <th className="w-28 py-1.5 pl-6 text-left font-medium">
-                          판정
-                        </th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {part.map((r) => (
-                        <tr
-                          key={r.scale}
-                          className="border-b border-(--border) last:border-0"
+      <Panel title="문항 일관성" aside="척도별 신뢰도">
+        <div className="grid gap-x-12 gap-y-6 lg:grid-cols-2">
+          {GROUPS.map((g) => {
+            const part = rows.filter((r) => g.has(r));
+            if (part.length === 0) return null;
+            return (
+              <div key={g.label} className="overflow-x-auto">
+                <p className="text-table text-ink-secondary mb-1.5">
+                  {g.label}
+                  <span className="text-axis text-ink-muted ml-2">
+                    {g.note}
+                  </span>
+                </p>
+                <table className="text-table w-full min-w-[22rem]">
+                  <thead>
+                    <tr className="text-axis text-ink-muted border-b border-(--border)">
+                      <th className="py-1.5 text-left font-medium">척도</th>
+                      <th className="w-16 py-1.5 text-right font-medium">
+                        문항
+                      </th>
+                      <th className="w-20 py-1.5 text-right font-medium">
+                        신뢰도
+                      </th>
+                      <th className="w-28 py-1.5 pl-6 text-left font-medium">
+                        판정
+                      </th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {part.map((r) => (
+                      <tr
+                        key={r.scale}
+                        className="border-b border-(--border) last:border-0"
+                      >
+                        <th
+                          scope="row"
+                          className="py-2 text-left font-normal"
                         >
-                          <th
-                            scope="row"
-                            className="py-2 text-left font-normal"
-                          >
-                            {r.scale}
-                          </th>
-                          <td className="tabular py-2 text-right">
-                            {r.itemCount}
-                          </td>
-                          <td className="tabular py-2 text-right font-medium">
-                            {r.alpha === null ? "—" : formatReliability(r.alpha)}
-                          </td>
-                          <td
-                            className="text-axis py-2 pl-6"
-                            style={{ color: COLOR[r.verdict] }}
-                          >
-                            {LABEL[r.verdict]}
-                          </td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
-              );
-            })}
-          </div>
+                          {r.scale}
+                        </th>
+                        <td className="tabular py-2 text-right">
+                          {r.itemCount}
+                        </td>
+                        <td className="tabular py-2 text-right font-medium">
+                          {r.alpha === null ? "—" : formatReliability(r.alpha)}
+                        </td>
+                        <td
+                          className="text-axis py-2 pl-6"
+                          style={{ color: COLOR[r.verdict] }}
+                        >
+                          {LABEL[r.verdict]}
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            );
+          })}
+        </div>
 
-          <div className="mt-6 flex flex-col gap-2">
-            {/*
-              「α가 낮으면 그 상관은 볼 필요가 없다」고 적혀 있었다.
-              D-92에서 뒤집은 결론인데 이 줄만 남아 있었다 (2026-08-25).
-              제목 밑 설명 줄이던 것을 접힌 설명으로 내렸다 (2026-10-07).
-            */}
-            <Note label="신뢰도가 재는 것">
-              <p className="mb-2">
-                한 척도의 문항들이 같은 것을 재고 있는지를 봅니다(Cronbach&apos;s α).
-              </p>
-              <p>
-                <strong>93%는 「결과가 93% 맞는다」는 뜻이 아닙니다.</strong> 사람들
-                점수 차이 가운데 93%가 실제 성향 차이에서 나오고 7%가 측정
-                오차라는 뜻입니다. α는 이 몫을 낮게 잡는 쪽이라 실제는 같거나
-                더 높습니다. 60% 아래면 그 척도는 해석에 쓰지 않습니다.
-              </p>
-            </Note>
-            <Note label="직무능력이 이 표에 없는 이유">
-              <p className="mb-2">
-                α는 <strong>「문항들이 한 가지를 재는가」</strong>를 잽니다.
-                TCI 축은 그 구조라서(하나의 성향이 문항 15개 답을 일으킴) α가
-                제 몫을 합니다.
-              </p>
-              <p className="mb-2">
-                <strong>직무능력 3축은 구조가 다릅니다.</strong> 「협력」은 내
-                몫 하기 · 미리 알리기 · 남 돕기가 <strong>모여서 이루는</strong>
-                것이라 문항끼리 같이 움직이지 않아도 정상입니다. 소득·학력·직업의
-                α를 재서 「사회경제적 지위 척도가 못 만들어졌다」고 하지 않는
-                것과 같습니다.
-              </p>
-              <p>
-                직무능력의 신뢰도는 <strong>같은 사람을 두 번 재서</strong>{" "}
-                확인해야 합니다. 아직 두 번째 응시 데이터가 없어{" "}
-                <strong>지금은 답할 수 없는 상태</strong>입니다.
-              </p>
-            </Note>
-          </div>
-        </Panel>
+        <div className="mt-6 flex flex-col gap-2">
+          {/*
+            「α가 낮으면 그 상관은 볼 필요가 없다」고 적혀 있었다.
+            D-92에서 뒤집은 결론인데 이 줄만 남아 있었다 (2026-08-25).
+            제목 밑 설명 줄이던 것을 접힌 설명으로 내렸다 (2026-10-07).
+          */}
+          <Note label="신뢰도가 재는 것">
+            <p className="mb-2">
+              한 척도의 문항들이 같은 것을 재고 있는지를 봅니다(Cronbach&apos;s α).
+            </p>
+            <p>
+              <strong>93%는 「결과가 93% 맞는다」는 뜻이 아닙니다.</strong> 사람들
+              점수 차이 가운데 93%가 실제 성향 차이에서 나오고 7%가 측정
+              오차라는 뜻입니다. α는 이 몫을 낮게 잡는 쪽이라 실제는 같거나
+              더 높습니다. 60% 아래면 그 척도는 해석에 쓰지 않습니다.
+            </p>
+          </Note>
+          <Note label="직무능력이 이 표에 없는 이유">
+            <p className="mb-2">
+              α는 <strong>「문항들이 한 가지를 재는가」</strong>를 잽니다.
+              TCI 축은 그 구조라서(하나의 성향이 문항 15개 답을 일으킴) α가
+              제 몫을 합니다.
+            </p>
+            <p className="mb-2">
+              <strong>직무능력 3축은 구조가 다릅니다.</strong> 「협력」은 내
+              몫 하기 · 미리 알리기 · 남 돕기가 <strong>모여서 이루는</strong>
+              것이라 문항끼리 같이 움직이지 않아도 정상입니다. 소득·학력·직업의
+              α를 재서 「사회경제적 지위 척도가 못 만들어졌다」고 하지 않는
+              것과 같습니다.
+            </p>
+            <p>
+              직무능력의 신뢰도는 <strong>같은 사람을 두 번 재서</strong>{" "}
+              확인해야 합니다. 아직 두 번째 응시 데이터가 없어{" "}
+              <strong>지금은 답할 수 없는 상태</strong>입니다.
+            </p>
+          </Note>
+        </div>
+      </Panel>
 
-        <Panel
-          title="신뢰도 위험"
-          aside={flagged ? <span className="tabular">{flagged}명</span> : undefined}
-          bodyClassName="py-2!"
-        >
-          <LowQualityList rows={quality} />
-        </Panel>
-      </div>
+      <Panel
+        title="신뢰도 위험"
+        aside={flagged ? <span className="tabular">{flagged}명</span> : undefined}
+        bodyClassName="py-2!"
+      >
+        <LowQualityList rows={quality} />
+      </Panel>
 
       <Panel
         title="사람별 응답 신뢰도"

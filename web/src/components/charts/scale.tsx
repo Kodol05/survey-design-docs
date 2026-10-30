@@ -35,23 +35,25 @@ export function colorAt(pct: number): string {
   return `color-mix(in oklab, var(--scale-${p1}) ${(t * 100).toFixed(1)}%, var(--scale-${p0}))`;
 }
 
-/** 바깥 검정 링 + 안쪽은 그 자리의 색. 색을 못 봐도 링 위치로 읽힌다. */
+/**
+ * 눈금 위 내 자리 표시 (2026-10-30 사용자 요청으로 다시 그림).
+ *
+ * 전에는 검정 링 안에 작은 색 점이라 무겁고 눈금 색과 따로 놀았다. 이제
+ * **그 자리의 색으로 꽉 찬 원**에 바탕색 테두리와 옅은 그림자만 둔다 —
+ * 눈금 위에 살짝 떠 있는 구슬처럼 보인다. 색을 못 봐도 위치로 읽힌다.
+ */
 export function Marker({ percent, size = 24 }: { percent: number; size?: number }) {
   return (
     <span
-      className="flex items-center justify-center rounded-full ring-4"
+      className="block rounded-full"
       style={{
         width: size,
         height: size,
-        background: "var(--ink)",
-        ["--tw-ring-color" as string]: "var(--page)",
+        background: colorAt(percent),
+        border: `${Math.max(2, Math.round(size / 6))}px solid var(--page)`,
+        boxShadow: "0 1px 4px rgb(0 0 0 / 0.28)",
       }}
-    >
-      <span
-        className="block rounded-full"
-        style={{ width: size * 0.5, height: size * 0.5, background: colorAt(percent) }}
-      />
-    </span>
+    />
   );
 }
 

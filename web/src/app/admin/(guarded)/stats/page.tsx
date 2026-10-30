@@ -31,23 +31,17 @@ const TABS = [
 export default async function StatsPage(props: {
   searchParams: Promise<{
     tab?: string;
-    clean?: string;
   }>;
 }) {
   await requireAdmin();
   const sp = await props.searchParams;
   const tab = TABS.some((t) => t.key === sp.tab) ? sp.tab! : "matrix";
   /*
-    **응답 신뢰도가 낮은 사람을 빼고 다시 본다** (2026-08-25 사용자 요청).
-
-    「이 결과가 대충 찍은 몇 명 때문인가」는 늘 남는 물음인데, 그동안
-    `loadPeople(excludePoor)`라는 손잡이가 코드에만 있고 화면에는 없었다.
-    켜고 끄면서 숫자가 얼마나 움직이는지 보는 것이 답이다.
+    「신뢰도 낮은 응답 빼기」(`?clean=1`)는 뺐다 (2026-10-30 사용자 결정) —
+    분석은 늘 전원으로 본다.
   */
-  const clean = sp.clean === "1";
-
   const [people, reliability, personQuality] = await Promise.all([
-    loadPeople(clean),
+    loadPeople(),
     loadReliability(),
     loadPersonQuality(),
   ]);
@@ -58,12 +52,6 @@ export default async function StatsPage(props: {
     안 된다 (2026-08-25 사용자 결정).
   */
   const byScale = Object.fromEntries(reliability.map((r) => [r.scale, r]));
-  /*
-    빠지는 인원을 **품질 목록에서 직접 센다.** `people.length`와 빼서 구하면
-    거르개가 꺼져 있을 때는 0이 나와 「몇 명이 빠지는지」를 미리 말할 수 없다.
-    켜기 전에 알려줘야 누를지 말지 정할 수 있다.
-  */
-  const poorN = personQuality.filter((q) => q.flag === "poor").length;
 
   return (
     <>
@@ -74,37 +62,48 @@ export default async function StatsPage(props: {
         둔다 (2026-10-07 사용자 결정). 같은 것이 두 화면 맨 위에 똑같이 떠
         있었다 — 분석에 들어오면 바로 표가 보여야 한다.
       */}
-      <nav className="mb-6 flex flex-wrap gap-1 border-b border-(--border)">
-        {TABS.map((t) => (
-          <Link
-            key={t.key}
-            href={`/admin/stats?tab=${t.key}`}
-            className="text-table -mb-px border-b-2 px-4 py-2.5"
-            style={{
-              borderColor: t.key === tab ? "var(--ink)" : "transparent",
-              color: t.key === tab ? "var(--ink)" : "var(--ink-secondary)",
-              fontWeight: t.key === tab ? 600 : 400,
-            }}
-          >
-            {t.label}
-          </Link>
-        ))}
+      {/*
+        **진짜 탭처럼 — 지금 탭이 아래 카드와 이어진다** (2026-10-30 사용자 요청).
+
+        전에는 탭 줄 아래에 가는 선이 있고 지금 탭은 옅은 알약이라, 탭과 아래
+        표가 따로 놀았다. 선을 걷고, 지금 탭을 **카드와 같은 바탕**으로 칠해
+        아래 첫 카드에 붙인다. 탭은 위만 둥글고 아래는 각지게, 첫 카드는
+        탭이 붙는 왼쪽 위 모서리를 각지게 둔다(\`.tab-body\`).
+      */}
+      <nav className="flex flex-wrap items-end gap-1">
+        {TABS.map((t) => {
+          const on = t.key === tab;
+          return (
+            <Link
+              key={t.key}
+              href={`/admin/stats?tab=${t.key}`}
+              aria-current={on ? "page" : undefined}
+              className={`text-table relative rounded-t-xl px-5 transition-colors ${
+                on ? "z-10 -mb-px pt-3 pb-3.5" : "py-2.5 hover:bg-(--wash)/60"
+              }`}
+              style={{
+                background: on ? "var(--card)" : undefined,
+                color: on ? "var(--ink)" : "var(--ink-secondary)",
+                fontWeight: on ? 600 : 400,
+              }}
+            >
+              {t.label}
+            </Link>
+          );
+        })}
       </nav>
 
-      {tab === "matrix" && (
-        <MatrixTab
-          people={people}
-          matrix={matrix}
-          clean={clean}
-          poorN={poorN}
-        />
-      )}
-      {tab === "spread" && (
-        <SpreadTab people={people} reliability={byScale} />
-      )}
-      {tab === "reliability" && (
-        <ReliabilityTab rows={reliability} quality={personQuality} />
-      )}
+      <div className="tab-body">
+        {tab === "matrix" && (
+          <MatrixTab people={people} matrix={matrix} />
+        )}
+        {tab === "spread" && (
+          <SpreadTab people={people} reliability={byScale} />
+        )}
+        {tab === "reliability" && (
+          <ReliabilityTab rows={reliability} quality={personQuality} />
+        )}
+      </div>
     </>
   );
 }

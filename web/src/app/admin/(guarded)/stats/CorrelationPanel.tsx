@@ -29,7 +29,17 @@ import { rankByAbs } from "@/components/analysis/share";
  *   - 표에서 칸을 누르면 그 조합으로 가고, 이전·다음은 그 순번에서 이어진다
  *
  * 그리는 조합의 칸에는 표에서 늘 테두리가 둘려 있어 두 쪽이 이어진다.
+ *
+ * ## 처음에는 큰 순 넷을 함께 (2026-10-30 사용자 요청)
+ *
+ * 아무것도 안 골랐을 때는 |r| 큰 순 **넷을 2×2로** 깔아 둔다. 표의 칸은 어느
+ * 것도 고른 상태로 두지 않는다 — 전에는 가장 큰 칸(예: 0.55)이 처음부터
+ * 테두리를 두르고 있어 누른 것처럼 보였다. 칸이나 작은 그림 제목을 누르면
+ * 그 조합 하나를 크게 보고, 「큰 순 4개」를 누르면 다시 넷으로 돌아온다.
  */
+
+/** 처음 화면에 깔아 둘 조합 수 */
+const OVERVIEW = 4;
 export function CorrelationPanel({
   rows,
   cols,
@@ -70,7 +80,9 @@ export function CorrelationPanel({
     ? ranked.findIndex((x) => x.row === sel.row && x.col === sel.col)
     : -1;
   const i = Math.max(0, found);
-  const cur = ranked[i];
+  /** 고른 조합 — 안 골랐으면 없음(큰 순 넷을 보여 준다) */
+  const cur = sel ? ranked[i] : undefined;
+  const top = ranked.slice(0, OVERVIEW);
   const go = (j: number) =>
     ranked[j] && setSel({ row: ranked[j].row, col: ranked[j].col });
 
@@ -85,7 +97,11 @@ export function CorrelationPanel({
       : null;
 
   return (
-    <div className="grid gap-8 xl:grid-cols-[34rem_minmax(0,1fr)]">
+    /*
+      표와 그림을 **비슷한 무게로** 나눈다 (2026-10-30 사용자 요청 — 오른쪽 그림이
+      너무 커서 표가 먹혀 보였다). 그림 쪽에 상한을 두고 남는 폭은 표에 준다.
+    */
+    <div className="grid gap-8 xl:grid-cols-[minmax(32rem,1fr)_minmax(0,46rem)]">
       <div>
         <CorrelationTable
           rows={rows}
@@ -94,18 +110,58 @@ export function CorrelationPanel({
           selected={cur ? { row: cur.row, col: cur.col } : null}
           onSelect={setSel}
           groups={groups}
+          colsLabel="직무능력"
         />
         <CorrelationLegend nRange={nRange} />
       </div>
 
       <div className="min-w-0">
-        {!cur ? (
+        {ranked.length === 0 ? (
           <p className="text-ink-muted py-16 text-center">
             아직 그려 볼 값이 없습니다.
           </p>
+        ) : !cur ? (
+          /* 큰 순 넷 — 제목을 누르면 그 조합 하나를 크게 본다 */
+          /*
+            넷을 합쳐도 하나 크게 볼 때와 **비슷한 크기**로 (2026-10-30 사용자 요청).
+          */
+          <div className="grid gap-x-6 gap-y-4 lg:grid-cols-2">
+            {top.map((x, k) => (
+              <div key={`${x.row}|${x.col}`} className="min-w-0">
+                <button
+                  type="button"
+                  onClick={() => setSel({ row: x.row, col: x.col })}
+                  className="group mb-1 flex w-full flex-wrap items-baseline gap-x-3 text-left"
+                >
+                  <span className="text-axis text-ink-muted tabular">{k + 1}</span>
+                  <span className="text-table font-semibold group-hover:underline group-hover:underline-offset-4">
+                    {x.row} <span className="text-ink-muted font-normal">×</span> {x.col}
+                  </span>
+                  <span className="flex items-baseline gap-1.5">
+                    <span className="text-table tabular">{formatR(x.r)}</span>
+                    <GradeTag r={x.r} ci={x.ci} />
+                  </span>
+                </button>
+                <ScatterPlot
+                  height={180}
+                  points={scatter[`${x.row}|${x.col}`] ?? []}
+                  trend={trends[`${x.row}|${x.col}`] ?? null}
+                  xLabel={x.row}
+                  yLabel={x.col}
+                />
+              </div>
+            ))}
+          </div>
         ) : (
           <>
             <div className="mb-2 flex flex-wrap items-center gap-x-4 gap-y-2">
+              <button
+                type="button"
+                onClick={() => setSel(null)}
+                className="text-axis rounded-full bg-(--wash)/70 px-3 py-1 transition hover:bg-(--wash)"
+              >
+                큰 순 {OVERVIEW}개
+              </button>
               <h3 className="text-table font-semibold">
                 {cur.row} <span className="text-ink-muted font-normal">×</span>{" "}
                 {cur.col}
@@ -122,7 +178,7 @@ export function CorrelationPanel({
               />
             </div>
             <ScatterPlot
-              height={420}
+              height={380}
               points={scatter[`${cur.row}|${cur.col}`] ?? []}
               trend={trends[`${cur.row}|${cur.col}`] ?? null}
               xLabel={cur.row}
@@ -148,7 +204,7 @@ function Stepper({
   onNext: () => void;
 }) {
   const btn =
-    "text-axis rounded-md border border-(--border) px-2.5 py-1 transition enabled:hover:bg-card-head disabled:opacity-40";
+    "text-axis rounded-full bg-(--wash)/70 px-3 py-1 transition enabled:hover:bg-(--wash) disabled:opacity-40";
   return (
     <span className="ml-auto flex items-center gap-2">
       <button type="button" className={btn} onClick={onPrev} disabled={at <= 0}>

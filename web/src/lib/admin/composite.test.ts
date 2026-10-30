@@ -9,6 +9,7 @@ const P = (
 ): Person => ({
   employeeId: `e${n}`,
   name: `사람${n}`,
+  phoneTail: String(n).padStart(4, "0"),
   traits,
   abilities: { 협력: abil[0], 조직생활: abil[1], 자율적실행: abil[2] },
   quality: "ok",
@@ -106,6 +107,7 @@ describe("topGroup", () => {
   const P2 = (n: number, v: number, traits: Record<string, number>) => ({
     employeeId: `e${n}`,
     name: `사람${n}`,
+    phoneTail: String(n).padStart(4, "0"),
     traits,
     abilities: { 협력: v, 조직생활: v, 자율적실행: v },
     quality: "ok",

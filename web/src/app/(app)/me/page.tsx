@@ -13,7 +13,7 @@ import {
   latestResult,
 } from "@/lib/survey/result";
 
-export const metadata = { title: "내 결과 — 7차원 성향 설문" };
+export const metadata = { title: "내 결과 — 7가지 성향 검사" };
 
 /**
  * 개인 결과지 (2026-09-18 다시 짬, 같은 날 사용자 피드백으로 한 번 더).

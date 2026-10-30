@@ -1,10 +1,11 @@
 import type { Metadata } from "next";
 import { THEME_SCRIPT } from "@/lib/theme";
+import { ZOOM_SCRIPT } from "@/lib/pageZoom";
 import { ThemeOnRoute } from "@/components/ui/ThemeOnRoute";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "7차원 성향 설문",
+  title: "7가지 성향 검사",
   description: "사내 성향·직무능력 설문",
 };
 
@@ -19,6 +20,8 @@ export default function RootLayout({
           별도 웹폰트를 받지 않으므로 사내망에서도 즉시 뜬다. */}
       <head>
         <script dangerouslySetInnerHTML={{ __html: THEME_SCRIPT }} />
+        {/* 1920px보다 넓은 모니터에서는 화면 전체를 비율대로 키운다 (lib/pageZoom) */}
+        <script dangerouslySetInnerHTML={{ __html: ZOOM_SCRIPT }} />
       </head>
       <body className="flex min-h-full flex-col">
         {/*

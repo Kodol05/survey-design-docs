@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { CHARACTER } from "../charts/scale";
 import { formatR } from "./correlationColor";
-import { gradeOf, isUncertain } from "./correlationWords";
+import { isUncertain } from "./correlationWords";
 import { DivergingBar } from "./DivergingBar";
 import { ScatterPlot, type Point } from "./ScatterPlot";
 import { formatShare, sharePct, shareOf } from "./share";
@@ -11,7 +11,7 @@ import { formatShare, sharePct, shareOf } from "./share";
 /**
  * 성향 일곱 축을 **「차이의 몇 %」 순으로** 늘어놓는 목록 (2026-10-07 사용자 결정).
  *
- * 「각 직무능력별 정리」와 「모든 직무능력과 가장 연관된 성향」 두 카드가 같은
+ * 「직무능력별 상관관계」와 「직무능력에 긍정적인 영향을 끼치는 성향」 두 카드가 같은
  * 줄 모양을 쓴다 — 순위 · 축 이름 · 0을 가운데 둔 막대 · `+15% (+0.39)`.
  * 따로 두었더니 조금씩 어긋났던 일이 있어 한 부품으로 모았다.
  *
@@ -36,7 +36,7 @@ export function ShareList({
   sentence,
   scatter,
   trends,
-  foldNone = false,
+  visible = 4,
 }: {
   /** 이미 |r| 큰 순으로 정렬된 줄 */
   rows: ShareRow[];
@@ -50,17 +50,16 @@ export function ShareList({
   scatter?: Record<string, Point[]>;
   trends?: Record<string, { x: number; y: number }[] | null>;
   /**
-   * 「없음」(|r| < .10) 줄을 접어 둘지 (2026-08-25 사용자 요청).
-   * 능력 하나에 일곱 줄 중 네댓이 「없음」이면 볼 것보다 화면이 길어진다.
+   * 처음에 보일 줄 수 (2026-10-30 사용자 요청 — 두 카드 모두 위 네 줄만).
+   * 나머지는 「자세히 보기」로 편다. 전에는 「없음」(|r| < .10) 줄만 접었다.
    */
-  foldNone?: boolean;
+  visible?: number;
 }) {
   const [open, setOpen] = useState<string | null>(null);
   const [showAll, setShowAll] = useState(false);
 
-  const none = foldNone ? rows.filter((r) => gradeOf(r.r) === "없음") : [];
-  const shown =
-    foldNone && !showAll ? rows.filter((r) => gradeOf(r.r) !== "없음") : rows;
+  const hidden = Math.max(0, rows.length - visible);
+  const shown = showAll ? rows : rows.slice(0, visible);
 
   return (
     <div>
@@ -143,13 +142,13 @@ export function ShareList({
         })}
       </ul>
 
-      {none.length > 0 && (
+      {hidden > 0 && (
         <button
           type="button"
           onClick={() => setShowAll((v) => !v)}
           className="text-axis text-ink-muted hover:text-ink-secondary mt-2 underline decoration-dotted underline-offset-4"
         >
-          {showAll ? "관련 없는 축 접기" : `관련 없는 축 ${none.length}개 더 보기`}
+          {showAll ? "접기" : "자세히 보기"}
         </button>
       )}
     </div>

@@ -47,7 +47,6 @@ export function AxisRanking({
         sentence={(r) => `${describeCorrelation(r.scale, axis, r.r)}.`}
         scatter={scatter}
         trends={trends}
-        foldNone
       />
     </div>
   );

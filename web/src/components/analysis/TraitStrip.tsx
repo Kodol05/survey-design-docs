@@ -1,15 +1,26 @@
-import { abilityColorAt, colorAt } from "../charts/scale";
+import { abilityColorAt } from "../charts/scale";
 import { ABILITY_AXES, TRAIT_SCALES } from "@/lib/items/types";
 
 /**
  * 7축 한 줄 표시 — 구성원 목록에서 한 사람을 훑는 용도.
  *
- * **숫자를 왼쪽에, 색 네모를 그 오른쪽에** 둔다. 칸 전체를 색으로 칠하면
- * 줄마다 색 덩어리가 이어져 화면이 시끄럽다. 작은 네모로 떼어 두면 숫자가
- * 먼저 읽히고 색은 옆에서 거들기만 한다.
+ * **숫자의 글자색만 살짝** 바꾼다 (2026-10-30 사용자 요청). 전에는 숫자
+ * 오른쪽에 색 네모를 두었는데, 작아서 티가 잘 안 나면서 자리만 차지했다.
  *
- * 색은 성향 눈금과 같다 — 청회색이 낮음, 테라코타가 높음.
+ * 색은 성향 눈금과 같은 방향이다 — 낮을수록 파랑, 높을수록 테라코타 쪽으로.
+ * 다만 **50에서는 본문 글자색 그대로**이고 멀어질수록 조금씩만 물든다
+ * (`traitInk`). 글자를 읽는 것이 먼저라, 끝까지 가도 바탕 위에서 또렷한
+ * 진한 색(`--scale-ink-*`)까지만 간다.
  */
+
+/** 성향 숫자의 글자색 — 50은 본문색, 0·100 쪽으로 갈수록 파랑·테라코타가 최대 80%까지 섞인다 */
+export function traitInk(v: number): string {
+  const d = Math.max(-50, Math.min(50, v - 50));
+  const p = Math.min(80, Math.round(Math.abs(d) * 1.8));
+  if (p === 0) return "var(--ink)";
+  const pole = d < 0 ? "var(--scale-ink-low)" : "var(--scale-ink-high)";
+  return `color-mix(in oklab, ${pole} ${p}%, var(--ink))`;
+}
 
 // 넓은 화면에서 늘어나되 무한정은 아니다.
 //
@@ -34,14 +45,14 @@ export function TraitStrip({ traits }: { traits: Record<string, number> | null }
           <span
             key={s}
             title={has ? `${s} ${Math.round(v)}` : s}
-            className={`${CELL} flex items-center justify-end gap-1.5`}
+            className={`${CELL} flex items-center justify-end`}
           >
-            <span className="tabular text-table">{has ? Math.round(v) : "—"}</span>
             <span
-              aria-hidden
-              className="size-3.5 shrink-0 rounded-[3px]"
-              style={{ background: has ? colorAt(v) : "var(--grid)" }}
-            />
+              className="tabular text-table font-medium"
+              style={{ color: has ? traitInk(v) : "var(--ink-muted)" }}
+            >
+              {has ? Math.round(v) : "—"}
+            </span>
           </span>
         );
       })}
@@ -197,7 +208,7 @@ export function TraitStripHeader() {
       {TRAIT_SCALES.map((s) => (
         <span
           key={s}
-          className={`${CELL} text-ink-muted pr-[1.5rem] text-right`}
+          className={`${CELL} text-ink-muted text-right`}
           style={{ fontSize: 17 }}
           title={s}
         >

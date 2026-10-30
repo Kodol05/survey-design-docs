@@ -6,8 +6,8 @@ import { usePathname } from "next/navigation";
 /**
  * 메뉴 한 칸.
  *
- * **지금 어느 화면인지 보여야 한다.** 지금 화면은 잉크색 바탕에 흰 글씨로
- * 뒤집는다.
+ * **지금 어느 화면인지 보여야 한다.** 지금 화면은 옅은 바탕(`--wash`)에
+ * 굵은 글씨로 띄운다 (2026-10-28 — 정안 시안처럼 뒤집지 않고 바탕으로 강조).
  *
  * `/admin`은 정확히 일치할 때만 켠다 — `startsWith`로 하면 어느 화면에서나
  * 「대시보드」가 같이 켜져 둘이 동시에 눌린 것처럼 보인다.
@@ -34,10 +34,10 @@ export function NavItem({
       aria-current={on ? "page" : undefined}
       className={`text-table shrink-0 rounded-lg whitespace-nowrap transition-colors ${
         block ? "block px-3.5 py-2.5" : "px-3.5 py-1.5"
-      } ${on ? "" : "hover:bg-(--wash)"}`}
+      } ${on ? "" : "hover:bg-(--wash)/60"}`}
       style={{
-        background: on ? "var(--ink)" : undefined,
-        color: on ? "var(--page)" : "var(--ink-secondary)",
+        background: on ? "var(--wash)" : undefined,
+        color: on ? "var(--ink)" : "var(--ink-secondary)",
         fontWeight: on ? 600 : 400,
       }}
     >

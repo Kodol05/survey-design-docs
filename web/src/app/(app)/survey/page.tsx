@@ -11,7 +11,7 @@ import {
 } from "@/lib/survey/session";
 import { inProgress, latestResult } from "@/lib/survey/result";
 
-export const metadata = { title: "응시 — 7차원 성향 설문" };
+export const metadata = { title: "응시 — 7가지 성향 검사" };
 
 export default async function SurveyPage(props: {
   searchParams: Promise<{ section?: string; rest?: string; retake?: string }>;
@@ -66,7 +66,8 @@ export default async function SurveyPage(props: {
   const savedElsewhere = saved - Object.keys(answers).length;
 
   return (
-    <main className="mx-auto w-full max-w-[92rem] px-6">
+    // 응시 영역 폭은 전보다 20% 좁게 (2026-10-30 사용자 요청, 92rem → 74rem)
+    <main className="mx-auto w-full max-w-[74rem] px-6">
       {/*
         묶음을 넘겨 왔으면 남은 개수를 **화면 가운데 잠깐** 띄운다.
         화면 위에 떠 있는 것이라 이 자리가 본문 흐름을 밀지 않는다.

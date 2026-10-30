@@ -114,13 +114,18 @@ export function DivergingBar({
         />
       )}
 
+      {/*
+        **0 쪽 끝은 각지게, 바깥 끝만 둥글게** (2026-10-30 사용자 지적). 양끝을
+        다 둥글리면 막대가 0선에서 떨어져 떠 있는 것처럼 보였다.
+      */}
       <span
-        className="absolute rounded-sm"
+        className="absolute"
         style={{
           left: r < 0 ? `${HALF - w}%` : `${HALF}%`,
           width: `${w}%`,
           top: 0,
           bottom: barBottom,
+          borderRadius: r < 0 ? "3px 0 0 3px" : "0 3px 3px 0",
           background: hollow ? "transparent" : color,
           outline: hollow ? `1.5px solid ${color}` : undefined,
           outlineOffset: -1.5,
