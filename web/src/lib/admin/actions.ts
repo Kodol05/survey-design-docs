@@ -1,6 +1,7 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
+import { forgetAnalysis } from "./cached";
 import { redirect, unstable_rethrow } from "next/navigation";
 import { Prisma } from "@/generated/prisma/client";
 import { prisma } from "../db";
@@ -92,6 +93,8 @@ export async function deleteEmployeeAction(
     // 로그인 실패 기록은 직원 표와 이어져 있지 않아 따로 지운다
     if (target.phone) await clearFailures(target.phone);
     await prisma.employee.delete({ where: { id: employeeId } });
+    // 그 사람의 응시 기록이 분석에서 빠지도록 기억해 둔 분석 값을 버린다
+    forgetAnalysis();
   } catch (e) {
     unstable_rethrow(e);
     console.error("[admin]", e);
@@ -141,6 +144,8 @@ export async function updateItemAction(
       where: { id },
       data: itemUpdateData(kind, patch) as Prisma.ItemUncheckedUpdateInput,
     });
+    // 역채점·축이 바뀌면 신뢰도가 달라진다 — 기억해 둔 분석 값을 버린다
+    forgetAnalysis();
   } catch (e) {
     unstable_rethrow(e);
     console.error("[admin]", e);

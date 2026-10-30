@@ -1,11 +1,11 @@
 import Link from "next/link";
 import { requireAdmin } from "@/lib/auth/guard";
+import { traitAbilityMatrix } from "@/lib/admin/analysis";
 import {
-  loadPeople,
-  loadPersonQuality,
-  loadReliability,
-  traitAbilityMatrix,
-} from "@/lib/admin/analysis";
+  cachedPeople,
+  cachedPersonQuality,
+  cachedReliability,
+} from "@/lib/admin/cached";
 import { MatrixTab } from "./MatrixTab";
 import { SpreadTab } from "./SpreadTab";
 import { ReliabilityTab } from "./ReliabilityTab";
@@ -41,9 +41,10 @@ export default async function StatsPage(props: {
     분석은 늘 전원으로 본다.
   */
   const [people, reliability, personQuality] = await Promise.all([
-    loadPeople(),
-    loadReliability(),
-    loadPersonQuality(),
+    // 서버에 잠시 기억해 둔 값 — 탭을 바꿔도 DB를 다시 묻지 않는다 (`admin/cached.ts`)
+    cachedPeople(),
+    cachedReliability(),
+    cachedPersonQuality(),
   ]);
   const matrix = traitAbilityMatrix(people);
   /*

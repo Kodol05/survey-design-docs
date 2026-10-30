@@ -156,25 +156,28 @@ export type ScaleReliability = {
  * 못 만들어진 척도의 상관을 열심히 해석하게 된다.
  */
 export async function loadReliability(): Promise<ScaleReliability[]> {
-  const assessment = await prisma.assessment.findFirst({
-    where: { isActive: true },
-  });
-  if (!assessment) return [];
-
-  const items = await prisma.item.findMany({
-    where: { assessmentId: assessment.id, status: "ACTIVE" },
-    select: {
-      id: true,
-      kind: true,
-      scale: true,
-      abilityAxis: true,
-      isReverse: true,
-    },
-  });
-  const responses = await prisma.response.findMany({
-    where: { session: { status: "COMPLETED", employee: { role: "USER" } } },
-    select: { sessionId: true, itemId: true, value: true },
-  });
+  /*
+    세 번 차례로 묻던 것(검사 → 문항 → 응답)을 **한 번에 같이** 묻는다
+    (2026-10-30). DB가 멀어(us-east-1) 왕복 한 번이 0.2초씩이라, 차례로
+    기다리면 그만큼 쌓였다. 문항은 「활성 검사의 문항」으로 바로 고른다.
+  */
+  const [items, responses] = await Promise.all([
+    prisma.item.findMany({
+      where: { assessment: { isActive: true }, status: "ACTIVE" },
+      select: {
+        id: true,
+        kind: true,
+        scale: true,
+        abilityAxis: true,
+        isReverse: true,
+      },
+    }),
+    prisma.response.findMany({
+      where: { session: { status: "COMPLETED", employee: { role: "USER" } } },
+      select: { sessionId: true, itemId: true, value: true },
+    }),
+  ]);
+  if (items.length === 0) return [];
 
   const bySession = new Map<string, Map<string, number>>();
   for (const r of responses) {

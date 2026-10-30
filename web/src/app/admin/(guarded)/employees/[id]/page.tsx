@@ -13,7 +13,8 @@ import {
 import { EmptyState } from "@/components/ui/Card";
 import { MIN_N, WARNINGS } from "@/components/ui/NBadge.helpers";
 import { Panel, panelClass } from "@/components/ui/Panel";
-import { loadPeople } from "@/lib/admin/analysis";
+import type { loadPeople } from "@/lib/admin/analysis";
+import { cachedPeople } from "@/lib/admin/cached";
 import { averageOf } from "@/lib/admin/distribution";
 import { topPercent } from "@/lib/admin/percentile";
 import { requireAdmin } from "@/lib/auth/guard";
@@ -77,8 +78,8 @@ export default async function EmployeeDetail(props: {
       orderBy: { name: "asc" },
     }),
     // 사내 비교(상위 N% · 평균)의 모집단 — 사람 한 명당 가장 최근 결과 하나, 사원만.
-    // 따로 기다리면 DB를 한 번 더 왕복한다 (2026-10-07 점검)
-    loadPeople(),
+    // 따로 기다리면 DB를 한 번 더 왕복한다 (2026-10-07 점검). 서버에 기억해 둔 값을 쓴다
+    cachedPeople(),
   ]);
   if (!e || e.role !== "USER") notFound();
 

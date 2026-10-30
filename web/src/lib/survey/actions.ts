@@ -3,6 +3,7 @@
 import { redirect, unstable_rethrow } from "next/navigation";
 import { after } from "next/server";
 import { backupAfterSubmit } from "../admin/backup";
+import { forgetAnalysis } from "../admin/cached";
 import { prisma } from "../db";
 import { requireUser } from "../auth/guard";
 import {
@@ -211,6 +212,8 @@ export async function submitAction(sessionId: string) {
       where: { id: sessionId },
       data: { status: "COMPLETED", completedAt: new Date(), durationSec },
     });
+    // 새 결과가 분석에 바로 들어가도록 기억해 둔 분석 값을 버린다 (`admin/cached.ts`)
+    forgetAnalysis();
 
     // 응답을 보낸 뒤에 백업한다 — 사람을 기다리게 하지 않는다 (한 시간에 한 벌까지)
     after(backupAfterSubmit);

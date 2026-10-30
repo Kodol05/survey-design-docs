@@ -1,10 +1,6 @@
 import { ABILITY_AXES, TRAIT_SCALES } from "@/lib/items/types";
-import {
-  cellOf,
-  loadPeople,
-  loadReliability,
-  traitAbilityMatrix,
-} from "./analysis";
+import { cellOf, traitAbilityMatrix } from "./analysis";
+import { cachedPeople, cachedReliability } from "./cached";
 import type { ScaleReliability } from "./analysis";
 import { ensureBackup, listBackups } from "./backup";
 import { loadAttendance, loadSummary } from "./summary";
@@ -65,8 +61,8 @@ export async function loadDashboard() {
   */
   const [summary, people, reliability, attendance] = await Promise.all([
     loadSummary(),
-    loadPeople(),
-    loadReliability(),
+    cachedPeople(),
+    cachedReliability(),
     loadAttendance(),
     ensureBackup(),
   ]);

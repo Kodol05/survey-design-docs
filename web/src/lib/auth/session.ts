@@ -1,4 +1,5 @@
 import "server-only";
+import { cache } from "react";
 import { cookies } from "next/headers";
 import { randomBytes } from "node:crypto";
 import { prisma } from "../db";
@@ -103,8 +104,14 @@ export async function revokeSessions(
   });
 }
 
-/** 로그인한 사람. 없으면 null. */
-export async function currentUser() {
+/**
+ * 로그인한 사람. 없으면 null.
+ *
+ * 한 번의 요청 안에서는 **한 번만** DB에 묻는다 (`cache`, 2026-10-30) — 레이아웃과
+ * 화면이 각각 로그인을 확인해 같은 질문을 두 번 보내고 있었다. 요청이 끝나면
+ * 잊으므로 로그아웃·만료는 다음 요청에서 그대로 반영된다.
+ */
+export const currentUser = cache(async () => {
   const jar = await cookies();
   const id = jar.get(COOKIE)?.value;
   if (!id) return null;
@@ -114,4 +121,4 @@ export async function currentUser() {
   });
   if (!s || s.expiresAt < new Date()) return null;
   return s.employee;
-}
+});
