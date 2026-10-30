@@ -65,24 +65,32 @@ export function LowQualityList({ rows }: { rows: PersonQuality[] }) {
       */}
       <ul className="grid gap-x-10 sm:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4">
         {flagged.map((r) => {
-          const bySpeed = r.agreement !== null && r.agreement >= QUALITY.agreementReview;
+          /*
+            까닭 글 대신 **등급 한마디** (2026-10-30 사용자 요청) — 낮음은
+            「신뢰도 수치 위험」, 검토는 「신뢰도 수치 주의」. 글자는 검정이고
+            색(빨강 · 노랑)은 숫자만 맡는다 (같은 날 사용자 요청).
+          */
+          const poor = r.flag === "poor";
+          const tone = poor ? "var(--status-critical)" : "var(--status-warn)";
           return (
             <li
               key={r.employeeId}
               className="grid grid-cols-[1fr_auto] items-baseline gap-x-4 border-b border-(--border) py-3"
             >
-              <Link href={`/admin/employees/${r.employeeId}`} className="text-table underline">
+              {/* 이름은 밑줄 없이 조금 굵게만 (2026-10-30 사용자 요청) */}
+              <Link
+                href={`/admin/employees/${r.employeeId}`}
+                className="text-table hover:text-ink-secondary font-semibold transition-colors"
+              >
                 {r.name}
               </Link>
               <span className="text-axis tabular text-right">
-                <span className="font-medium" style={{ color: toneOf(r.agreement ?? 0) }}>
+                <span className="font-medium" style={{ color: tone }}>
                   {r.agreement === null ? "—" : Math.round(r.agreement * 100)}
                 </span>
               </span>
-              <span className="text-axis text-ink-muted col-span-2 leading-snug">
-                {bySpeed
-                  ? `1.5초 안에 넘긴 문항 ${r.fastCount ?? 0}개`
-                  : "반대 문항에 어긋난 답이 많음"}
+              <span className="text-axis text-ink col-span-2 leading-snug">
+                {poor ? "신뢰도 수치 위험" : "신뢰도 수치 주의"}
               </span>
             </li>
           );
