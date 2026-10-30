@@ -23,7 +23,7 @@ export async function GET() {
   // 서버리스에는 pg_dump 도 디스크도 없다. 여기까지 오면 화면 쪽이 이미
   // 버튼을 감췄어야 하지만, 주소를 직접 치는 길도 막아 둔다
   if (!backupSupported())
-    return new Response("이 서버에서는 백업을 받을 수 없습니다.", {
+    return new Response("이 서버에서는 백업 파일을 받을 수 없습니다.", {
       status: 501,
       headers: { "Cache-Control": "no-store, private" },
     });

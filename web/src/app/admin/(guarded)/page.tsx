@@ -11,7 +11,6 @@ import { EXPECTED } from "@/lib/items/types";
 import { loadDashboard } from "@/lib/admin/dashboard";
 import {
   INTERVAL_HOURS,
-  KEEP_COUNT,
   backupSupported,
   type Backup,
 } from "@/lib/admin/backup";
@@ -128,7 +127,7 @@ export default async function AdminHome() {
           }
           href="#backup"
           warn={canBackup && backupStale}
-          hint={canBackup ? "하루 한 벌 자동" : "올린 곳에서 백업"}
+          hint={canBackup ? "하루 1회 자동" : "외부에서 자동 백업"}
         />
       </div>
 
@@ -294,9 +293,9 @@ export default async function AdminHome() {
 function BackupElsewhere() {
   return (
     <Panel title="데이터 백업" id="backup">
-      <p className="text-table">이 서버에서는 받지 않습니다</p>
+      <p className="text-table">이 서버에서는 백업하지 않습니다</p>
       <p className="text-axis text-ink-secondary mt-1 leading-snug">
-        올린 곳에서 자동으로 백업합니다. 사내 서버로 옮기면 여기서 직접 받습니다.
+        DB를 맡긴 곳에서 자동으로 백업합니다. 사내 서버로 옮기면 이 화면에서 백업합니다.
       </p>
     </Panel>
   );
@@ -335,12 +334,16 @@ function BackupCard({
       aside={
         <a
           href="/admin/backup"
-          className="text-table text-ink inline-flex h-9 items-center rounded-lg border border-(--border) px-3 font-medium"
+          className="text-table text-ink inline-flex h-9 items-center rounded-lg bg-(--wash)/70 px-3 font-medium transition-colors hover:bg-(--wash)"
         >
           백업 파일 받기
         </a>
       }
     >
+      {/*
+        문구는 **짧은 사실만** (2026-10-30 사용자 지적 — 「한 벌씩 뜹니다」 같은
+        말투가 어색했다). 보관 개수 · 자동 주기 · 파일에 든 것 세 가지만 둔다.
+      */}
       <p className="text-table">
         마지막 백업{" "}
         <span
@@ -352,18 +355,16 @@ function BackupCard({
       </p>
       <p className="text-axis text-ink-secondary tabular mt-1 leading-snug">
         {latest
-          ? `서버 안 관리자 백업 ${admin}벌(최근 ${KEEP_COUNT.admin}벌) · 제출 백업 ${submit}벌(최근 ${KEEP_COUNT.submit}벌)`
-          : "이 화면을 열면 하루 한 벌씩 자동으로 뜹니다"}
+          ? `보관 중 · 하루 1회 저장 ${admin}개 · 제출 후 저장 ${submit}개`
+          : "대시보드를 열 때 하루 1회 자동 저장"}
       </p>
       <p className="text-axis text-ink-muted mt-2 leading-snug">
-        받는 파일에는 전화번호와 비밀번호 해시까지 전부 들어갑니다.
+        파일에 전화번호 · 암호화된 비밀번호 포함
       </p>
-      <Note label="서버 밖에 한 벌 두는 이유" className="mt-3">
+      <Note label="보관 안내" className="mt-3">
         <p>
-          서버 안 백업은 <strong>디스크가 죽으면 같이 사라집니다.</strong> 가끔
-          받아서 서버 밖에 한 벌 두시는 편이 실제 방어가 됩니다. 버튼을 누르면
-          지금 상태로 새로 뜹니다. 서버 안 백업은 이 화면을 열 때 하루 한 벌씩
-          자동으로 뜹니다.
+          서버 안 백업은 서버에 문제가 생기면 함께 사라질 수 있습니다. 가끔
+          파일로 받아 따로 보관해 주세요. 파일은 받는 시점의 상태로 새로 만들어집니다.
         </p>
       </Note>
     </Panel>
