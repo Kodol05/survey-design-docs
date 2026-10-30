@@ -259,9 +259,9 @@ export function SectionForm({
       >
         <svg
           viewBox="0 0 160 12"
-          className="h-3 w-40 transition-transform duration-200 group-hover:-translate-y-0.5"
+          className="text-ink-muted group-hover:text-ink h-3 w-40 transition-colors duration-200"
           fill="none"
-          stroke="var(--ink-muted)"
+          stroke="currentColor"
           strokeWidth="1.5"
           strokeLinecap="round"
           strokeLinejoin="round"

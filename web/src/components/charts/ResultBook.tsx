@@ -163,7 +163,7 @@ export function ResultBook({
     showEdges ? "flex" : "hidden"
   }`;
   const circle =
-    "flex size-10 items-center justify-center rounded-full text-xl leading-none shadow-md transition hover:scale-105";
+    "flex size-10 items-center justify-center rounded-full text-xl leading-none shadow-md transition-opacity hover:opacity-85";
   const circleStyle = { background: "var(--ink)", color: "var(--page)" } as const;
   const edgeLabel = "text-axis text-ink-secondary w-full truncate text-center";
 

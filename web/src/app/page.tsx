@@ -121,7 +121,7 @@ export default async function Home() {
             */}
             <Link
               href="/signup"
-              className="group -mx-2 inline-flex items-center gap-4 px-2 py-3 font-bold"
+              className="-mx-2 inline-flex items-center gap-4 px-2 py-3 font-bold transition-opacity duration-200 hover:opacity-75"
               style={{
                 fontSize: "clamp(2rem, 1.6rem + 1.4vw, 2.75rem)",
                 lineHeight: 1.1,
@@ -138,7 +138,7 @@ export default async function Home() {
                 strokeWidth={1.6}
                 strokeLinecap="round"
                 strokeLinejoin="round"
-                className="size-[0.85em] shrink-0 transition-transform duration-200 group-hover:translate-x-1.5"
+                className="size-[0.85em] shrink-0"
               >
                 <circle cx="12" cy="12" r="10.5" />
                 <path d="M10.5 8l4 4-4 4" />

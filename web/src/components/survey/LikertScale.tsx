@@ -115,7 +115,7 @@ export function LikertScale({
                 />
                 <span
                   aria-hidden
-                  className="flex items-center justify-center rounded-full transition-all duration-150 group-hover:scale-110 group-has-[:focus-visible]:outline-2 group-has-[:focus-visible]:outline-offset-4 group-has-[:focus-visible]:outline-(--ink)"
+                  className="flex items-center justify-center rounded-full transition-all duration-150 group-hover:bg-(--wash) group-has-[:focus-visible]:outline-2 group-has-[:focus-visible]:outline-offset-4 group-has-[:focus-visible]:outline-(--ink)"
                   style={{
                     width: size,
                     height: size,
@@ -126,7 +126,8 @@ export function LikertScale({
                       테두리를 굵히고 후광을 진하게 넓혀 둔다.
                     */
                     border: `${on ? 3.5 : 2}px solid ${on ? color : `color-mix(in oklab, ${color} 60%, transparent)`}`,
-                    background: on ? color : "transparent",
+                    // 안 고른 칸은 바탕을 비워 두고, 마우스를 올리면 옅은 바탕만 깐다 (크기는 그대로 — 2026-10-30)
+                    background: on ? color : undefined,
                     boxShadow: on ? `0 0 0 7px color-mix(in oklab, ${color} 22%, transparent)` : undefined,
                     transform: on ? "scale(1.06)" : undefined,
                   }}

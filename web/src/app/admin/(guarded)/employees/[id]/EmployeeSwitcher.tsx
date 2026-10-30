@@ -107,7 +107,7 @@ export function EmployeeSwitcher({
             setOpen(false);
           }
         }}
-        className="text-table h-10 w-56 rounded-lg bg-(--wash)/60 px-3 placeholder:text-(--ink-muted) focus:bg-(--wash)"
+        className="text-table h-10 w-56 rounded-lg bg-(--wash)/60 px-3 placeholder:text-(--ink-muted) focus:bg-card focus:shadow-(--field-focus) focus:outline-none"
       />
 
       {shown && (

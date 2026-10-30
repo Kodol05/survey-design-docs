@@ -79,7 +79,7 @@ export function PersonFinder({
         onChange={(e) => setQ(e.target.value)}
         placeholder="이름 또는 번호 끝자리"
         aria-label="이름 검색"
-        className="text-table w-full rounded-lg bg-(--wash)/60 px-3 py-2 placeholder:text-(--ink-muted) focus:bg-(--wash) focus:outline-none"
+        className="text-table w-full rounded-lg bg-(--wash)/60 px-3 py-2 placeholder:text-(--ink-muted) focus:bg-card focus:shadow-(--field-focus) focus:outline-none"
       />
 
       <ul className="soft-scroll mt-2 -mr-1 flex max-h-[26rem] flex-col gap-0.5 overflow-y-auto pr-1">

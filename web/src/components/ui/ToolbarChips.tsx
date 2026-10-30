@@ -113,7 +113,7 @@ export function ToolbarSearch({
         defaultValue={defaultValue}
         placeholder={placeholder}
         aria-label={placeholder}
-        className="text-table h-10 w-52 rounded-lg bg-(--wash)/60 px-3 placeholder:text-(--ink-muted) focus:bg-(--wash)"
+        className="text-table h-10 w-52 rounded-lg bg-(--wash)/60 px-3 placeholder:text-(--ink-muted) focus:bg-card focus:shadow-(--field-focus) focus:outline-none"
       />
       {Object.entries(hidden ?? {}).map(([k, v]) =>
         v ? <input key={k} type="hidden" name={k} value={v} /> : null,

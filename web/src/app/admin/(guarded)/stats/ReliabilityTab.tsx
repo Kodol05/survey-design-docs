@@ -113,11 +113,9 @@ export function ReliabilityTab({
                     </tr>
                   </thead>
                   <tbody>
+                    {/* 줄 사이 선 없이 여백만 — 가로선은 머리줄 아래 하나 (2026-10-30, 정안 관리자 표처럼) */}
                     {part.map((r) => (
-                      <tr
-                        key={r.scale}
-                        className="border-b border-(--border) last:border-0"
-                      >
+                      <tr key={r.scale}>
                         <th
                           scope="row"
                           className="py-2 text-left font-normal"

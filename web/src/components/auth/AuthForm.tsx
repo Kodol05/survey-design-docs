@@ -96,7 +96,7 @@ export function Field({
       <input
         name={name}
         type={type}
-        className="text-table h-12 rounded-lg bg-(--wash)/60 px-4 transition-colors placeholder:text-(--ink-muted) focus:bg-(--wash) focus:outline-2 focus:outline-offset-0 focus:outline-(--ink)/30"
+        className="text-table h-12 rounded-lg bg-(--wash)/60 px-4 transition-[background-color,box-shadow] placeholder:text-(--ink-muted) focus:bg-card focus:shadow-(--field-focus) focus:outline-none"
         {...rest}
       />
       {hint && <span className="text-axis text-ink-muted">{hint}</span>}
