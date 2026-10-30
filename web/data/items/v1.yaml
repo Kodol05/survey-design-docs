@@ -68,7 +68,7 @@ items:
     code: NS1-04
     scale: 자극추구
     subscale: 탐색적 흥분
-    content: 익숙한 방법보다 안 해 본 방법에 먼저 눈이 간다.
+    content: 익숙한 방법을 계속 쓰기보다 새로운 방법을 찾아 해 보는 편이다.
     # 2026-08-25 고침. 전 문장은 「회의에서 아무도 꺼내지 않은 방식을 먼저
     # 말해보는 편이다」였는데 **「회의에서 말한다」**가 끼어 있어 새로움
     # 추구가 아니라 **발언 자신감·직급**을 같이 쟀다. 신입은 새로움을
@@ -88,7 +88,7 @@ items:
     code: NS2-02
     scale: 자극추구
     subscale: 충동성
-    content: 일을 시작하기 전에 따져볼 것은 충분히 따져본다.
+    content: 일을 시작하기 전에 세부 사항과 내 상황을 따져 보고 정하는 편이다.
     reverse: true
     sourceRef: 한국판 TCI-RS 심사숙고(양극 반대편) · NS2-01의 반대 방향
     antonymOf: NS2-01
@@ -113,7 +113,7 @@ items:
     code: NS3-01
     scale: 자극추구
     subscale: 무절제
-    content: 갖고 싶은 것이 생기면 형편을 따져 보기 전에 먼저 사게 된다.
+    content: 갖고 싶은 것이 생기면 지금 내 상황은 생각하지 않고 먼저 사는 편이다.
     sourceRef: 한국판 TCI-RS 무절제 facet 정의 · IPIP Extravagance 참고(.60)
     antonymOf: NS3-02
 
@@ -121,7 +121,7 @@ items:
     code: NS3-02
     scale: 자극추구
     subscale: 무절제
-    content: 지출은 미리 정해 둔 범위 안에서 하는 편이다.
+    content: 쓸 돈의 범위를 미리 정해 두고 그 안에서 쓰는 편이다.
     reverse: true
     sourceRef: 한국판 TCI-RS 절제(양극 반대편) · NS3-01의 반대 방향
     antonymOf: NS3-01
@@ -137,7 +137,7 @@ items:
     code: NS3-04
     scale: 자극추구
     subscale: 무절제
-    content: 한번 흥이 오르면 적당한 선에서 멈추기가 어렵다.
+    content: 한번 흥이 오르면 끝까지 가는 편이다.
     sourceRef: 한국판 TCI-RS 무절제 facet 정의
 
   # ── 자유분방 / 질서정연 ──
@@ -153,7 +153,7 @@ items:
     code: NS4-02
     scale: 자극추구
     subscale: 자유분방
-    content: 번거로운 규정이라도 정해진 대로 따른다.
+    content: 번거로운 규정이라도 지키는 것이 중요하다고 생각한다.
     reverse: true
     sourceRef: 한국판 TCI-RS 질서정연(양극 반대편) · NS4-01의 반대 방향
     antonymOf: NS4-01
@@ -199,7 +199,7 @@ items:
     code: HA1-04
     scale: 위험회피
     subscale: 예기불안
-    content: 발표나 보고를 앞두면 며칠 전부터 신경이 쓰인다.
+    content: 발표나 중요한 일을 앞두면 며칠 전부터 계속 신경이 쓰인다.
     sourceRef: 한국판 TCI-RS 예기불안 facet 정의 · 직장 맥락
 
   # ── 불확실성에 대한 두려움 ──
@@ -215,7 +215,7 @@ items:
     code: HA2-02
     scale: 위험회피
     subscale: 불확실성에 대한 두려움
-    content: 결과가 아직 정해지지 않은 일에도 크게 불편함을 느끼지 않는다.
+    content: 어떻게 될지 모르는 일이어도 크게 불편함을 느끼지 않는다.
     reverse: true
     sourceRef: 한국판 TCI-RS 불확실성에 대한 두려움 반대 방향 · HA2-01의 짝
     antonymOf: HA2-01
@@ -224,7 +224,7 @@ items:
     code: HA2-03
     scale: 위험회피
     subscale: 불확실성에 대한 두려움
-    content: 처음 해 보는 방식보다 결과가 검증된 방식을 택한다.
+    content: 처음 해 보는 방식보다 이미 해 봤거나 결과가 검증된 방식을 택한다.
     sourceRef: 한국판 TCI-RS 불확실성에 대한 두려움 facet 정의
 
   - kind: trait
@@ -319,14 +319,14 @@ items:
     code: RD1-03
     scale: 사회적민감성
     subscale: 정서적 감수성
-    content: 안타까운 이야기를 들으면 한동안 마음에 남아 있다.
+    content: 안타까운 이야기를 들으면 계속 생각나고 마음에 남는 편이다.
     sourceRef: 한국판 TCI-RS 정서적 감수성 facet 정의
 
   - kind: trait
     code: RD1-04
     scale: 사회적민감성
     subscale: 정서적 감수성
-    content: 회의 분위기가 가라앉으면 금세 알아차리는 편이다.
+    content: 대화 중에 분위기가 가라앉으면 금세 알아차리는 편이다.
     sourceRef: 한국판 TCI-RS 정서적 감수성 facet 정의 · 직장 맥락
 
   # ── 정서적 개방성 ──
@@ -351,7 +351,7 @@ items:
     code: RD2-03
     scale: 사회적민감성
     subscale: 정서적 개방성
-    content: 처음 만난 사람에게도 따뜻하게 대하는 편이다.
+    content: 처음 만난 사람에게도 친절하고 따뜻하게 대하려는 편이다.
     sourceRef: 한국판 TCI-RS 정서적 개방성 facet 정의 · IPIP Friendliness 참고
 
   - kind: trait
@@ -390,7 +390,7 @@ items:
     code: RD3-04
     scale: 사회적민감성
     subscale: 친밀감
-    content: 오래 알고 지낸 사람들과의 관계를 중요하게 여긴다.
+    content: 주변 사람들과의 관계를 중요하게 여기는 편이다.
     sourceRef: 한국판 TCI-RS 친밀감 facet 정의
 
   # ── 의존 / 독립 ──
@@ -428,7 +428,7 @@ items:
     code: PS1-01
     scale: 인내력
     subscale: 근면
-    content: 해야 할 일은 미루지 않고 바로 착수하는 편이다.
+    content: 해야 할 일은 미루지 않고 바로바로 착수하는 편이다.
     sourceRef: 한국판 TCI-RS 근면 facet 정의 · IPIP Initiative 참고(.64)
     antonymOf: PS1-02
 
@@ -457,7 +457,7 @@ items:
     code: PS1-04
     scale: 인내력
     subscale: 근면
-    content: 쉬는 날에도 할 일이 있으면 미리 해 두는 편이다.
+    content: 쉴 때도 해야 할 일이 있으면 미리 해 두는 편이다.
     sourceRef: 한국판 TCI-RS 근면 facet 정의
 
   # ── 끈기 ──
@@ -465,7 +465,7 @@ items:
     code: PS2-01
     scale: 인내력
     subscale: 끈기
-    content: 잘 안 풀리는 일도 방법을 바꿔가며 계속 붙잡는다.
+    content: 잘 안 풀릴 때도 방법을 바꿔 가며 계속 풀어 보려고 하는 편이다.
     sourceRef: 한국판 TCI-RS 끈기 facet 정의 · IPIP Competence 참고(.56)
     antonymOf: PS2-02
 
@@ -482,14 +482,14 @@ items:
     code: PS2-03
     scale: 인내력
     subscale: 끈기
-    content: 시간이 오래 걸리는 일이라도 끝까지 해내는 편이다.
+    content: 생각보다 시간이 오래 걸리는 일이라도 끝까지 해내는 편이다.
     sourceRef: 한국판 TCI-RS 끈기 facet 정의
 
   - kind: trait
     code: PS2-04
     scale: 인내력
     subscale: 끈기
-    content: 단조로운 일이라도 정해진 분량은 해내는 편이다.
+    content: 단조로운 일이 많아도 정해진 분량은 끝까지 해내는 편이다.
     sourceRef: 한국판 TCI-RS 끈기 facet 정의
 
   # ── 성취에 대한 야망 ──
@@ -497,14 +497,14 @@ items:
     code: PS3-01
     scale: 인내력
     subscale: 성취에 대한 야망
-    content: 한번 정한 목표는 웬만해서는 중간에 포기하지 않는다.
+    content: 한번 정한 목표는 웬만해서는 포기하지 않고 이루려고 하는 편이다.
     sourceRef: 한국판 TCI-RS 성취에 대한 야망 facet 정의 · IPIP Achievement-striving 참고(.68)
 
   - kind: trait
     code: PS3-02
     scale: 인내력
     subscale: 성취에 대한 야망
-    content: 남들보다 더 잘하고 싶다는 마음이 일할 때 큰 힘이 된다.
+    content: 남들보다 더 잘하고 싶다는 마음이 무엇을 하든 큰 힘이 되는 편이다.
     sourceRef: 한국판 TCI-RS 성취에 대한 야망 facet 정의 · 직장 맥락
     antonymOf: PS3-03
 
@@ -529,7 +529,7 @@ items:
     code: PS4-01
     scale: 인내력
     subscale: 완벽주의
-    content: 일을 넘기기 전에 한 번 더 확인하는 편이다.
+    content: 일을 넘기기 전에 여러 번 확실하게 확인하는 편이다.
     sourceRef: 한국판 TCI-RS 완벽주의 facet 정의 · IPIP Hard-working 참고(.65) · 직장 맥락
     antonymOf: PS4-03
 
@@ -537,14 +537,14 @@ items:
     code: PS4-02
     scale: 인내력
     subscale: 완벽주의
-    content: 일을 어중간하게 마무리하는 것을 견디기 어렵다.
+    content: 일을 어중간하게 마무리해 두는 것은 견디기 어렵다.
     sourceRef: 한국판 TCI-RS 완벽주의 facet 정의
 
   - kind: trait
     code: PS4-03
     scale: 인내력
     subscale: 완벽주의
-    content: 어느 정도 됐다 싶으면 더 붙잡지 않고 넘기는 편이다.
+    content: 어느 정도 됐다 싶으면 더 붙잡지 않고 빠르게 넘기는 편이다.
     reverse: true
     sourceRef: 한국판 TCI-RS 완벽주의 반대 방향 · PS4-01의 짝
     antonymOf: PS4-01
@@ -601,7 +601,7 @@ items:
     code: SD2-03
     scale: 자율성
     subscale: 목적의식
-    content: 그날그날 주어진 일을 할 뿐 큰 방향까지는 잘 모르겠다.
+    content: 그날그날 주어진 일 위주로 하고, 큰 방향은 별로 신경 쓰지 않는다.
     reverse: true
     sourceRef: 한국판 TCI-RS 목적의식 반대 방향 · SD2-01의 짝
     antonymOf: SD2-01
@@ -611,7 +611,7 @@ items:
     code: SD3-01
     scale: 자율성
     subscale: 유능감
-    content: 처음 접하는 문제라도 해결할 방법을 찾아내는 편이다.
+    content: 처음 접하는 문제라도 그에 맞는 해결 방법을 찾아내는 편이다.
     sourceRef: 한국판 TCI-RS 유능감 facet 정의 · IPIP Resourcefulness 참고(.73)
     antonymOf: SD3-02
 
@@ -628,7 +628,7 @@ items:
     code: SD3-03
     scale: 자율성
     subscale: 유능감
-    content: 혼자 처리해야 하는 상황에서도 크게 막힘 없이 해 나간다.
+    content: 혼자 해결해야 하는 상황에서도 막힘 없이 판단하며 해 나가는 편이다.
     sourceRef: 한국판 TCI-RS 유능감 facet 정의 · 직장 맥락
 
   # ── 자기수용 / 자기불만 ──
@@ -646,7 +646,7 @@ items:
     code: SD4-02
     scale: 자율성
     subscale: 자기수용
-    content: 스스로 마음에 들지 않는 부분이 자주 마음에 걸린다.
+    content: 스스로 마음에 들지 않는 부분이 자주 마음에 걸리는 편이다.
     reverse: true
     sourceRef: 한국판 TCI-RS 자기불만(양극 반대편) · SD4-01의 짝
     antonymOf: SD4-01
@@ -678,7 +678,7 @@ items:
     code: SD5-03
     scale: 자율성
     subscale: 자기일치
-    content: 당장 하고 싶은 것을 참기 어려울 때가 많다.
+    content: 하고 싶은 일이 생기면 당장 해야 직성이 풀리는 편이다.
     reverse: true
     sourceRef: 한국판 TCI-RS 자기일치 반대 방향 · SD5-02의 짝
     antonymOf: SD5-02
@@ -702,7 +702,7 @@ items:
     code: CO1-02
     scale: 연대감
     subscale: 타인수용
-    content: 일하는 방식이 나와 많이 다른 사람과는 함께 일하기 불편하다.
+    content: 일하는 방식이 나와 많이 다른 사람들과는 일하기 불편하다.
     reverse: true
     sourceRef: 한국판 TCI-RS 타인수용 반대 방향 · CO1-01의 짝
     antonymOf: CO1-01
@@ -719,14 +719,14 @@ items:
     code: CO2-01
     scale: 연대감
     subscale: 공감
-    content: 동료가 어려운 상황에 놓이면 그 사람의 입장에서 생각해 본다.
+    content: 주변 사람이 어려운 상황에 놓이면 그 사람의 입장을 많이 생각하는 편이다.
     sourceRef: 한국판 TCI-RS 공감 facet 정의 · IPIP Empathy 참고(.64) · 직장 맥락
 
   - kind: trait
     code: CO2-02
     scale: 연대감
     subscale: 공감
-    content: 다른 사람의 이야기를 들으면 그 마음이 어느 정도 느껴진다.
+    content: 다른 사람의 이야기를 듣고 나면 그 마음이 이해가 가는 편이다.
     sourceRef: 한국판 TCI-RS 공감 facet 정의
     antonymOf: CO2-03
 
@@ -744,7 +744,7 @@ items:
     code: CO3-01
     scale: 연대감
     subscale: 이타성
-    content: 내 일이 아니더라도 도움이 된다면 손을 보태는 편이다.
+    content: 꼭 내 일이 아니더라도 도움이 된다면 손을 보태는 편이다.
     sourceRef: 한국판 TCI-RS 이타성 facet 정의 · IPIP Trust 참고(.59) · 직장 맥락
     antonymOf: CO3-02
 
@@ -769,7 +769,7 @@ items:
     code: CO4-01
     scale: 연대감
     subscale: 관대함
-    content: 실수한 사람에게 한 번은 다시 기회를 주는 편이다.
+    content: 실수한 사람에게도 다시 기회를 주는 편이다.
     sourceRef: 한국판 TCI-RS 관대함 facet 정의 · IPIP Compassion 참고(.68) · 직장 맥락
     antonymOf: CO4-02
 
@@ -794,7 +794,7 @@ items:
     code: CO5-01
     scale: 연대감
     subscale: 공평
-    content: 친한 사람이라고 해서 예외를 두지는 않는 편이다.
+    content: 친한 사람이어도 예외를 두지 않고 똑같이 대하는 편이다.
     sourceRef: 한국판 TCI-RS 공평 facet 정의 · IPIP Morality 참고(.54) · 직장 맥락
     antonymOf: CO5-03
 
@@ -802,7 +802,7 @@ items:
     code: CO5-02
     scale: 연대감
     subscale: 공평
-    content: 사정이 딱하더라도 규칙에 예외를 두는 것은 망설여진다.
+    content: 규칙에는 예외를 두지 않는 편이다.
     # 2026-08-25 고침. 전 문장은 「규칙은 누구에게나 똑같이 적용해야 한다고
     # 생각한다」였는데 **거의 모두가 동의하는 말**이라 사람이 갈리지 않았다
     # (사회적 바람직성). 실제로 갈리는 자리는 **원칙과 인정이 부딪칠 때**라,
@@ -844,7 +844,7 @@ items:
     code: ST1-02
     scale: 자기초월
     subscale: 창조적 자기망각
-    content: 무슨 일을 하든 시간이 얼마나 지났는지 의식하는 편이다.
+    content: 무슨 일을 하든 시간이 얼마나 지났는지 매번 의식하는 편이다.
     reverse: true
     sourceRef: 한국판 TCI-RS 자의식(양극 반대편) · ST1-01의 짝
     antonymOf: ST1-01
@@ -853,7 +853,7 @@ items:
     code: ST1-03
     scale: 자기초월
     subscale: 창조적 자기망각
-    content: 머릿속으로 여러 장면을 그려 보는 것을 즐긴다.
+    content: 머릿속으로 여러 장면을 떠올려 보는 것을 즐긴다.
     sourceRef: 한국판 TCI-RS 창조적 자기망각 facet 정의 · IPIP Imagination 참고
 
   - kind: trait
@@ -867,7 +867,7 @@ items:
     code: ST1-05
     scale: 자기초월
     subscale: 창조적 자기망각
-    content: 무언가에 깊이 빠져 있을 때가 가장 즐겁다.
+    content: 무언가에 깊이 빠져 몰입하고 있을 때가 가장 즐겁다.
     sourceRef: 한국판 TCI-RS 창조적 자기망각 facet 정의
 
   # ── 우주만물과의 일체감 ──
@@ -922,7 +922,7 @@ items:
     code: ST3-02
     scale: 자기초월
     subscale: 영성 수용
-    content: 확인된 근거가 없으면 잘 받아들이지 않는 편이다.
+    content: 뚜렷한 근거 없이 들려오는 이야기는 잘 믿지 않는 편이다.
     reverse: true
     sourceRef: 한국판 TCI-RS 합리적 유물론(양극 반대편) · ST3-01의 짝
     antonymOf: ST3-01
@@ -983,21 +983,21 @@ items:
     code: AB-COOP-01
     axis: 협력
     direct: true
-    content: 다른 사람과 함께 일할 때 손발을 잘 맞추는 편이다.
+    content: 여러 사람이 함께하는 일에서 내 몫을 제대로 해내는 편이다.
     sourceRef: 07-job-ability.md 직접형
 
   - kind: ability
     code: AB-COOP-02
     axis: 협력
     direct: false
-    content: 내 일의 진행 상황을 함께 일하는 사람들과 자주 공유한다.
+    content: 일정이 늦어질 것 같으면 아직 확실하지 않아도 미리 알리는 편이다.
     sourceRef: 07-job-ability.md 간접형 — 능력이 아니라 행동을 묻는다
 
   - kind: ability
     code: AB-COOP-03
     axis: 협력
     direct: false
-    content: 동료가 일로 곤란해하면 먼저 도울 방법을 찾는다.
+    content: 내 담당이 아니어도 옆 사람의 일이 막히면 같이 살펴보는 편이다.
     sourceRef: 07-job-ability.md 간접형
 
   # 조율 — 의견이 갈릴 때. 협력의 핵심인데 셋일 때 빠져 있었다
@@ -1005,7 +1005,7 @@ items:
     code: AB-COOP-04
     axis: 협력
     direct: false
-    content: 의견이 다를 때 상대의 방식도 받아들여 절충점을 찾는다.
+    content: 의견이 갈릴 때는 다른 사람의 방식에 맞춰 가는 편이다.
     sourceRef: 07-job-ability.md 간접형 — 조율 (2026-08-25 추가)
 
   # 약속 지키기 — 같이 하는 일에서 신뢰의 바탕
@@ -1013,7 +1013,7 @@ items:
     code: AB-COOP-05
     axis: 협력
     direct: false
-    content: 함께 하기로 한 일은 정한 때까지 내 몫을 마친다.
+    content: 함께 하는 일은 늦어지더라도 최대한 빨리 끝내서 넘기려고 한다.
     sourceRef: 07-job-ability.md 간접형 — 약속 (2026-08-25 추가)
 
   # ── 조직생활 ──
@@ -1030,14 +1030,14 @@ items:
     code: AB-ORG-02
     axis: 조직생활
     direct: false
-    content: 회사에 편하게 이야기를 나누는 동료가 여럿 있다.
+    content: 쉬는 시간에 동료들과 편하게 이야기를 나누는 일이 많은 편이다.
     sourceRef: 07-job-ability.md 간접형 — 대인 융화
 
   - kind: ability
     code: AB-ORG-03
     axis: 조직생활
     direct: false
-    content: 지금 회사에서 앞으로도 계속 일하고 싶다.
+    content: 힘든 일이 있어도 잘 넘기고 곧 괜찮아질 거라고 생각하는 편이다.
     sourceRef: 07-job-ability.md 간접형 — 오래 다닌다. 근속 기록과 대조할 수 있는 축
 
   # 회복 — 부딪친 뒤에 어떻게 되는가. 오래 다니는 것의 실제 조건이다
@@ -1045,7 +1045,7 @@ items:
     code: AB-ORG-04
     axis: 조직생활
     direct: false
-    content: 동료와 불편한 일이 있어도 오래 담아 두지 않는다.
+    content: 껄끄러운 일이 있었더라도 얼마 지나면 예전처럼 지낸다.
     sourceRef: 07-job-ability.md 간접형 — 관계 회복 (2026-08-25 추가)
 
   # 조직에 맞추기 — 대인 융화와 다른 축. 「따라온다」가 아니라 「알아본다」로 쓴다
@@ -1053,7 +1053,7 @@ items:
     code: AB-ORG-05
     axis: 조직생활
     direct: false
-    content: 우리 회사에서 일이 돌아가는 방식을 잘 알고 있다.
+    content: 어떤 일이든 일이 진행되는 순서와 방식을 잘 파악하는 편이다.
     sourceRef: 07-job-ability.md 간접형 — 조직 이해 (2026-08-25 추가)
 
   # ── 자율적 실행 ──
@@ -1061,21 +1061,21 @@ items:
     code: AB-AUTO-01
     axis: 자율적실행
     direct: true
-    content: 지시가 없어도 스스로 할 일을 찾아서 하는 편이다.
+    content: 특별한 지시가 없어도 해야 할 일을 스스로 찾아 진행하는 편이다.
     sourceRef: 07-job-ability.md 직접형
 
   - kind: ability
     code: AB-AUTO-02
     axis: 자율적실행
     direct: false
-    content: 방법이 정해져 있지 않으면 스스로 판단해서 진행한다.
+    content: 방법이 애매할 때는 우선 내 판단대로 진행하고 나중에 확인받는다.
     sourceRef: 07-job-ability.md 간접형
 
   - kind: ability
     code: AB-AUTO-03
     axis: 자율적실행
     direct: false
-    content: 맡은 일의 다음 단계를 스스로 정해서 움직인다.
+    content: 맡은 일의 다음 단계를 누가 말해 주지 않아도 스스로 챙긴다.
     sourceRef: 07-job-ability.md 간접형
 
   # 막혔을 때 — 스스로 한다는 것의 진짜 시험대는 잘 풀릴 때가 아니다
@@ -1083,7 +1083,7 @@ items:
     code: AB-AUTO-04
     axis: 자율적실행
     direct: false
-    content: 일이 막히면 도움을 청하기 전에 스스로 방법을 찾아본다.
+    content: 막히면 물어보기 전에 몇 가지 방법을 먼저 시도해 본다.
     sourceRef: 07-job-ability.md 간접형 — 자력 해결 (2026-08-25 추가)
 
   # 마무리 — 시작만 스스로 하고 끝을 안 맺으면 자율적 실행이 아니다
@@ -1091,5 +1091,5 @@ items:
     code: AB-AUTO-05
     axis: 자율적실행
     direct: false
-    content: 시작한 일은 누가 챙기지 않아도 끝까지 마무리한다.
+    content: 시작한 일은 누가 챙기지 않아도 마무리까지 해낸다.
     sourceRef: 07-job-ability.md 간접형 — 완결 (2026-08-25 추가)

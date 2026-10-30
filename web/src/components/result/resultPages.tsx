@@ -163,8 +163,13 @@ export function buildResultBook(
         </p>
       </header>
 
+      {/*
+        구역 사이는 **선 대신 여백으로** 가른다 (2026-10-30 사용자 요청 — 한 장 안에
+        가로선이 여섯 개라 과했다). 구역마다 작은 머리표(특징 · 일하는 방식 …)가
+        시작을 알린다. 장 탭 아래 · 넘김 줄 위 · 기질/성격 사이 선은 남긴다.
+      */}
       {/* 프로필 도형 | 일곱 축 점수표 */}
-      <section className="mt-5 grid items-center gap-x-10 gap-y-6 border-t border-(--border) pt-5 lg:grid-cols-[minmax(0,5fr)_minmax(0,7fr)]">
+      <section className="mt-8 grid items-center gap-x-10 gap-y-6 lg:grid-cols-[minmax(0,5fr)_minmax(0,7fr)]">
         <div className="mx-auto w-full max-w-[21rem]">
           <TraitRadar
             data={traits.map((t) => ({ scale: t.scale, percent: t.percent }))}
@@ -221,7 +226,7 @@ export function buildResultBook(
         척도 이름을 앞에 달지 않는다. 사람마다 자기 구간의 문장 일곱 개가
         척도 순서대로 조합되어, 짧은 소견처럼 읽힌다 (`lines.ts`).
       */}
-      <section className="mt-6 border-t border-(--border) pt-5">
+      <section className="mt-10">
         <p className="eyebrow mb-2">특징</p>
         <p className="text-item max-w-[64rem]">
           {traits.map((t) => LINE[t.scale]?.[t.band]).filter(Boolean).join(" ")}
@@ -230,13 +235,13 @@ export function buildResultBook(
 
       {/* 일하는 방식 · 강점 · 유의할 점 */}
       {standout.length === 0 ? (
-        <p className="text-table text-ink-secondary mt-6 max-w-[54rem] border-t border-(--border) pt-5">
+        <p className="text-table text-ink-secondary mt-10 max-w-[54rem]">
           일곱 척도가 모두 보통 범위입니다. 어느 쪽으로도 크게 기울지 않아
           상황에 따라 양쪽을 고르게 쓰는 편입니다. 척도별 내용은 다음 장에
           있습니다.
         </p>
       ) : (
-        <section className="mt-6 grid gap-x-10 gap-y-7 border-t border-(--border) pt-5 md:grid-cols-3">
+        <section className="mt-10 grid gap-x-10 gap-y-7 md:grid-cols-3">
           {column(
             "일하는 방식",
             notes.map((n) => ({
