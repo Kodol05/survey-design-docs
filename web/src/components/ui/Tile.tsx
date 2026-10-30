@@ -32,10 +32,7 @@ export function Tile({
       <p className="text-axis text-ink-secondary">{label}</p>
       <p className="tabular mt-1 text-4xl font-semibold">{value}</p>
       {hint && (
-        <p className="text-axis text-ink-muted mt-1.5">
-          {hint}
-          {href && <span aria-hidden> →</span>}
-        </p>
+        <p className="text-axis text-ink-muted mt-1.5">{hint}</p>
       )}
     </>
   );

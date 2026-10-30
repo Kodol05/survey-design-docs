@@ -4,7 +4,6 @@ import { Tile } from "@/components/ui/Tile";
 import { Note } from "@/components/ui/Note";
 import { MIN_N } from "@/components/ui/NBadge";
 import { Attendance } from "@/components/charts/Attendance";
-import { ALPHA } from "@/lib/admin/stats";
 import { requireAdmin } from "@/lib/auth/guard";
 import { formatReliability } from "@/components/analysis/reliability";
 import { EXPECTED } from "@/lib/items/types";
@@ -75,46 +74,39 @@ export default async function AdminHome() {
 
         좁은 화면에서는 같은 순서로 위에서 아래로 쌓인다.
       */}
+      {/*
+        이름은 무엇을 센 것인지 바로 읽히게, 숫자 아래 보조 글과 「→」는 뺐다
+        (2026-10-30 사용자 요청). 누르면 그 명단·탭으로 가는 것은 그대로다.
+      */}
       <div className="mb-4 grid grid-cols-2 gap-3 sm:grid-cols-3 xl:grid-cols-6">
         <Tile
-          label="응시 완료"
+          label="설문 응시 완료"
           value={s.completed}
           href="/admin/employees?status=completed"
-          hint={`가입 ${attendance.length}명 중`}
         />
         <Tile
-          label="진행 중"
+          label="설문 진행 중"
           value={s.inProgress}
           href="/admin/employees?status=inprogress"
-          hint={s.inProgress ? "누구인지 보기" : "없음"}
         />
         <Tile
-          label="검토 필요"
+          label="신뢰도 검토 필요"
           value={reviewCount}
           href="/admin/employees?flag=review"
           warn={reviewCount > 0}
-          hint={s.quality.poor ? `그중 낮음 ${s.quality.poor}건` : "누구인지 보기"}
         />
         <Tile
-          label="검사 신뢰도"
+          label="전체 검사 신뢰도"
           // α를 %로 적는다 (2026-10-07 사용자 결정, components/analysis/reliability)
           value={meanAlpha === null ? "—" : formatReliability(meanAlpha)}
           href="/admin/stats?tab=reliability"
           warn={poorScales.length > 0}
-          hint="성향 7축 평균"
         />
         <Tile
-          label="기준 아래 성향 축"
+          label="기준 미달 성향 축"
           value={poorScales.length}
           href="/admin/stats?tab=reliability"
           warn={poorScales.length > 0}
-          hint={
-            poorNames.length === 0
-              ? `모두 ${formatReliability(ALPHA.poor)} 이상`
-              : poorNames.length === 1
-                ? poorNames[0]
-                : `${poorNames[0]} 외 ${poorNames.length - 1}`
-          }
         />
         <Tile
           label="마지막 백업"
@@ -127,7 +119,6 @@ export default async function AdminHome() {
           }
           href="#backup"
           warn={canBackup && backupStale}
-          hint={canBackup ? "하루 1회 자동" : "외부에서 자동 백업"}
         />
       </div>
 
