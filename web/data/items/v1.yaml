@@ -52,7 +52,7 @@ items:
     code: NS1-02
     scale: 자극추구
     subscale: 탐색적 흥분
-    content: 익숙한 방식대로 일할 때 마음이 편하다.
+    content: 새로운 방식을 찾기보다 해 오던 방식대로 하는 쪽이 좋다.
     reverse: true
     sourceRef: 한국판 TCI-RS 관습적 안정성(양극 반대편) · NS1-01의 반대 방향
     antonymOf: NS1-01
@@ -80,7 +80,7 @@ items:
     code: NS2-01
     scale: 자극추구
     subscale: 충동성
-    content: 괜찮아 보이는 일은 깊이 따지기 전에 우선 시작한다.
+    content: 괜찮아 보이는 일은 깊이 따져 보지 않고 바로 시작하는 편이다.
     sourceRef: 한국판 TCI-RS 충동성 facet 정의 · IPIP Recklessness 참고(.60)
     antonymOf: NS2-02
 
@@ -104,7 +104,7 @@ items:
     code: NS2-04
     scale: 자극추구
     subscale: 충동성
-    content: 언짢은 일이 있어도 한 박자 두고 반응한다.
+    content: 기분이 상해도 바로 드러내기보다 한번 가라앉힌 뒤에 말하는 편이다.
     reverse: true
     sourceRef: 한국판 TCI-RS 심사숙고(양극 반대편)
 
@@ -366,7 +366,7 @@ items:
     code: RD3-01
     scale: 사회적민감성
     subscale: 친밀감
-    content: 직장에도 속마음을 나눌 수 있는 사람이 있기를 바란다.
+    content: 함께 일하는 사람과도 일 이야기 말고 사적인 이야기를 나누는 편이 좋다.
     sourceRef: 한국판 TCI-RS 친밀감 facet 정의 · IPIP Self-disclosure 참고(.78)
     antonymOf: RD3-02
 
@@ -374,7 +374,7 @@ items:
     code: RD3-02
     scale: 사회적민감성
     subscale: 친밀감
-    content: 직장 사람과는 업무 이야기만 나누는 편이 편하다.
+    content: 함께 일하는 사람과는 일 이야기만 나누는 편이 편하다.
     reverse: true
     sourceRef: 한국판 TCI-RS 거리두기(양극 반대편) · RD3-01의 짝
     antonymOf: RD3-01
@@ -655,7 +655,7 @@ items:
     code: SD4-03
     scale: 자율성
     subscale: 자기수용
-    content: 다른 사람과 비교해 스스로를 낮춰 보지는 않는다.
+    content: 실수를 해도 나 자신을 크게 탓하지 않는 편이다.
     sourceRef: 한국판 TCI-RS 자기수용 facet 정의
 
   # ── 자기일치 ──
@@ -777,7 +777,7 @@ items:
     code: CO4-02
     scale: 연대감
     subscale: 관대함
-    content: 나를 한 번 서운하게 한 사람은 오래 기억에 남는다.
+    content: 나에게 잘못한 사람에게는 다시 마음을 열기 어렵다.
     reverse: true
     sourceRef: 한국판 TCI-RS 복수심(양극 반대편) · CO4-01의 짝
     antonymOf: CO4-01
@@ -813,7 +813,7 @@ items:
     code: CO5-03
     scale: 연대감
     subscale: 공평
-    content: 아는 사람의 일이면 아무래도 마음이 그쪽으로 기운다.
+    content: 같은 일이라도 사람에 따라 다르게 대할 때가 있다.
     reverse: true
     sourceRef: 한국판 TCI-RS 편파(양극 반대편) · CO5-01의 짝
     antonymOf: CO5-01
@@ -914,7 +914,7 @@ items:
     code: ST3-01
     scale: 자기초월
     subscale: 영성 수용
-    content: 세상에는 아직 설명되지 않은 것이 많다고 생각한다.
+    content: 과학으로는 설명되지 않는 신비로운 힘이 있다고 느낄 때가 있다.
     sourceRef: 한국판 TCI-RS 영성 수용 facet 정의 (IPIP 대응 항목 없음, 00 §2.9.4)
     antonymOf: ST3-02
 
@@ -938,7 +938,7 @@ items:
     code: ST3-04
     scale: 자기초월
     subscale: 영성 수용
-    content: 사람이 알 수 있는 것에는 한계가 있다고 생각한다.
+    content: 직감이나 예감이 맞아떨어진 경험이 종종 있다.
     sourceRef: 한국판 TCI-RS 영성 수용 facet 정의
 
   - kind: trait
@@ -983,7 +983,7 @@ items:
     code: AB-COOP-01
     axis: 협력
     direct: true
-    content: 여러 사람이 함께하는 일에서 내 몫을 제대로 해내는 편이다.
+    content: 여러 사람이 함께하는 일에서 내가 맡은 부분은 끝까지 책임지는 편이다.
     sourceRef: 07-job-ability.md 직접형
 
   - kind: ability
@@ -1023,7 +1023,7 @@ items:
     code: AB-ORG-01
     axis: 조직생활
     direct: true
-    content: 직장 사람들과 두루 원만하게 지내는 편이다.
+    content: 함께 일하는 사람들과 두루 원만하게 지내는 편이다.
     sourceRef: 07-job-ability.md 직접형
 
   - kind: ability
