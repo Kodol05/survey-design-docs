@@ -510,6 +510,11 @@ body:has(.result-stage[data-peek]) {
 .tab-body > :first-child > .admin-card:first-child {
   border-top-left-radius: 0;
 }
+/* 탭에 붙은 첫 카드는 제목 아래 가는 선을 뺀다 (2026-10-30 사용자 요청) — 탭 줄 아래 선과 겹쳐 보였다 */
+.tab-body > .admin-card:first-child > header,
+.tab-body > :first-child > .admin-card:first-child > header {
+  border-bottom-color: transparent;
+}
 
 /*
   가늘고 둥근 스크롤바 (2026-10-30 사용자 요청 — 분석 「개인 검색」 목록).

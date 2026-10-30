@@ -70,7 +70,12 @@ export default async function StatsPage(props: {
         아래 첫 카드에 붙인다. 탭은 위만 둥글고 아래는 각지게, 첫 카드는
         탭이 붙는 왼쪽 위 모서리를 각지게 둔다(\`.tab-body\`).
       */}
-      <nav className="flex flex-wrap items-end gap-1">
+      {/*
+        (같은 날 더) 탭 줄 아래에 **옅은 선 하나**를 깔고, 지금 탭이 그 선을
+        덮어 아래 카드로 이어지게 한다. 나머지 탭은 옅은 바탕을 줘 탭이라는 것이
+        보이게 한다.
+      */}
+      <nav className="flex flex-wrap items-end gap-1 border-b border-(--border)">
         {TABS.map((t) => {
           const on = t.key === tab;
           return (
@@ -79,10 +84,12 @@ export default async function StatsPage(props: {
               href={`/admin/stats?tab=${t.key}`}
               aria-current={on ? "page" : undefined}
               className={`text-table relative rounded-t-xl px-5 transition-colors ${
-                on ? "z-10 -mb-px pt-3 pb-3.5" : "py-2.5 hover:bg-(--wash)/60"
+                on ? "z-10 -mb-px pt-3 pb-3.5" : "py-2.5 hover:bg-(--wash)!"
               }`}
               style={{
-                background: on ? "var(--card)" : undefined,
+                background: on
+                  ? "var(--card)"
+                  : "color-mix(in oklab, var(--wash) 60%, transparent)",
                 color: on ? "var(--ink)" : "var(--ink-secondary)",
                 fontWeight: on ? 600 : 400,
               }}
