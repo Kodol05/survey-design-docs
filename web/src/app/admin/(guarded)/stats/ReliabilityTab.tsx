@@ -51,14 +51,14 @@ export function ReliabilityTab({
   const GROUPS = [
     {
       label: "기질",
-      note: "TCI 4축",
+      note: "4축",
       has: (r: { scale: string; kind: string }) =>
         r.kind === "trait" &&
         (TEMPERAMENT as readonly string[]).includes(r.scale),
     },
     {
       label: "성격",
-      note: "TCI 3축",
+      note: "3축",
       has: (r: { scale: string; kind: string }) =>
         r.kind === "trait" &&
         (CHARACTER as readonly string[]).includes(r.scale),
